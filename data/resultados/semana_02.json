@@ -4,26 +4,16 @@
     {
       "visitante": "Panthers",
       "local": "Falcons",
-      "marcador_visitante": 27,
+      "marcador_visitante": 34,
       "marcador_local": 3,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Panthers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
-      "visitante": "Vikings",
-      "local": "Bears",
-      "marcador_visitante": 6,
-      "marcador_local": 3,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-09-20T17:00:00+00:00"
-    },
-    {
-      "visitante": "Eagles",
-      "local": "Titans",
+      "visitante": "Packers",
+      "local": "Jets",
       "marcador_visitante": 17,
       "marcador_local": 17,
       "ganador": null,
@@ -32,50 +22,20 @@
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
-      "visitante": "Steelers",
-      "local": "Patriots",
-      "marcador_visitante": 3,
-      "marcador_local": 10,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-09-20T17:00:00+00:00"
-    },
-    {
-      "visitante": "Packers",
-      "local": "Jets",
-      "marcador_visitante": 7,
-      "marcador_local": 7,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-09-20T17:00:00+00:00"
-    },
-    {
       "visitante": "Browns",
       "local": "Buccaneers",
-      "marcador_visitante": 9,
-      "marcador_local": 16,
+      "marcador_visitante": 23,
+      "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-09-20T17:00:00+00:00"
-    },
-    {
-      "visitante": "Saints",
-      "local": "Ravens",
-      "marcador_visitante": 9,
-      "marcador_local": 17,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Delayed",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
       "visitante": "Bengals",
       "local": "Texans",
-      "marcador_visitante": 16,
-      "marcador_local": 3,
+      "marcador_visitante": 20,
+      "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -88,7 +48,7 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-09-20T20:05:00+00:00"
     },
     {
@@ -98,8 +58,48 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-09-20T20:05:00+00:00"
+    },
+    {
+      "visitante": "Vikings",
+      "local": "Bears",
+      "marcador_visitante": 9,
+      "marcador_local": 3,
+      "ganador": "Vikings",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T17:00:00+00:00"
+    },
+    {
+      "visitante": "Eagles",
+      "local": "Titans",
+      "marcador_visitante": 24,
+      "marcador_local": 20,
+      "ganador": "Eagles",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T17:00:00+00:00"
+    },
+    {
+      "visitante": "Steelers",
+      "local": "Patriots",
+      "marcador_visitante": 3,
+      "marcador_local": 20,
+      "ganador": "Patriots",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T17:00:00+00:00"
+    },
+    {
+      "visitante": "Saints",
+      "local": "Ravens",
+      "marcador_visitante": 24,
+      "marcador_local": 17,
+      "ganador": "Saints",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
       "visitante": "Washington",
