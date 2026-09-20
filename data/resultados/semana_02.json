@@ -8,7 +8,7 @@
       "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
-      "estado": "Delayed",
+      "estado": "In Progress",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
@@ -18,7 +18,7 @@
       "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-09-20T20:05:00+00:00"
     },
     {
