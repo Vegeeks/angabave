@@ -36,9 +36,9 @@
       "local": "Texans",
       "marcador_visitante": 20,
       "marcador_local": 6,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Bengals",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
