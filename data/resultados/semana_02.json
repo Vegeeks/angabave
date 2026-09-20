@@ -2,16 +2,6 @@
   "semana": 2,
   "partidos": [
     {
-      "visitante": "Washington",
-      "local": "Cowboys",
-      "marcador_visitante": 20,
-      "marcador_local": 37,
-      "ganador": "Cowboys",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-20T20:25:00+00:00"
-    },
-    {
       "visitante": "Panthers",
       "local": "Falcons",
       "marcador_visitante": 34,
@@ -110,6 +100,16 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-20T20:05:00+00:00"
+    },
+    {
+      "visitante": "Washington",
+      "local": "Cowboys",
+      "marcador_visitante": 20,
+      "marcador_local": 37,
+      "ganador": "Cowboys",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
       "visitante": "Seahawks",
