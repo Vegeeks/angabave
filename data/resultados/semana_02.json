@@ -2,43 +2,13 @@
   "semana": 2,
   "partidos": [
     {
-      "visitante": "Raiders",
-      "local": "Chargers",
-      "marcador_visitante": 26,
-      "marcador_local": 14,
-      "ganador": "Raiders",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-20T20:05:00+00:00"
-    },
-    {
       "visitante": "Washington",
       "local": "Cowboys",
       "marcador_visitante": 20,
-      "marcador_local": 30,
+      "marcador_local": 37,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
-      "inicio": "2026-09-20T20:25:00+00:00"
-    },
-    {
-      "visitante": "Seahawks",
-      "local": "Cardinals",
-      "marcador_visitante": 31,
-      "marcador_local": 7,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "End of Period",
-      "inicio": "2026-09-20T20:25:00+00:00"
-    },
-    {
-      "visitante": "Dolphins",
-      "local": "49ers",
-      "marcador_visitante": 13,
-      "marcador_local": 35,
-      "ganador": "49ers",
-      "finalizado": true,
-      "estado": "Final",
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
@@ -130,6 +100,36 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-20T20:05:00+00:00"
+    },
+    {
+      "visitante": "Raiders",
+      "local": "Chargers",
+      "marcador_visitante": 26,
+      "marcador_local": 14,
+      "ganador": "Raiders",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T20:05:00+00:00"
+    },
+    {
+      "visitante": "Seahawks",
+      "local": "Cardinals",
+      "marcador_visitante": 31,
+      "marcador_local": 7,
+      "ganador": "Seahawks",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T20:25:00+00:00"
+    },
+    {
+      "visitante": "Dolphins",
+      "local": "49ers",
+      "marcador_visitante": 13,
+      "marcador_local": 35,
+      "ganador": "49ers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
       "visitante": "Colts",
