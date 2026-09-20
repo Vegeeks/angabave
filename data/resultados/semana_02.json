@@ -8,7 +8,7 @@
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
@@ -108,7 +108,7 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
@@ -118,7 +118,7 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
@@ -128,7 +128,7 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
