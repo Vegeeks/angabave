@@ -25,7 +25,7 @@
       "visitante": "Raiders",
       "local": "Chargers",
       "marcador_visitante": 7,
-      "marcador_local": 0,
+      "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -34,7 +34,7 @@
     {
       "visitante": "Washington",
       "local": "Cowboys",
-      "marcador_visitante": 0,
+      "marcador_visitante": 3,
       "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
