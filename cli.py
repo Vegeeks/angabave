@@ -285,6 +285,15 @@ def comando_escenarios(argumentos) -> int:
     return 0
 
 
+def comando_pendientes(argumentos) -> int:
+    """Cuántos partidos siguen abiertos. Lo usa el workflow para saber si parar."""
+    semana = argumentos.semana or ultima_semana()
+    partidos, _, resultados = _cargar_semana(semana, argumentos.anio, sin_red=True)
+    abiertos = sum(1 for partido in resultados if not partido.finalizado)
+    print(abiertos)
+    return 0
+
+
 def comando_validar(argumentos) -> int:
     semana = argumentos.semana or ultima_semana()
     ruta = ruta_picks(semana)
@@ -324,6 +333,12 @@ def construir_parser() -> argparse.ArgumentParser:
     escenarios_.add_argument("--participante", required=True)
     escenarios_.add_argument("--semana", type=int)
     escenarios_.set_defaults(funcion=comando_escenarios)
+
+    pendientes = subcomandos.add_parser(
+        "pendientes", help="imprime cuántos partidos siguen abiertos"
+    )
+    pendientes.add_argument("--semana", type=int)
+    pendientes.set_defaults(funcion=comando_pendientes)
 
     validar = subcomandos.add_parser("validar", help="solo revisa el Excel, no calcula")
     validar.add_argument("--semana", type=int)

@@ -1,0 +1,94 @@
+name: Directo
+
+# El cron de GitHub no es de fiar: en repos nuevos tarda en activarse y el
+# propio GitHub avisa que retrasa o descarta corridas programadas cuando hay
+# carga. Depender de que dispare 70 veces un domingo es frágil.
+#
+# Este workflow necesita disparar UNA vez por ventana: en cuanto arranca se
+# queda corriendo y recalcula cada dos minutos hasta que cierra el último
+# partido. Si el cron llega tarde, el resto de la tarde ya queda cubierta.
+#
+# CDMX está fija en UTC-6, así que la hora local + 6 da la UTC.
+on:
+  schedule:
+    - cron: "0 17 * * 0"   # domingo 11:00 CDMX
+    - cron: "0 0 * * 5"    # jueves  18:00 CDMX (viernes en UTC)
+    - cron: "0 0 * * 2"    # lunes   18:00 CDMX (martes en UTC)
+  workflow_dispatch:
+    inputs:
+      minutos:
+        description: "Cuántos minutos seguir en directo"
+        required: false
+        default: "300"
+      cada:
+        description: "Segundos entre cada recálculo"
+        required: false
+        default: "120"
+
+# GitHub Pages publica solo, con cada commit a docs/: basta con poder escribir.
+permissions:
+  contents: write
+
+concurrency:
+  group: quiniela-directo
+  cancel-in-progress: false
+
+jobs:
+  directo:
+    runs-on: ubuntu-latest
+    # El tope de un job en GitHub es de 6 horas; nos quedamos debajo.
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Seguir la jornada
+        env:
+          MINUTOS: ${{ inputs.minutos || '300' }}
+          CADA: ${{ inputs.cada || '120' }}
+        run: |
+          git config user.name "Angel Barrera"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          publicar() {
+            git add docs data/resultados
+            if git diff --staged --quiet; then
+              return 1
+            fi
+            git commit -q -m "Directo: $(date -u '+%Y-%m-%d %H:%M UTC')"
+            for intento in 1 2 3; do
+              if git push -q; then return 0; fi
+              git fetch -q origin main
+              git reset -q --soft origin/main
+              git add docs data/resultados
+              git diff --staged --quiet && return 1
+              git commit -q -m "Directo: $(date -u '+%Y-%m-%d %H:%M UTC')"
+            done
+            echo "No pude publicar después de 3 intentos." >&2
+            return 2
+          }
+
+          FIN=$(( $(date -u +%s) + MINUTOS * 60 ))
+          VUELTA=0
+          while [ "$(date -u +%s)" -lt "$FIN" ]; do
+            VUELTA=$(( VUELTA + 1 ))
+            echo "── vuelta $VUELTA · $(date -u '+%H:%M:%S UTC') ──"
+            python cli.py actualizar
+
+            publicar
+            CODIGO=$?
+            [ "$CODIGO" -eq 2 ] && exit 1
+
+            ABIERTOS=$(python cli.py pendientes 2>/dev/null || echo 1)
+            echo "Partidos abiertos: $ABIERTOS"
+            if [ "$ABIERTOS" = "0" ]; then
+              echo "Todo cerrado: se acabó la jornada."
+              break
+            fi
+            sleep "$CADA"
+          done
