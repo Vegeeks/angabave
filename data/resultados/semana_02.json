@@ -25,7 +25,7 @@
       "visitante": "Raiders",
       "local": "Chargers",
       "marcador_visitante": 10,
-      "marcador_local": 7,
+      "marcador_local": 14,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -38,7 +38,7 @@
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
@@ -48,7 +48,7 @@
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
