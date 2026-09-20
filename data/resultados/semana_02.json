@@ -24,7 +24,7 @@
     {
       "visitante": "Raiders",
       "local": "Chargers",
-      "marcador_visitante": 10,
+      "marcador_visitante": 17,
       "marcador_local": 14,
       "ganador": null,
       "finalizado": false,
@@ -55,7 +55,7 @@
       "visitante": "Dolphins",
       "local": "49ers",
       "marcador_visitante": 6,
-      "marcador_local": 21,
+      "marcador_local": 28,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
