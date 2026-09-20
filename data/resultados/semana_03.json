@@ -1,0 +1,165 @@
+{
+  "semana": 3,
+  "partidos": [
+    {
+      "visitante": "Falcons",
+      "local": "Packers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-25T00:15:00+00:00"
+    },
+    {
+      "visitante": "Chargers",
+      "local": "Bills",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Panthers",
+      "local": "Browns",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Jets",
+      "local": "Lions",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Texans",
+      "local": "Colts",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Chiefs",
+      "local": "Dolphins",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Titans",
+      "local": "Giants",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Bengals",
+      "local": "Steelers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Seahawks",
+      "local": "Washington",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Patriots",
+      "local": "Jaguars",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Cardinals",
+      "local": "49ers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T20:05:00+00:00"
+    },
+    {
+      "visitante": "Vikings",
+      "local": "Buccaneers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T20:05:00+00:00"
+    },
+    {
+      "visitante": "Ravens",
+      "local": "Cowboys",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T20:25:00+00:00"
+    },
+    {
+      "visitante": "Raiders",
+      "local": "Saints",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-27T20:25:00+00:00"
+    },
+    {
+      "visitante": "Rams",
+      "local": "Broncos",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-28T00:20:00+00:00"
+    },
+    {
+      "visitante": "Eagles",
+      "local": "Bears",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-09-29T00:15:00+00:00"
+    }
+  ]
+}

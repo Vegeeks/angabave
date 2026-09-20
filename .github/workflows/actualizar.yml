@@ -1,0 +1,78 @@
+name: Actualizar quiniela
+
+# Ciudad de México está fija en UTC-6 todo el año (México eliminó el horario de
+# verano en 2022), así que el ajuste es sumar 6 horas a la hora local:
+#
+#   jueves  18:00-23:59 CDMX  ->  viernes 00:00-05:59 UTC   (cron: día 5)
+#   domingo 11:00-17:59 CDMX  ->  domingo 17:00-23:59 UTC   (cron: día 0)
+#   domingo 18:00-23:59 CDMX  ->  lunes   00:00-05:59 UTC   (cron: día 1)
+#   lunes   18:00-23:59 CDMX  ->  martes  00:00-05:59 UTC   (cron: día 2)
+on:
+  schedule:
+    - cron: "*/15 0-5 * * 5"
+    - cron: "*/15 17-23 * * 0"
+    - cron: "*/15 0-5 * * 1"
+    - cron: "*/15 0-5 * * 2"
+  workflow_dispatch:
+    inputs:
+      semana:
+        description: "Número de semana (vacío = la última con picks)"
+        required: false
+        type: string
+  push:
+    paths:
+      - "data/picks/**"
+      - "data/overrides.json"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Nunca dos corridas a la vez: se pisarían el commit.
+concurrency:
+  group: quiniela
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Calcular tablas y regenerar docs/
+        # Sin "continue-on-error": si esto truena, el workflow se ve en rojo y
+        # no se publica una tabla vieja como si fuera buena.
+        run: |
+          if [ -n "${{ inputs.semana }}" ]; then
+            python cli.py actualizar --semana ${{ inputs.semana }}
+          else
+            python cli.py actualizar
+          fi
+
+      - name: Publicar cambios
+        run: |
+          git config user.name "Angel Barrera"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs data/resultados
+          if git diff --staged --quiet; then
+            echo "Sin cambios que publicar."
+          else
+            git commit -m "Actualiza tablas: $(date -u '+%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - id: despliegue
+        uses: actions/deploy-pages@v4

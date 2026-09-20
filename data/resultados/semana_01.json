@@ -1,0 +1,165 @@
+{
+  "semana": 1,
+  "partidos": [
+    {
+      "visitante": "Patriots",
+      "local": "Seahawks",
+      "marcador_visitante": 10,
+      "marcador_local": 13,
+      "ganador": "Seahawks",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-10T00:20:00+00:00"
+    },
+    {
+      "visitante": "49ers",
+      "local": "Rams",
+      "marcador_visitante": 27,
+      "marcador_local": 7,
+      "ganador": "49ers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-11T00:35:00+00:00"
+    },
+    {
+      "visitante": "Buccaneers",
+      "local": "Bengals",
+      "marcador_visitante": 27,
+      "marcador_local": 33,
+      "ganador": "Bengals",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T17:00:00+00:00"
+    },
+    {
+      "visitante": "Saints",
+      "local": "Lions",
+      "marcador_visitante": 30,
+      "marcador_local": 31,
+      "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T17:00:00+00:00"
+    },
+    {
+      "visitante": "Jets",
+      "local": "Titans",
+      "marcador_visitante": 23,
+      "marcador_local": 10,
+      "ganador": "Jets",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T17:00:00+00:00"
+    },
+    {
+      "visitante": "Ravens",
+      "local": "Colts",
+      "marcador_visitante": 41,
+      "marcador_local": 23,
+      "ganador": "Ravens",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T17:00:00+00:00"
+    },
+    {
+      "visitante": "Falcons",
+      "local": "Steelers",
+      "marcador_visitante": 13,
+      "marcador_local": 20,
+      "ganador": "Steelers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T17:00:00+00:00"
+    },
+    {
+      "visitante": "Bears",
+      "local": "Panthers",
+      "marcador_visitante": 59,
+      "marcador_local": 37,
+      "ganador": "Bears",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T17:00:00+00:00"
+    },
+    {
+      "visitante": "Browns",
+      "local": "Jaguars",
+      "marcador_visitante": 10,
+      "marcador_local": 34,
+      "ganador": "Jaguars",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T17:00:00+00:00"
+    },
+    {
+      "visitante": "Bills",
+      "local": "Texans",
+      "marcador_visitante": 36,
+      "marcador_local": 31,
+      "ganador": "Bills",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T17:00:00+00:00"
+    },
+    {
+      "visitante": "Dolphins",
+      "local": "Raiders",
+      "marcador_visitante": 13,
+      "marcador_local": 27,
+      "ganador": "Raiders",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T20:25:00+00:00"
+    },
+    {
+      "visitante": "Packers",
+      "local": "Vikings",
+      "marcador_visitante": 22,
+      "marcador_local": 39,
+      "ganador": "Vikings",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T20:25:00+00:00"
+    },
+    {
+      "visitante": "Washington",
+      "local": "Eagles",
+      "marcador_visitante": 22,
+      "marcador_local": 24,
+      "ganador": "Eagles",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T20:25:00+00:00"
+    },
+    {
+      "visitante": "Cardinals",
+      "local": "Chargers",
+      "marcador_visitante": 26,
+      "marcador_local": 14,
+      "ganador": "Cardinals",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-13T20:25:00+00:00"
+    },
+    {
+      "visitante": "Cowboys",
+      "local": "Giants",
+      "marcador_visitante": 20,
+      "marcador_local": 28,
+      "ganador": "Giants",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-14T00:20:00+00:00"
+    },
+    {
+      "visitante": "Broncos",
+      "local": "Chiefs",
+      "marcador_visitante": 10,
+      "marcador_local": 31,
+      "ganador": "Chiefs",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-15T00:15:00+00:00"
+    }
+  ]
+}

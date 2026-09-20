@@ -1,0 +1,1125 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="author" content="{{ desarrollador }}">
+<meta name="description" content="{{ marca }} · Quiniela NFL {{ anio }}: tabla general, ganadores por semana, premios y picks de todos los participantes.">
+<meta name="theme-color" content="#080b11">
+<title>{{ marca }} · Quiniela NFL {{ anio }}</title>
+<style>
+:root{
+  --bg:#080b11; --panel:#111823; --panel2:#18212f; --panel3:#1f2a3a;
+  --linea:#222c3b; --linea2:#2f3c50;
+  --txt:#eaf1f9; --tenue:#8e9cb0; --tenue2:#5f6d81;
+  --oro:#f7c948; --oro2:#ffe193; --plata:#cfd9e6; --bronce:#d58f52;
+  --verde:#3ddc84; --rojo:#ff6058; --acento:#5b95ff; --vivo:#ff4757;
+  --radio:18px; --sombra:0 14px 44px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent; min-width:0}
+html{scroll-behavior:smooth; -webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--txt); overflow-x:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px; line-height:1.45; -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(1200px 560px at 10% -14%, rgba(91,149,255,.16), transparent 62%),
+    radial-gradient(1000px 500px at 92% -8%, rgba(247,201,72,.11), transparent 60%);
+  background-attachment:fixed;
+}
+h1,h2,h3{margin:0; font-weight:800; letter-spacing:-.02em}
+button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
+.oculto{display:none !important}
+.env{max-width:1120px; margin:0 auto; padding-inline:clamp(.7rem,3.5vw,1.4rem)}
+
+/* ═══ encabezado ═══ */
+header{
+  position:sticky; top:0; z-index:60;
+  background:rgba(8,11,17,.9); backdrop-filter:blur(16px) saturate(140%);
+  border-bottom:1px solid var(--linea); padding-top:env(safe-area-inset-top);
+}
+.top{display:flex; align-items:center; gap:.6rem; padding-block:.65rem .5rem; flex-wrap:wrap}
+.logo{display:flex; flex-direction:column; gap:.08rem; min-width:0; flex:1 1 auto}
+.logo .marca{
+  font-size:clamp(1.15rem,5.6vw,1.7rem); font-weight:900; line-height:1;
+  letter-spacing:.14em; white-space:nowrap;
+  background:linear-gradient(96deg,#ffe193 0%,#f7c948 38%,#fff 62%,#9fc0ff 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.logo .sub{font-size:.66rem; letter-spacing:.24em; color:var(--tenue2); font-weight:700;
+  text-transform:uppercase; display:flex; align-items:center; gap:.4rem; flex-wrap:wrap}
+.version{font-style:normal; letter-spacing:.08em; font-size:.6rem; color:var(--oro);
+  background:rgba(247,201,72,.1); border:1px solid rgba(247,201,72,.26);
+  padding:.04rem .34rem; border-radius:5px; white-space:nowrap}
+.estado{
+  display:inline-flex; align-items:center; gap:.4rem; flex:0 0 auto; max-width:100%;
+  font-size:.64rem; font-weight:800; text-transform:uppercase; letter-spacing:.09em;
+  padding:.36rem .62rem; border-radius:999px;
+  border:1px solid var(--linea2); color:var(--tenue); background:rgba(255,255,255,.02);
+}
+.estado span:last-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.estado.vivo{color:var(--vivo); border-color:rgba(255,71,87,.45); background:rgba(255,71,87,.09)}
+.estado.esperando{color:var(--oro); border-color:rgba(247,201,72,.42); background:rgba(247,201,72,.08)}
+.punto{width:7px; height:7px; border-radius:50%; background:currentColor; flex:0 0 auto}
+.estado.vivo .punto,.estado.esperando .punto{animation:latir 1.5s ease-in-out infinite}
+@keyframes latir{0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.3; transform:scale(.7)}}
+
+.soy{display:inline-flex; align-items:center; gap:.4rem; flex:0 0 auto; max-width:100%;
+  border:1px solid var(--linea2); border-radius:999px; padding:.22rem .3rem .22rem .62rem;
+  background:rgba(255,255,255,.02)}
+.soy>span{font-size:.6rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--tenue2)}
+.soy select{
+  width:auto; max-width:9.5rem; margin:0; padding:.18rem 1.3rem .18rem .4rem;
+  border:0; background-color:transparent; border-radius:999px;
+  font-size:.76rem; font-weight:700; color:var(--txt); text-overflow:ellipsis;
+  background-position:calc(100% - 11px) 50%,calc(100% - 6px) 50%;
+}
+.soy.puesto{border-color:rgba(91,149,255,.45); background:rgba(91,149,255,.08)}
+.soy.puesto select{color:var(--acento)}
+
+.pastillas button.actual{border-color:rgba(255,71,87,.5)}
+.pastillas button.actual[aria-selected="true"]{
+  background:linear-gradient(180deg,#fff,#ffd3d6); box-shadow:0 4px 18px rgba(255,71,87,.28)}
+.pastillas .ahora{display:inline-block; margin-left:.32rem; width:6px; height:6px; border-radius:50%;
+  background:var(--vivo); animation:latir 1.5s ease-in-out infinite}
+
+.mi-semana{
+  display:flex; align-items:center; gap:.7rem; flex-wrap:wrap;
+  border:1px solid rgba(91,149,255,.35); border-radius:14px; padding:.7rem .85rem;
+  background:linear-gradient(180deg,rgba(91,149,255,.1),var(--panel)); margin-bottom:.85rem;
+  animation:brincar .4s ease both;
+}
+.mi-semana .yo{font-weight:900; font-size:1rem; overflow-wrap:anywhere}
+.mi-semana .rot{font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--acento); font-weight:800}
+.mi-semana .cuentas{display:flex; gap:.9rem; margin-left:auto; flex-wrap:wrap}
+.mi-semana .dato{text-align:right}
+.mi-semana .dato b{display:block; font-size:1.25rem; font-weight:900; line-height:1; font-variant-numeric:tabular-nums}
+.mi-semana .dato span{font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--tenue2)}
+.mi-semana .dato.ok b{color:var(--verde)} .mi-semana .dato.no b{color:var(--rojo)}
+.mi-semana .dato.vivo b{color:var(--oro)}
+
+.juego{border-left:3px solid transparent}
+.juego.mio-ok{border-left-color:var(--verde)}
+.juego.mio-no{border-left-color:var(--rojo)}
+.juego.mio-vivo-ok{border-left-color:rgba(61,220,132,.5)}
+.juego.mio-vivo-no{border-left-color:rgba(255,96,88,.5)}
+.mi-pick{display:flex; align-items:center; gap:.35rem; font-size:.68rem; font-weight:800;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--tenue2); margin-top:.1rem}
+.mi-pick b{color:var(--txt); font-weight:800}
+.juego.mio-ok .mi-pick b,.juego.mio-vivo-ok .mi-pick b{color:var(--verde)}
+.juego.mio-no .mi-pick b,.juego.mio-vivo-no .mi-pick b{color:var(--rojo)}
+tbody tr.yo td{background:rgba(91,149,255,.1)}
+tbody tr.yo .c-nombre{color:var(--acento)}
+table.fija tbody tr.yo td:nth-child(-n+2){background:#17233a}
+
+.menu{position:relative}
+.menu::after{
+  content:""; position:absolute; right:0; top:0; bottom:8px; width:34px; pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(8,11,17,.92));
+}
+.pastillas{display:flex; gap:.35rem; overflow-x:auto; scrollbar-width:none; padding-block:0 .55rem}
+.pastillas::-webkit-scrollbar{display:none}
+.pastillas button{
+  flex:0 0 auto; padding:.42rem .8rem; border-radius:999px; font-size:.82rem; font-weight:700;
+  color:var(--tenue); border:1px solid var(--linea); white-space:nowrap;
+  transition:color .18s,border-color .18s,background .18s;
+}
+.pastillas button:hover{color:var(--txt); border-color:var(--linea2)}
+.pastillas button[aria-selected="true"]{
+  color:#0a1020; background:linear-gradient(180deg,#fff,#c9dcff); border-color:transparent;
+  box-shadow:0 4px 18px rgba(91,149,255,.32);
+}
+.pastillas button.dorada[aria-selected="true"]{
+  background:linear-gradient(180deg,#ffe193,#f7c948); box-shadow:0 4px 18px rgba(247,201,72,.3);
+}
+.pastillas .punto{display:inline-block; margin-left:.32rem; background:var(--oro)}
+
+main{padding-bottom:3.5rem}
+.vista.anima{animation:entrar .34s cubic-bezier(.2,.7,.3,1) both}
+@keyframes entrar{from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none}}
+
+/* ═══ títulos ═══ */
+.titulo{display:flex; align-items:baseline; gap:.5rem; margin:1.5rem .1rem .7rem; flex-wrap:wrap}
+.titulo h2{font-size:.78rem; text-transform:uppercase; letter-spacing:.14em; color:var(--tenue)}
+.titulo .nota{font-size:.76rem; color:var(--tenue2); margin-left:auto}
+
+/* ═══ podio ═══ */
+.podio{display:grid; gap:.6rem; grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.lugar{
+  position:relative; overflow:hidden; border-radius:var(--radio); padding:1.05rem .85rem .95rem;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  border:1px solid var(--linea); text-align:center; box-shadow:var(--sombra);
+  animation:brincar .55s cubic-bezier(.2,.8,.3,1) both; animation-delay:calc(var(--i)*90ms);
+}
+@keyframes brincar{from{opacity:0; transform:translateY(22px) scale(.95)} to{opacity:1; transform:none}}
+.lugar::before{content:""; position:absolute; inset:0 0 auto; height:3px; background:var(--linea2)}
+.lugar.oro{border-color:rgba(247,201,72,.45); box-shadow:0 14px 44px rgba(247,201,72,.1)}
+.lugar.oro::before{background:linear-gradient(90deg,#f7c948,#ffe193,#f7c948)}
+.lugar.plata::before{background:linear-gradient(90deg,#9fb0c6,#e6edf6,#9fb0c6)}
+.lugar.bronce::before{background:linear-gradient(90deg,#b5773f,#e6b183,#b5773f)}
+.lugar.oro::after{
+  content:""; position:absolute; top:0; left:-60%; width:42%; height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.09),transparent);
+  animation:destello 5s ease-in-out infinite 1.2s;
+}
+@keyframes destello{0%{left:-60%} 45%,100%{left:140%}}
+.medalla{
+  width:36px; height:36px; margin:0 auto .45rem; border-radius:50%; display:grid; place-items:center;
+  font-size:.95rem; font-weight:900; color:#0a1020; background:linear-gradient(160deg,#dfe7f2,#93a3b8);
+}
+.oro .medalla{background:linear-gradient(160deg,#ffe193,#e0a92b); box-shadow:0 0 26px rgba(247,201,72,.34)}
+.bronce .medalla{background:linear-gradient(160deg,#e9bb92,#b5773f)}
+.lugar .puntos{font-size:clamp(1.9rem,9vw,2.5rem); font-weight:900; letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums; line-height:1}
+.oro .puntos{color:var(--oro)} .plata .puntos{color:var(--plata)} .bronce .puntos{color:var(--bronce)}
+.lugar .detalle{font-size:.64rem; color:var(--tenue2); margin-top:.2rem; text-transform:uppercase; letter-spacing:.12em}
+.lugar .quien{font-weight:800; font-size:clamp(.95rem,4vw,1.08rem); line-height:1.25; margin-top:.5rem;
+  overflow-wrap:anywhere}
+.lugar .bolsa{margin-top:.5rem; font-size:.84rem; font-weight:800; color:var(--oro);
+  padding:.2rem .5rem; border-radius:8px; background:rgba(247,201,72,.1); display:inline-block}
+.lugar .empatados{margin-top:.5rem; font-size:.76rem; font-weight:700; color:var(--tenue)}
+.lugar .gente{justify-content:center; margin-top:.35rem}
+
+/* ═══ tablas ═══ */
+.marco{border:1px solid var(--linea); border-radius:var(--radio); background:var(--panel); position:relative}
+.rueda{overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:var(--radio)}
+.rueda::-webkit-scrollbar{height:6px}
+.rueda::-webkit-scrollbar-thumb{background:var(--linea2); border-radius:99px}
+table{border-collapse:separate; border-spacing:0; width:100%; font-variant-numeric:tabular-nums}
+th,td{padding:.6rem .5rem; text-align:right; white-space:nowrap; font-size:clamp(.82rem,3.4vw,.94rem)}
+thead th{
+  font-size:.62rem; text-transform:uppercase; letter-spacing:.1em; color:var(--tenue2);
+  border-bottom:1px solid var(--linea); font-weight:800; background:var(--panel);
+  position:sticky; top:0; z-index:3;
+}
+tbody td{border-bottom:1px solid rgba(34,44,59,.65)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{animation:asomar .42s ease both; animation-delay:calc(var(--i)*20ms)}
+@keyframes asomar{from{opacity:0; transform:translateX(-7px)} to{opacity:1; transform:none}}
+.c-pos{width:2.6rem; color:var(--tenue2); font-weight:800; text-align:right}
+.c-nombre{text-align:left; font-weight:700; max-width:0; width:99%; overflow:hidden; text-overflow:ellipsis}
+.pts{font-weight:900; font-size:1.02em; color:var(--verde)}
+.err{color:var(--rojo); opacity:.8}
+.sem{color:var(--tenue2)}
+tr.p1 .c-pos{color:var(--oro)} tr.p2 .c-pos{color:var(--plata)} tr.p3 .c-pos{color:var(--bronce)}
+/* Las dos primeras columnas se quedan fijas al deslizar de lado. */
+table.fija th:nth-child(-n+2),table.fija td:nth-child(-n+2){position:sticky; background:var(--panel); z-index:2}
+table.fija th:nth-child(1),table.fija td:nth-child(1){left:0}
+table.fija th:nth-child(2),table.fija td:nth-child(2){left:2.6rem;
+  box-shadow:1px 0 0 var(--linea)}
+table.fija thead th:nth-child(-n+2){z-index:4}
+tbody tr:hover td{background:var(--panel2)}
+.chip-vivo{
+  display:inline-block; margin-left:.3rem; padding:.02rem .3rem; border-radius:5px;
+  font-size:.62rem; font-weight:900; color:var(--oro); background:rgba(247,201,72,.14);
+  border:1px solid rgba(247,201,72,.3); vertical-align:middle;
+}
+
+/* ═══ pestañas ═══ */
+.tabs{position:relative; margin:.2rem 0 .85rem}
+.tabs-int{display:flex; gap:.25rem; overflow-x:auto; scrollbar-width:none; padding-bottom:.1rem}
+.tabs-int::-webkit-scrollbar{display:none}
+.tabs-int button{
+  flex:0 0 auto; padding:.48rem .78rem; border-radius:11px; font-size:.83rem; font-weight:700;
+  color:var(--tenue); white-space:nowrap; transition:background .18s,color .18s;
+}
+.tabs-int button[aria-selected="true"]{color:var(--txt); background:var(--panel2); box-shadow:inset 0 0 0 1px var(--linea)}
+
+/* ═══ campeón de la semana ═══ */
+.campeon{
+  position:relative; overflow:hidden; border-radius:var(--radio); padding:1.3rem 1rem 1.15rem;
+  text-align:center; border:1px solid var(--linea2); margin-bottom:1rem;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  animation:brincar .5s cubic-bezier(.2,.8,.3,1) both;
+}
+.campeon.oficial{
+  border-color:rgba(247,201,72,.5);
+  background:
+    radial-gradient(120% 90% at 50% -20%, rgba(247,201,72,.17), transparent 62%),
+    linear-gradient(180deg,var(--panel2),var(--panel));
+  box-shadow:0 16px 50px rgba(247,201,72,.12);
+}
+.copa{width:46px; height:46px; margin:0 auto .35rem; display:block}
+.campeon.oficial .copa{animation:palpitar 2.6s ease-in-out infinite; filter:drop-shadow(0 0 14px rgba(247,201,72,.45))}
+@keyframes palpitar{0%,100%{transform:scale(1)} 50%{transform:scale(1.07)}}
+.campeon .rotulo{font-size:.64rem; letter-spacing:.2em; text-transform:uppercase; font-weight:800; color:var(--tenue)}
+.campeon.oficial .rotulo{color:var(--oro)}
+.campeon .nombres{
+  font-size:clamp(1.25rem,6.4vw,2rem); font-weight:900; letter-spacing:-.03em; line-height:1.15;
+  margin:.3rem 0 .1rem; overflow-wrap:anywhere;
+}
+.campeon.oficial .nombres{
+  background:linear-gradient(94deg,#fff,#ffe193 55%,#f7c948);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.campeon .cifra{font-size:.8rem; color:var(--tenue); margin-top:.15rem}
+.campeon .bolsa{
+  display:inline-block; margin-top:.6rem; padding:.34rem .8rem; border-radius:999px;
+  font-weight:900; font-size:1rem; color:var(--oro);
+  background:rgba(247,201,72,.12); border:1px solid rgba(247,201,72,.3);
+}
+.campeon.provisional .bolsa{color:var(--tenue); background:rgba(255,255,255,.04); border-color:var(--linea2)}
+.confetis{position:absolute; inset:0; pointer-events:none; overflow:hidden}
+.confeti{
+  position:absolute; top:-16px; width:7px; height:13px; border-radius:2px; opacity:0;
+  animation:caer var(--d) cubic-bezier(.3,.5,.5,1) forwards;
+}
+@keyframes caer{
+  0%{opacity:0; transform:translate3d(0,-20px,0) rotate(0)}
+  12%{opacity:1}
+  100%{opacity:0; transform:translate3d(var(--x),300px,0) rotate(var(--r))}
+}
+
+/* ═══ premios ═══ */
+.bolsas{display:grid; gap:.6rem; grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.bolsa-card{
+  border:1px solid var(--linea); border-radius:var(--radio); padding:.95rem .9rem;
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  animation:brincar .45s ease both; animation-delay:calc(var(--i)*70ms);
+}
+.bolsa-card .rot{font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--tenue2); font-weight:800}
+.bolsa-card .val{font-size:clamp(1.5rem,7vw,1.9rem); font-weight:900; letter-spacing:-.03em; margin-top:.25rem; color:var(--oro)}
+.bolsa-card .pie{font-size:.74rem; color:var(--tenue2); margin-top:.25rem}
+.bolsa-card.neutra .val{color:var(--txt)}
+.progreso-bolsa{height:6px; border-radius:99px; background:var(--linea); overflow:hidden; margin-top:.6rem}
+.progreso-bolsa i{display:block; height:100%; width:0; border-radius:99px;
+  background:linear-gradient(90deg,var(--oro),#ffe193); transition:width 1s cubic-bezier(.2,.7,.3,1)}
+
+.ganadores{display:grid; gap:.45rem}
+.fila-gan{
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.65rem;
+  padding:.62rem .8rem; border:1px solid var(--linea); border-radius:12px; background:var(--panel);
+  animation:asomar .4s ease both; animation-delay:calc(var(--i)*30ms);
+}
+.fila-gan .sN{font-size:.66rem; font-weight:900; color:var(--tenue2); letter-spacing:.08em;
+  background:var(--panel2); padding:.28rem .45rem; border-radius:7px; min-width:2.5rem; text-align:center}
+.fila-gan .quien{font-weight:800; overflow-wrap:anywhere; line-height:1.25}
+.fila-gan .quien small{display:block; font-weight:600; font-size:.7rem; color:var(--tenue2)}
+.fila-gan .monto{font-weight:900; color:var(--oro); font-size:.92rem; white-space:nowrap}
+.fila-gan.abierta{border-style:dashed}
+.fila-gan.abierta .monto{color:var(--tenue2)}
+
+/* ═══ partidos ═══ */
+.juegos{display:grid; gap:.5rem; grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))}
+.juego{
+  border:1px solid var(--linea); border-radius:14px; background:var(--panel); padding:.7rem .85rem;
+  display:grid; gap:.4rem; animation:brincar .42s ease both; animation-delay:calc(var(--i)*30ms);
+}
+.juego.envivo{border-color:rgba(255,71,87,.38); background:linear-gradient(180deg,rgba(255,71,87,.06),var(--panel))}
+.juego .equipo{display:flex; align-items:center; gap:.5rem; font-size:.95rem}
+.juego .equipo .nom{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--tenue)}
+.juego .equipo.gana .nom{color:var(--txt); font-weight:800}
+.juego .equipo .mrc{font-weight:900; font-variant-numeric:tabular-nums; color:var(--tenue2)}
+.juego .equipo.gana .mrc{color:var(--verde)}
+.juego .pie{display:flex; align-items:center; gap:.4rem; font-size:.66rem; color:var(--tenue2);
+  text-transform:uppercase; letter-spacing:.08em; border-top:1px solid var(--linea); padding-top:.42rem}
+.juego.envivo .pie{color:var(--vivo)}
+
+/* ═══ reparto de picks ═══ */
+.reparto{display:grid; gap:.55rem}
+.balanza{display:flex; height:7px; border-radius:99px; overflow:hidden; background:var(--linea)}
+.balanza i{display:block; height:100%; transition:width .8s cubic-bezier(.2,.7,.3,1)}
+.balanza .iv{background:linear-gradient(90deg,#5b95ff,#8fb6ff)}
+.balanza .il{background:linear-gradient(90deg,#f7c948,#ffe193)}
+.gente{display:flex; flex-wrap:wrap; gap:.28rem}
+.gente span{font-size:.72rem; padding:.14rem .42rem; border-radius:6px;
+  background:var(--panel2); border:1px solid var(--linea); color:var(--tenue); overflow-wrap:anywhere}
+.gente span.ok{color:var(--verde); border-color:rgba(61,220,132,.3)}
+.gente span.no{color:var(--rojo); border-color:rgba(255,96,88,.25); opacity:.68}
+.mini{font-size:.68rem; color:var(--tenue2); text-transform:uppercase; letter-spacing:.08em}
+
+select{
+  width:100%; padding:.62rem .7rem; border-radius:12px; margin-bottom:.8rem;
+  background:var(--panel); color:var(--txt); border:1px solid var(--linea2);
+  font-size:.92rem; appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--tenue) 50%),linear-gradient(135deg,var(--tenue) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;
+  background-size:5px 5px,5px 5px; background-repeat:no-repeat;
+}
+.boleta{display:grid; gap:.38rem}
+.boleta .linea{
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.55rem;
+  padding:.55rem .7rem; border:1px solid var(--linea); border-radius:12px; background:var(--panel);
+  font-size:.88rem; animation:asomar .34s ease both; animation-delay:calc(var(--i)*22ms);
+}
+.boleta .vs{color:var(--tenue); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.boleta .vs b{color:var(--txt)}
+.sello{width:22px; height:22px; border-radius:50%; display:grid; place-items:center;
+  font-size:.7rem; font-weight:900; flex:0 0 auto}
+.sello.ok{background:rgba(61,220,132,.16); color:var(--verde)}
+.sello.no{background:rgba(255,96,88,.13); color:var(--rojo)}
+.sello.esp{background:var(--panel2); color:var(--tenue2)}
+.boleta .linea.acierto{border-color:rgba(61,220,132,.28)}
+.boleta .linea.fallo{opacity:.7}
+
+/* ═══ escenarios ═══ */
+.escena{display:grid; gap:.42rem}
+.candidato{
+  display:grid; grid-template-columns:1.5rem minmax(0,1fr) auto; align-items:center; gap:.55rem;
+  padding:.5rem .7rem; border:1px solid var(--linea); border-radius:12px; background:var(--panel);
+  animation:asomar .38s ease both; animation-delay:calc(var(--i)*35ms);
+}
+.candidato .n{color:var(--tenue2); font-weight:800; font-size:.8rem}
+.candidato .quien{font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.candidato .pct{font-weight:900; font-variant-numeric:tabular-nums; color:var(--oro); font-size:.92rem}
+.progreso{grid-column:2/4; height:6px; border-radius:99px; background:var(--linea); overflow:hidden; margin-top:.15rem}
+.progreso i{display:block; height:100%; width:0; border-radius:99px;
+  background:linear-gradient(90deg,var(--acento),#9dc0ff); transition:width .9s cubic-bezier(.2,.7,.3,1)}
+.candidato.lider .progreso i{background:linear-gradient(90deg,#f7c948,#ffe193)}
+
+.aviso{
+  border:1px dashed var(--linea2); border-radius:var(--radio); padding:1.5rem 1.05rem;
+  text-align:center; color:var(--tenue); font-size:.9rem; background:rgba(17,24,35,.55);
+}
+.aviso strong{display:block; color:var(--txt); font-size:1.02rem; margin-bottom:.35rem}
+
+footer{border-top:1px solid var(--linea); color:var(--tenue2); font-size:.76rem;
+  padding:1.7rem 0 calc(2.6rem + env(safe-area-inset-bottom))}
+footer p{margin:.26rem 0}
+footer .firma{color:var(--tenue); font-weight:700}
+footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); font-size:.8rem}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+  html{scroll-behavior:auto}
+  .confetis{display:none}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="env top">
+    <div class="logo">
+      <span class="marca">{{ marca }}</span>
+      <span class="sub">Quiniela NFL {{ anio }} <i class="version">{{ etapa }} {{ version }}</i></span>
+    </div>
+    <label class="soy" id="soy"><span>Soy</span><select id="quien-soy" aria-label="Elige tu nombre"></select></label>
+    <span class="estado" id="estado"><span class="punto"></span><span id="estado-txt">Temporada</span></span>
+  </div>
+  <div class="env menu">
+    <nav class="pastillas" id="nav" aria-label="Secciones">
+      <button type="button" data-vista="general" aria-selected="true">General</button>
+      <button type="button" data-vista="premios" class="dorada" aria-selected="false">Premios</button>
+      {% for semana in semanas %}
+      <button type="button" data-vista="{{ semana.numero }}" aria-selected="false"
+        class="{% if activa and semana.numero == activa.numero %}actual{% endif %}">
+        S{{ semana.numero }}{% if activa and semana.numero == activa.numero %}<span class="ahora"></span>{% elif semana.estado == "pendiente" %}<span class="punto"></span>{% endif %}
+      </button>
+      {% endfor %}
+    </nav>
+  </div>
+</header>
+
+<main>
+  <!-- La general se escribe en el HTML: se ve aunque el navegador no ejecute nada. -->
+  <section class="vista anima env" id="vista-general">
+    {% if podio_listo %}
+    <div class="titulo">
+      <h2>Podio</h2><span class="nota">Bolsa final {{ premios.total }}</span>
+    </div>
+    <div class="podio">
+      {% for escalon in podio %}
+      <article class="lugar {% if loop.index0 == 0 %}oro{% elif loop.index0 == 1 %}plata{% else %}bronce{% endif %}" style="--i:{{ loop.index0 }}">
+        <div class="medalla">{{ escalon.pos }}</div>
+        <div class="puntos">{{ escalon.total }}</div>
+        <div class="detalle">{% if escalon.total == 1 %}acierto{% else %}aciertos{% endif %}</div>
+        {% if escalon.enlistar %}
+        <div class="quien">{{ escalon.nombres|join(' · ') }}</div>
+        {% else %}
+        <div class="empatados">{{ escalon.cuantos }} empatados</div>
+        {% endif %}
+        {% if escalon.premio %}<div class="bolsa">{{ escalon.premio }}</div>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="titulo">
+      <h2>Podio</h2><span class="nota">aún no</span>
+    </div>
+    <div class="aviso">
+      <strong>El podio se arma con más partidos</strong>
+      Van {{ cerrados_temporada }} de {{ umbral_podio }} partidos cerrados. Con tan pocos juegos
+      casi todos van empatados y un podio no diría nada. Mientras tanto, la tabla de abajo ya cuenta.
+      <div class="progreso-bolsa" style="max-width:280px;margin:.9rem auto 0">
+        <i style="width:{{ (100 * cerrados_temporada / umbral_podio)|round(0, 'floor') }}%"></i>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="titulo">
+      <h2>Tabla general</h2><span class="nota">{{ general|length }} participantes</span>
+    </div>
+    <div class="marco rueda">
+      <table class="fija">
+        <thead>
+          <tr>
+            <th class="c-pos">#</th><th class="c-nombre">Participante</th>
+            <th>Aciertos</th><th>Fallos</th>
+            {% for columna in columnas_semana %}<th>{{ columna }}</th>{% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for fila in general %}
+          <tr class="p{{ fila.pos }}" style="--i:{{ loop.index0 }}">
+            <td class="c-pos">{{ fila.pos }}</td>
+            <td class="c-nombre">{{ participantes[fila.p] }}</td>
+            <td class="pts">{{ fila.total }}</td>
+            <td class="err">{{ fila.err }}</td>
+            {% for columna in columnas_semana %}<td class="sem">{{ fila.sem[columna[1:]] }}</td>{% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="vista oculto env" id="vista-premios"></section>
+  <section class="vista oculto env" id="vista-semana"></section>
+</main>
+
+<footer>
+  <div class="env">
+    <p class="sello-marca">{{ marca }} · {{ etapa }} {{ version }}</p>
+    <p>Primera versión del portal: puede cambiar de una semana a otra.</p>
+    <p>Gana la semana quien tenga más aciertos. Si un partido termina empatado, nadie acierta.</p>
+    <p>Actualizado {{ actualizado }} · horario de Ciudad de México</p>
+    <p class="firma">Desarrollado por {{ desarrollador }}</p>
+  </div>
+</footer>
+
+<script type="application/json" id="datos">{{ datos|safe }}</script>
+<script>
+(() => {
+  "use strict";
+  const D = JSON.parse(document.getElementById("datos").textContent);
+  const vistas = {
+    general: document.getElementById("vista-general"),
+    premios: document.getElementById("vista-premios"),
+    semana: document.getElementById("vista-semana"),
+  };
+  const nav = document.getElementById("nav");
+  const chip = document.getElementById("estado");
+  const chipTxt = document.getElementById("estado-txt");
+  const porSemana = new Map(D.semanas.map((s) => [s.n, s]));
+  const nombre = (i) => D.participantes[i] || "?";
+  const suave = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let pestana = "tabla";
+
+  /* ═══ modo jugador ═══ */
+  const LLAVE = "angabave.jugador";
+  const cajaSoy = document.getElementById("soy");
+  const selectorSoy = document.getElementById("quien-soy");
+  let jugador = null;
+
+  function recordar(valor) {
+    // El almacenamiento puede fallar (ventana privada, permisos): no pasa nada.
+    try {
+      if (valor === null) localStorage.removeItem(LLAVE);
+      else localStorage.setItem(LLAVE, D.participantes[valor]);
+    } catch (e) { /* sin memoria, el modo sigue funcionando en esta visita */ }
+  }
+
+  function recordado() {
+    try {
+      const guardado = localStorage.getItem(LLAVE);
+      if (!guardado) return null;
+      const i = D.participantes.indexOf(guardado);
+      return i >= 0 ? i : null;
+    } catch (e) { return null; }
+  }
+
+  function montarSelector() {
+    selectorSoy.innerHTML = '<option value="">elige tu nombre</option>';
+    D.participantes
+      .map((quien, i) => [i, quien])
+      .sort((a, b) => a[1].localeCompare(b[1], "es"))
+      .forEach(([i, quien]) => {
+        const op = crear("option", null, quien);
+        op.value = String(i);
+        selectorSoy.appendChild(op);
+      });
+    jugador = recordado();
+    selectorSoy.value = jugador === null ? "" : String(jugador);
+    cajaSoy.classList.toggle("puesto", jugador !== null);
+    selectorSoy.addEventListener("change", () => {
+      jugador = selectorSoy.value === "" ? null : Number(selectorSoy.value);
+      recordar(jugador);
+      cajaSoy.classList.toggle("puesto", jugador !== null);
+      repintar();
+    });
+  }
+
+  /* Qué hizo el jugador en un partido: null si no jugó esa semana. */
+  function miPick(s, col) {
+    if (jugador === null) return null;
+    const fila = s.jugadores.indexOf(jugador);
+    if (fila < 0) return null;
+    const local = s.picks[fila][col] === 1;
+    return { lado: local ? "l" : "v", equipo: local ? s.partidos[col].l : s.partidos[col].v };
+  }
+
+  const crear = (tag, clase, texto) => {
+    const n = document.createElement(tag);
+    if (clase) n.className = clase;
+    if (texto !== undefined) n.textContent = texto;
+    return n;
+  };
+  const COPA =
+    '<svg class="copa" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
+    '<path d="M6 4h12v5a6 6 0 0 1-12 0V4Z" fill="#f7c948"/>' +
+    '<path d="M6 5H4a3 3 0 0 0 3 3M18 5h2a3 3 0 0 1-3 3" stroke="#f7c948" stroke-width="1.6" stroke-linecap="round"/>' +
+    '<path d="M12 15v3M9 21h6M10 18h4" stroke="#ffe193" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+  /* ═══ encabezado ═══ */
+  function pintarEstado(vista) {
+    const s = typeof vista === "number" ? porSemana.get(vista) : porSemana.get(D.activa);
+    chip.className = "estado";
+    if (!s) { chipTxt.textContent = "Temporada " + D.anio; return; }
+    if (s.estado === "pendiente") {
+      chip.classList.add("esperando");
+      chipTxt.textContent = "Actualizando la semana " + s.n;
+    } else if (s.estado === "en_vivo") {
+      chip.classList.add("vivo");
+      chipTxt.textContent = s.cerrados + " de " + s.total + " cerrados";
+    } else {
+      chipTxt.textContent = "Semana " + s.n + " cerrada";
+    }
+  }
+
+  /* ═══ confeti ═══ */
+  const COLORES = ["#f7c948", "#ffe193", "#5b95ff", "#3ddc84", "#ffffff", "#ff6058"];
+  function confeti(caja) {
+    if (suave) return;
+    for (let i = 0; i < 46; i++) {
+      const p = crear("i", "confeti");
+      p.style.left = Math.random() * 100 + "%";
+      p.style.background = COLORES[i % COLORES.length];
+      p.style.setProperty("--d", (2.2 + Math.random() * 1.6).toFixed(2) + "s");
+      p.style.setProperty("--x", Math.round(Math.random() * 140 - 70) + "px");
+      p.style.setProperty("--r", Math.round(Math.random() * 720 - 360) + "deg");
+      p.style.animationDelay = (Math.random() * 0.9).toFixed(2) + "s";
+      caja.appendChild(p);
+    }
+  }
+
+  /* ═══ campeón de la semana ═══ */
+  // En lo que va en curso se cuenta; para el ganador oficial sí se nombra,
+  // porque es quien cobra.
+  const MAX_NOMBRES = 3;
+  const MAX_NOMBRES_OFICIAL = 6;
+  const listar = (gente, oficial) =>
+    gente.length <= (oficial ? MAX_NOMBRES_OFICIAL : MAX_NOMBRES)
+      ? gente.join(" · ")
+      : gente.length + " empatados";
+
+  function campeon(s) {
+    if (!s.proyectable) {
+      return aviso("Todavía no hay ganador que mostrar",
+        "Van " + s.cerrados + " de " + s.total + " partidos cerrados. A partir de " +
+        s.umbral + " se puede hablar de quién va ganando la semana.");
+    }
+    const gente = (s.ganadores || []).map(nombre);
+    if (!gente.length) return null;
+    const oficial = !!s.oficial;
+    const caja = crear("div", "campeon " + (oficial ? "oficial" : "provisional"));
+    const lluvia = crear("div", "confetis");
+    caja.appendChild(lluvia);
+    caja.insertAdjacentHTML("beforeend", COPA);
+    caja.appendChild(crear("div", "rotulo", oficial
+      ? (gente.length > 1 ? "Ganadores de la semana " + s.n : "Ganador de la semana " + s.n)
+      : "Va ganando la semana " + s.n));
+
+    caja.appendChild(crear("div", "nombres", listar(gente, oficial)));
+
+    const fila = s.tabla.find((f) => f.pos === 1);
+    const aciertos = fila ? fila.f : 0;
+    caja.appendChild(crear("div", "cifra",
+      aciertos + (aciertos === 1 ? " acierto" : " aciertos") + " de " +
+      s.cerrados + (s.cerrados === 1 ? " partido cerrado" : " partidos cerrados")));
+
+    const bolsa = crear("div", "bolsa");
+    bolsa.textContent = oficial
+      ? s.premio + (gente.length > 1 ? " para cada uno" : "")
+      : s.premio_total + " en juego";
+    caja.appendChild(bolsa);
+
+    if (oficial) requestAnimationFrame(() => confeti(lluvia));
+    return caja;
+  }
+
+  /* ═══ tabla de la semana ═══ */
+  function vivosPorParticipante(s) {
+    const cuenta = new Map();
+    s.jugadores.forEach((idx, fila) => {
+      let n = 0;
+      s.partidos.forEach((p, col) => {
+        if (!p.cerrado && p.vivo && p.g !== null) {
+          if ((p.g === "l") === (s.picks[fila][col] === 1)) n++;
+        }
+      });
+      cuenta.set(idx, n);
+    });
+    return cuenta;
+  }
+
+  function tablaSemana(s) {
+    const marco = crear("div", "marco rueda");
+    const tabla = crear("table");
+    tabla.className = "fija";
+    tabla.innerHTML =
+      '<thead><tr><th class="c-pos">#</th><th class="c-nombre">Participante</th>' +
+      "<th>Aciertos</th><th>Fallos</th></tr></thead>";
+    const cuerpo = crear("tbody");
+    const vivos = vivosPorParticipante(s);
+
+    s.tabla.forEach((fila, i) => {
+      const tr = crear("tr", "p" + fila.pos + (fila.p === jugador ? " yo" : ""));
+      tr.style.setProperty("--i", Math.min(i, 12));
+      tr.appendChild(crear("td", "c-pos", String(fila.pos)));
+      tr.appendChild(crear("td", "c-nombre", nombre(fila.p)));
+      const pts = crear("td", "pts", String(fila.f));
+      const extra = vivos.get(fila.p) || 0;
+      if (extra > 0) {
+        const marca = crear("span", "chip-vivo", "+" + extra);
+        marca.title = "Va ganando " + extra + " partido(s) en curso";
+        pts.appendChild(marca);
+      }
+      tr.appendChild(pts);
+      tr.appendChild(crear("td", "err", String(fila.e)));
+      cuerpo.appendChild(tr);
+    });
+    tabla.appendChild(cuerpo);
+    marco.appendChild(tabla);
+    return marco;
+  }
+
+  /* ═══ partidos ═══ */
+  function panelPartidos(s) {
+    const caja = crear("div", "juegos");
+    s.partidos.forEach((p, i) => {
+      const nodo = crear("article", "juego" + (p.vivo ? " envivo" : ""));
+      nodo.style.setProperty("--i", Math.min(i, 12));
+      [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, equipo, marcador]) => {
+        const linea = crear("div", "equipo" + (p.g === lado ? " gana" : ""));
+        linea.appendChild(crear("span", "nom", equipo));
+        linea.appendChild(crear("span", "mrc", marcador === null ? "—" : String(marcador)));
+        nodo.appendChild(linea);
+      });
+      const pie = crear("div", "pie");
+      if (p.vivo) pie.appendChild(crear("span", "punto"));
+      pie.appendChild(crear("span", null, p.e));
+      nodo.appendChild(pie);
+
+      const mio = miPick(s, i);
+      if (mio) {
+        if (p.g === null) nodo.classList.add("mio-esp");
+        else if (p.cerrado) nodo.classList.add(p.g === mio.lado ? "mio-ok" : "mio-no");
+        else nodo.classList.add(p.g === mio.lado ? "mio-vivo-ok" : "mio-vivo-no");
+        const marca = crear("div", "mi-pick");
+        marca.appendChild(crear("span", null, "Tu pick"));
+        marca.appendChild(crear("b", null, mio.equipo));
+        if (p.cerrado) marca.appendChild(crear("span", null, p.g === "x" ? "· empate" : (p.g === mio.lado ? "· acierto" : "· fallo")));
+        else if (p.g !== null) marca.appendChild(crear("span", null, p.g === mio.lado ? "· vas ganando" : "· vas perdiendo"));
+        nodo.appendChild(marca);
+      }
+      caja.appendChild(nodo);
+    });
+    return caja;
+  }
+
+  /* ═══ quién le fue a quién ═══ */
+  function panelReparto(s) {
+    const envoltura = crear("div");
+    const lista = crear("select");
+    lista.innerHTML = '<option value="">Reparto de cada partido</option>';
+    s.jugadores
+      .map((idx) => [idx, nombre(idx)])
+      .sort((a, b) => a[1].localeCompare(b[1], "es"))
+      .forEach(([idx, quien]) => {
+        const op = crear("option", null, quien);
+        op.value = String(idx);
+        lista.appendChild(op);
+      });
+    if (jugador !== null && s.jugadores.indexOf(jugador) >= 0) lista.value = String(jugador);
+    envoltura.appendChild(lista);
+
+    const destino = crear("div");
+    envoltura.appendChild(destino);
+    const pintar = () => {
+      destino.textContent = "";
+      destino.appendChild(lista.value === "" ? repartoPorPartido(s) : boleta(s, Number(lista.value)));
+    };
+    lista.addEventListener("change", pintar);
+    pintar();
+    return envoltura;
+  }
+
+  function repartoPorPartido(s) {
+    const caja = crear("div", "reparto");
+    s.partidos.forEach((p, col) => {
+      const visita = [], casa = [];
+      s.jugadores.forEach((idx, fila) => { (s.picks[fila][col] === 1 ? casa : visita).push(idx); });
+      const total = visita.length + casa.length || 1;
+
+      const nodo = crear("article", "juego" + (p.vivo ? " envivo" : ""));
+      nodo.style.setProperty("--i", Math.min(col, 12));
+      const cabeza = crear("div", "equipo");
+      cabeza.appendChild(crear("span", "nom", p.v + "  @  " + p.l));
+      cabeza.appendChild(crear("span", "mrc", p.mv === null ? p.e : p.mv + "–" + p.ml));
+      nodo.appendChild(cabeza);
+
+      const balanza = crear("div", "balanza");
+      const iv = crear("i", "iv"), il = crear("i", "il");
+      balanza.appendChild(iv); balanza.appendChild(il);
+      nodo.appendChild(balanza);
+      requestAnimationFrame(() => {
+        iv.style.width = (visita.length / total) * 100 + "%";
+        il.style.width = (casa.length / total) * 100 + "%";
+      });
+
+      [[p.v, visita, "v"], [p.l, casa, "l"]].forEach(([equipo, quienes, lado]) => {
+        nodo.appendChild(crear("div", "mini", equipo + " · " + quienes.length));
+        const fila = crear("div", "gente");
+        quienes.map(nombre).sort((a, b) => a.localeCompare(b, "es")).forEach((quien) => {
+          fila.appendChild(crear("span", p.cerrado ? (p.g === lado ? "ok" : "no") : null, quien));
+        });
+        nodo.appendChild(fila);
+      });
+      caja.appendChild(nodo);
+    });
+    return caja;
+  }
+
+  function boleta(s, idx) {
+    const fila = s.jugadores.indexOf(idx);
+    const caja = crear("div", "boleta");
+    if (fila < 0) return caja;
+    s.partidos.forEach((p, col) => {
+      const local = s.picks[fila][col] === 1;
+      const lado = local ? "l" : "v";
+      let clase = "", sello = "esp", simbolo = "·";
+      if (p.cerrado) {
+        if (p.g === "x") { clase = " fallo"; sello = "no"; simbolo = "="; }
+        else if (p.g === lado) { clase = " acierto"; sello = "ok"; simbolo = "✓"; }
+        else { clase = " fallo"; sello = "no"; simbolo = "✗"; }
+      }
+      const linea = crear("div", "linea" + clase);
+      linea.style.setProperty("--i", Math.min(col, 12));
+      linea.appendChild(crear("span", "sello " + sello, simbolo));
+      const texto = crear("span", "vs");
+      texto.appendChild(local ? crear("span", null, p.v) : crear("b", null, p.v));
+      texto.appendChild(document.createTextNode(" @ "));
+      texto.appendChild(local ? crear("b", null, p.l) : crear("span", null, p.l));
+      linea.appendChild(texto);
+      linea.appendChild(crear("span", "mini", p.mv === null ? p.e : p.mv + "–" + p.ml));
+      caja.appendChild(linea);
+    });
+    return caja;
+  }
+
+  /* ═══ escenarios ═══ */
+  function panelEscenarios(s) {
+    const total = s.combinaciones || 0;
+    const filas = Object.entries(s.panorama || {})
+      .map(([idx, [solo, empata]]) => ({ idx: Number(idx), suma: solo + empata }))
+      .sort((a, b) => b.suma - a.suma || nombre(a.idx).localeCompare(nombre(b.idx), "es"));
+    if (!total || !filas.length) {
+      return aviso("Sin escenarios que calcular", "La semana ya cerró: el primer lugar está definido.");
+    }
+    const envoltura = crear("div");
+    const intro = crear("p", "mini");
+    intro.style.margin = "0 .1rem .7rem";
+    intro.textContent = "Faltan " + (s.total - s.cerrados) + " partidos: " +
+      total.toLocaleString("es-MX") + " combinaciones. Quién termina primero en cuántas.";
+    envoltura.appendChild(intro);
+
+    const caja = crear("div", "escena");
+    const tope = filas[0].suma || 1;
+    filas.slice(0, 12).forEach((f, i) => {
+      const nodo = crear("div", "candidato" + (i === 0 ? " lider" : ""));
+      nodo.style.setProperty("--i", Math.min(i, 12));
+      nodo.appendChild(crear("span", "n", String(i + 1)));
+      nodo.appendChild(crear("span", "quien", nombre(f.idx)));
+      nodo.appendChild(crear("span", "pct", ((f.suma / total) * 100).toFixed(1) + "%"));
+      const barra = crear("div", "progreso");
+      const relleno = crear("i");
+      barra.appendChild(relleno);
+      nodo.appendChild(barra);
+      caja.appendChild(nodo);
+      requestAnimationFrame(() => { relleno.style.width = (f.suma / tope) * 100 + "%"; });
+    });
+    envoltura.appendChild(caja);
+    return envoltura;
+  }
+
+  function miSemana(s) {
+    if (jugador === null || s.jugadores.indexOf(jugador) < 0) return null;
+    let ok = 0, mal = 0, ganando = 0, faltan = 0;
+    s.partidos.forEach((p, col) => {
+      const mio = miPick(s, col);
+      if (!mio) return;
+      if (p.cerrado) { if (p.g === mio.lado) ok++; else mal++; }
+      else if (p.g === mio.lado) { ganando++; faltan++; }
+      else faltan++;
+    });
+
+    const caja = crear("div", "mi-semana");
+    const quien = crear("div");
+    quien.appendChild(crear("div", "rot", "Tu semana"));
+    quien.appendChild(crear("div", "yo", nombre(jugador)));
+    caja.appendChild(quien);
+
+    const cuentas = crear("div", "cuentas");
+    [["ok", ok, ok === 1 ? "acierto" : "aciertos"],
+     ["no", mal, mal === 1 ? "fallo" : "fallos"],
+     ["vivo", ganando, "ganando"],
+     ["", faltan, "por jugar"]]
+      .forEach(([clase, valor, etiqueta]) => {
+        const dato = crear("div", "dato" + (clase ? " " + clase : ""));
+        dato.appendChild(crear("b", null, String(valor)));
+        dato.appendChild(crear("span", null, etiqueta));
+        cuentas.appendChild(dato);
+      });
+    caja.appendChild(cuentas);
+    return caja;
+  }
+
+  function aviso(titulo, texto) {
+    const n = crear("div", "aviso");
+    n.appendChild(crear("strong", null, titulo));
+    n.appendChild(document.createTextNode(texto));
+    return n;
+  }
+
+  /* ═══ premios ═══ */
+  function pintarPremios() {
+    const P = D.premios;
+    const raiz = vistas.premios;
+    raiz.textContent = "";
+
+    const t1 = crear("div", "titulo");
+    t1.appendChild(crear("h2", null, "La bolsa"));
+    raiz.appendChild(t1);
+
+    const bolsas = crear("div", "bolsas");
+    [
+      ["Premio semanal", P.semanal, "solo para el 1er lugar de la semana", false],
+      ["Acumulado semanal", P.acumulado_semanal, "se aparta cada semana", true],
+      ["Bolsa final", P.total, "al terminar las " + P.semanas_temporada + " semanas", false],
+    ].forEach(([rot, val, pie, neutra], i) => {
+      const c = crear("div", "bolsa-card" + (neutra ? " neutra" : ""));
+      c.style.setProperty("--i", i);
+      c.appendChild(crear("div", "rot", rot));
+      c.appendChild(crear("div", "val", val));
+      c.appendChild(crear("div", "pie", pie));
+      if (i === 2) {
+        const barra = crear("div", "progreso-bolsa");
+        const relleno = crear("i");
+        barra.appendChild(relleno);
+        c.appendChild(barra);
+        c.appendChild(crear("div", "pie",
+          "Van " + P.apartado + " de " + P.semanas_jugadas + " semana(s) jugada(s)"));
+        requestAnimationFrame(() => {
+          relleno.style.width = (P.semanas_jugadas / P.semanas_temporada) * 100 + "%";
+        });
+      }
+      bolsas.appendChild(c);
+    });
+    raiz.appendChild(bolsas);
+
+    const t2 = crear("div", "titulo");
+    t2.appendChild(crear("h2", null, "Reparto final"));
+    t2.appendChild(crear("span", "nota", "al cerrar la temporada"));
+    raiz.appendChild(t2);
+
+    const reglas = crear("div", "ganadores");
+    P.reglas.forEach((r, i) => {
+      const fila = crear("div", "fila-gan");
+      fila.style.setProperty("--i", i);
+      fila.appendChild(crear("span", "sN", r.lugar));
+      const quien = crear("div", "quien", r.porcentaje + " de la bolsa final");
+      quien.appendChild(crear("small", null, P.temporada_cerrada ? "" : "se define al terminar la temporada"));
+      fila.appendChild(quien);
+      fila.appendChild(crear("span", "monto", r.monto));
+      reglas.appendChild(fila);
+    });
+    raiz.appendChild(reglas);
+
+    if (!P.reparto.length) {
+      const nota = crear("p", "mini");
+      nota.style.margin = ".7rem .1rem 0";
+      nota.style.lineHeight = "1.6";
+      nota.textContent = "La bolsa final se entrega hasta que terminen las " +
+        P.semanas_temporada + " semanas. Van " + P.semanas_jugadas + ". " +
+        "Cuando varios empatan se suman los porcentajes de los lugares que ocupan " +
+        "y se divide en partes iguales.";
+      raiz.appendChild(nota);
+    } else {
+      const caja = crear("div", "ganadores");
+      caja.style.marginTop = ".7rem";
+      P.reparto.forEach((r, i) => {
+        const fila = crear("div", "fila-gan");
+        fila.style.setProperty("--i", i);
+        fila.appendChild(crear("span", "sN", r.pos + "º"));
+        const quien = crear("div", "quien", r.nombre);
+        quien.appendChild(crear("small", null, r.aciertos + " aciertos · " + r.porcentaje + " de la bolsa"));
+        fila.appendChild(quien);
+        fila.appendChild(crear("span", "monto", r.premio));
+        caja.appendChild(fila);
+      });
+      raiz.appendChild(caja);
+      const pie = crear("p", "mini");
+      pie.style.margin = ".7rem .1rem 0";
+      pie.style.lineHeight = "1.6";
+      pie.textContent = "Temporada cerrada. Cuando varios empatan se suman los porcentajes " +
+        "de los lugares que ocupan y se divide en partes iguales.";
+      raiz.appendChild(pie);
+    }
+
+    const t3 = crear("div", "titulo");
+    t3.appendChild(crear("h2", null, "Ganadores por semana"));
+    t3.appendChild(crear("span", "nota", P.semanal + " al 1er lugar"));
+    raiz.appendChild(t3);
+
+    const lista = crear("div", "ganadores");
+    const jugadas = D.semanas.filter((s) => s.estado !== "pendiente");
+    if (!jugadas.length) {
+      raiz.appendChild(aviso("Aún no hay semanas jugadas", "Aquí aparece el ganador de cada una."));
+      return;
+    }
+    jugadas.slice().reverse().forEach((s, i) => {
+      const gente = (s.ganadores || []).map(nombre);
+      const fila = crear("div", "fila-gan" + (s.oficial ? "" : " abierta"));
+      fila.style.setProperty("--i", i);
+      fila.appendChild(crear("span", "sN", "S" + s.n));
+
+      if (!s.proyectable) {
+        const quien = crear("div", "quien", "En curso");
+        quien.appendChild(crear("small", null,
+          s.cerrados + " de " + s.total + " cerrados · aún no se proyecta"));
+        fila.appendChild(quien);
+        fila.appendChild(crear("span", "monto", "—"));
+        lista.appendChild(fila);
+        return;
+      }
+
+      const quien = crear("div", "quien", !gente.length ? "—" : listar(gente, s.oficial));
+      quien.appendChild(crear("small", null, s.oficial
+        ? "semana cerrada"
+        : "va ganando · " + s.cerrados + " de " + s.total + " cerrados"));
+      fila.appendChild(quien);
+      fila.appendChild(crear("span", "monto",
+        s.oficial ? (s.premio + (gente.length > 1 ? " c/u" : "")) : "en juego"));
+      lista.appendChild(fila);
+    });
+    raiz.appendChild(lista);
+  }
+
+  /* ═══ vista de una semana ═══ */
+  const PESTANAS = [
+    ["tabla", "Tabla"],
+    ["partidos", "Partidos"],
+    ["picks", "Quién le fue a quién"],
+    ["escenarios", "Escenarios"],
+  ];
+
+  function pintarSemana(n) {
+    const s = porSemana.get(n);
+    const raiz = vistas.semana;
+    raiz.textContent = "";
+    if (!s) return;
+
+    const titulo = crear("div", "titulo");
+    titulo.appendChild(crear("h2", null, "Semana " + s.n));
+    titulo.appendChild(crear("span", "nota", s.estado === "pendiente"
+      ? "Picks por cargar"
+      : s.cerrados + " de " + s.total + " partidos cerrados"));
+    raiz.appendChild(titulo);
+
+    if (s.estado === "pendiente") {
+      raiz.appendChild(aviso("Actualizando la semana " + s.n,
+        "Estos son los partidos programados. En cuanto se cargue el compilado aparecen los picks, la tabla y el ganador."));
+      raiz.appendChild(panelPartidos(s));
+      return;
+      return;
+    }
+
+    const hero = campeon(s);
+    if (hero) raiz.appendChild(hero);
+    const resumen = miSemana(s);
+    if (resumen) raiz.appendChild(resumen);
+
+    const disponibles = PESTANAS.filter(([clave]) =>
+      clave !== "escenarios" || (s.cerrados < s.total && Object.keys(s.panorama || {}).length > 0));
+    if (!disponibles.some(([clave]) => clave === pestana)) pestana = disponibles[0][0];
+
+    const tabs = crear("div", "tabs");
+    const interior = crear("div", "tabs-int");
+    disponibles.forEach(([clave, etiqueta]) => {
+      const boton = crear("button", null, etiqueta);
+      boton.type = "button";
+      boton.setAttribute("aria-selected", String(clave === pestana));
+      boton.addEventListener("click", () => { pestana = clave; pintarSemana(n); });
+      interior.appendChild(boton);
+    });
+    tabs.appendChild(interior);
+    raiz.appendChild(tabs);
+
+    if (pestana === "tabla") raiz.appendChild(tablaSemana(s));
+    else if (pestana === "partidos") raiz.appendChild(panelPartidos(s));
+    else if (pestana === "picks") raiz.appendChild(panelReparto(s));
+    else raiz.appendChild(panelEscenarios(s));
+  }
+
+  /* ═══ navegación ═══ */
+  function ir(vista, empujar) {
+    vistaActual = vista;
+    const cual = vista === "general" ? "general" : vista === "premios" ? "premios" : "semana";
+    Object.entries(vistas).forEach(([clave, nodo]) => nodo.classList.toggle("oculto", clave !== cual));
+    if (cual === "semana") pintarSemana(Number(vista));
+    if (cual === "premios") pintarPremios();
+
+    const nodo = vistas[cual];
+    nodo.classList.remove("anima");
+    void nodo.offsetWidth;
+    nodo.classList.add("anima");
+
+    nav.querySelectorAll("button").forEach((b) =>
+      b.setAttribute("aria-selected", String(b.dataset.vista === String(vista))));
+    pintarEstado(cual === "semana" ? Number(vista) : cual);
+
+    const destino = cual === "general" ? "#" : cual === "premios" ? "#premios" : "#s" + vista;
+    if (empujar && location.hash !== destino) history.replaceState(null, "", destino);
+    const activo = nav.querySelector('[aria-selected="true"]');
+    if (activo) activo.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
+  }
+
+  let vistaActual = "general";
+  function repintar() {
+    ir(vistaActual, false);
+  }
+
+  nav.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (b) { window.scrollTo({ top: 0, behavior: "smooth" }); ir(b.dataset.vista, true); }
+  });
+
+  montarSelector();
+
+  // Sin enlace directo, se entra por la semana en curso: es lo que importa hoy.
+  const hash = location.hash;
+  const m = hash.match(/^#s(\d+)$/);
+  const inicio = m && porSemana.has(Number(m[1])) ? Number(m[1])
+    : hash === "#premios" ? "premios"
+    : hash === "#general" ? "general"
+    : D.activa !== null && porSemana.has(D.activa) ? D.activa
+    : "general";
+  ir(inicio, false);
+
+  /* Mientras haya partidos abiertos la página se refresca sola. */
+  if (D.recarga > 0) setTimeout(() => location.reload(), D.recarga * 1000);
+})();
+</script>
+</body>
+</html>

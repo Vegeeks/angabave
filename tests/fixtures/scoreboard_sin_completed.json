@@ -1,0 +1,21 @@
+{
+  "events": [
+    {
+      "id": "401772801",
+      "date": "2026-09-17T00:15Z",
+      "status": {"type": {"name": "STATUS_FINAL", "state": "post", "description": "Final"}},
+      "competitions": [
+        {
+          "id": "401772801",
+          "competitors": [
+            {"homeAway": "home", "score": "41",
+             "team": {"id": "2", "abbreviation": "BUF"}},
+            {"homeAway": "away", "score": "31",
+             "team": {"id": "8", "abbreviation": "DET"}}
+          ],
+          "status": {"type": {"name": "STATUS_FINAL", "state": "post", "description": "Final"}}
+        }
+      ]
+    }
+  ]
+}

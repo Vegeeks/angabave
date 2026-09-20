@@ -1,0 +1,13 @@
+{
+  "events": [
+    {
+      "id": "401772801",
+      "date": "2026-09-17T00:15Z",
+      "status": {"type": {"name": "STATUS_FINAL", "state": "post", "completed": true,
+                          "description": "Final"}},
+      "competitions": [
+        {"id": "401772801", "venue": {"fullName": "Highmark Stadium"}}
+      ]
+    }
+  ]
+}

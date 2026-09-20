@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+# Archivos temporales que Excel deja al lado del original.
+~$*.xlsx
+.DS_Store
