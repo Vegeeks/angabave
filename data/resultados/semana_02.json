@@ -105,7 +105,7 @@
       "visitante": "Washington",
       "local": "Cowboys",
       "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -114,7 +114,7 @@
     {
       "visitante": "Seahawks",
       "local": "Cardinals",
-      "marcador_visitante": 0,
+      "marcador_visitante": 7,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
