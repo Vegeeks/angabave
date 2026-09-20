@@ -2,16 +2,6 @@
   "semana": 2,
   "partidos": [
     {
-      "visitante": "Browns",
-      "local": "Buccaneers",
-      "marcador_visitante": 23,
-      "marcador_local": 19,
-      "ganador": "Browns",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-20T17:00:00+00:00"
-    },
-    {
       "visitante": "Jaguars",
       "local": "Broncos",
       "marcador_visitante": 13,
@@ -55,7 +45,7 @@
       "visitante": "Dolphins",
       "local": "49ers",
       "marcador_visitante": 6,
-      "marcador_local": 28,
+      "marcador_local": 35,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -107,6 +97,16 @@
       "marcador_visitante": 20,
       "marcador_local": 17,
       "ganador": "Packers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T17:00:00+00:00"
+    },
+    {
+      "visitante": "Browns",
+      "local": "Buccaneers",
+      "marcador_visitante": 23,
+      "marcador_local": 19,
+      "ganador": "Browns",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-20T17:00:00+00:00"
