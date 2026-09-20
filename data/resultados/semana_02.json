@@ -2,19 +2,9 @@
   "semana": 2,
   "partidos": [
     {
-      "visitante": "Jaguars",
-      "local": "Broncos",
-      "marcador_visitante": 13,
-      "marcador_local": 20,
-      "ganador": "Broncos",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-20T20:05:00+00:00"
-    },
-    {
       "visitante": "Raiders",
       "local": "Chargers",
-      "marcador_visitante": 24,
+      "marcador_visitante": 26,
       "marcador_local": 14,
       "ganador": null,
       "finalizado": false,
@@ -44,7 +34,7 @@
     {
       "visitante": "Dolphins",
       "local": "49ers",
-      "marcador_visitante": 6,
+      "marcador_visitante": 13,
       "marcador_local": 35,
       "ganador": null,
       "finalizado": false,
@@ -130,6 +120,16 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-20T17:00:00+00:00"
+    },
+    {
+      "visitante": "Jaguars",
+      "local": "Broncos",
+      "marcador_visitante": 13,
+      "marcador_local": 20,
+      "ganador": "Broncos",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T20:05:00+00:00"
     },
     {
       "visitante": "Colts",
