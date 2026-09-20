@@ -2,16 +2,6 @@
   "semana": 2,
   "partidos": [
     {
-      "visitante": "Packers",
-      "local": "Jets",
-      "marcador_visitante": 20,
-      "marcador_local": 17,
-      "ganador": "Packers",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-20T17:00:00+00:00"
-    },
-    {
       "visitante": "Browns",
       "local": "Buccaneers",
       "marcador_visitante": 23,
@@ -68,7 +58,7 @@
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
@@ -107,6 +97,16 @@
       "marcador_visitante": 3,
       "marcador_local": 20,
       "ganador": "Patriots",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T17:00:00+00:00"
+    },
+    {
+      "visitante": "Packers",
+      "local": "Jets",
+      "marcador_visitante": 20,
+      "marcador_local": 17,
+      "ganador": "Packers",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-20T17:00:00+00:00"
