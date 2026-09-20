@@ -38,13 +38,13 @@
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
       "visitante": "Seahawks",
       "local": "Cardinals",
-      "marcador_visitante": 7,
+      "marcador_visitante": 14,
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
