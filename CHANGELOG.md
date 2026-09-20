@@ -9,6 +9,24 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.4.1
+
+Arreglo de la publicación automática.
+
+* **El cron de GitHub no disparó ni una vez** en la primera ventana de domingo:
+  en repos nuevos las tareas programadas tardan en activarse y GitHub avisa que
+  retrasa o descarta corridas cuando hay carga. Depender de que dispare 70
+  veces una tarde era frágil.
+* Nuevo workflow **Directo**: necesita arrancar una sola vez por ventana y se
+  queda corriendo hasta 5 horas, recalculando cada 2 minutos y parando solo
+  cuando cierra el último partido. Si el cron llega tarde, el resto de la tarde
+  queda cubierta igual.
+* **GitHub Pages pasa a publicar por rama** en lugar de por workflow: cada
+  commit a `docs/` se ve de inmediato. Antes, los commits del bucle no habrían
+  aparecido en el sitio hasta que el bucle terminara, horas después.
+* Comando nuevo `python cli.py pendientes`, que dice cuántos partidos siguen
+  abiertos. Es lo que usa el bucle para saber cuándo parar.
+
 ## alfa v0.4.0
 
 Temas de equipo completos y comodidades de uso.
