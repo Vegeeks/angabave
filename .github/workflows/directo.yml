@@ -58,19 +58,18 @@ jobs:
           publicar() {
             git add docs data/resultados
             if git diff --staged --quiet; then
+              echo "Sin cambios en esta vuelta."
               return 1
             fi
             git commit -q -m "Directo: $(date -u '+%Y-%m-%d %H:%M UTC')"
-            for intento in 1 2 3; do
-              if git push -q; then return 0; fi
-              git fetch -q origin main
-              git reset -q --soft origin/main
-              git add docs data/resultados
-              git diff --staged --quiet && return 1
-              git commit -q -m "Directo: $(date -u '+%Y-%m-%d %H:%M UTC')"
-            done
-            echo "No pude publicar después de 3 intentos." >&2
-            return 2
+            # Si alguien se adelantó, no se fuerza nada: la siguiente vuelta
+            # arranca del remoto y recalcula encima.
+            if git push -q; then
+              echo "Publicado."
+              return 0
+            fi
+            echo "Otra corrida se adelantó; la próxima vuelta lo recoge."
+            return 1
           }
 
           FIN=$(( $(date -u +%s) + MINUTOS * 60 ))
@@ -78,11 +77,17 @@ jobs:
           while [ "$(date -u +%s)" -lt "$FIN" ]; do
             VUELTA=$(( VUELTA + 1 ))
             echo "── vuelta $VUELTA · $(date -u '+%H:%M:%S UTC') ──"
+
+            # Cada vuelta arranca de lo que está publicado. Sin esto, el job se
+            # quedaría con el código del momento en que empezó: un arreglo o un
+            # Excel nuevo no entrarían hasta reiniciar el directo, y peor, la
+            # siguiente vuelta pisaría lo que alguien más hubiera publicado.
+            git fetch -q origin main
+            git reset -q --hard origin/main
+
             python cli.py actualizar
 
-            publicar
-            CODIGO=$?
-            [ "$CODIGO" -eq 2 ] && exit 1
+            publicar || true
 
             ABIERTOS=$(python cli.py pendientes 2>/dev/null || echo 1)
             echo "Partidos abiertos: $ABIERTOS"

@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.4.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.4.2**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -253,13 +253,29 @@ todo el año desde que México eliminó el horario de verano en 2022.
 
 ## Automatización
 
-`.github/workflows/actualizar.yml` corre cada 15 minutos, solo en la ventana que
-importa (jueves, domingos y lunes por la noche, hora de CDMX), y también cuando
-subes un Excel nuevo o lo disparas a mano con el número de semana.
+Hay dos workflows, porque el cron de GitHub no es de fiar: en repos nuevos
+tarda en activarse y GitHub avisa que retrasa o descarta corridas programadas
+cuando hay carga.
 
-Cada corrida recalcula, hace commit de `docs/` y `data/resultados/` si algo
-cambió, y publica en GitHub Pages. Si el script falla, el workflow falla en
-rojo: nunca publica una tabla vieja como si fuera buena.
+**`directo.yml`** es el que trabaja durante los partidos. Necesita arrancar una
+sola vez por ventana (jueves, domingo y lunes) y de ahí se queda corriendo
+hasta 5 horas, recalculando cada 2 minutos y parando cuando cierra el último
+partido. Cada vuelta arranca de lo que está publicado, así que si subes un
+Excel nuevo o se corrige algo a media tarde, entra sin reiniciar el directo.
+Para arrancarlo a mano:
+
+```bash
+gh workflow run directo.yml --repo <cuenta>/<repo> -f minutos=300 -f cada=120
+```
+
+**`actualizar.yml`** es el respaldo: corre cada 5 minutos en las mismas
+ventanas, cuando subes un Excel nuevo y cuando lo disparas a mano.
+
+Cada corrida recalcula y hace commit de `docs/` y `data/resultados/` si algo
+cambió. GitHub Pages está configurado para publicar **desde la rama**
+(`main`, carpeta `/docs`), así que cada commit se ve en el sitio sin más pasos.
+Si el script falla, el workflow falla en rojo: nunca publica una tabla vieja
+como si fuera buena.
 
 ## Ver el sitio en local
 
