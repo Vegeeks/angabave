@@ -24,7 +24,7 @@ from quiniela.equipos import EquipoDesconocidoError
 from quiniela.espn import ErrorESPN, ahora_cdmx, obtener_partidos
 from quiniela.picks import ErrorPicks, leer_picks, numero_semana
 from quiniela.render_html import SemanaRender, generar_html
-from quiniela.render_png import generar_png
+from quiniela.render_png import generar_iconos, generar_png
 from quiniela.scoring import (
     ErrorCalendario,
     emparejar_resultados,
@@ -198,6 +198,7 @@ def comando_actualizar(argumentos) -> int:
         tabla_acumulada=general,
         momento=momento,
     )
+    generar_iconos()
     png = generar_png(
         tabla_acumulada=general,
         semana=semana,

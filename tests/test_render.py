@@ -61,14 +61,24 @@ def datos_embebidos(html: str) -> dict:
     return json.loads(crudo.group(1).replace("\\u003c", "<"))
 
 
-def test_la_pagina_no_pide_nada_de_afuera(armado, tmp_path: Path):
-    """Lleva JavaScript, pero todo embebido: sin CDN, sin archivos aparte."""
+def test_la_pagina_no_carga_codigo_de_afuera(armado, tmp_path: Path):
+    """CSS y JavaScript van embebidos: sin CDN, sin hojas ni scripts externos."""
     html = render(armado, tmp_path)
-    assert "<link" not in html.lower()
-    assert "@import" not in html
-    assert "http://" not in html and "https://" not in html
-    assert not re.search(r"<script[^>]+src=", html, re.I)
     assert "<style>" in html
+    assert "@import" not in html
+    assert not re.search(r"<script[^>]+src=", html, re.I)
+    assert not re.search(r'<link[^>]+rel="stylesheet"', html, re.I)
+
+
+def test_la_unica_direccion_externa_es_la_de_los_marcadores(armado, tmp_path: Path):
+    """El resto de los enlaces son archivos propios (iconos, manifiesto)."""
+    html = render(armado, tmp_path)
+    externas = set(re.findall(r"https?://[^\s\"'<>]+", html))
+    # El espacio de nombres de SVG es un identificador, no una petición de red.
+    externas.discard("http://www.w3.org/2000/svg")
+    assert externas == {"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"}
+    for propio in ('href="manifest.webmanifest"', 'href="icono-180.png"'):
+        assert propio in html
 
 
 def test_el_encabezado_trae_la_hora_de_cdmx(armado, tmp_path: Path):
@@ -123,10 +133,19 @@ def test_las_semanas_jugadas_quedan_navegables(armado, tmp_path: Path):
     assert 'data-vista="general"' in html
 
 
-def test_los_estados_salen_en_espanol(armado, tmp_path: Path):
-    html = render(armado, tmp_path)
-    for ingles in ("In Progress", "Scheduled", "End of Period"):
-        assert ingles not in html
+def test_los_estados_que_se_muestran_salen_en_espanol(armado, tmp_path: Path):
+    """Ni los que calcula Python ni los que traerá el navegador van en inglés."""
+    datos = datos_embebidos(render(armado, tmp_path))
+    mostrados = {p["e"] for s in datos["semanas"] for p in s["partidos"]}
+    for ingles in ("In Progress", "Scheduled", "End of Period", "Halftime"):
+        assert ingles not in mostrados
+
+    # El navegador traduce con este diccionario antes de pintar nada.
+    traducciones = datos["vivo"]["estados"]
+    assert traducciones["In Progress"] == "En curso"
+    assert traducciones["Halftime"] == "Medio tiempo"
+    for ingles in ("In Progress", "Scheduled", "End of Period", "Halftime", "Final/OT"):
+        assert ingles in traducciones
 
 
 def test_el_proyectado_no_se_publica(armado, tmp_path: Path):

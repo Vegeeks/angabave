@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from .espn import ahora_cdmx
 
@@ -185,3 +185,136 @@ def generar_png(
     imagen.save(ruta_salida, "PNG", optimize=True)
     _log.info("Escribí %s (%dx%d px).", ruta_salida, ANCHO, alto)
     return ruta_salida
+
+
+# --- iconos para la pantalla de inicio ---------------------------------------
+
+#: Tamaños que piden iOS y Android al guardar el sitio como app.
+TAMANOS_ICONO = (180, 192, 512)
+
+_FONDO_ICONO = (10, 14, 22)
+_ORO_ALTO = (255, 231, 170)
+_ORO_BAJO = (208, 150, 23)
+_ORO_PLANO = (247, 201, 72)
+
+
+def _bezier(inicio, control, fin, pasos: int = 24):
+    """Curva cuadrática, para que el escudo no se vea de cartón."""
+    puntos = []
+    for paso in range(pasos + 1):
+        t = paso / pasos
+        u = 1 - t
+        puntos.append(
+            (
+                u * u * inicio[0] + 2 * u * t * control[0] + t * t * fin[0],
+                u * u * inicio[1] + 2 * u * t * control[1] + t * t * fin[1],
+            )
+        )
+    return puntos
+
+
+def _escudo(lado: int, escala: float = 1.0) -> list[tuple[float, float]]:
+    """Silueta del escudo: hombros rectos y punta curva, como los de liga."""
+    # Coordenadas en fracción del lienzo, medidas desde el centro.
+    izquierda, derecha = 0.145, 0.855
+    alto, hombro, punta = 0.085, 0.50, 0.925
+    centro = 0.5
+
+    forma = [(izquierda, alto), (derecha, alto), (derecha, hombro)]
+    forma += _bezier((derecha, hombro), (derecha, punta - 0.10), (centro, punta))
+    forma += _bezier((centro, punta), (izquierda, punta - 0.10), (izquierda, hombro))
+    forma.append((izquierda, alto))
+
+    return [
+        ((x - centro) * escala * lado + centro * lado,
+         (y - centro) * escala * lado + centro * lado)
+        for x, y in forma
+    ]
+
+
+def _degradado_vertical(lado: int, arriba, abajo) -> Image.Image:
+    tira = Image.new("RGB", (1, lado))
+    for y in range(lado):
+        mezcla = y / max(1, lado - 1)
+        tira.putpixel(
+            (0, y), tuple(round(a + (b - a) * mezcla) for a, b in zip(arriba, abajo))
+        )
+    return tira.resize((lado, lado), Image.BILINEAR)
+
+
+def _mascara(lado: int, forma) -> Image.Image:
+    mascara = Image.new("L", (lado, lado), 0)
+    ImageDraw.Draw(mascara).polygon(forma, fill=255)
+    return mascara
+
+
+def _balon(lado: int) -> Image.Image:
+    """Balón recortado en negativo sobre el escudo, con costuras doradas."""
+    capa = Image.new("RGBA", (lado, lado), (0, 0, 0, 0))
+    pincel = ImageDraw.Draw(capa)
+    ancho, alto = lado * 0.46, lado * 0.285
+    cx, cy = lado / 2, lado * 0.475
+    pincel.ellipse(
+        [cx - ancho / 2, cy - alto / 2, cx + ancho / 2, cy + alto / 2],
+        fill=_FONDO_ICONO + (255,),
+    )
+    grosor = max(2, int(lado * 0.018))
+    pincel.line(
+        [(cx - ancho * 0.26, cy), (cx + ancho * 0.26, cy)],
+        fill=_ORO_PLANO + (255,), width=grosor,
+    )
+    for paso in (-1.5, -0.5, 0.5, 1.5):
+        x = cx + paso * ancho * 0.12
+        pincel.line(
+            [(x, cy - alto * 0.2), (x, cy + alto * 0.2)],
+            fill=_ORO_PLANO + (255,), width=grosor,
+        )
+    return capa.rotate(25, resample=Image.BICUBIC, expand=False, center=(cx, cy))
+
+
+def generar_iconos(dir_salida: Path = RUTA_SALIDA.parent) -> list[Path]:
+    """Escribe los iconos cuadrados con el escudo de la quiniela.
+
+    Se dibuja en grande y se reduce con LANCZOS: así los bordes curvos salen
+    limpios en los tamaños chicos, que es donde se nota lo amateur.
+    """
+    dir_salida = Path(dir_salida)
+    dir_salida.mkdir(parents=True, exist_ok=True)
+    lado = 1024
+
+    lienzo = Image.new("RGBA", (lado, lado), _FONDO_ICONO + (255,))
+
+    # Escudo dorado con degradado de arriba a abajo.
+    forma = _escudo(lado, escala=0.94)
+    oro = _degradado_vertical(lado, _ORO_ALTO, _ORO_BAJO).convert("RGBA")
+    lienzo.paste(oro, (0, 0), _mascara(lado, forma))
+
+    # Brillo sutil en la mitad superior. Va difuminado: un borde duro aquí se
+    # ve como un pliegue de plástico, que es justo lo que no queremos.
+    brillo = Image.new("RGBA", (lado, lado), (0, 0, 0, 0))
+    ImageDraw.Draw(brillo).polygon(
+        [(0, 0), (lado, 0), (lado, lado * 0.40), (0, lado * 0.56)], fill=(255, 255, 255, 34)
+    )
+    brillo = brillo.filter(ImageFilter.GaussianBlur(lado * 0.07))
+    lienzo.alpha_composite(Image.composite(
+        brillo, Image.new("RGBA", (lado, lado), (0, 0, 0, 0)), _mascara(lado, forma)
+    ))
+
+    # Filete interior oscuro: separa el escudo del fondo y marca el borde.
+    contorno = Image.new("RGBA", (lado, lado), (0, 0, 0, 0))
+    ImageDraw.Draw(contorno).line(
+        forma + [forma[0]], fill=_FONDO_ICONO + (170,), width=max(2, int(lado * 0.014)), joint="curve"
+    )
+    lienzo.alpha_composite(contorno)
+
+    lienzo.alpha_composite(_balon(lado))
+
+    rutas = []
+    for tamano in TAMANOS_ICONO:
+        ruta = dir_salida / f"icono-{tamano}.png"
+        lienzo.resize((tamano, tamano), Image.LANCZOS).convert("RGB").save(
+            ruta, "PNG", optimize=True
+        )
+        rutas.append(ruta)
+    _log.info("Escribí %d iconos en %s.", len(rutas), dir_salida)
+    return rutas

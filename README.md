@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.0.0.1**.
+Versión **alfa v0.3.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -203,6 +203,18 @@ Qué trae:
   hay en juego.
 * **Navegación por semanas**: General, Premios y una pestaña por cada semana.
   El portal abre en la semana en curso, que además va marcada en el menú.
+* **Marcador en vivo**: el navegador consulta ESPN cada 60 segundos, solo con
+  la pestaña al frente. Esa capa nunca cierra un partido ni cambia el conteo
+  oficial —eso lo decide CI— así que un error de la API no puede producir una
+  tabla equivocada; si falla, se ve lo último publicado.
+* **Jugadores**: buscador entre los 34, ficha de cada quien con su línea por
+  semana y sus semanas ganadas, y un duelo para comparar a dos y ver en qué
+  partidos difieren.
+* **Modo equipo**: eliges tu equipo y el portal se tiñe con sus colores, los de
+  casa o los de visita según dónde juegue esa semana. Todos los colores pasan
+  una verificación de contraste de 4.5:1 contra el fondo.
+* **Se guarda como app**: al agregarlo a la pantalla de inicio en iPhone o
+  Android usa el logo propio y abre a pantalla completa.
 * **Modo jugador**: en el encabezado eliges tu nombre y el sitio se vuelve
   tuyo. Cada partido de la semana se pinta según tu pick —verde si vas
   ganando, rojo si vas perdiendo, gris si no empieza— con un resumen de

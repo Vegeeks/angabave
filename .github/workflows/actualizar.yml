@@ -1,5 +1,9 @@
 name: Actualizar quiniela
 
+# Cada 5 minutos, que es el mínimo que permite GitHub. Aun así el programador
+# de GitHub se retrasa cuando hay carga, así que el sitio no depende de esto
+# para el marcador en vivo: el navegador consulta ESPN por su cuenta.
+#
 # Ciudad de México está fija en UTC-6 todo el año (México eliminó el horario de
 # verano en 2022), así que el ajuste es sumar 6 horas a la hora local:
 #
@@ -9,10 +13,10 @@ name: Actualizar quiniela
 #   lunes   18:00-23:59 CDMX  ->  martes  00:00-05:59 UTC   (cron: día 2)
 on:
   schedule:
-    - cron: "*/15 0-5 * * 5"
-    - cron: "*/15 17-23 * * 0"
-    - cron: "*/15 0-5 * * 1"
-    - cron: "*/15 0-5 * * 2"
+    - cron: "*/5 0-5 * * 5"
+    - cron: "*/5 17-23 * * 0"
+    - cron: "*/5 0-5 * * 1"
+    - cron: "*/5 0-5 * * 2"
   workflow_dispatch:
     inputs:
       semana:

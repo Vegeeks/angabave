@@ -4,57 +4,77 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="author" content="Angel Barrera">
-<meta name="description" content="ANGABAVE · Quiniela NFL 2026: tabla general, ganadores por semana, premios y picks de todos los participantes.">
-<meta name="theme-color" content="#080b11">
+<meta name="description" content="ANGABAVE · Quiniela NFL 2026: tabla general, ganadores por semana, premios, marcador en vivo y los picks de todos.">
+<meta name="theme-color" content="#06090f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 3 35 8v13c0 8.5-6.5 14.5-15 17C11.5 35.5 5 29.5 5 21V8z' fill='%23f7c948'/%3E%3Cellipse cx='20' cy='19' rx='9' ry='5.6' transform='rotate(-28 20 19)' fill='%23090d14'/%3E%3Cpath d='M15.8 22.2 24.2 15.8' stroke='%23f7c948' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icono-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ANGABAVE">
+<meta property="og:title" content="ANGABAVE · Quiniela NFL 2026">
+<meta property="og:description" content="Tabla general, ganadores por semana y marcador en vivo.">
+<meta property="og:image" content="tabla.png">
 <title>ANGABAVE · Quiniela NFL 2026</title>
 <style>
 :root{
-  --bg:#080b11; --panel:#111823; --panel2:#18212f; --panel3:#1f2a3a;
-  --linea:#222c3b; --linea2:#2f3c50;
-  --txt:#eaf1f9; --tenue:#8e9cb0; --tenue2:#5f6d81;
+  --bg:#06090f; --bg2:#0b1018;
+  --panel:#101724; --panel2:#161f2e; --panel3:#1d2838;
+  --linea:#1f2938; --linea2:#2b3849;
+  --txt:#eef4fb; --tenue:#8d9bb0; --tenue2:#5c6a7e;
   --oro:#f7c948; --oro2:#ffe193; --plata:#cfd9e6; --bronce:#d58f52;
   --verde:#3ddc84; --rojo:#ff6058; --acento:#5b95ff; --vivo:#ff4757;
-  --radio:18px; --sombra:0 14px 44px rgba(0,0,0,.5);
+  --radio:16px; --sombra:0 16px 48px rgba(0,0,0,.55);
+  --campo:rgba(255,255,255,.028);
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; min-width:0}
-html{scroll-behavior:smooth; -webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
 body{
   margin:0; background:var(--bg); color:var(--txt); overflow-x:hidden;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   font-size:16px; line-height:1.45; -webkit-font-smoothing:antialiased;
   background-image:
-    radial-gradient(1200px 560px at 10% -14%, rgba(91,149,255,.16), transparent 62%),
-    radial-gradient(1000px 500px at 92% -8%, rgba(247,201,72,.11), transparent 60%);
+    radial-gradient(1200px 560px at 8% -16%, rgba(91,149,255,.15), transparent 60%),
+    radial-gradient(1000px 500px at 94% -10%, rgba(247,201,72,.1), transparent 58%),
+    repeating-linear-gradient(90deg, var(--campo) 0 1px, transparent 1px 84px);
   background-attachment:fixed;
 }
 h1,h2,h3{margin:0; font-weight:800; letter-spacing:-.02em}
 button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
+input,select{font:inherit}
 .oculto{display:none !important}
-.env{max-width:1120px; margin:0 auto; padding-inline:clamp(.7rem,3.5vw,1.4rem)}
+.env{max-width:1160px; margin:0 auto; padding-inline:clamp(.7rem,3.4vw,1.5rem)}
+.rotulo{font-size:.63rem; font-weight:900; letter-spacing:.16em; text-transform:uppercase; color:var(--tenue2)}
 
-/* ═══ encabezado ═══ */
+/* ═══════ encabezado ═══════ */
 header{
   position:sticky; top:0; z-index:60;
-  background:rgba(8,11,17,.9); backdrop-filter:blur(16px) saturate(140%);
+  background:linear-gradient(180deg,rgba(6,9,15,.97),rgba(6,9,15,.88));
+  backdrop-filter:blur(18px) saturate(150%);
   border-bottom:1px solid var(--linea); padding-top:env(safe-area-inset-top);
 }
-.top{display:flex; align-items:center; gap:.6rem; padding-block:.65rem .5rem; flex-wrap:wrap}
-.logo{display:flex; flex-direction:column; gap:.08rem; min-width:0; flex:1 1 auto}
+header::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+  background:linear-gradient(90deg,transparent,var(--oro),var(--acento),transparent); opacity:.5}
+.top{display:flex; align-items:center; gap:.55rem; padding-block:.6rem .45rem; flex-wrap:wrap}
+.logo{display:flex; align-items:center; gap:.55rem; min-width:0; flex:1 1 auto; text-align:left}
+.logo svg{width:34px; height:34px; flex:0 0 auto; filter:drop-shadow(0 3px 10px rgba(247,201,72,.3))}
+.logo .letras{display:flex; flex-direction:column; min-width:0}
 .logo .marca{
-  font-size:clamp(1.15rem,5.6vw,1.7rem); font-weight:900; line-height:1;
-  letter-spacing:.14em; white-space:nowrap;
-  background:linear-gradient(96deg,#ffe193 0%,#f7c948 38%,#fff 62%,#9fc0ff 100%);
+  font-size:clamp(1.05rem,5.2vw,1.5rem); font-weight:900; line-height:1; letter-spacing:.15em;
+  white-space:nowrap;
+  background:linear-gradient(96deg,#ffe193,#f7c948 36%,#fff 62%,#a8c6ff);
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-.logo .sub{font-size:.66rem; letter-spacing:.24em; color:var(--tenue2); font-weight:700;
-  text-transform:uppercase; display:flex; align-items:center; gap:.4rem; flex-wrap:wrap}
-.version{font-style:normal; letter-spacing:.08em; font-size:.6rem; color:var(--oro);
+.logo .sub{font-size:.6rem; letter-spacing:.2em; color:var(--tenue2); font-weight:800;
+  text-transform:uppercase; display:flex; align-items:center; gap:.35rem; flex-wrap:wrap; margin-top:.15rem}
+.version{font-style:normal; letter-spacing:.08em; font-size:.56rem; color:var(--oro);
   background:rgba(247,201,72,.1); border:1px solid rgba(247,201,72,.26);
-  padding:.04rem .34rem; border-radius:5px; white-space:nowrap}
+  padding:.04rem .3rem; border-radius:4px; white-space:nowrap}
 .estado{
-  display:inline-flex; align-items:center; gap:.4rem; flex:0 0 auto; max-width:100%;
-  font-size:.64rem; font-weight:800; text-transform:uppercase; letter-spacing:.09em;
-  padding:.36rem .62rem; border-radius:999px;
+  display:inline-flex; align-items:center; gap:.38rem; flex:0 0 auto; max-width:100%;
+  font-size:.62rem; font-weight:900; text-transform:uppercase; letter-spacing:.09em;
+  padding:.34rem .6rem; border-radius:999px;
   border:1px solid var(--linea2); color:var(--tenue); background:rgba(255,255,255,.02);
 }
 .estado span:last-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
@@ -64,284 +84,262 @@ header{
 .estado.vivo .punto,.estado.esperando .punto{animation:latir 1.5s ease-in-out infinite}
 @keyframes latir{0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.3; transform:scale(.7)}}
 
-.soy{display:inline-flex; align-items:center; gap:.4rem; flex:0 0 auto; max-width:100%;
-  border:1px solid var(--linea2); border-radius:999px; padding:.22rem .3rem .22rem .62rem;
+.controles{display:flex; gap:.4rem; padding-bottom:.45rem}
+.soy{display:flex; align-items:center; gap:.35rem; flex:1 1 0; min-width:0;
+  border:1px solid var(--linea2); border-radius:999px; padding:.2rem .28rem .2rem .58rem;
   background:rgba(255,255,255,.02)}
-.soy>span{font-size:.6rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--tenue2)}
-.soy select{
-  width:auto; max-width:9.5rem; margin:0; padding:.18rem 1.3rem .18rem .4rem;
-  border:0; background-color:transparent; border-radius:999px;
-  font-size:.76rem; font-weight:700; color:var(--txt); text-overflow:ellipsis;
-  background-position:calc(100% - 11px) 50%,calc(100% - 6px) 50%;
-}
-.soy.puesto{border-color:rgba(91,149,255,.45); background:rgba(91,149,255,.08)}
+.soy>span{font-size:.56rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase; color:var(--tenue2)}
+.soy>span{flex:0 0 auto}
+.soy select{width:100%; max-width:none; margin:0; min-width:0; padding:.16rem 1.25rem .16rem .35rem; border:0;
+  background-color:transparent; border-radius:999px; font-size:.74rem; font-weight:800; color:var(--txt);
+  text-overflow:ellipsis; appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--tenue) 50%),linear-gradient(135deg,var(--tenue) 50%,transparent 50%);
+  background-position:calc(100% - 10px) 50%,calc(100% - 6px) 50%; background-size:4px 4px,4px 4px;
+  background-repeat:no-repeat}
+.soy.puesto{border-color:rgba(91,149,255,.5); background:rgba(91,149,255,.1)}
 .soy.puesto select{color:var(--acento)}
 
-.pastillas button.actual{border-color:rgba(255,71,87,.5)}
-.pastillas button.actual[aria-selected="true"]{
-  background:linear-gradient(180deg,#fff,#ffd3d6); box-shadow:0 4px 18px rgba(255,71,87,.28)}
-.pastillas .ahora{display:inline-block; margin-left:.32rem; width:6px; height:6px; border-radius:50%;
-  background:var(--vivo); animation:latir 1.5s ease-in-out infinite}
-
-.mi-semana{
-  display:flex; align-items:center; gap:.7rem; flex-wrap:wrap;
-  border:1px solid rgba(91,149,255,.35); border-radius:14px; padding:.7rem .85rem;
-  background:linear-gradient(180deg,rgba(91,149,255,.1),var(--panel)); margin-bottom:.85rem;
-  animation:brincar .4s ease both;
-}
-.mi-semana .yo{font-weight:900; font-size:1rem; overflow-wrap:anywhere}
-.mi-semana .rot{font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--acento); font-weight:800}
-.mi-semana .cuentas{display:flex; gap:.9rem; margin-left:auto; flex-wrap:wrap}
-.mi-semana .dato{text-align:right}
-.mi-semana .dato b{display:block; font-size:1.25rem; font-weight:900; line-height:1; font-variant-numeric:tabular-nums}
-.mi-semana .dato span{font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--tenue2)}
-.mi-semana .dato.ok b{color:var(--verde)} .mi-semana .dato.no b{color:var(--rojo)}
-.mi-semana .dato.vivo b{color:var(--oro)}
-
-.juego{border-left:3px solid transparent}
-.juego.mio-ok{border-left-color:var(--verde)}
-.juego.mio-no{border-left-color:var(--rojo)}
-.juego.mio-vivo-ok{border-left-color:rgba(61,220,132,.5)}
-.juego.mio-vivo-no{border-left-color:rgba(255,96,88,.5)}
-.mi-pick{display:flex; align-items:center; gap:.35rem; font-size:.68rem; font-weight:800;
-  letter-spacing:.06em; text-transform:uppercase; color:var(--tenue2); margin-top:.1rem}
-.mi-pick b{color:var(--txt); font-weight:800}
-.juego.mio-ok .mi-pick b,.juego.mio-vivo-ok .mi-pick b{color:var(--verde)}
-.juego.mio-no .mi-pick b,.juego.mio-vivo-no .mi-pick b{color:var(--rojo)}
-tbody tr.yo td{background:rgba(91,149,255,.1)}
-tbody tr.yo .c-nombre{color:var(--acento)}
-table.fija tbody tr.yo td:nth-child(-n+2){background:#17233a}
-
 .menu{position:relative}
-.menu::after{
-  content:""; position:absolute; right:0; top:0; bottom:8px; width:34px; pointer-events:none;
-  background:linear-gradient(90deg,transparent,rgba(8,11,17,.92));
-}
-.pastillas{display:flex; gap:.35rem; overflow-x:auto; scrollbar-width:none; padding-block:0 .55rem}
+.menu::after{content:""; position:absolute; right:0; top:0; bottom:8px; width:32px; pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(6,9,15,.95))}
+.pastillas{display:flex; gap:.32rem; overflow-x:auto; scrollbar-width:none; padding-block:0 .5rem}
 .pastillas::-webkit-scrollbar{display:none}
-.pastillas button{
-  flex:0 0 auto; padding:.42rem .8rem; border-radius:999px; font-size:.82rem; font-weight:700;
-  color:var(--tenue); border:1px solid var(--linea); white-space:nowrap;
-  transition:color .18s,border-color .18s,background .18s;
-}
+.pastillas button{flex:0 0 auto; padding:.4rem .78rem; border-radius:999px; font-size:.79rem;
+  font-weight:800; color:var(--tenue); border:1px solid var(--linea); white-space:nowrap;
+  transition:color .18s,border-color .18s,background .18s}
 .pastillas button:hover{color:var(--txt); border-color:var(--linea2)}
-.pastillas button[aria-selected="true"]{
-  color:#0a1020; background:linear-gradient(180deg,#fff,#c9dcff); border-color:transparent;
-  box-shadow:0 4px 18px rgba(91,149,255,.32);
-}
-.pastillas button.dorada[aria-selected="true"]{
-  background:linear-gradient(180deg,#ffe193,#f7c948); box-shadow:0 4px 18px rgba(247,201,72,.3);
-}
-.pastillas .punto{display:inline-block; margin-left:.32rem; background:var(--oro)}
+.pastillas button[aria-selected="true"]{color:#08111f;
+  background:linear-gradient(180deg,#fff,#c9dcff); border-color:transparent;
+  box-shadow:0 4px 18px rgba(91,149,255,.32)}
+.pastillas button.dorada[aria-selected="true"]{background:linear-gradient(180deg,#ffe193,#f7c948);
+  box-shadow:0 4px 18px rgba(247,201,72,.3)}
+.pastillas button.actual{border-color:rgba(255,71,87,.5)}
+.pastillas button.actual[aria-selected="true"]{background:linear-gradient(180deg,#fff,#ffd3d6);
+  box-shadow:0 4px 18px rgba(255,71,87,.3)}
+.pastillas .ahora{display:inline-block; margin-left:.3rem; width:6px; height:6px; border-radius:50%;
+  background:var(--vivo); animation:latir 1.5s ease-in-out infinite}
 
 main{padding-bottom:3.5rem}
 .vista.anima{animation:entrar .34s cubic-bezier(.2,.7,.3,1) both}
 @keyframes entrar{from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none}}
+.titulo{display:flex; align-items:center; gap:.5rem; margin:1.5rem .1rem .7rem; flex-wrap:wrap}
+.titulo h2{font-size:.76rem; text-transform:uppercase; letter-spacing:.15em; color:var(--tenue)}
+.titulo h2::before{content:""; display:inline-block; width:3px; height:.78rem; margin-right:.45rem;
+  background:linear-gradient(180deg,var(--oro),var(--acento)); border-radius:2px; vertical-align:-1px}
+.titulo .nota{font-size:.74rem; color:var(--tenue2); margin-left:auto; text-align:right}
 
-/* ═══ títulos ═══ */
-.titulo{display:flex; align-items:baseline; gap:.5rem; margin:1.5rem .1rem .7rem; flex-wrap:wrap}
-.titulo h2{font-size:.78rem; text-transform:uppercase; letter-spacing:.14em; color:var(--tenue)}
-.titulo .nota{font-size:.76rem; color:var(--tenue2); margin-left:auto}
-
-/* ═══ podio ═══ */
-.podio{display:grid; gap:.6rem; grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
-.lugar{
-  position:relative; overflow:hidden; border-radius:var(--radio); padding:1.05rem .85rem .95rem;
+/* ═══════ podio ═══════ */
+.podio{display:grid; gap:.6rem; grid-template-columns:repeat(auto-fit,minmax(min(100%,185px),1fr))}
+.lugar{position:relative; overflow:hidden; border-radius:var(--radio); padding:1.05rem .85rem .95rem;
   background:linear-gradient(180deg,var(--panel2),var(--panel));
   border:1px solid var(--linea); text-align:center; box-shadow:var(--sombra);
-  animation:brincar .55s cubic-bezier(.2,.8,.3,1) both; animation-delay:calc(var(--i)*90ms);
-}
+  animation:brincar .55s cubic-bezier(.2,.8,.3,1) both; animation-delay:calc(var(--i)*90ms)}
 @keyframes brincar{from{opacity:0; transform:translateY(22px) scale(.95)} to{opacity:1; transform:none}}
 .lugar::before{content:""; position:absolute; inset:0 0 auto; height:3px; background:var(--linea2)}
-.lugar.oro{border-color:rgba(247,201,72,.45); box-shadow:0 14px 44px rgba(247,201,72,.1)}
+.lugar.oro{border-color:rgba(247,201,72,.45); box-shadow:0 16px 48px rgba(247,201,72,.1)}
 .lugar.oro::before{background:linear-gradient(90deg,#f7c948,#ffe193,#f7c948)}
 .lugar.plata::before{background:linear-gradient(90deg,#9fb0c6,#e6edf6,#9fb0c6)}
 .lugar.bronce::before{background:linear-gradient(90deg,#b5773f,#e6b183,#b5773f)}
-.lugar.oro::after{
-  content:""; position:absolute; top:0; left:-60%; width:42%; height:100%;
+.lugar.oro::after{content:""; position:absolute; top:0; left:-60%; width:42%; height:100%;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.09),transparent);
-  animation:destello 5s ease-in-out infinite 1.2s;
-}
+  animation:destello 5s ease-in-out infinite 1.2s}
 @keyframes destello{0%{left:-60%} 45%,100%{left:140%}}
-.medalla{
-  width:36px; height:36px; margin:0 auto .45rem; border-radius:50%; display:grid; place-items:center;
-  font-size:.95rem; font-weight:900; color:#0a1020; background:linear-gradient(160deg,#dfe7f2,#93a3b8);
-}
+.medalla{width:36px; height:36px; margin:0 auto .45rem; border-radius:50%; display:grid; place-items:center;
+  font-size:.95rem; font-weight:900; color:#0a1020; background:linear-gradient(160deg,#dfe7f2,#93a3b8)}
 .oro .medalla{background:linear-gradient(160deg,#ffe193,#e0a92b); box-shadow:0 0 26px rgba(247,201,72,.34)}
 .bronce .medalla{background:linear-gradient(160deg,#e9bb92,#b5773f)}
 .lugar .puntos{font-size:clamp(1.9rem,9vw,2.5rem); font-weight:900; letter-spacing:-.04em;
   font-variant-numeric:tabular-nums; line-height:1}
 .oro .puntos{color:var(--oro)} .plata .puntos{color:var(--plata)} .bronce .puntos{color:var(--bronce)}
-.lugar .detalle{font-size:.64rem; color:var(--tenue2); margin-top:.2rem; text-transform:uppercase; letter-spacing:.12em}
-.lugar .quien{font-weight:800; font-size:clamp(.95rem,4vw,1.08rem); line-height:1.25; margin-top:.5rem;
+.lugar .detalle{font-size:.62rem; color:var(--tenue2); margin-top:.2rem; text-transform:uppercase; letter-spacing:.12em}
+.lugar .quien{font-weight:800; font-size:clamp(.92rem,4vw,1.05rem); line-height:1.25; margin-top:.5rem;
   overflow-wrap:anywhere}
-.lugar .bolsa{margin-top:.5rem; font-size:.84rem; font-weight:800; color:var(--oro);
+.lugar .empatados{margin-top:.5rem; font-size:.76rem; font-weight:800; color:var(--tenue)}
+.lugar .bolsa{margin-top:.5rem; font-size:.82rem; font-weight:900; color:var(--oro);
   padding:.2rem .5rem; border-radius:8px; background:rgba(247,201,72,.1); display:inline-block}
-.lugar .empatados{margin-top:.5rem; font-size:.76rem; font-weight:700; color:var(--tenue)}
-.lugar .gente{justify-content:center; margin-top:.35rem}
 
-/* ═══ tablas ═══ */
+/* ═══════ tablas ═══════ */
 .marco{border:1px solid var(--linea); border-radius:var(--radio); background:var(--panel); position:relative}
 .rueda{overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:var(--radio)}
 .rueda::-webkit-scrollbar{height:6px}
 .rueda::-webkit-scrollbar-thumb{background:var(--linea2); border-radius:99px}
 table{border-collapse:separate; border-spacing:0; width:100%; font-variant-numeric:tabular-nums}
-th,td{padding:.6rem .5rem; text-align:right; white-space:nowrap; font-size:clamp(.82rem,3.4vw,.94rem)}
-thead th{
-  font-size:.62rem; text-transform:uppercase; letter-spacing:.1em; color:var(--tenue2);
-  border-bottom:1px solid var(--linea); font-weight:800; background:var(--panel);
-  position:sticky; top:0; z-index:3;
-}
-tbody td{border-bottom:1px solid rgba(34,44,59,.65)}
+th,td{padding:.6rem .5rem; text-align:right; white-space:nowrap; font-size:clamp(.82rem,3.3vw,.93rem)}
+thead th{font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--tenue2);
+  border-bottom:1px solid var(--linea); font-weight:900; background:var(--panel);
+  position:sticky; top:0; z-index:3}
+tbody td{border-bottom:1px solid rgba(31,41,56,.7)}
 tbody tr:last-child td{border-bottom:0}
 tbody tr{animation:asomar .42s ease both; animation-delay:calc(var(--i)*20ms)}
 @keyframes asomar{from{opacity:0; transform:translateX(-7px)} to{opacity:1; transform:none}}
-.c-pos{width:2.6rem; color:var(--tenue2); font-weight:800; text-align:right}
+.c-pos{width:2.5rem; color:var(--tenue2); font-weight:900; text-align:right}
 .c-nombre{text-align:left; font-weight:700; max-width:0; width:99%; overflow:hidden; text-overflow:ellipsis}
 .pts{font-weight:900; font-size:1.02em; color:var(--verde)}
 .err{color:var(--rojo); opacity:.8}
 .sem{color:var(--tenue2)}
 tr.p1 .c-pos{color:var(--oro)} tr.p2 .c-pos{color:var(--plata)} tr.p3 .c-pos{color:var(--bronce)}
-/* Las dos primeras columnas se quedan fijas al deslizar de lado. */
 table.fija th:nth-child(-n+2),table.fija td:nth-child(-n+2){position:sticky; background:var(--panel); z-index:2}
 table.fija th:nth-child(1),table.fija td:nth-child(1){left:0}
-table.fija th:nth-child(2),table.fija td:nth-child(2){left:2.6rem;
-  box-shadow:1px 0 0 var(--linea)}
+table.fija th:nth-child(2),table.fija td:nth-child(2){left:2.5rem; box-shadow:1px 0 0 var(--linea)}
 table.fija thead th:nth-child(-n+2){z-index:4}
 tbody tr:hover td{background:var(--panel2)}
-.chip-vivo{
-  display:inline-block; margin-left:.3rem; padding:.02rem .3rem; border-radius:5px;
-  font-size:.62rem; font-weight:900; color:var(--oro); background:rgba(247,201,72,.14);
-  border:1px solid rgba(247,201,72,.3); vertical-align:middle;
-}
+tbody tr.yo td{background:rgba(91,149,255,.1)}
+tbody tr.yo .c-nombre{color:var(--acento)}
+table.fija tbody tr.yo td:nth-child(-n+2){background:#16233a}
+tbody tr.clic{cursor:pointer}
+.chip-vivo{display:inline-block; margin-left:.3rem; padding:.02rem .3rem; border-radius:5px;
+  font-size:.6rem; font-weight:900; color:var(--oro); background:rgba(247,201,72,.14);
+  border:1px solid rgba(247,201,72,.3); vertical-align:middle}
 
-/* ═══ pestañas ═══ */
+/* ═══════ pestañas ═══════ */
 .tabs{position:relative; margin:.2rem 0 .85rem}
 .tabs-int{display:flex; gap:.25rem; overflow-x:auto; scrollbar-width:none; padding-bottom:.1rem}
 .tabs-int::-webkit-scrollbar{display:none}
-.tabs-int button{
-  flex:0 0 auto; padding:.48rem .78rem; border-radius:11px; font-size:.83rem; font-weight:700;
-  color:var(--tenue); white-space:nowrap; transition:background .18s,color .18s;
-}
-.tabs-int button[aria-selected="true"]{color:var(--txt); background:var(--panel2); box-shadow:inset 0 0 0 1px var(--linea)}
+.tabs-int button{flex:0 0 auto; padding:.46rem .76rem; border-radius:10px; font-size:.81rem;
+  font-weight:800; color:var(--tenue); white-space:nowrap; transition:background .18s,color .18s}
+.tabs-int button[aria-selected="true"]{color:var(--txt); background:var(--panel2);
+  box-shadow:inset 0 0 0 1px var(--linea)}
 
-/* ═══ campeón de la semana ═══ */
-.campeon{
-  position:relative; overflow:hidden; border-radius:var(--radio); padding:1.3rem 1rem 1.15rem;
-  text-align:center; border:1px solid var(--linea2); margin-bottom:1rem;
+/* ═══════ campeón ═══════ */
+.campeon{position:relative; overflow:hidden; border-radius:var(--radio); padding:1.3rem 1rem 1.15rem;
+  text-align:center; border:1px solid var(--linea2); margin-bottom:.9rem;
   background:linear-gradient(180deg,var(--panel2),var(--panel));
-  animation:brincar .5s cubic-bezier(.2,.8,.3,1) both;
-}
-.campeon.oficial{
-  border-color:rgba(247,201,72,.5);
-  background:
-    radial-gradient(120% 90% at 50% -20%, rgba(247,201,72,.17), transparent 62%),
-    linear-gradient(180deg,var(--panel2),var(--panel));
-  box-shadow:0 16px 50px rgba(247,201,72,.12);
-}
+  animation:brincar .5s cubic-bezier(.2,.8,.3,1) both}
+.campeon.oficial{border-color:rgba(247,201,72,.5);
+  background:radial-gradient(120% 90% at 50% -20%, rgba(247,201,72,.17), transparent 62%),
+             linear-gradient(180deg,var(--panel2),var(--panel));
+  box-shadow:0 18px 54px rgba(247,201,72,.12)}
 .copa{width:46px; height:46px; margin:0 auto .35rem; display:block}
 .campeon.oficial .copa{animation:palpitar 2.6s ease-in-out infinite; filter:drop-shadow(0 0 14px rgba(247,201,72,.45))}
 @keyframes palpitar{0%,100%{transform:scale(1)} 50%{transform:scale(1.07)}}
-.campeon .rotulo{font-size:.64rem; letter-spacing:.2em; text-transform:uppercase; font-weight:800; color:var(--tenue)}
-.campeon.oficial .rotulo{color:var(--oro)}
-.campeon .nombres{
-  font-size:clamp(1.25rem,6.4vw,2rem); font-weight:900; letter-spacing:-.03em; line-height:1.15;
-  margin:.3rem 0 .1rem; overflow-wrap:anywhere;
-}
-.campeon.oficial .nombres{
-  background:linear-gradient(94deg,#fff,#ffe193 55%,#f7c948);
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-}
-.campeon .cifra{font-size:.8rem; color:var(--tenue); margin-top:.15rem}
-.campeon .bolsa{
-  display:inline-block; margin-top:.6rem; padding:.34rem .8rem; border-radius:999px;
+.campeon .rot{font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; font-weight:900; color:var(--tenue)}
+.campeon.oficial .rot{color:var(--oro)}
+.campeon .nombres{font-size:clamp(1.25rem,6.2vw,2rem); font-weight:900; letter-spacing:-.03em;
+  line-height:1.15; margin:.3rem 0 .1rem; overflow-wrap:anywhere}
+.campeon.oficial .nombres{background:linear-gradient(94deg,#fff,#ffe193 55%,#f7c948);
+  -webkit-background-clip:text; background-clip:text; color:transparent}
+.campeon .cifra{font-size:.78rem; color:var(--tenue); margin-top:.15rem}
+.campeon .bolsa{display:inline-block; margin-top:.6rem; padding:.34rem .8rem; border-radius:999px;
   font-weight:900; font-size:1rem; color:var(--oro);
-  background:rgba(247,201,72,.12); border:1px solid rgba(247,201,72,.3);
-}
+  background:rgba(247,201,72,.12); border:1px solid rgba(247,201,72,.3)}
 .campeon.provisional .bolsa{color:var(--tenue); background:rgba(255,255,255,.04); border-color:var(--linea2)}
 .confetis{position:absolute; inset:0; pointer-events:none; overflow:hidden}
-.confeti{
-  position:absolute; top:-16px; width:7px; height:13px; border-radius:2px; opacity:0;
-  animation:caer var(--d) cubic-bezier(.3,.5,.5,1) forwards;
-}
-@keyframes caer{
-  0%{opacity:0; transform:translate3d(0,-20px,0) rotate(0)}
-  12%{opacity:1}
-  100%{opacity:0; transform:translate3d(var(--x),300px,0) rotate(var(--r))}
-}
+.confeti{position:absolute; top:-16px; width:7px; height:13px; border-radius:2px; opacity:0;
+  animation:caer var(--d) cubic-bezier(.3,.5,.5,1) forwards}
+@keyframes caer{0%{opacity:0; transform:translate3d(0,-20px,0) rotate(0)} 12%{opacity:1}
+  100%{opacity:0; transform:translate3d(var(--x),300px,0) rotate(var(--r))}}
 
-/* ═══ premios ═══ */
-.bolsas{display:grid; gap:.6rem; grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
-.bolsa-card{
-  border:1px solid var(--linea); border-radius:var(--radio); padding:.95rem .9rem;
+/* ═══════ mi semana ═══════ */
+.mi-semana{display:flex; align-items:center; gap:.7rem; flex-wrap:wrap;
+  border:1px solid rgba(91,149,255,.35); border-radius:14px; padding:.7rem .85rem;
+  background:linear-gradient(180deg,rgba(91,149,255,.1),var(--panel)); margin-bottom:.85rem;
+  animation:brincar .4s ease both}
+.mi-semana .yo{font-weight:900; font-size:1rem; overflow-wrap:anywhere}
+.mi-semana .rot{font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; color:var(--acento); font-weight:900}
+.mi-semana .cuentas{display:flex; gap:.9rem; margin-left:auto; flex-wrap:wrap}
+.mi-semana .dato{text-align:right}
+.mi-semana .dato b{display:block; font-size:1.25rem; font-weight:900; line-height:1; font-variant-numeric:tabular-nums}
+.mi-semana .dato span{font-size:.58rem; text-transform:uppercase; letter-spacing:.1em; color:var(--tenue2)}
+.mi-semana .dato.ok b{color:var(--verde)} .mi-semana .dato.no b{color:var(--rojo)}
+.mi-semana .dato.vivo b{color:var(--oro)}
+
+/* ═══════ premios ═══════ */
+.bolsas{display:grid; gap:.6rem; grid-template-columns:repeat(auto-fit,minmax(min(100%,185px),1fr))}
+.bolsa-card{border:1px solid var(--linea); border-radius:var(--radio); padding:.95rem .9rem;
   background:linear-gradient(180deg,var(--panel2),var(--panel));
-  animation:brincar .45s ease both; animation-delay:calc(var(--i)*70ms);
-}
-.bolsa-card .rot{font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--tenue2); font-weight:800}
-.bolsa-card .val{font-size:clamp(1.5rem,7vw,1.9rem); font-weight:900; letter-spacing:-.03em; margin-top:.25rem; color:var(--oro)}
-.bolsa-card .pie{font-size:.74rem; color:var(--tenue2); margin-top:.25rem}
+  animation:brincar .45s ease both; animation-delay:calc(var(--i)*70ms)}
+.bolsa-card .rot{font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--tenue2); font-weight:900}
+.bolsa-card .val{font-size:clamp(1.5rem,7vw,1.9rem); font-weight:900; letter-spacing:-.03em;
+  margin-top:.25rem; color:var(--oro)}
+.bolsa-card .pie{font-size:.73rem; color:var(--tenue2); margin-top:.25rem}
 .bolsa-card.neutra .val{color:var(--txt)}
 .progreso-bolsa{height:6px; border-radius:99px; background:var(--linea); overflow:hidden; margin-top:.6rem}
 .progreso-bolsa i{display:block; height:100%; width:0; border-radius:99px;
   background:linear-gradient(90deg,var(--oro),#ffe193); transition:width 1s cubic-bezier(.2,.7,.3,1)}
-
 .ganadores{display:grid; gap:.45rem}
-.fila-gan{
-  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.65rem;
+.fila-gan{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.65rem;
   padding:.62rem .8rem; border:1px solid var(--linea); border-radius:12px; background:var(--panel);
-  animation:asomar .4s ease both; animation-delay:calc(var(--i)*30ms);
-}
-.fila-gan .sN{font-size:.66rem; font-weight:900; color:var(--tenue2); letter-spacing:.08em;
+  animation:asomar .4s ease both; animation-delay:calc(var(--i)*30ms)}
+.fila-gan .sN{font-size:.64rem; font-weight:900; color:var(--tenue2); letter-spacing:.08em;
   background:var(--panel2); padding:.28rem .45rem; border-radius:7px; min-width:2.5rem; text-align:center}
 .fila-gan .quien{font-weight:800; overflow-wrap:anywhere; line-height:1.25}
-.fila-gan .quien small{display:block; font-weight:600; font-size:.7rem; color:var(--tenue2)}
-.fila-gan .monto{font-weight:900; color:var(--oro); font-size:.92rem; white-space:nowrap}
+.fila-gan .quien small{display:block; font-weight:600; font-size:.69rem; color:var(--tenue2)}
+.fila-gan .monto{font-weight:900; color:var(--oro); font-size:.9rem; white-space:nowrap}
 .fila-gan.abierta{border-style:dashed}
 .fila-gan.abierta .monto{color:var(--tenue2)}
 
-/* ═══ partidos ═══ */
-.juegos{display:grid; gap:.5rem; grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))}
-.juego{
-  border:1px solid var(--linea); border-radius:14px; background:var(--panel); padding:.7rem .85rem;
-  display:grid; gap:.4rem; animation:brincar .42s ease both; animation-delay:calc(var(--i)*30ms);
-}
-.juego.envivo{border-color:rgba(255,71,87,.38); background:linear-gradient(180deg,rgba(255,71,87,.06),var(--panel))}
-.juego .equipo{display:flex; align-items:center; gap:.5rem; font-size:.95rem}
-.juego .equipo .nom{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--tenue)}
-.juego .equipo.gana .nom{color:var(--txt); font-weight:800}
-.juego .equipo .mrc{font-weight:900; font-variant-numeric:tabular-nums; color:var(--tenue2)}
-.juego .equipo.gana .mrc{color:var(--verde)}
-.juego .pie{display:flex; align-items:center; gap:.4rem; font-size:.66rem; color:var(--tenue2);
-  text-transform:uppercase; letter-spacing:.08em; border-top:1px solid var(--linea); padding-top:.42rem}
+/* ═══════ marcador estilo transmisión ═══════ */
+.juegos{display:grid; gap:.5rem; grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.juego{border:1px solid var(--linea); border-radius:14px; background:var(--panel); overflow:hidden;
+  animation:brincar .42s ease both; animation-delay:calc(var(--i)*30ms)}
+.juego.envivo{border-color:rgba(255,71,87,.4);
+  box-shadow:0 0 0 1px rgba(255,71,87,.12), 0 10px 30px rgba(255,71,87,.07)}
+.lado{display:flex; align-items:center; gap:.55rem; padding:.55rem .7rem; position:relative}
+.lado+.lado{border-top:1px solid rgba(31,41,56,.7)}
+.lado::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--c,var(--linea2))}
+.lado .sig{font-size:.64rem; font-weight:900; letter-spacing:.06em; color:#070b12;
+  background:var(--c,var(--tenue2)); padding:.16rem .34rem; border-radius:5px; min-width:2.5rem;
+  text-align:center; flex:0 0 auto}
+.lado .nom{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--tenue);
+  font-weight:700; font-size:.94rem}
+.lado .mrc{font-weight:900; font-size:1.18rem; font-variant-numeric:tabular-nums; color:var(--tenue2);
+  letter-spacing:-.02em}
+.lado.gana .nom{color:var(--txt); font-weight:900}
+.lado.gana .mrc{color:var(--txt)}
+.lado.gana::after{content:"◀"; font-size:.5rem; color:var(--verde); margin-left:-.25rem}
+.juego .pie{display:flex; align-items:center; gap:.4rem; font-size:.63rem; color:var(--tenue2);
+  text-transform:uppercase; letter-spacing:.09em; font-weight:800;
+  border-top:1px solid var(--linea); padding:.42rem .7rem; background:rgba(0,0,0,.18)}
 .juego.envivo .pie{color:var(--vivo)}
+.juego .pie .der{margin-left:auto; color:var(--tenue2)}
+.juego{border-left:3px solid transparent}
+.juego.mio-ok{border-left-color:var(--verde)}
+.juego.mio-no{border-left-color:var(--rojo)}
+.juego.mio-vivo-ok{border-left-color:rgba(61,220,132,.55)}
+.juego.mio-vivo-no{border-left-color:rgba(255,96,88,.55)}
+.mi-pick{display:flex; align-items:center; gap:.3rem; font-size:.63rem; font-weight:900;
+  letter-spacing:.07em; text-transform:uppercase; color:var(--tenue2);
+  padding:.36rem .7rem; border-top:1px solid var(--linea)}
+.mi-pick b{color:var(--txt)}
+.juego.mio-ok .mi-pick b,.juego.mio-vivo-ok .mi-pick b{color:var(--verde)}
+.juego.mio-no .mi-pick b,.juego.mio-vivo-no .mi-pick b{color:var(--rojo)}
 
-/* ═══ reparto de picks ═══ */
+/* ═══════ reparto de picks ═══════ */
 .reparto{display:grid; gap:.55rem}
-.balanza{display:flex; height:7px; border-radius:99px; overflow:hidden; background:var(--linea)}
+.split{border:1px solid var(--linea); border-radius:14px; background:var(--panel); padding:.7rem .8rem;
+  display:grid; gap:.45rem; animation:brincar .4s ease both; animation-delay:calc(var(--i)*30ms)}
+.split .cab{display:flex; align-items:center; gap:.5rem; font-weight:800; font-size:.92rem}
+.split .cab .vs{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.split .cab .mr{font-variant-numeric:tabular-nums; color:var(--tenue2); font-weight:900; font-size:.82rem}
+.balanza{display:flex; height:8px; border-radius:99px; overflow:hidden; background:var(--linea)}
 .balanza i{display:block; height:100%; transition:width .8s cubic-bezier(.2,.7,.3,1)}
-.balanza .iv{background:linear-gradient(90deg,#5b95ff,#8fb6ff)}
-.balanza .il{background:linear-gradient(90deg,#f7c948,#ffe193)}
-.gente{display:flex; flex-wrap:wrap; gap:.28rem}
-.gente span{font-size:.72rem; padding:.14rem .42rem; border-radius:6px;
-  background:var(--panel2); border:1px solid var(--linea); color:var(--tenue); overflow-wrap:anywhere}
+.cuenta-lado{display:flex; justify-content:space-between; font-size:.66rem; font-weight:900;
+  text-transform:uppercase; letter-spacing:.06em}
+.gente{display:flex; flex-wrap:wrap; gap:.26rem}
+.gente span{font-size:.71rem; padding:.13rem .4rem; border-radius:6px; background:var(--panel2);
+  border:1px solid var(--linea); color:var(--tenue); overflow-wrap:anywhere}
 .gente span.ok{color:var(--verde); border-color:rgba(61,220,132,.3)}
 .gente span.no{color:var(--rojo); border-color:rgba(255,96,88,.25); opacity:.68}
-.mini{font-size:.68rem; color:var(--tenue2); text-transform:uppercase; letter-spacing:.08em}
+.gente span.tu{outline:1px solid var(--acento)}
+.mini{font-size:.67rem; color:var(--tenue2); text-transform:uppercase; letter-spacing:.08em}
+.sello-consenso{font-size:.58rem; font-weight:900; letter-spacing:.1em; text-transform:uppercase;
+  padding:.1rem .36rem; border-radius:5px; white-space:nowrap}
+.sello-consenso.unanime{color:var(--oro); background:rgba(247,201,72,.12)}
+.sello-consenso.dividido{color:var(--acento); background:rgba(91,149,255,.14)}
 
-select{
-  width:100%; padding:.62rem .7rem; border-radius:12px; margin-bottom:.8rem;
-  background:var(--panel); color:var(--txt); border:1px solid var(--linea2);
-  font-size:.92rem; appearance:none;
+select.ancho,input.ancho{width:100%; padding:.6rem .7rem; border-radius:12px; margin-bottom:.7rem;
+  background:var(--panel); color:var(--txt); border:1px solid var(--linea2); font-size:.92rem}
+select.ancho{appearance:none;
   background-image:linear-gradient(45deg,transparent 50%,var(--tenue) 50%),linear-gradient(135deg,var(--tenue) 50%,transparent 50%);
-  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;
-  background-size:5px 5px,5px 5px; background-repeat:no-repeat;
-}
-.boleta{display:grid; gap:.38rem}
-.boleta .linea{
-  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.55rem;
-  padding:.55rem .7rem; border:1px solid var(--linea); border-radius:12px; background:var(--panel);
-  font-size:.88rem; animation:asomar .34s ease both; animation-delay:calc(var(--i)*22ms);
-}
+  background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%; background-size:5px 5px,5px 5px;
+  background-repeat:no-repeat}
+input.ancho::placeholder{color:var(--tenue2)}
+input.ancho:focus,select.ancho:focus{outline:0; border-color:var(--acento)}
+
+.boleta{display:grid; gap:.36rem}
+.boleta .linea{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:.55rem;
+  padding:.52rem .7rem; border:1px solid var(--linea); border-radius:12px; background:var(--panel);
+  font-size:.87rem; animation:asomar .34s ease both; animation-delay:calc(var(--i)*22ms)}
 .boleta .vs{color:var(--tenue); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .boleta .vs b{color:var(--txt)}
 .sello{width:22px; height:22px; border-radius:50%; display:grid; place-items:center;
@@ -352,32 +350,78 @@ select{
 .boleta .linea.acierto{border-color:rgba(61,220,132,.28)}
 .boleta .linea.fallo{opacity:.7}
 
-/* ═══ escenarios ═══ */
+/* ═══════ escenarios ═══════ */
 .escena{display:grid; gap:.42rem}
-.candidato{
-  display:grid; grid-template-columns:1.5rem minmax(0,1fr) auto; align-items:center; gap:.55rem;
+.candidato{display:grid; grid-template-columns:1.5rem minmax(0,1fr) auto; align-items:center; gap:.55rem;
   padding:.5rem .7rem; border:1px solid var(--linea); border-radius:12px; background:var(--panel);
-  animation:asomar .38s ease both; animation-delay:calc(var(--i)*35ms);
-}
-.candidato .n{color:var(--tenue2); font-weight:800; font-size:.8rem}
-.candidato .quien{font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.candidato .pct{font-weight:900; font-variant-numeric:tabular-nums; color:var(--oro); font-size:.92rem}
+  animation:asomar .38s ease both; animation-delay:calc(var(--i)*35ms)}
+.candidato .n{color:var(--tenue2); font-weight:900; font-size:.78rem}
+.candidato .quien{font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.candidato .pct{font-weight:900; font-variant-numeric:tabular-nums; color:var(--oro); font-size:.9rem}
+.candidato.yo{border-color:rgba(91,149,255,.5); background:rgba(91,149,255,.08)}
 .progreso{grid-column:2/4; height:6px; border-radius:99px; background:var(--linea); overflow:hidden; margin-top:.15rem}
 .progreso i{display:block; height:100%; width:0; border-radius:99px;
   background:linear-gradient(90deg,var(--acento),#9dc0ff); transition:width .9s cubic-bezier(.2,.7,.3,1)}
 .candidato.lider .progreso i{background:linear-gradient(90deg,#f7c948,#ffe193)}
 
-.aviso{
-  border:1px dashed var(--linea2); border-radius:var(--radio); padding:1.5rem 1.05rem;
-  text-align:center; color:var(--tenue); font-size:.9rem; background:rgba(17,24,35,.55);
-}
-.aviso strong{display:block; color:var(--txt); font-size:1.02rem; margin-bottom:.35rem}
+/* ═══════ jugadores ═══════ */
+.fichas{display:grid; gap:.42rem}
+.ficha{display:grid; grid-template-columns:2.1rem minmax(0,1fr) auto; align-items:center; gap:.6rem;
+  padding:.55rem .75rem; border:1px solid var(--linea); border-radius:12px; background:var(--panel);
+  text-align:left; width:100%; transition:border-color .18s,background .18s}
+.ficha:hover{border-color:var(--linea2); background:var(--panel2)}
+.ficha .pos{font-weight:900; color:var(--tenue2); font-size:.82rem}
+.ficha.p1 .pos{color:var(--oro)} .ficha.p2 .pos{color:var(--plata)} .ficha.p3 .pos{color:var(--bronce)}
+.ficha .quien{font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.ficha .quien small{display:block; font-weight:600; font-size:.68rem; color:var(--tenue2)}
+.ficha .tot{font-weight:900; color:var(--verde); font-size:1.05rem}
+.ficha.tuya{border-color:rgba(91,149,255,.5); background:rgba(91,149,255,.08)}
 
-footer{border-top:1px solid var(--linea); color:var(--tenue2); font-size:.76rem;
-  padding:1.7rem 0 calc(2.6rem + env(safe-area-inset-bottom))}
+.perfil{border:1px solid var(--linea2); border-radius:var(--radio); background:linear-gradient(180deg,var(--panel2),var(--panel));
+  padding:1rem .9rem; margin-bottom:.8rem; animation:brincar .4s ease both}
+.perfil .cab{display:flex; align-items:flex-start; gap:.7rem; flex-wrap:wrap}
+.perfil .nom{font-size:clamp(1.15rem,5.4vw,1.5rem); font-weight:900; letter-spacing:-.02em; overflow-wrap:anywhere}
+.perfil .cerrar{margin-left:auto; font-size:1.1rem; color:var(--tenue2); padding:.1rem .4rem; line-height:1}
+.perfil .cifras{display:flex; gap:1.1rem; flex-wrap:wrap; margin-top:.7rem}
+.perfil .cifra b{display:block; font-size:1.35rem; font-weight:900; line-height:1; font-variant-numeric:tabular-nums}
+.perfil .cifra span{font-size:.58rem; text-transform:uppercase; letter-spacing:.1em; color:var(--tenue2)}
+.barras{display:flex; align-items:flex-end; gap:5px; height:58px; margin-top:.85rem}
+.barras .col{flex:1 1 0; max-width:44px; display:flex; flex-direction:column;
+  justify-content:flex-end; align-items:center; gap:3px}
+.barras .b{width:100%; border-radius:3px 3px 0 0; background:linear-gradient(180deg,var(--acento),#3b6fd4);
+  min-height:3px; transition:height .7s cubic-bezier(.2,.7,.3,1)}
+.barras .col.mejor .b{background:linear-gradient(180deg,#ffe193,var(--oro))}
+.barras .col small{font-size:.54rem; color:var(--tenue2); font-weight:800}
+
+.duelo{display:grid; gap:.5rem}
+.duelo .caras{display:grid; grid-template-columns:1fr auto 1fr; gap:.5rem; align-items:center}
+.duelo .cara{border:1px solid var(--linea); border-radius:12px; background:var(--panel); padding:.6rem;
+  text-align:center; min-width:0}
+.duelo .cara .q{font-weight:900; font-size:.88rem; overflow-wrap:anywhere; line-height:1.2}
+.duelo .cara .t{font-size:1.5rem; font-weight:900; color:var(--verde); font-variant-numeric:tabular-nums}
+.duelo .cara.arriba{border-color:rgba(61,220,132,.45); background:rgba(61,220,132,.06)}
+.duelo .vs-mid{font-weight:900; color:var(--tenue2); font-size:.72rem; letter-spacing:.1em}
+.dif{display:grid; gap:.36rem}
+.dif .row{display:grid; grid-template-columns:1fr auto 1fr; gap:.4rem; align-items:center;
+  padding:.45rem .6rem; border:1px solid var(--linea); border-radius:10px; background:var(--panel); font-size:.8rem}
+.dif .row .j{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:800}
+.dif .row .j.izq{text-align:right} .dif .row .j.der{text-align:left}
+.dif .row .mid{font-size:.6rem; color:var(--tenue2); text-transform:uppercase; letter-spacing:.06em; text-align:center}
+.dif .row .j.gano{color:var(--verde)} .dif .row .j.perdio{color:var(--rojo); opacity:.7}
+
+.aviso{border:1px dashed var(--linea2); border-radius:var(--radio); padding:1.4rem 1rem; text-align:center;
+  color:var(--tenue); font-size:.88rem; background:rgba(16,23,36,.55)}
+.aviso strong{display:block; color:var(--txt); font-size:1.02rem; margin-bottom:.35rem}
+.envivo-chip{display:inline-flex; align-items:center; gap:.3rem; font-size:.58rem; font-weight:900;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--vivo); padding:.16rem .4rem;
+  border-radius:5px; background:rgba(255,71,87,.1); border:1px solid rgba(255,71,87,.3)}
+.envivo-chip .punto{animation:latir 1.4s ease-in-out infinite; width:5px; height:5px}
+
+footer{border-top:1px solid var(--linea); color:var(--tenue2); font-size:.75rem;
+  padding:1.7rem 0 calc(2.6rem + env(safe-area-inset-bottom)); margin-top:1.5rem}
 footer p{margin:.26rem 0}
-footer .firma{color:var(--tenue); font-weight:700}
-footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); font-size:.8rem}
+footer .firma{color:var(--tenue); font-weight:800}
+footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); font-size:.78rem}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none !important; transition:none !important}
@@ -391,16 +435,35 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 <header>
   <div class="env top">
     <div class="logo">
-      <span class="marca">ANGABAVE</span>
-      <span class="sub">Quiniela NFL 2026 <i class="version">alfa v0.0.0.1</i></span>
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <defs>
+          <linearGradient id="esc" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ffe193"/><stop offset=".55" stop-color="#f7c948"/>
+            <stop offset="1" stop-color="#d09617"/>
+          </linearGradient>
+        </defs>
+        <path d="M20 2.6 35.2 7.7v13.1c0 8.9-6.6 15.2-15.2 17.6C11.4 36 4.8 29.7 4.8 20.8V7.7z" fill="url(#esc)"/>
+        <path d="M20 5.4 32.6 9.6v11.2c0 7.4-5.5 12.7-12.6 14.8C12.9 33.5 7.4 28.2 7.4 20.8V9.6z" fill="#070b12" opacity=".9"/>
+        <ellipse cx="20" cy="19.6" rx="9.1" ry="5.7" transform="rotate(-27 20 19.6)" fill="url(#esc)"/>
+        <path d="M15.6 23.1 24.4 16.1" stroke="#070b12" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M17.3 20.6l1.5 1.9M19.5 18.8l1.5 1.9M21.7 17.1l1.5 1.9" stroke="#070b12" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <span class="letras">
+        <span class="marca">ANGABAVE</span>
+        <span class="sub">Quiniela NFL 2026 <i class="version">alfa v0.3.0</i></span>
+      </span>
     </div>
-    <label class="soy" id="soy"><span>Soy</span><select id="quien-soy" aria-label="Elige tu nombre"></select></label>
     <span class="estado" id="estado"><span class="punto"></span><span id="estado-txt">Temporada</span></span>
+  </div>
+  <div class="env controles">
+    <label class="soy" id="soy"><span>Soy</span><select id="quien-soy" aria-label="Elige tu nombre"></select></label>
+    <label class="soy" id="equipo"><span>Equipo</span><select id="mi-equipo" aria-label="Elige tu equipo"></select></label>
   </div>
   <div class="env menu">
     <nav class="pastillas" id="nav" aria-label="Secciones">
       <button type="button" data-vista="general" aria-selected="true">General</button>
       <button type="button" data-vista="premios" class="dorada" aria-selected="false">Premios</button>
+      <button type="button" data-vista="jugadores" aria-selected="false">Jugadores</button>
       <button type="button" data-vista="1" aria-selected="false"
         class="">
         S1      </button>
@@ -663,20 +726,20 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
   </section>
 
   <section class="vista oculto env" id="vista-premios"></section>
+  <section class="vista oculto env" id="vista-jugadores"></section>
   <section class="vista oculto env" id="vista-semana"></section>
 </main>
 
 <footer>
   <div class="env">
-    <p class="sello-marca">ANGABAVE · alfa v0.0.0.1</p>
-    <p>Primera versión del portal: puede cambiar de una semana a otra.</p>
+    <p class="sello-marca">ANGABAVE · alfa v0.3.0</p>
     <p>Gana la semana quien tenga más aciertos. Si un partido termina empatado, nadie acierta.</p>
-    <p>Actualizado 20 sep 2026, 12:45 · horario de Ciudad de México</p>
+    <p>Actualizado 20 sep 2026, 13:05 · horario de Ciudad de México</p>
     <p class="firma">Desarrollado por Angel Barrera</p>
   </div>
 </footer>
 
-<script type="application/json" id="datos">{"marca":"ANGABAVE","anio":2026,"actualizado":"20 sep 2026, 12:45","participantes":["Abundance","Adrish Irish","Angel D Luffy","Luis Santoyo","Gabriel Barrera","Alberto Santoyo","Beto Alvarez","Rogelio Loredo","Cesar de la Vega","Ismael Reyna","Luis Toledano","Chilangos Norteños","Marco Velasco","BuffyTinas","Leo Villavicencio","Chucho el Destructor","Mauro Soria","Raider79","Anya Villasister","Crosbytch","SKittles","Sotocles","Valentin Esparza","Guillermo Sors","Karla Villasister","Carlos Rodriguez","Emilio Madrigal","Emir Ibarra","Pato del Conde","Sol Vega","Alberto Alvarez","Tristan Mejia","Patrizio Di Toma","Salvador Mejia"],"general":[{"p":0,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":1,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":2,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":3,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":4,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":5,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":6,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":7,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":8,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":9,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":10,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":11,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":12,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":13,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":14,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":15,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":16,"pos":16,"total":11,"err":6,"sem":{"1":11,"2":0}},{"p":17,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":18,"pos":16,"total":11,"err":6,"sem":{"1":11,"2":0}},{"p":19,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":20,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":21,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":22,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":23,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":24,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":25,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":26,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":27,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":28,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":29,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":30,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":31,"pos":32,"total":9,"err":8,"sem":{"1":9,"2":0}},{"p":32,"pos":32,"total":9,"err":8,"sem":{"1":8,"2":1}},{"p":33,"pos":34,"total":8,"err":9,"sem":{"1":7,"2":1}}],"semanas":[{"n":1,"estado":"cerrada","cerrados":16,"total":16,"partidos":[{"v":"Patriots","l":"Seahawks","mv":10,"ml":13,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"49ers","l":"Rams","mv":27,"ml":7,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Bears","l":"Panthers","mv":59,"ml":37,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Buccaneers","l":"Bengals","mv":27,"ml":33,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Saints","l":"Lions","mv":30,"ml":31,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Bills","l":"Texans","mv":36,"ml":31,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Ravens","l":"Colts","mv":41,"ml":23,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Browns","l":"Jaguars","mv":10,"ml":34,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Falcons","l":"Steelers","mv":13,"ml":20,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Jets","l":"Titans","mv":23,"ml":10,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Cardinals","l":"Chargers","mv":26,"ml":14,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Dolphins","l":"Raiders","mv":13,"ml":27,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Packers","l":"Vikings","mv":22,"ml":39,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Washington","l":"Eagles","mv":22,"ml":24,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Cowboys","l":"Giants","mv":20,"ml":28,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Broncos","l":"Chiefs","mv":10,"ml":31,"e":"Final","g":"l","cerrado":true,"vivo":false}],"jugadores":[9,5,29,17,4,3,10,31,18,23,13,12,14,33,11,25,2,6,30,22,0,19,8,24,15,27,32,21,1,28,7,26,20,16],"picks":[[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,1],[1,1,0,1,1,1,0,1,1,0,1,1,1,1,0,0],[1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,0],[0,1,0,1,1,0,0,1,1,1,1,1,0,1,0,1],[1,0,0,1,1,1,0,1,1,1,1,1,1,1,1,0],[1,1,0,1,1,0,0,1,1,0,1,1,0,1,1,0],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,1],[1,1,0,1,1,1,0,1,1,1,1,0,1,1,0,0],[1,0,0,0,1,0,0,1,1,1,1,1,0,1,0,1],[1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,0],[1,0,0,1,1,0,0,1,1,1,1,0,0,1,0,1],[1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1],[1,1,0,1,1,1,0,1,1,0,1,1,1,1,0,0],[1,1,1,1,1,0,1,1,1,1,1,0,0,1,0,0],[1,1,0,1,1,0,0,1,1,0,1,1,0,1,0,0],[1,1,0,1,1,0,0,1,1,1,1,0,0,1,0,0],[1,1,0,1,1,0,0,1,1,0,1,1,1,1,0,0],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,1],[1,1,1,1,1,0,0,1,0,1,1,1,0,1,0,1],[1,1,0,1,1,0,0,1,0,1,1,1,0,1,0,1],[1,1,0,1,1,0,0,1,1,1,1,1,1,1,0,1],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,0],[1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,0],[1,1,0,0,1,0,0,1,1,1,1,1,0,1,1,0],[1,1,0,1,1,0,1,1,0,0,1,0,1,1,0,0],[0,0,1,0,1,0,0,1,0,1,1,1,0,1,0,1],[1,1,0,1,1,1,0,1,1,1,1,1,1,1,0,0],[0,1,0,1,1,0,0,1,1,1,1,1,1,1,1,1],[0,1,0,1,1,0,0,1,1,1,1,0,1,1,0,0],[1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1],[1,1,0,0,1,0,0,1,1,1,1,1,0,1,0,0],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,0],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,1,0]],"tabla":[{"p":0,"pos":1,"f":12,"e":4},{"p":1,"pos":1,"f":12,"e":4},{"p":2,"pos":1,"f":12,"e":4},{"p":4,"pos":1,"f":12,"e":4},{"p":3,"pos":1,"f":12,"e":4},{"p":5,"pos":6,"f":11,"e":5},{"p":18,"pos":6,"f":11,"e":5},{"p":6,"pos":6,"f":11,"e":5},{"p":13,"pos":6,"f":11,"e":5},{"p":8,"pos":6,"f":11,"e":5},{"p":11,"pos":6,"f":11,"e":5},{"p":9,"pos":6,"f":11,"e":5},{"p":14,"pos":6,"f":11,"e":5},{"p":10,"pos":6,"f":11,"e":5},{"p":12,"pos":6,"f":11,"e":5},{"p":16,"pos":6,"f":11,"e":5},{"p":7,"pos":6,"f":11,"e":5},{"p":15,"pos":18,"f":10,"e":6},{"p":19,"pos":18,"f":10,"e":6},{"p":23,"pos":18,"f":10,"e":6},{"p":24,"pos":18,"f":10,"e":6},{"p":17,"pos":18,"f":10,"e":6},{"p":20,"pos":18,"f":10,"e":6},{"p":21,"pos":18,"f":10,"e":6},{"p":22,"pos":18,"f":10,"e":6},{"p":30,"pos":26,"f":9,"e":7},{"p":25,"pos":26,"f":9,"e":7},{"p":26,"pos":26,"f":9,"e":7},{"p":27,"pos":26,"f":9,"e":7},{"p":28,"pos":26,"f":9,"e":7},{"p":29,"pos":26,"f":9,"e":7},{"p":31,"pos":26,"f":9,"e":7},{"p":32,"pos":33,"f":8,"e":8},{"p":33,"pos":34,"f":7,"e":9}],"panorama":{},"ganadores":[0,1,2,4,3],"oficial":true,"proyectable":true,"umbral":8,"premio":"$1,040","premio_total":"$5,200"},{"n":2,"estado":"en_vivo","cerrados":1,"total":16,"partidos":[{"v":"Lions","l":"Bills","mv":31,"ml":41,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Panthers","l":"Falcons","mv":20,"ml":3,"e":"Medio tiempo","g":"v","cerrado":false,"vivo":true},{"v":"Saints","l":"Ravens","mv":9,"ml":14,"e":"En curso","g":"l","cerrado":false,"vivo":true},{"v":"Vikings","l":"Bears","mv":6,"ml":3,"e":"En curso","g":"v","cerrado":false,"vivo":true},{"v":"Bengals","l":"Texans","mv":7,"ml":3,"e":"Medio tiempo","g":"v","cerrado":false,"vivo":true},{"v":"Steelers","l":"Patriots","mv":3,"ml":10,"e":"En curso","g":"l","cerrado":false,"vivo":true},{"v":"Packers","l":"Jets","mv":7,"ml":7,"e":"Medio tiempo","g":null,"cerrado":false,"vivo":true},{"v":"Browns","l":"Buccaneers","mv":6,"ml":9,"e":"En curso","g":"l","cerrado":false,"vivo":true},{"v":"Eagles","l":"Titans","mv":14,"ml":10,"e":"En curso","g":"v","cerrado":false,"vivo":true},{"v":"Jaguars","l":"Broncos","mv":null,"ml":null,"e":"dom 20 · 14:05","g":null,"cerrado":false,"vivo":false},{"v":"Raiders","l":"Chargers","mv":null,"ml":null,"e":"dom 20 · 14:05","g":null,"cerrado":false,"vivo":false},{"v":"Seahawks","l":"Cardinals","mv":null,"ml":null,"e":"dom 20 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Washington","l":"Cowboys","mv":null,"ml":null,"e":"dom 20 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Dolphins","l":"49ers","mv":null,"ml":null,"e":"dom 20 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Colts","l":"Chiefs","mv":null,"ml":null,"e":"dom 20 · 18:20","g":null,"cerrado":false,"vivo":false},{"v":"Giants","l":"Rams","mv":null,"ml":null,"e":"lun 21 · 18:15","g":null,"cerrado":false,"vivo":false}],"jugadores":[9,5,29,17,4,3,10,31,18,23,13,12,14,33,11,25,2,6,30,22,0,19,8,24,15,27,32,21,1,28,7,26,20,16],"picks":[[1,0,1,1,1,1,0,1,0,0,1,0,1,1,1,1],[1,0,1,1,0,1,1,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,1,0,0,1,1,1,1],[1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,1,1,0,1,0,1,0,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,0,1,0,0,1,1,1],[1,0,1,1,1,1,1,1,0,1,1,0,1,1,1,1],[0,0,1,0,1,1,0,1,0,1,1,1,1,1,0,1],[0,1,1,1,0,1,0,1,0,1,1,0,0,1,1,1],[1,1,1,1,0,0,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,1,0,0,1,0,1,1,1,1,1,1,1],[1,1,1,1,0,0,0,1,0,0,0,0,0,1,1,1],[1,1,1,1,1,0,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,0,0,1,0,0,1,0,1,1,1,1],[1,1,1,1,0,1,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,0,1,0,1,1,1,1],[1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,1,1,0,1,0,0,1,0,1,1,1,1],[1,0,1,1,0,0,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,0,1,0,1,0,1,0,0,1,1,1,1],[1,0,1,1,0,0,0,1,0,1,1,0,0,1,1,1],[1,1,1,1,0,0,0,1,0,0,1,1,0,1,1,0],[1,0,1,1,0,1,0,1,0,0,1,0,1,1,1,1],[1,1,1,1,0,1,0,1,0,1,0,0,0,1,1,0],[1,0,1,1,1,1,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1],[1,0,1,1,1,1,0,1,0,0,0,0,0,1,1,1],[1,0,1,0,1,1,0,1,0,0,0,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,0,1,0,1,1,1,1],[0,0,1,1,0,1,0,1,0,1,1,0,1,1,1,1]],"tabla":[{"p":0,"pos":1,"f":1,"e":0},{"p":5,"pos":1,"f":1,"e":0},{"p":6,"pos":1,"f":1,"e":0},{"p":15,"pos":1,"f":1,"e":0},{"p":17,"pos":1,"f":1,"e":0},{"p":7,"pos":1,"f":1,"e":0},{"p":1,"pos":1,"f":1,"e":0},{"p":2,"pos":1,"f":1,"e":0},{"p":25,"pos":1,"f":1,"e":0},{"p":8,"pos":1,"f":1,"e":0},{"p":19,"pos":1,"f":1,"e":0},{"p":26,"pos":1,"f":1,"e":0},{"p":27,"pos":1,"f":1,"e":0},{"p":9,"pos":1,"f":1,"e":0},{"p":3,"pos":1,"f":1,"e":0},{"p":10,"pos":1,"f":1,"e":0},{"p":28,"pos":1,"f":1,"e":0},{"p":32,"pos":1,"f":1,"e":0},{"p":20,"pos":1,"f":1,"e":0},{"p":29,"pos":1,"f":1,"e":0},{"p":21,"pos":1,"f":1,"e":0},{"p":22,"pos":1,"f":1,"e":0},{"p":30,"pos":1,"f":1,"e":0},{"p":11,"pos":1,"f":1,"e":0},{"p":4,"pos":1,"f":1,"e":0},{"p":23,"pos":1,"f":1,"e":0},{"p":24,"pos":1,"f":1,"e":0},{"p":12,"pos":1,"f":1,"e":0},{"p":33,"pos":1,"f":1,"e":0},{"p":13,"pos":1,"f":1,"e":0},{"p":14,"pos":1,"f":1,"e":0},{"p":16,"pos":32,"f":0,"e":1},{"p":31,"pos":32,"f":0,"e":1},{"p":18,"pos":32,"f":0,"e":1}],"panorama":{"9":[0,704],"5":[640,2272],"29":[192,2048],"17":[0,640],"4":[384,1152],"3":[448,1696],"10":[576,2016],"31":[768,1120],"18":[0,384],"23":[384,1152],"13":[1056,2272],"12":[1792,1088],"14":[512,1024],"33":[192,704],"11":[704,1664],"25":[128,1152],"2":[0,704],"6":[0,640],"30":[448,1728],"22":[352,1376],"0":[0,640],"19":[192,896],"8":[896,2080],"24":[2496,3088],"15":[288,1952],"27":[1280,2960],"32":[0,576],"21":[0,576],"1":[1040,2096],"28":[704,2560],"7":[1344,2656],"26":[0,576],"20":[0,704]},"ganadores":[],"oficial":false,"proyectable":false,"umbral":8,"combinaciones":32768},{"n":3,"estado":"pendiente","cerrados":0,"total":16,"partidos":[{"v":"Falcons","l":"Packers","mv":null,"ml":null,"e":"jue 24 · 18:15","g":null,"cerrado":false,"vivo":false},{"v":"Chargers","l":"Bills","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Panthers","l":"Browns","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Jets","l":"Lions","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Texans","l":"Colts","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Chiefs","l":"Dolphins","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Titans","l":"Giants","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Bengals","l":"Steelers","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Seahawks","l":"Washington","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Patriots","l":"Jaguars","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Cardinals","l":"49ers","mv":null,"ml":null,"e":"dom 27 · 14:05","g":null,"cerrado":false,"vivo":false},{"v":"Vikings","l":"Buccaneers","mv":null,"ml":null,"e":"dom 27 · 14:05","g":null,"cerrado":false,"vivo":false},{"v":"Ravens","l":"Cowboys","mv":null,"ml":null,"e":"dom 27 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Raiders","l":"Saints","mv":null,"ml":null,"e":"dom 27 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Rams","l":"Broncos","mv":null,"ml":null,"e":"dom 27 · 18:20","g":null,"cerrado":false,"vivo":false},{"v":"Eagles","l":"Bears","mv":null,"ml":null,"e":"lun 28 · 18:15","g":null,"cerrado":false,"vivo":false}],"jugadores":[],"picks":[],"tabla":[],"panorama":{},"ganadores":[],"oficial":false,"proyectable":false,"umbral":8}],"activa":2,"premios":{"semanal":"$5,200","acumulado_semanal":"$1,400","total":"$25,200","semanas_temporada":18,"semanas_jugadas":2,"apartado":"$2,800","reparto":[],"temporada_cerrada":false,"reglas":[{"lugar":"1º","porcentaje":"70%","monto":"$17,640"},{"lugar":"2º","porcentaje":"20%","monto":"$5,040"},{"lugar":"3º","porcentaje":"10%","monto":"$2,520"}]},"podio_listo":true,"cerrados_temporada":17,"umbral_podio":16,"recarga":300}</script>
+<script type="application/json" id="datos">{"marca":"ANGABAVE","anio":2026,"actualizado":"20 sep 2026, 13:05","participantes":["Abundance","Adrish Irish","Angel D Luffy","Luis Santoyo","Gabriel Barrera","Alberto Santoyo","Beto Alvarez","Rogelio Loredo","Cesar de la Vega","Ismael Reyna","Luis Toledano","Chilangos Norteños","Marco Velasco","BuffyTinas","Leo Villavicencio","Chucho el Destructor","Mauro Soria","Raider79","Anya Villasister","Crosbytch","SKittles","Sotocles","Valentin Esparza","Guillermo Sors","Karla Villasister","Carlos Rodriguez","Emilio Madrigal","Emir Ibarra","Pato del Conde","Sol Vega","Alberto Alvarez","Tristan Mejia","Patrizio Di Toma","Salvador Mejia"],"colores":{"Cardinals":{"local":"#D95A6F","local_texto":"#070B12","visita":"#E8EDF5","visita_texto":"#070B12"},"Falcons":{"local":"#E94449","local_texto":"#070B12","visita":"#D6D9DD","visita_texto":"#070B12"},"Ravens":{"local":"#8B76E0","local_texto":"#070B12","visita":"#FFC547","visita_texto":"#070B12"},"Bills":{"local":"#4A7DFF","local_texto":"#070B12","visita":"#E94C48","visita_texto":"#070B12"},"Panthers":{"local":"#0BA0E8","local_texto":"#070B12","visita":"#C6CDD2","visita_texto":"#070B12"},"Bears":{"local":"#E8642A","local_texto":"#070B12","visita":"#6988B7","visita_texto":"#070B12"},"Bengals":{"local":"#FB4F14","local_texto":"#070B12","visita":"#E8EDF5","visita_texto":"#070B12"},"Browns":{"local":"#FF6A2A","local_texto":"#070B12","visita":"#E8DCC8","visita_texto":"#070B12"},"Cowboys":{"local":"#7FA3E8","local_texto":"#070B12","visita":"#C6CDD2","visita_texto":"#070B12"},"Broncos":{"local":"#FB6B1E","local_texto":"#070B12","visita":"#6D8FE8","visita_texto":"#070B12"},"Lions":{"local":"#35A7E8","local_texto":"#070B12","visita":"#C6CDD2","visita_texto":"#070B12"},"Packers":{"local":"#FFC547","local_texto":"#070B12","visita":"#4FA37A","visita_texto":"#070B12"},"Texans":{"local":"#E8455C","local_texto":"#070B12","visita":"#6D8FE8","visita_texto":"#070B12"},"Colts":{"local":"#4A93E8","local_texto":"#070B12","visita":"#E8EDF5","visita_texto":"#070B12"},"Jaguars":{"local":"#2FC2C9","local_texto":"#070B12","visita":"#D7A22A","visita_texto":"#070B12"},"Chiefs":{"local":"#FF3B4E","local_texto":"#070B12","visita":"#FFC547","visita_texto":"#070B12"},"Chargers":{"local":"#2BA8FF","local_texto":"#070B12","visita":"#FFC72C","visita_texto":"#070B12"},"Rams":{"local":"#FFB020","local_texto":"#070B12","visita":"#6D8FE8","visita_texto":"#070B12"},"Raiders":{"local":"#C6CDD2","local_texto":"#070B12","visita":"#E8EDF5","visita_texto":"#070B12"},"Dolphins":{"local":"#17C5CC","local_texto":"#070B12","visita":"#FF8C2E","visita_texto":"#070B12"},"Vikings":{"local":"#9B6BE8","local_texto":"#070B12","visita":"#FFC547","visita_texto":"#070B12"},"Patriots":{"local":"#E85A72","local_texto":"#070B12","visita":"#6D8FE8","visita_texto":"#070B12"},"Saints":{"local":"#E3CB94","local_texto":"#070B12","visita":"#C6CDD2","visita_texto":"#070B12"},"Giants":{"local":"#6D8FE8","local_texto":"#070B12","visita":"#E8455C","visita_texto":"#070B12"},"Jets":{"local":"#2FBF7A","local_texto":"#070B12","visita":"#E8EDF5","visita_texto":"#070B12"},"Eagles":{"local":"#16A085","local_texto":"#070B12","visita":"#C6CDD2","visita_texto":"#070B12"},"Steelers":{"local":"#FFC72C","local_texto":"#070B12","visita":"#C6CDD2","visita_texto":"#070B12"},"49ers":{"local":"#E8503F","local_texto":"#070B12","visita":"#E3CB94","visita_texto":"#070B12"},"Seahawks":{"local":"#69BE28","local_texto":"#070B12","visita":"#6D8FE8","visita_texto":"#070B12"},"Buccaneers":{"local":"#FF3535","local_texto":"#070B12","visita":"#C6853F","visita_texto":"#070B12"},"Titans":{"local":"#67A9E8","local_texto":"#070B12","visita":"#6D8FE8","visita_texto":"#070B12"},"Washington":{"local":"#C8656B","local_texto":"#070B12","visita":"#FFC547","visita_texto":"#070B12"}},"siglas":{"Cardinals":"ARI","Falcons":"ATL","Ravens":"BAL","Bills":"BUF","Panthers":"CAR","Bears":"CHI","Bengals":"CIN","Browns":"CLE","Cowboys":"DAL","Broncos":"DEN","Lions":"DET","Packers":"GB","Texans":"HOU","Colts":"IND","Jaguars":"JAX","Chiefs":"KC","Chargers":"LAC","Rams":"LAR","Raiders":"LV","Dolphins":"MIA","Vikings":"MIN","Patriots":"NE","Saints":"NO","Giants":"NYG","Jets":"NYJ","Eagles":"PHI","Steelers":"PIT","49ers":"SF","Seahawks":"SEA","Buccaneers":"TB","Titans":"TEN","Washington":"WSH"},"general":[{"p":0,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":1,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":2,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":3,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":4,"pos":1,"total":13,"err":4,"sem":{"1":12,"2":1}},{"p":5,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":6,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":7,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":8,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":9,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":10,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":11,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":12,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":13,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":14,"pos":6,"total":12,"err":5,"sem":{"1":11,"2":1}},{"p":15,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":16,"pos":16,"total":11,"err":6,"sem":{"1":11,"2":0}},{"p":17,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":18,"pos":16,"total":11,"err":6,"sem":{"1":11,"2":0}},{"p":19,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":20,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":21,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":22,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":23,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":24,"pos":16,"total":11,"err":6,"sem":{"1":10,"2":1}},{"p":25,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":26,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":27,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":28,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":29,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":30,"pos":26,"total":10,"err":7,"sem":{"1":9,"2":1}},{"p":31,"pos":32,"total":9,"err":8,"sem":{"1":9,"2":0}},{"p":32,"pos":32,"total":9,"err":8,"sem":{"1":8,"2":1}},{"p":33,"pos":34,"total":8,"err":9,"sem":{"1":7,"2":1}}],"semanas":[{"n":1,"estado":"cerrada","cerrados":16,"total":16,"partidos":[{"v":"Patriots","l":"Seahawks","mv":10,"ml":13,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"49ers","l":"Rams","mv":27,"ml":7,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Bears","l":"Panthers","mv":59,"ml":37,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Buccaneers","l":"Bengals","mv":27,"ml":33,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Saints","l":"Lions","mv":30,"ml":31,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Bills","l":"Texans","mv":36,"ml":31,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Ravens","l":"Colts","mv":41,"ml":23,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Browns","l":"Jaguars","mv":10,"ml":34,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Falcons","l":"Steelers","mv":13,"ml":20,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Jets","l":"Titans","mv":23,"ml":10,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Cardinals","l":"Chargers","mv":26,"ml":14,"e":"Final","g":"v","cerrado":true,"vivo":false},{"v":"Dolphins","l":"Raiders","mv":13,"ml":27,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Packers","l":"Vikings","mv":22,"ml":39,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Washington","l":"Eagles","mv":22,"ml":24,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Cowboys","l":"Giants","mv":20,"ml":28,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Broncos","l":"Chiefs","mv":10,"ml":31,"e":"Final","g":"l","cerrado":true,"vivo":false}],"jugadores":[9,5,29,17,4,3,10,31,18,23,13,12,14,33,11,25,2,6,30,22,0,19,8,24,15,27,32,21,1,28,7,26,20,16],"picks":[[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,1],[1,1,0,1,1,1,0,1,1,0,1,1,1,1,0,0],[1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,0],[0,1,0,1,1,0,0,1,1,1,1,1,0,1,0,1],[1,0,0,1,1,1,0,1,1,1,1,1,1,1,1,0],[1,1,0,1,1,0,0,1,1,0,1,1,0,1,1,0],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,1],[1,1,0,1,1,1,0,1,1,1,1,0,1,1,0,0],[1,0,0,0,1,0,0,1,1,1,1,1,0,1,0,1],[1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,0],[1,0,0,1,1,0,0,1,1,1,1,0,0,1,0,1],[1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1],[1,1,0,1,1,1,0,1,1,0,1,1,1,1,0,0],[1,1,1,1,1,0,1,1,1,1,1,0,0,1,0,0],[1,1,0,1,1,0,0,1,1,0,1,1,0,1,0,0],[1,1,0,1,1,0,0,1,1,1,1,0,0,1,0,0],[1,1,0,1,1,0,0,1,1,0,1,1,1,1,0,0],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,1],[1,1,1,1,1,0,0,1,0,1,1,1,0,1,0,1],[1,1,0,1,1,0,0,1,0,1,1,1,0,1,0,1],[1,1,0,1,1,0,0,1,1,1,1,1,1,1,0,1],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,0],[1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,0],[1,1,0,0,1,0,0,1,1,1,1,1,0,1,1,0],[1,1,0,1,1,0,1,1,0,0,1,0,1,1,0,0],[0,0,1,0,1,0,0,1,0,1,1,1,0,1,0,1],[1,1,0,1,1,1,0,1,1,1,1,1,1,1,0,0],[0,1,0,1,1,0,0,1,1,1,1,1,1,1,1,1],[0,1,0,1,1,0,0,1,1,1,1,0,1,1,0,0],[1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1],[1,1,0,0,1,0,0,1,1,1,1,1,0,1,0,0],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,0,0],[1,1,0,1,1,0,0,1,1,1,1,1,0,1,1,0]],"tabla":[{"p":0,"pos":1,"f":12,"e":4},{"p":1,"pos":1,"f":12,"e":4},{"p":2,"pos":1,"f":12,"e":4},{"p":4,"pos":1,"f":12,"e":4},{"p":3,"pos":1,"f":12,"e":4},{"p":5,"pos":6,"f":11,"e":5},{"p":18,"pos":6,"f":11,"e":5},{"p":6,"pos":6,"f":11,"e":5},{"p":13,"pos":6,"f":11,"e":5},{"p":8,"pos":6,"f":11,"e":5},{"p":11,"pos":6,"f":11,"e":5},{"p":9,"pos":6,"f":11,"e":5},{"p":14,"pos":6,"f":11,"e":5},{"p":10,"pos":6,"f":11,"e":5},{"p":12,"pos":6,"f":11,"e":5},{"p":16,"pos":6,"f":11,"e":5},{"p":7,"pos":6,"f":11,"e":5},{"p":15,"pos":18,"f":10,"e":6},{"p":19,"pos":18,"f":10,"e":6},{"p":23,"pos":18,"f":10,"e":6},{"p":24,"pos":18,"f":10,"e":6},{"p":17,"pos":18,"f":10,"e":6},{"p":20,"pos":18,"f":10,"e":6},{"p":21,"pos":18,"f":10,"e":6},{"p":22,"pos":18,"f":10,"e":6},{"p":30,"pos":26,"f":9,"e":7},{"p":25,"pos":26,"f":9,"e":7},{"p":26,"pos":26,"f":9,"e":7},{"p":27,"pos":26,"f":9,"e":7},{"p":28,"pos":26,"f":9,"e":7},{"p":29,"pos":26,"f":9,"e":7},{"p":31,"pos":26,"f":9,"e":7},{"p":32,"pos":33,"f":8,"e":8},{"p":33,"pos":34,"f":7,"e":9}],"panorama":{},"ganadores":[0,1,2,4,3],"oficial":true,"proyectable":true,"umbral":8,"premio":"$1,040","premio_total":"$5,200"},{"n":2,"estado":"en_vivo","cerrados":1,"total":16,"partidos":[{"v":"Lions","l":"Bills","mv":31,"ml":41,"e":"Final","g":"l","cerrado":true,"vivo":false},{"v":"Panthers","l":"Falcons","mv":20,"ml":3,"e":"En curso","g":"v","cerrado":false,"vivo":true},{"v":"Saints","l":"Ravens","mv":9,"ml":17,"e":"En curso","g":"l","cerrado":false,"vivo":true},{"v":"Vikings","l":"Bears","mv":6,"ml":3,"e":"En curso","g":"v","cerrado":false,"vivo":true},{"v":"Bengals","l":"Texans","mv":10,"ml":3,"e":"En curso","g":"v","cerrado":false,"vivo":true},{"v":"Steelers","l":"Patriots","mv":3,"ml":10,"e":"En curso","g":"l","cerrado":false,"vivo":true},{"v":"Packers","l":"Jets","mv":7,"ml":7,"e":"En curso","g":null,"cerrado":false,"vivo":true},{"v":"Browns","l":"Buccaneers","mv":9,"ml":16,"e":"En curso","g":"l","cerrado":false,"vivo":true},{"v":"Eagles","l":"Titans","mv":17,"ml":17,"e":"En curso","g":null,"cerrado":false,"vivo":true},{"v":"Jaguars","l":"Broncos","mv":null,"ml":null,"e":"dom 20 · 14:05","g":null,"cerrado":false,"vivo":false},{"v":"Raiders","l":"Chargers","mv":null,"ml":null,"e":"dom 20 · 14:05","g":null,"cerrado":false,"vivo":false},{"v":"Seahawks","l":"Cardinals","mv":null,"ml":null,"e":"dom 20 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Washington","l":"Cowboys","mv":null,"ml":null,"e":"dom 20 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Dolphins","l":"49ers","mv":null,"ml":null,"e":"dom 20 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Colts","l":"Chiefs","mv":null,"ml":null,"e":"dom 20 · 18:20","g":null,"cerrado":false,"vivo":false},{"v":"Giants","l":"Rams","mv":null,"ml":null,"e":"lun 21 · 18:15","g":null,"cerrado":false,"vivo":false}],"jugadores":[9,5,29,17,4,3,10,31,18,23,13,12,14,33,11,25,2,6,30,22,0,19,8,24,15,27,32,21,1,28,7,26,20,16],"picks":[[1,0,1,1,1,1,0,1,0,0,1,0,1,1,1,1],[1,0,1,1,0,1,1,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,1,0,0,1,1,1,1],[1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,1,1,0,1,0,1,0,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,0,1,0,0,1,1,1],[1,0,1,1,1,1,1,1,0,1,1,0,1,1,1,1],[0,0,1,0,1,1,0,1,0,1,1,1,1,1,0,1],[0,1,1,1,0,1,0,1,0,1,1,0,0,1,1,1],[1,1,1,1,0,0,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,1,0,0,1,0,1,1,1,1,1,1,1],[1,1,1,1,0,0,0,1,0,0,0,0,0,1,1,1],[1,1,1,1,1,0,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,0,0,1,0,0,1,0,1,1,1,1],[1,1,1,1,0,1,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,0,1,0,1,1,1,1],[1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,1,1,0,1,0,0,1,0,1,1,1,1],[1,0,1,1,0,0,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,0,1,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,0,1,0,1,0,1,0,0,1,1,1,1],[1,0,1,1,0,0,0,1,0,1,1,0,0,1,1,1],[1,1,1,1,0,0,0,1,0,0,1,1,0,1,1,0],[1,0,1,1,0,1,0,1,0,0,1,0,1,1,1,1],[1,1,1,1,0,1,0,1,0,1,0,0,0,1,1,0],[1,0,1,1,1,1,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,1,1,0,1,1,1,1],[1,1,1,1,0,1,0,1,0,1,0,1,1,1,1,1],[1,0,1,1,1,1,0,1,0,0,0,0,0,1,1,1],[1,0,1,0,1,1,0,1,0,0,0,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,1,1,0,1,1,1,1],[1,0,1,1,1,1,0,1,0,0,1,0,1,1,1,1],[0,0,1,1,0,1,0,1,0,1,1,0,1,1,1,1]],"tabla":[{"p":0,"pos":1,"f":1,"e":0},{"p":5,"pos":1,"f":1,"e":0},{"p":6,"pos":1,"f":1,"e":0},{"p":15,"pos":1,"f":1,"e":0},{"p":17,"pos":1,"f":1,"e":0},{"p":7,"pos":1,"f":1,"e":0},{"p":1,"pos":1,"f":1,"e":0},{"p":2,"pos":1,"f":1,"e":0},{"p":25,"pos":1,"f":1,"e":0},{"p":8,"pos":1,"f":1,"e":0},{"p":19,"pos":1,"f":1,"e":0},{"p":26,"pos":1,"f":1,"e":0},{"p":27,"pos":1,"f":1,"e":0},{"p":9,"pos":1,"f":1,"e":0},{"p":3,"pos":1,"f":1,"e":0},{"p":10,"pos":1,"f":1,"e":0},{"p":28,"pos":1,"f":1,"e":0},{"p":32,"pos":1,"f":1,"e":0},{"p":20,"pos":1,"f":1,"e":0},{"p":29,"pos":1,"f":1,"e":0},{"p":21,"pos":1,"f":1,"e":0},{"p":22,"pos":1,"f":1,"e":0},{"p":30,"pos":1,"f":1,"e":0},{"p":11,"pos":1,"f":1,"e":0},{"p":4,"pos":1,"f":1,"e":0},{"p":23,"pos":1,"f":1,"e":0},{"p":24,"pos":1,"f":1,"e":0},{"p":12,"pos":1,"f":1,"e":0},{"p":33,"pos":1,"f":1,"e":0},{"p":13,"pos":1,"f":1,"e":0},{"p":14,"pos":1,"f":1,"e":0},{"p":16,"pos":32,"f":0,"e":1},{"p":31,"pos":32,"f":0,"e":1},{"p":18,"pos":32,"f":0,"e":1}],"panorama":{"9":[0,704],"5":[640,2272],"29":[192,2048],"17":[0,640],"4":[384,1152],"3":[448,1696],"10":[576,2016],"31":[768,1120],"18":[0,384],"23":[384,1152],"13":[1056,2272],"12":[1792,1088],"14":[512,1024],"33":[192,704],"11":[704,1664],"25":[128,1152],"2":[0,704],"6":[0,640],"30":[448,1728],"22":[352,1376],"0":[0,640],"19":[192,896],"8":[896,2080],"24":[2496,3088],"15":[288,1952],"27":[1280,2960],"32":[0,576],"21":[0,576],"1":[1040,2096],"28":[704,2560],"7":[1344,2656],"26":[0,576],"20":[0,704]},"ganadores":[],"oficial":false,"proyectable":false,"umbral":8,"combinaciones":32768},{"n":3,"estado":"pendiente","cerrados":0,"total":16,"partidos":[{"v":"Falcons","l":"Packers","mv":null,"ml":null,"e":"jue 24 · 18:15","g":null,"cerrado":false,"vivo":false},{"v":"Chargers","l":"Bills","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Panthers","l":"Browns","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Jets","l":"Lions","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Texans","l":"Colts","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Chiefs","l":"Dolphins","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Titans","l":"Giants","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Bengals","l":"Steelers","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Seahawks","l":"Washington","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Patriots","l":"Jaguars","mv":null,"ml":null,"e":"dom 27 · 11:00","g":null,"cerrado":false,"vivo":false},{"v":"Cardinals","l":"49ers","mv":null,"ml":null,"e":"dom 27 · 14:05","g":null,"cerrado":false,"vivo":false},{"v":"Vikings","l":"Buccaneers","mv":null,"ml":null,"e":"dom 27 · 14:05","g":null,"cerrado":false,"vivo":false},{"v":"Ravens","l":"Cowboys","mv":null,"ml":null,"e":"dom 27 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Raiders","l":"Saints","mv":null,"ml":null,"e":"dom 27 · 14:25","g":null,"cerrado":false,"vivo":false},{"v":"Rams","l":"Broncos","mv":null,"ml":null,"e":"dom 27 · 18:20","g":null,"cerrado":false,"vivo":false},{"v":"Eagles","l":"Bears","mv":null,"ml":null,"e":"lun 28 · 18:15","g":null,"cerrado":false,"vivo":false}],"jugadores":[],"picks":[],"tabla":[],"panorama":{},"ganadores":[],"oficial":false,"proyectable":false,"umbral":8}],"activa":2,"premios":{"semanal":"$5,200","acumulado_semanal":"$1,400","total":"$25,200","semanas_temporada":18,"semanas_jugadas":2,"apartado":"$2,800","reparto":[],"temporada_cerrada":false,"reglas":[{"lugar":"1º","porcentaje":"70%","monto":"$17,640"},{"lugar":"2º","porcentaje":"20%","monto":"$5,040"},{"lugar":"3º","porcentaje":"10%","monto":"$2,520"}]},"podio_listo":true,"cerrados_temporada":17,"umbral_podio":16,"recarga":600,"vivo":{"url":"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard","cada":60,"equipos":{"ARI":"Cardinals","ATL":"Falcons","BAL":"Ravens","BUF":"Bills","CAR":"Panthers","CHI":"Bears","CIN":"Bengals","CLE":"Browns","DAL":"Cowboys","DEN":"Broncos","DET":"Lions","GB":"Packers","HOU":"Texans","IND":"Colts","JAX":"Jaguars","KC":"Chiefs","LAC":"Chargers","LAR":"Rams","LV":"Raiders","MIA":"Dolphins","MIN":"Vikings","NE":"Patriots","NO":"Saints","NYG":"Giants","NYJ":"Jets","PHI":"Eagles","PIT":"Steelers","SF":"49ers","SEA":"Seahawks","TB":"Buccaneers","TEN":"Titans","WSH":"Washington","JAC":"Jaguars","LA":"Rams","WAS":"Washington"},"estados":{"Final":"Final","Final/OT":"Final/TE","In Progress":"En curso","End of Period":"Fin del periodo","Halftime":"Medio tiempo","Scheduled":"Por jugar","Postponed":"Pospuesto","Delayed":"Demorado","Canceled":"Cancelado","Suspended":"Suspendido"}}}</script>
 <script>
 (() => {
   "use strict";
@@ -684,6 +747,7 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
   const vistas = {
     general: document.getElementById("vista-general"),
     premios: document.getElementById("vista-premios"),
+    jugadores: document.getElementById("vista-jugadores"),
     semana: document.getElementById("vista-semana"),
   };
   const nav = document.getElementById("nav");
@@ -692,60 +756,8 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
   const porSemana = new Map(D.semanas.map((s) => [s.n, s]));
   const nombre = (i) => D.participantes[i] || "?";
   const suave = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let pestana = "tabla";
-
-  /* ═══ modo jugador ═══ */
-  const LLAVE = "angabave.jugador";
-  const cajaSoy = document.getElementById("soy");
-  const selectorSoy = document.getElementById("quien-soy");
-  let jugador = null;
-
-  function recordar(valor) {
-    // El almacenamiento puede fallar (ventana privada, permisos): no pasa nada.
-    try {
-      if (valor === null) localStorage.removeItem(LLAVE);
-      else localStorage.setItem(LLAVE, D.participantes[valor]);
-    } catch (e) { /* sin memoria, el modo sigue funcionando en esta visita */ }
-  }
-
-  function recordado() {
-    try {
-      const guardado = localStorage.getItem(LLAVE);
-      if (!guardado) return null;
-      const i = D.participantes.indexOf(guardado);
-      return i >= 0 ? i : null;
-    } catch (e) { return null; }
-  }
-
-  function montarSelector() {
-    selectorSoy.innerHTML = '<option value="">elige tu nombre</option>';
-    D.participantes
-      .map((quien, i) => [i, quien])
-      .sort((a, b) => a[1].localeCompare(b[1], "es"))
-      .forEach(([i, quien]) => {
-        const op = crear("option", null, quien);
-        op.value = String(i);
-        selectorSoy.appendChild(op);
-      });
-    jugador = recordado();
-    selectorSoy.value = jugador === null ? "" : String(jugador);
-    cajaSoy.classList.toggle("puesto", jugador !== null);
-    selectorSoy.addEventListener("change", () => {
-      jugador = selectorSoy.value === "" ? null : Number(selectorSoy.value);
-      recordar(jugador);
-      cajaSoy.classList.toggle("puesto", jugador !== null);
-      repintar();
-    });
-  }
-
-  /* Qué hizo el jugador en un partido: null si no jugó esa semana. */
-  function miPick(s, col) {
-    if (jugador === null) return null;
-    const fila = s.jugadores.indexOf(jugador);
-    if (fila < 0) return null;
-    const local = s.picks[fila][col] === 1;
-    return { lado: local ? "l" : "v", equipo: local ? s.partidos[col].l : s.partidos[col].v };
-  }
+  const MAX_NOMBRES = 3, MAX_NOMBRES_OFICIAL = 6;
+  let pestana = "tabla", vistaActual = "general", perfilAbierto = null;
 
   const crear = (tag, clase, texto) => {
     const n = document.createElement(tag);
@@ -753,11 +765,158 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     if (texto !== undefined) n.textContent = texto;
     return n;
   };
+  const listar = (gente, oficial) =>
+    gente.length <= (oficial ? MAX_NOMBRES_OFICIAL : MAX_NOMBRES)
+      ? gente.join(" · ") : gente.length + " empatados";
   const COPA =
     '<svg class="copa" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
     '<path d="M6 4h12v5a6 6 0 0 1-12 0V4Z" fill="#f7c948"/>' +
     '<path d="M6 5H4a3 3 0 0 0 3 3M18 5h2a3 3 0 0 1-3 3" stroke="#f7c948" stroke-width="1.6" stroke-linecap="round"/>' +
     '<path d="M12 15v3M9 21h6M10 18h4" stroke="#ffe193" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+  /* ═══ memoria del navegador ═══ */
+  function guardar(llave, valor) {
+    try { valor === null ? localStorage.removeItem(llave) : localStorage.setItem(llave, valor); }
+    catch (e) { /* ventana privada o permisos: el modo sigue vivo esta visita */ }
+  }
+  function leer(llave) {
+    try { return localStorage.getItem(llave); } catch (e) { return null; }
+  }
+
+  /* ═══ quién soy ═══ */
+  const cajaSoy = document.getElementById("soy");
+  const selSoy = document.getElementById("quien-soy");
+  let jugador = null;
+
+  function montarSoy() {
+    selSoy.innerHTML = '<option value="">elige tu nombre</option>';
+    D.participantes.map((q, i) => [i, q]).sort((a, b) => a[1].localeCompare(b[1], "es"))
+      .forEach(([i, q]) => { const o = crear("option", null, q); o.value = String(i); selSoy.appendChild(o); });
+    const g = leer("angabave.jugador");
+    const i = g ? D.participantes.indexOf(g) : -1;
+    jugador = i >= 0 ? i : null;
+    selSoy.value = jugador === null ? "" : String(jugador);
+    cajaSoy.classList.toggle("puesto", jugador !== null);
+    selSoy.addEventListener("change", () => {
+      jugador = selSoy.value === "" ? null : Number(selSoy.value);
+      guardar("angabave.jugador", jugador === null ? null : D.participantes[jugador]);
+      cajaSoy.classList.toggle("puesto", jugador !== null);
+      perfilAbierto = null;
+      repintar();
+    });
+  }
+
+  /* ═══ mi equipo: el portal se tiñe con sus colores ═══ */
+  const cajaEquipo = document.getElementById("equipo");
+  const selEquipo = document.getElementById("mi-equipo");
+  let equipo = null;
+
+  function montarEquipo() {
+    selEquipo.innerHTML = '<option value="">elige tu equipo</option>';
+    Object.keys(D.colores).sort((a, b) => a.localeCompare(b, "es")).forEach((eq) => {
+      const o = crear("option", null, eq); o.value = eq; selEquipo.appendChild(o);
+    });
+    const g = leer("angabave.equipo");
+    equipo = g && D.colores[g] ? g : null;
+    selEquipo.value = equipo || "";
+    selEquipo.addEventListener("change", () => {
+      equipo = selEquipo.value || null;
+      guardar("angabave.equipo", equipo);
+      aplicarTema();
+      repintar();
+    });
+    aplicarTema();
+  }
+
+  /* Colores de casa si juega de local esta semana, de visita si va de visitante. */
+  function aplicarTema() {
+    const raiz = document.documentElement;
+    cajaEquipo.classList.toggle("puesto", equipo !== null);
+    if (!equipo || !D.colores[equipo]) {
+      raiz.style.removeProperty("--acento");
+      return;
+    }
+    const s = porSemana.get(D.activa) || D.semanas[D.semanas.length - 1];
+    let donde = "local";
+    if (s) {
+      const juego = s.partidos.find((p) => p.v === equipo || p.l === equipo);
+      if (juego) donde = juego.l === equipo ? "local" : "visita";
+    }
+    raiz.style.setProperty("--acento", D.colores[equipo][donde]);
+  }
+
+  /* ═══ marcador en vivo ═══ */
+  const marcadores = new Map();
+  let fallosVivo = 0, ultimaConsulta = null;
+
+  function parsearVivo(carga) {
+    if (!carga || !Array.isArray(carga.events)) return null;
+    const salida = new Map();
+    for (const ev of carga.events) {
+      const comp = (ev.competitions || [])[0];
+      if (!comp || !Array.isArray(comp.competitors) || comp.competitors.length !== 2) return null;
+      let v = null, l = null;
+      for (const c of comp.competitors) {
+        const eq = D.vivo.equipos[(c.team || {}).abbreviation];
+        if (!eq) return null;
+        const m = c.score === "" || c.score == null ? null : Number(c.score);
+        if (Number.isNaN(m)) return null;
+        if (c.homeAway === "home") l = { eq, m };
+        else if (c.homeAway === "away") v = { eq, m };
+      }
+      if (!v || !l) return null;
+      const tipo = ((comp.status || ev.status || {}).type) || {};
+      if (typeof tipo.completed !== "boolean") return null;
+      let g = null;
+      if (v.m !== null && l.m !== null && v.m !== l.m) g = v.m > l.m ? "v" : "l";
+      const crudo = tipo.description || tipo.name || "";
+      salida.set(v.eq + "@" + l.eq, {
+        mv: v.m, ml: l.m, g,
+        e: D.vivo.estados[crudo] || crudo,
+        completado: tipo.completed,
+        enJuego: !tipo.completed && (tipo.state === "in" || (v.m || 0) + (l.m || 0) > 0),
+      });
+    }
+    return salida;
+  }
+
+  async function consultarVivo() {
+    if (!D.vivo || fallosVivo >= 3 || document.hidden) return;
+    const s = typeof vistaActual === "number" ? porSemana.get(vistaActual) : porSemana.get(D.activa);
+    if (!s || s.cerrados >= s.total) return;
+    const control = new AbortController();
+    const corte = setTimeout(() => control.abort(), 8000);
+    try {
+      const r = await fetch(
+        D.vivo.url + "?dates=" + D.anio + "&seasontype=2&week=" + s.n,
+        { signal: control.signal, cache: "no-store" }
+      );
+      if (!r.ok) throw new Error(r.status);
+      const frescos = parsearVivo(await r.json());
+      if (!frescos) throw new Error("formato inesperado");
+      frescos.forEach((valor, clave) => marcadores.set(clave, valor));
+      fallosVivo = 0;
+      ultimaConsulta = new Date();
+      repintar();
+    } catch (e) {
+      fallosVivo++;   // a la tercera se deja de insistir y manda lo publicado por CI
+    } finally {
+      clearTimeout(corte);
+    }
+  }
+
+  /* El navegador nunca cierra un partido: eso lo decide CI, que es la fuente oficial. */
+  function efectivo(p) {
+    if (p.cerrado) return p;
+    const vivo = marcadores.get(p.v + "@" + p.l);
+    if (!vivo) return p;
+    return Object.assign({}, p, {
+      mv: vivo.mv, ml: vivo.ml, g: vivo.g, vivo: vivo.enJuego,
+      e: vivo.completado ? "Final · por confirmar" : (vivo.e || p.e),
+      porConfirmar: vivo.completado,
+    });
+  }
+  const partidosDe = (s) => s.partidos.map(efectivo);
 
   /* ═══ encabezado ═══ */
   function pintarEstado(vista) {
@@ -775,7 +934,6 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     }
   }
 
-  /* ═══ confeti ═══ */
   const COLORES = ["#f7c948", "#ffe193", "#5b95ff", "#3ddc84", "#ffffff", "#ff6058"];
   function confeti(caja) {
     if (suave) return;
@@ -791,15 +949,13 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     }
   }
 
-  /* ═══ campeón de la semana ═══ */
-  // En lo que va en curso se cuenta; para el ganador oficial sí se nombra,
-  // porque es quien cobra.
-  const MAX_NOMBRES = 3;
-  const MAX_NOMBRES_OFICIAL = 6;
-  const listar = (gente, oficial) =>
-    gente.length <= (oficial ? MAX_NOMBRES_OFICIAL : MAX_NOMBRES)
-      ? gente.join(" · ")
-      : gente.length + " empatados";
+  function miPick(s, col) {
+    if (jugador === null) return null;
+    const fila = s.jugadores.indexOf(jugador);
+    if (fila < 0) return null;
+    const local = s.picks[fila][col] === 1;
+    return { lado: local ? "l" : "v", equipo: local ? s.partidos[col].l : s.partidos[col].v };
+  }
 
   function campeon(s) {
     if (!s.proyectable) {
@@ -814,37 +970,57 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     const lluvia = crear("div", "confetis");
     caja.appendChild(lluvia);
     caja.insertAdjacentHTML("beforeend", COPA);
-    caja.appendChild(crear("div", "rotulo", oficial
+    caja.appendChild(crear("div", "rot", oficial
       ? (gente.length > 1 ? "Ganadores de la semana " + s.n : "Ganador de la semana " + s.n)
       : "Va ganando la semana " + s.n));
-
     caja.appendChild(crear("div", "nombres", listar(gente, oficial)));
-
     const fila = s.tabla.find((f) => f.pos === 1);
-    const aciertos = fila ? fila.f : 0;
+    const ac = fila ? fila.f : 0;
     caja.appendChild(crear("div", "cifra",
-      aciertos + (aciertos === 1 ? " acierto" : " aciertos") + " de " +
-      s.cerrados + (s.cerrados === 1 ? " partido cerrado" : " partidos cerrados")));
-
+      ac + (ac === 1 ? " acierto" : " aciertos") + " de " + s.cerrados +
+      (s.cerrados === 1 ? " partido cerrado" : " partidos cerrados")));
     const bolsa = crear("div", "bolsa");
-    bolsa.textContent = oficial
-      ? s.premio + (gente.length > 1 ? " para cada uno" : "")
-      : s.premio_total + " en juego";
+    bolsa.textContent = oficial ? s.premio + (gente.length > 1 ? " para cada uno" : "")
+                                : s.premio_total + " en juego";
     caja.appendChild(bolsa);
-
     if (oficial) requestAnimationFrame(() => confeti(lluvia));
     return caja;
   }
 
-  /* ═══ tabla de la semana ═══ */
+  function miSemana(s) {
+    if (jugador === null || s.jugadores.indexOf(jugador) < 0) return null;
+    const juegos = partidosDe(s);
+    let ok = 0, mal = 0, ganando = 0, faltan = 0;
+    juegos.forEach((p, col) => {
+      const mio = miPick(s, col);
+      if (!mio) return;
+      if (p.cerrado) { p.g === mio.lado ? ok++ : mal++; }
+      else { faltan++; if (p.g === mio.lado) ganando++; }
+    });
+    const caja = crear("div", "mi-semana");
+    const quien = crear("div");
+    quien.appendChild(crear("div", "rot", "Tu semana"));
+    quien.appendChild(crear("div", "yo", nombre(jugador)));
+    caja.appendChild(quien);
+    const cuentas = crear("div", "cuentas");
+    [["ok", ok, ok === 1 ? "acierto" : "aciertos"], ["no", mal, mal === 1 ? "fallo" : "fallos"],
+     ["vivo", ganando, "ganando"], ["", faltan, "por jugar"]].forEach(([c, v, et]) => {
+      const d = crear("div", "dato" + (c ? " " + c : ""));
+      d.appendChild(crear("b", null, String(v)));
+      d.appendChild(crear("span", null, et));
+      cuentas.appendChild(d);
+    });
+    caja.appendChild(cuentas);
+    return caja;
+  }
+
   function vivosPorParticipante(s) {
+    const juegos = partidosDe(s);
     const cuenta = new Map();
     s.jugadores.forEach((idx, fila) => {
       let n = 0;
-      s.partidos.forEach((p, col) => {
-        if (!p.cerrado && p.vivo && p.g !== null) {
-          if ((p.g === "l") === (s.picks[fila][col] === 1)) n++;
-        }
+      juegos.forEach((p, col) => {
+        if (!p.cerrado && p.g !== null && (p.g === "l") === (s.picks[fila][col] === 1)) n++;
       });
       cuenta.set(idx, n);
     });
@@ -855,26 +1031,25 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     const marco = crear("div", "marco rueda");
     const tabla = crear("table");
     tabla.className = "fija";
-    tabla.innerHTML =
-      '<thead><tr><th class="c-pos">#</th><th class="c-nombre">Participante</th>' +
+    tabla.innerHTML = '<thead><tr><th class="c-pos">#</th><th class="c-nombre">Participante</th>' +
       "<th>Aciertos</th><th>Fallos</th></tr></thead>";
     const cuerpo = crear("tbody");
     const vivos = vivosPorParticipante(s);
-
     s.tabla.forEach((fila, i) => {
-      const tr = crear("tr", "p" + fila.pos + (fila.p === jugador ? " yo" : ""));
+      const tr = crear("tr", "p" + fila.pos + (fila.p === jugador ? " yo" : "") + " clic");
       tr.style.setProperty("--i", Math.min(i, 12));
       tr.appendChild(crear("td", "c-pos", String(fila.pos)));
       tr.appendChild(crear("td", "c-nombre", nombre(fila.p)));
       const pts = crear("td", "pts", String(fila.f));
       const extra = vivos.get(fila.p) || 0;
       if (extra > 0) {
-        const marca = crear("span", "chip-vivo", "+" + extra);
-        marca.title = "Va ganando " + extra + " partido(s) en curso";
-        pts.appendChild(marca);
+        const m = crear("span", "chip-vivo", "+" + extra);
+        m.title = "Va ganando " + extra + " partido(s) en curso";
+        pts.appendChild(m);
       }
       tr.appendChild(pts);
       tr.appendChild(crear("td", "err", String(fila.e)));
+      tr.addEventListener("click", () => { perfilAbierto = fila.p; ir("jugadores", true); });
       cuerpo.appendChild(tr);
     });
     tabla.appendChild(cuerpo);
@@ -882,21 +1057,25 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     return marco;
   }
 
-  /* ═══ partidos ═══ */
+  /* ═══ marcador estilo transmisión ═══ */
   function panelPartidos(s) {
     const caja = crear("div", "juegos");
-    s.partidos.forEach((p, i) => {
+    partidosDe(s).forEach((p, i) => {
       const nodo = crear("article", "juego" + (p.vivo ? " envivo" : ""));
       nodo.style.setProperty("--i", Math.min(i, 12));
-      [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, equipo, marcador]) => {
-        const linea = crear("div", "equipo" + (p.g === lado ? " gana" : ""));
-        linea.appendChild(crear("span", "nom", equipo));
+      [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, eq, marcador]) => {
+        const linea = crear("div", "lado" + (p.g === lado ? " gana" : ""));
+        const color = (D.colores[eq] || {}).local;
+        if (color) linea.style.setProperty("--c", color);
+        linea.appendChild(crear("span", "sig", D.siglas[eq] || eq.slice(0, 3).toUpperCase()));
+        linea.appendChild(crear("span", "nom", eq));
         linea.appendChild(crear("span", "mrc", marcador === null ? "—" : String(marcador)));
         nodo.appendChild(linea);
       });
       const pie = crear("div", "pie");
       if (p.vivo) pie.appendChild(crear("span", "punto"));
       pie.appendChild(crear("span", null, p.e));
+      if (p.cerrado && p.g === "x") pie.appendChild(crear("span", "der", "empate"));
       nodo.appendChild(pie);
 
       const mio = miPick(s, i);
@@ -916,49 +1095,48 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     return caja;
   }
 
-  /* ═══ quién le fue a quién ═══ */
+  /* ═══ quién le fue a quién, con consenso ═══ */
   function panelReparto(s) {
-    const envoltura = crear("div");
-    const lista = crear("select");
+    const env = crear("div");
+    const lista = crear("select", "ancho");
     lista.innerHTML = '<option value="">Reparto de cada partido</option>';
-    s.jugadores
-      .map((idx) => [idx, nombre(idx)])
-      .sort((a, b) => a[1].localeCompare(b[1], "es"))
-      .forEach(([idx, quien]) => {
-        const op = crear("option", null, quien);
-        op.value = String(idx);
-        lista.appendChild(op);
-      });
+    s.jugadores.map((i) => [i, nombre(i)]).sort((a, b) => a[1].localeCompare(b[1], "es"))
+      .forEach(([i, q]) => { const o = crear("option", null, q); o.value = String(i); lista.appendChild(o); });
     if (jugador !== null && s.jugadores.indexOf(jugador) >= 0) lista.value = String(jugador);
-    envoltura.appendChild(lista);
-
+    env.appendChild(lista);
     const destino = crear("div");
-    envoltura.appendChild(destino);
+    env.appendChild(destino);
     const pintar = () => {
       destino.textContent = "";
       destino.appendChild(lista.value === "" ? repartoPorPartido(s) : boleta(s, Number(lista.value)));
     };
     lista.addEventListener("change", pintar);
     pintar();
-    return envoltura;
+    return env;
   }
 
   function repartoPorPartido(s) {
     const caja = crear("div", "reparto");
-    s.partidos.forEach((p, col) => {
+    const juegos = partidosDe(s);
+    juegos.forEach((p, col) => {
       const visita = [], casa = [];
       s.jugadores.forEach((idx, fila) => { (s.picks[fila][col] === 1 ? casa : visita).push(idx); });
       const total = visita.length + casa.length || 1;
+      const mayor = Math.max(visita.length, casa.length) / total;
 
-      const nodo = crear("article", "juego" + (p.vivo ? " envivo" : ""));
+      const nodo = crear("article", "split");
       nodo.style.setProperty("--i", Math.min(col, 12));
-      const cabeza = crear("div", "equipo");
-      cabeza.appendChild(crear("span", "nom", p.v + "  @  " + p.l));
-      cabeza.appendChild(crear("span", "mrc", p.mv === null ? p.e : p.mv + "–" + p.ml));
-      nodo.appendChild(cabeza);
+      const cab = crear("div", "cab");
+      cab.appendChild(crear("span", "vs", p.v + " @ " + p.l));
+      if (mayor >= 0.9) cab.appendChild(crear("span", "sello-consenso unanime", "casi unánime"));
+      else if (mayor <= 0.6) cab.appendChild(crear("span", "sello-consenso dividido", "dividido"));
+      cab.appendChild(crear("span", "mr", p.mv === null ? p.e : p.mv + "–" + p.ml));
+      nodo.appendChild(cab);
 
       const balanza = crear("div", "balanza");
-      const iv = crear("i", "iv"), il = crear("i", "il");
+      const iv = crear("i"), il = crear("i");
+      iv.style.background = (D.colores[p.v] || {}).local || "#5b95ff";
+      il.style.background = (D.colores[p.l] || {}).local || "#f7c948";
       balanza.appendChild(iv); balanza.appendChild(il);
       nodo.appendChild(balanza);
       requestAnimationFrame(() => {
@@ -966,11 +1144,20 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
         il.style.width = (casa.length / total) * 100 + "%";
       });
 
-      [[p.v, visita, "v"], [p.l, casa, "l"]].forEach(([equipo, quienes, lado]) => {
-        nodo.appendChild(crear("div", "mini", equipo + " · " + quienes.length));
+      const cuentas = crear("div", "cuenta-lado");
+      const izq = crear("span", null, p.v + " · " + visita.length);
+      izq.style.color = iv.style.background;
+      const der = crear("span", null, casa.length + " · " + p.l);
+      der.style.color = il.style.background;
+      cuentas.appendChild(izq); cuentas.appendChild(der);
+      nodo.appendChild(cuentas);
+
+      [[visita, "v"], [casa, "l"]].forEach(([quienes, lado]) => {
         const fila = crear("div", "gente");
-        quienes.map(nombre).sort((a, b) => a.localeCompare(b, "es")).forEach((quien) => {
-          fila.appendChild(crear("span", p.cerrado ? (p.g === lado ? "ok" : "no") : null, quien));
+        quienes.slice().sort((a, b) => nombre(a).localeCompare(nombre(b), "es")).forEach((idx) => {
+          const et = crear("span", p.cerrado ? (p.g === lado ? "ok" : "no") : null, nombre(idx));
+          if (idx === jugador) et.classList.add("tu");
+          fila.appendChild(et);
         });
         nodo.appendChild(fila);
       });
@@ -983,7 +1170,7 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     const fila = s.jugadores.indexOf(idx);
     const caja = crear("div", "boleta");
     if (fila < 0) return caja;
-    s.partidos.forEach((p, col) => {
+    partidosDe(s).forEach((p, col) => {
       const local = s.picks[fila][col] === 1;
       const lado = local ? "l" : "v";
       let clase = "", sello = "esp", simbolo = "·";
@@ -1006,26 +1193,24 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     return caja;
   }
 
-  /* ═══ escenarios ═══ */
   function panelEscenarios(s) {
     const total = s.combinaciones || 0;
     const filas = Object.entries(s.panorama || {})
-      .map(([idx, [solo, empata]]) => ({ idx: Number(idx), suma: solo + empata }))
+      .map(([i, [solo, emp]]) => ({ idx: Number(i), suma: solo + emp }))
       .sort((a, b) => b.suma - a.suma || nombre(a.idx).localeCompare(nombre(b.idx), "es"));
     if (!total || !filas.length) {
       return aviso("Sin escenarios que calcular", "La semana ya cerró: el primer lugar está definido.");
     }
-    const envoltura = crear("div");
+    const env = crear("div");
     const intro = crear("p", "mini");
     intro.style.margin = "0 .1rem .7rem";
     intro.textContent = "Faltan " + (s.total - s.cerrados) + " partidos: " +
       total.toLocaleString("es-MX") + " combinaciones. Quién termina primero en cuántas.";
-    envoltura.appendChild(intro);
-
+    env.appendChild(intro);
     const caja = crear("div", "escena");
     const tope = filas[0].suma || 1;
     filas.slice(0, 12).forEach((f, i) => {
-      const nodo = crear("div", "candidato" + (i === 0 ? " lider" : ""));
+      const nodo = crear("div", "candidato" + (i === 0 ? " lider" : "") + (f.idx === jugador ? " yo" : ""));
       nodo.style.setProperty("--i", Math.min(i, 12));
       nodo.appendChild(crear("span", "n", String(i + 1)));
       nodo.appendChild(crear("span", "quien", nombre(f.idx)));
@@ -1037,40 +1222,8 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       caja.appendChild(nodo);
       requestAnimationFrame(() => { relleno.style.width = (f.suma / tope) * 100 + "%"; });
     });
-    envoltura.appendChild(caja);
-    return envoltura;
-  }
-
-  function miSemana(s) {
-    if (jugador === null || s.jugadores.indexOf(jugador) < 0) return null;
-    let ok = 0, mal = 0, ganando = 0, faltan = 0;
-    s.partidos.forEach((p, col) => {
-      const mio = miPick(s, col);
-      if (!mio) return;
-      if (p.cerrado) { if (p.g === mio.lado) ok++; else mal++; }
-      else if (p.g === mio.lado) { ganando++; faltan++; }
-      else faltan++;
-    });
-
-    const caja = crear("div", "mi-semana");
-    const quien = crear("div");
-    quien.appendChild(crear("div", "rot", "Tu semana"));
-    quien.appendChild(crear("div", "yo", nombre(jugador)));
-    caja.appendChild(quien);
-
-    const cuentas = crear("div", "cuentas");
-    [["ok", ok, ok === 1 ? "acierto" : "aciertos"],
-     ["no", mal, mal === 1 ? "fallo" : "fallos"],
-     ["vivo", ganando, "ganando"],
-     ["", faltan, "por jugar"]]
-      .forEach(([clase, valor, etiqueta]) => {
-        const dato = crear("div", "dato" + (clase ? " " + clase : ""));
-        dato.appendChild(crear("b", null, String(valor)));
-        dato.appendChild(crear("span", null, etiqueta));
-        cuentas.appendChild(dato);
-      });
-    caja.appendChild(cuentas);
-    return caja;
+    env.appendChild(caja);
+    return env;
   }
 
   function aviso(titulo, texto) {
@@ -1082,19 +1235,14 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 
   /* ═══ premios ═══ */
   function pintarPremios() {
-    const P = D.premios;
-    const raiz = vistas.premios;
+    const P = D.premios, raiz = vistas.premios;
     raiz.textContent = "";
-
-    const t1 = crear("div", "titulo");
-    t1.appendChild(crear("h2", null, "La bolsa"));
-    raiz.appendChild(t1);
+    const t1 = crear("div", "titulo"); t1.appendChild(crear("h2", null, "La bolsa")); raiz.appendChild(t1);
 
     const bolsas = crear("div", "bolsas");
-    [
-      ["Premio semanal", P.semanal, "solo para el 1er lugar de la semana", false],
-      ["Acumulado semanal", P.acumulado_semanal, "se aparta cada semana", true],
-      ["Bolsa final", P.total, "al terminar las " + P.semanas_temporada + " semanas", false],
+    [["Premio semanal", P.semanal, "solo para el 1er lugar de la semana", false],
+     ["Acumulado semanal", P.acumulado_semanal, "se aparta cada semana", true],
+     ["Bolsa final", P.total, "al terminar las " + P.semanas_temporada + " semanas", false],
     ].forEach(([rot, val, pie, neutra], i) => {
       const c = crear("div", "bolsa-card" + (neutra ? " neutra" : ""));
       c.style.setProperty("--i", i);
@@ -1102,15 +1250,10 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       c.appendChild(crear("div", "val", val));
       c.appendChild(crear("div", "pie", pie));
       if (i === 2) {
-        const barra = crear("div", "progreso-bolsa");
-        const relleno = crear("i");
-        barra.appendChild(relleno);
-        c.appendChild(barra);
-        c.appendChild(crear("div", "pie",
-          "Van " + P.apartado + " de " + P.semanas_jugadas + " semana(s) jugada(s)"));
-        requestAnimationFrame(() => {
-          relleno.style.width = (P.semanas_jugadas / P.semanas_temporada) * 100 + "%";
-        });
+        const barra = crear("div", "progreso-bolsa"), relleno = crear("i");
+        barra.appendChild(relleno); c.appendChild(barra);
+        c.appendChild(crear("div", "pie", "Van " + P.apartado + " de " + P.semanas_jugadas + " semana(s) jugada(s)"));
+        requestAnimationFrame(() => { relleno.style.width = (P.semanas_jugadas / P.semanas_temporada) * 100 + "%"; });
       }
       bolsas.appendChild(c);
     });
@@ -1136,12 +1279,10 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 
     if (!P.reparto.length) {
       const nota = crear("p", "mini");
-      nota.style.margin = ".7rem .1rem 0";
-      nota.style.lineHeight = "1.6";
-      nota.textContent = "La bolsa final se entrega hasta que terminen las " +
-        P.semanas_temporada + " semanas. Van " + P.semanas_jugadas + ". " +
-        "Cuando varios empatan se suman los porcentajes de los lugares que ocupan " +
-        "y se divide en partes iguales.";
+      nota.style.cssText = "margin:.7rem .1rem 0; line-height:1.6";
+      nota.textContent = "La bolsa final se entrega hasta que terminen las " + P.semanas_temporada +
+        " semanas. Van " + P.semanas_jugadas + ". Cuando varios empatan se suman los porcentajes " +
+        "de los lugares que ocupan y se divide en partes iguales.";
       raiz.appendChild(nota);
     } else {
       const caja = crear("div", "ganadores");
@@ -1157,12 +1298,6 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
         caja.appendChild(fila);
       });
       raiz.appendChild(caja);
-      const pie = crear("p", "mini");
-      pie.style.margin = ".7rem .1rem 0";
-      pie.style.lineHeight = "1.6";
-      pie.textContent = "Temporada cerrada. Cuando varios empatan se suman los porcentajes " +
-        "de los lugares que ocupan y se divide en partes iguales.";
-      raiz.appendChild(pie);
     }
 
     const t3 = crear("div", "titulo");
@@ -1170,66 +1305,250 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     t3.appendChild(crear("span", "nota", P.semanal + " al 1er lugar"));
     raiz.appendChild(t3);
 
-    const lista = crear("div", "ganadores");
     const jugadas = D.semanas.filter((s) => s.estado !== "pendiente");
     if (!jugadas.length) {
       raiz.appendChild(aviso("Aún no hay semanas jugadas", "Aquí aparece el ganador de cada una."));
       return;
     }
+    const lista = crear("div", "ganadores");
     jugadas.slice().reverse().forEach((s, i) => {
       const gente = (s.ganadores || []).map(nombre);
       const fila = crear("div", "fila-gan" + (s.oficial ? "" : " abierta"));
       fila.style.setProperty("--i", i);
       fila.appendChild(crear("span", "sN", "S" + s.n));
-
       if (!s.proyectable) {
-        const quien = crear("div", "quien", "En curso");
-        quien.appendChild(crear("small", null,
-          s.cerrados + " de " + s.total + " cerrados · aún no se proyecta"));
-        fila.appendChild(quien);
+        const q = crear("div", "quien", "En curso");
+        q.appendChild(crear("small", null, s.cerrados + " de " + s.total + " cerrados · aún no se proyecta"));
+        fila.appendChild(q);
         fila.appendChild(crear("span", "monto", "—"));
-        lista.appendChild(fila);
-        return;
+      } else {
+        const q = crear("div", "quien", !gente.length ? "—" : listar(gente, s.oficial));
+        q.appendChild(crear("small", null, s.oficial ? "semana cerrada"
+          : "va ganando · " + s.cerrados + " de " + s.total + " cerrados"));
+        fila.appendChild(q);
+        fila.appendChild(crear("span", "monto",
+          s.oficial ? (s.premio + (gente.length > 1 ? " c/u" : "")) : "en juego"));
       }
-
-      const quien = crear("div", "quien", !gente.length ? "—" : listar(gente, s.oficial));
-      quien.appendChild(crear("small", null, s.oficial
-        ? "semana cerrada"
-        : "va ganando · " + s.cerrados + " de " + s.total + " cerrados"));
-      fila.appendChild(quien);
-      fila.appendChild(crear("span", "monto",
-        s.oficial ? (s.premio + (gente.length > 1 ? " c/u" : "")) : "en juego"));
       lista.appendChild(fila);
     });
     raiz.appendChild(lista);
   }
 
+  /* ═══ jugadores: buscador, ficha y duelo ═══ */
+  const generalPorIdx = new Map(D.general.map((f) => [f.p, f]));
+  const jugadas = D.semanas.filter((s) => s.estado !== "pendiente");
+
+  function lineaDe(idx) {
+    return jugadas.map((s) => {
+      const fila = (s.tabla || []).find((f) => f.p === idx);
+      return { n: s.n, aciertos: fila ? fila.f : null, pos: fila ? fila.pos : null };
+    });
+  }
+
+  function pintarJugadores() {
+    const raiz = vistas.jugadores;
+    raiz.textContent = "";
+
+    if (perfilAbierto !== null) raiz.appendChild(perfil(perfilAbierto));
+
+    const t = crear("div", "titulo");
+    t.appendChild(crear("h2", null, "Participantes"));
+    t.appendChild(crear("span", "nota", D.general.length + " en la quiniela"));
+    raiz.appendChild(t);
+
+    const buscador = crear("input", "ancho");
+    buscador.type = "search";
+    buscador.placeholder = "Buscar por nombre…";
+    buscador.setAttribute("aria-label", "Buscar participante");
+    raiz.appendChild(buscador);
+
+    const lista = crear("div", "fichas");
+    raiz.appendChild(lista);
+
+    const pintarLista = (filtro) => {
+      lista.textContent = "";
+      const limpio = filtro.trim().toLowerCase();
+      const visibles = D.general.filter((f) => !limpio || nombre(f.p).toLowerCase().includes(limpio));
+      if (!visibles.length) {
+        lista.appendChild(aviso("Nadie con ese nombre", "Prueba con otra parte del nombre."));
+        return;
+      }
+      visibles.forEach((f, i) => {
+        const b = crear("button", "ficha p" + f.pos + (f.p === jugador ? " tuya" : ""));
+        b.type = "button";
+        b.style.setProperty("--i", Math.min(i, 12));
+        b.appendChild(crear("span", "pos", String(f.pos) + "º"));
+        const q = crear("span", "quien", nombre(f.p));
+        q.appendChild(crear("small", null, f.err + (f.err === 1 ? " fallo" : " fallos")));
+        b.appendChild(q);
+        b.appendChild(crear("span", "tot", String(f.total)));
+        b.addEventListener("click", () => {
+          perfilAbierto = perfilAbierto === f.p ? null : f.p;
+          pintarJugadores();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        lista.appendChild(b);
+      });
+    };
+    buscador.addEventListener("input", () => pintarLista(buscador.value));
+    pintarLista("");
+
+    const t2 = crear("div", "titulo");
+    t2.appendChild(crear("h2", null, "Duelo"));
+    t2.appendChild(crear("span", "nota", "compara a dos"));
+    raiz.appendChild(t2);
+    raiz.appendChild(duelo());
+  }
+
+  function perfil(idx) {
+    const f = generalPorIdx.get(idx);
+    const caja = crear("div", "perfil");
+    const cab = crear("div", "cab");
+    const izq = crear("div");
+    izq.appendChild(crear("div", "rotulo", f ? f.pos + "º lugar general" : "participante"));
+    izq.appendChild(crear("div", "nom", nombre(idx)));
+    cab.appendChild(izq);
+    const cerrar = crear("button", "cerrar", "✕");
+    cerrar.type = "button";
+    cerrar.setAttribute("aria-label", "Cerrar ficha");
+    cerrar.addEventListener("click", () => { perfilAbierto = null; pintarJugadores(); });
+    cab.appendChild(cerrar);
+    caja.appendChild(cab);
+
+    const linea = lineaDe(idx).filter((s) => s.aciertos !== null);
+    const valores = linea.map((s) => s.aciertos);
+    const mejor = valores.length ? Math.max(...valores) : 0;
+    const peor = valores.length ? Math.min(...valores) : 0;
+    const semanasGanadas = jugadas.filter((s) => s.oficial && (s.ganadores || []).includes(idx)).length;
+
+    const cifras = crear("div", "cifras");
+    [[f ? f.total : 0, "aciertos"], [f ? f.err : 0, "fallos"],
+     [mejor, "su mejor semana"], [semanasGanadas, semanasGanadas === 1 ? "semana ganada" : "semanas ganadas"]]
+      .forEach(([v, et]) => {
+        const c = crear("div", "cifra");
+        c.appendChild(crear("b", null, String(v)));
+        c.appendChild(crear("span", null, et));
+        cifras.appendChild(c);
+      });
+    caja.appendChild(cifras);
+
+    if (linea.length) {
+      const barras = crear("div", "barras");
+      linea.forEach((s) => {
+        const col = crear("div", "col" + (s.aciertos === mejor && mejor !== peor ? " mejor" : ""));
+        const b = crear("div", "b");
+        b.title = "Semana " + s.n + ": " + s.aciertos + " aciertos";
+        col.appendChild(b);
+        col.appendChild(crear("small", null, "S" + s.n));
+        barras.appendChild(col);
+        requestAnimationFrame(() => {
+          b.style.height = Math.max(6, (s.aciertos / Math.max(1, mejor)) * 44) + "px";
+        });
+      });
+      caja.appendChild(barras);
+    }
+    return caja;
+  }
+
+  function duelo() {
+    const env = crear("div", "duelo");
+    const orden = D.general.map((f) => f.p);
+    const armar = (valor) => {
+      const s = crear("select", "ancho");
+      orden.forEach((i) => { const o = crear("option", null, nombre(i)); o.value = String(i); s.appendChild(o); });
+      s.value = String(valor);
+      return s;
+    };
+    const uno = armar(jugador !== null ? jugador : orden[0]);
+    const dos = armar(orden.find((i) => i !== Number(uno.value)) ?? orden[0]);
+    const fila = crear("div");
+    fila.style.cssText = "display:grid; grid-template-columns:1fr 1fr; gap:.5rem";
+    fila.appendChild(uno); fila.appendChild(dos);
+    env.appendChild(fila);
+    const destino = crear("div");
+    env.appendChild(destino);
+
+    const pintar = () => {
+      const a = Number(uno.value), b = Number(dos.value);
+      destino.textContent = "";
+      const fa = generalPorIdx.get(a), fb = generalPorIdx.get(b);
+      const caras = crear("div", "caras");
+      [[fa, a], [fb, b]].forEach(([f, idx], n) => {
+        const otra = n === 0 ? fb : fa;
+        const cara = crear("div", "cara" + (f && otra && f.total > otra.total ? " arriba" : ""));
+        cara.appendChild(crear("div", "q", nombre(idx)));
+        cara.appendChild(crear("div", "t", String(f ? f.total : 0)));
+        cara.appendChild(crear("div", "rotulo", f ? f.pos + "º" : ""));
+        if (n === 0) { caras.appendChild(cara); caras.appendChild(crear("div", "vs-mid", "VS")); }
+        else caras.appendChild(cara);
+      });
+      destino.appendChild(caras);
+
+      const s = porSemana.get(D.activa) || jugadas[jugadas.length - 1];
+      if (!s || !s.jugadores.length) return;
+      const fa2 = s.jugadores.indexOf(a), fb2 = s.jugadores.indexOf(b);
+      if (fa2 < 0 || fb2 < 0) return;
+      const juegos = partidosDe(s);
+      const difs = [];
+      juegos.forEach((p, col) => {
+        if (s.picks[fa2][col] === s.picks[fb2][col]) return;
+        const ladoA = s.picks[fa2][col] === 1 ? "l" : "v";
+        difs.push({ p, ladoA });
+      });
+      const t = crear("div", "titulo");
+      t.appendChild(crear("h2", null, "Dónde difieren · semana " + s.n));
+      t.appendChild(crear("span", "nota", difs.length + " de " + juegos.length));
+      destino.appendChild(t);
+      if (!difs.length) {
+        destino.appendChild(aviso("Picks idénticos", "Eligieron exactamente lo mismo esta semana."));
+        return;
+      }
+      const caja = crear("div", "dif");
+      difs.forEach(({ p, ladoA }) => {
+        const row = crear("div", "row");
+        const eqA = ladoA === "l" ? p.l : p.v;
+        const eqB = ladoA === "l" ? p.v : p.l;
+        const claseA = p.cerrado ? (p.g === ladoA ? " gano" : " perdio") : "";
+        const claseB = p.cerrado ? (p.g !== ladoA && p.g !== "x" ? " gano" : " perdio") : "";
+        row.appendChild(crear("span", "j izq" + claseA, eqA));
+        row.appendChild(crear("span", "mid", p.mv === null ? "por jugar" : p.mv + "–" + p.ml));
+        row.appendChild(crear("span", "j der" + claseB, eqB));
+        caja.appendChild(row);
+      });
+      destino.appendChild(caja);
+    };
+    uno.addEventListener("change", pintar);
+    dos.addEventListener("change", pintar);
+    pintar();
+    return env;
+  }
+
   /* ═══ vista de una semana ═══ */
-  const PESTANAS = [
-    ["tabla", "Tabla"],
-    ["partidos", "Partidos"],
-    ["picks", "Quién le fue a quién"],
-    ["escenarios", "Escenarios"],
-  ];
+  const PESTANAS = [["tabla", "Tabla"], ["partidos", "Partidos"],
+                    ["picks", "Quién le fue a quién"], ["escenarios", "Escenarios"]];
 
   function pintarSemana(n) {
-    const s = porSemana.get(n);
-    const raiz = vistas.semana;
+    const s = porSemana.get(n), raiz = vistas.semana;
     raiz.textContent = "";
     if (!s) return;
 
     const titulo = crear("div", "titulo");
     titulo.appendChild(crear("h2", null, "Semana " + s.n));
+    if (s.estado === "en_vivo" && ultimaConsulta && fallosVivo === 0) {
+      const chipV = crear("span", "envivo-chip");
+      chipV.appendChild(crear("span", "punto"));
+      chipV.appendChild(crear("span", null, "en vivo"));
+      chipV.title = "Última consulta " + ultimaConsulta.toLocaleTimeString("es-MX");
+      titulo.appendChild(chipV);
+    }
     titulo.appendChild(crear("span", "nota", s.estado === "pendiente"
-      ? "Picks por cargar"
-      : s.cerrados + " de " + s.total + " partidos cerrados"));
+      ? "Picks por cargar" : s.cerrados + " de " + s.total + " partidos cerrados"));
     raiz.appendChild(titulo);
 
     if (s.estado === "pendiente") {
       raiz.appendChild(aviso("Actualizando la semana " + s.n,
         "Estos son los partidos programados. En cuanto se cargue el compilado aparecen los picks, la tabla y el ganador."));
       raiz.appendChild(panelPartidos(s));
-      return;
       return;
     }
 
@@ -1238,18 +1557,17 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     const resumen = miSemana(s);
     if (resumen) raiz.appendChild(resumen);
 
-    const disponibles = PESTANAS.filter(([clave]) =>
-      clave !== "escenarios" || (s.cerrados < s.total && Object.keys(s.panorama || {}).length > 0));
-    if (!disponibles.some(([clave]) => clave === pestana)) pestana = disponibles[0][0];
+    const disponibles = PESTANAS.filter(([c]) =>
+      c !== "escenarios" || (s.cerrados < s.total && Object.keys(s.panorama || {}).length > 0));
+    if (!disponibles.some(([c]) => c === pestana)) pestana = disponibles[0][0];
 
-    const tabs = crear("div", "tabs");
-    const interior = crear("div", "tabs-int");
+    const tabs = crear("div", "tabs"), interior = crear("div", "tabs-int");
     disponibles.forEach(([clave, etiqueta]) => {
-      const boton = crear("button", null, etiqueta);
-      boton.type = "button";
-      boton.setAttribute("aria-selected", String(clave === pestana));
-      boton.addEventListener("click", () => { pestana = clave; pintarSemana(n); });
-      interior.appendChild(boton);
+      const b = crear("button", null, etiqueta);
+      b.type = "button";
+      b.setAttribute("aria-selected", String(clave === pestana));
+      b.addEventListener("click", () => { pestana = clave; pintarSemana(n); });
+      interior.appendChild(b);
     });
     tabs.appendChild(interior);
     raiz.appendChild(tabs);
@@ -1261,12 +1579,17 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
   }
 
   /* ═══ navegación ═══ */
+  function repintar() { ir(vistaActual, false); }
+
   function ir(vista, empujar) {
     vistaActual = vista;
-    const cual = vista === "general" ? "general" : vista === "premios" ? "premios" : "semana";
-    Object.entries(vistas).forEach(([clave, nodo]) => nodo.classList.toggle("oculto", clave !== cual));
+    const cual = vista === "general" ? "general" : vista === "premios" ? "premios"
+      : vista === "jugadores" ? "jugadores" : "semana";
+    Object.entries(vistas).forEach(([k, nodo]) => nodo.classList.toggle("oculto", k !== cual));
     if (cual === "semana") pintarSemana(Number(vista));
-    if (cual === "premios") pintarPremios();
+    else if (cual === "premios") pintarPremios();
+    else if (cual === "jugadores") pintarJugadores();
+    else marcarFilasPropias();
 
     const nodo = vistas[cual];
     nodo.classList.remove("anima");
@@ -1277,15 +1600,25 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       b.setAttribute("aria-selected", String(b.dataset.vista === String(vista))));
     pintarEstado(cual === "semana" ? Number(vista) : cual);
 
-    const destino = cual === "general" ? "#" : cual === "premios" ? "#premios" : "#s" + vista;
+    const destino = cual === "general" ? "#general" : cual === "semana" ? "#s" + vista : "#" + cual;
     if (empujar && location.hash !== destino) history.replaceState(null, "", destino);
     const activo = nav.querySelector('[aria-selected="true"]');
     if (activo) activo.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
   }
 
-  let vistaActual = "general";
-  function repintar() {
-    ir(vistaActual, false);
+  /* La tabla general viene escrita en el HTML: aquí solo se marca tu fila. */
+  function marcarFilasPropias() {
+    const filas = vistas.general.querySelectorAll("tbody tr");
+    filas.forEach((tr, i) => {
+      const f = D.general[i];
+      if (!f) return;
+      tr.classList.toggle("yo", f.p === jugador);
+      if (!tr.dataset.listo) {
+        tr.dataset.listo = "1";
+        tr.classList.add("clic");
+        tr.addEventListener("click", () => { perfilAbierto = f.p; ir("jugadores", true); });
+      }
+    });
   }
 
   nav.addEventListener("click", (e) => {
@@ -1293,19 +1626,24 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     if (b) { window.scrollTo({ top: 0, behavior: "smooth" }); ir(b.dataset.vista, true); }
   });
 
-  montarSelector();
+  montarSoy();
+  montarEquipo();
 
-  // Sin enlace directo, se entra por la semana en curso: es lo que importa hoy.
   const hash = location.hash;
   const m = hash.match(/^#s(\d+)$/);
   const inicio = m && porSemana.has(Number(m[1])) ? Number(m[1])
     : hash === "#premios" ? "premios"
+    : hash === "#jugadores" ? "jugadores"
     : hash === "#general" ? "general"
     : D.activa !== null && porSemana.has(D.activa) ? D.activa
     : "general";
   ir(inicio, false);
 
-  /* Mientras haya partidos abiertos la página se refresca sola. */
+  if (D.vivo) {
+    consultarVivo();
+    setInterval(consultarVivo, D.vivo.cada * 1000);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) consultarVivo(); });
+  }
   if (D.recarga > 0) setTimeout(() => location.reload(), D.recarga * 1000);
 })();
 </script>

@@ -8,7 +8,7 @@
       "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
@@ -24,8 +24,8 @@
     {
       "visitante": "Eagles",
       "local": "Titans",
-      "marcador_visitante": 14,
-      "marcador_local": 10,
+      "marcador_visitante": 17,
+      "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -48,14 +48,14 @@
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
       "visitante": "Browns",
       "local": "Buccaneers",
-      "marcador_visitante": 6,
-      "marcador_local": 9,
+      "marcador_visitante": 9,
+      "marcador_local": 16,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -65,7 +65,7 @@
       "visitante": "Saints",
       "local": "Ravens",
       "marcador_visitante": 9,
-      "marcador_local": 14,
+      "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -74,11 +74,11 @@
     {
       "visitante": "Bengals",
       "local": "Texans",
-      "marcador_visitante": 7,
+      "marcador_visitante": 10,
       "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {

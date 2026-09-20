@@ -21,7 +21,8 @@ from pathlib import Path
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 
-from .espn import Partido, a_cdmx, ahora_cdmx
+from .equipos import ABREVIATURAS_ESPN
+from .espn import URL_SCOREBOARD, Partido, a_cdmx, ahora_cdmx
 from .scoring import (
     ACUMULADO_SEMANAL,
     ACUMULADO_TOTAL,
@@ -37,6 +38,7 @@ __all__ = [
     "ETAPA",
     "MARCA",
     "RUTA_SALIDA",
+    "generar_manifiesto",
     "SemanaRender",
     "UMBRAL_PODIO",
     "UMBRAL_SEMANA",
@@ -57,8 +59,129 @@ MARCA = "ANGABAVE"
 DESARROLLADOR = "Angel Barrera"
 
 #: Etapa y versión del portal. Se muestra junto a la marca.
+#:
+#: Esquema: alfa vMAYOR.MENOR.PARCHE
+#:   MENOR  sube con cada función nueva visible
+#:   PARCHE sube con correcciones
+#:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.0.0.1"
+VERSION = "v0.3.0"
+
+#: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
+#: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
+#: equipo que elija cada quien.
+COLORES_EQUIPO: dict[str, dict[str, str]] = {
+    "Cardinals":  {"local": "#C8102E", "visita": "#E8EDF5"},
+    "Falcons":    {"local": "#E8383D", "visita": "#D6D9DD"},
+    "Ravens":     {"local": "#6B4FD8", "visita": "#FFC547"},
+    "Bills":      {"local": "#4A7DFF", "visita": "#E8413C"},
+    "Panthers":   {"local": "#0BA0E8", "visita": "#C6CDD2"},
+    "Bears":      {"local": "#E8642A", "visita": "#4A6FA8"},
+    "Bengals":    {"local": "#FB4F14", "visita": "#E8EDF5"},
+    "Browns":     {"local": "#FF6A2A", "visita": "#E8DCC8"},
+    "Cowboys":    {"local": "#7FA3E8", "visita": "#C6CDD2"},
+    "Broncos":    {"local": "#FB6B1E", "visita": "#6D8FE8"},
+    "Lions":      {"local": "#35A7E8", "visita": "#C6CDD2"},
+    "Packers":    {"local": "#FFC547", "visita": "#4FA37A"},
+    "Texans":     {"local": "#E8455C", "visita": "#6D8FE8"},
+    "Colts":      {"local": "#4A93E8", "visita": "#E8EDF5"},
+    "Jaguars":    {"local": "#2FC2C9", "visita": "#D7A22A"},
+    "Chiefs":     {"local": "#FF3B4E", "visita": "#FFC547"},
+    "Chargers":   {"local": "#2BA8FF", "visita": "#FFC72C"},
+    "Rams":       {"local": "#FFB020", "visita": "#6D8FE8"},
+    "Raiders":    {"local": "#C6CDD2", "visita": "#E8EDF5"},
+    "Dolphins":   {"local": "#17C5CC", "visita": "#FF8C2E"},
+    "Vikings":    {"local": "#9B6BE8", "visita": "#FFC547"},
+    "Patriots":   {"local": "#E85A72", "visita": "#6D8FE8"},
+    "Saints":     {"local": "#E3CB94", "visita": "#C6CDD2"},
+    "Giants":     {"local": "#6D8FE8", "visita": "#E8455C"},
+    "Jets":       {"local": "#2FBF7A", "visita": "#E8EDF5"},
+    "Eagles":     {"local": "#16A085", "visita": "#C6CDD2"},
+    "Steelers":   {"local": "#FFC72C", "visita": "#C6CDD2"},
+    "49ers":      {"local": "#E8503F", "visita": "#E3CB94"},
+    "Seahawks":   {"local": "#69BE28", "visita": "#6D8FE8"},
+    "Buccaneers": {"local": "#FF3535", "visita": "#C6853F"},
+    "Titans":     {"local": "#67A9E8", "visita": "#6D8FE8"},
+    "Washington": {"local": "#C8656B", "visita": "#FFC547"},
+}
+
+
+# --- contraste --------------------------------------------------------------
+#
+# Los colores de equipo se usan de dos formas: como texto sobre el fondo oscuro
+# del portal y como fondo de la sigla con texto encima. Ninguna de las dos se
+# deja al ojo: se calcula el contraste (WCAG) y se corrige si no llega.
+
+#: Fondo de los paneles, contra el que se mide el texto de color.
+FONDO_PANEL = "#101724"
+#: Mínimo exigido: 4.5:1, el umbral de WCAG para texto normal.
+CONTRASTE_MINIMO = 4.5
+
+
+def _a_rgb(color: str) -> tuple[float, float, float]:
+    color = color.lstrip("#")
+    return tuple(int(color[i : i + 2], 16) / 255 for i in (0, 2, 4))
+
+
+def _luminancia(color: str) -> float:
+    def canal(v: float) -> float:
+        return v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+
+    rojo, verde, azul = (canal(v) for v in _a_rgb(color))
+    return 0.2126 * rojo + 0.7152 * verde + 0.0722 * azul
+
+
+def contraste(uno: str, otro: str) -> float:
+    a, b = _luminancia(uno), _luminancia(otro)
+    claro, oscuro = max(a, b), min(a, b)
+    return (claro + 0.05) / (oscuro + 0.05)
+
+
+def _aclarar(color: str, paso: float = 0.06) -> str:
+    """Empuja un color hacia el blanco sin cambiarle el tono."""
+    rojo, verde, azul = _a_rgb(color)
+    mezcla = lambda v: min(1.0, v + (1.0 - v) * paso)
+    return "#%02X%02X%02X" % tuple(round(mezcla(v) * 255) for v in (rojo, verde, azul))
+
+
+def legible_sobre_oscuro(color: str, fondo: str = FONDO_PANEL) -> str:
+    """Devuelve el color aclarado lo justo para leerse sobre el panel."""
+    seguro = color
+    for _ in range(30):
+        if contraste(seguro, fondo) >= CONTRASTE_MINIMO:
+            return seguro
+        seguro = _aclarar(seguro)
+    return seguro
+
+
+def texto_encima(color: str) -> str:
+    """Negro o blanco, el que contraste mejor sobre ese color."""
+    return "#070B12" if contraste(color, "#070B12") >= contraste(color, "#FFFFFF") else "#FFFFFF"
+
+
+def paleta_equipos() -> dict[str, dict[str, str]]:
+    """Colores de equipo listos para usar, ya verificados."""
+    salida: dict[str, dict[str, str]] = {}
+    for equipo, colores in COLORES_EQUIPO.items():
+        entrada: dict[str, str] = {}
+        for donde, color in colores.items():
+            seguro = legible_sobre_oscuro(color)
+            entrada[donde] = seguro
+            entrada[donde + "_texto"] = texto_encima(seguro)
+        salida[equipo] = entrada
+    return salida
+
+
+def _siglas() -> dict[str, str]:
+    """Nombre de la quiniela -> abreviatura canónica, para el marcador.
+
+    El catálogo trae variantes (JAC y JAX son Jaguars); se queda la primera,
+    que es la forma principal.
+    """
+    salida: dict[str, str] = {}
+    for abreviatura, nombre in ABREVIATURAS_ESPN.items():
+        salida.setdefault(nombre, abreviatura)
+    return salida
 
 #: Partidos cerrados en la temporada antes de mostrar el podio. Con dos o tres
 #: juegos todo el mundo va empatado y un podio ahí no dice nada.
@@ -71,8 +194,12 @@ UMBRAL_SEMANA = 8
 #: A partir de cuántos empatados se deja de enlistar nombres y solo se cuenta.
 MAXIMO_NOMBRES = 3
 
-#: Cada cuántos segundos se recarga sola la página mientras haya juego.
-SEGUNDOS_RECARGA = 300
+#: Cada cuántos segundos se recarga la página entera mientras haya juego.
+#: Es la red de seguridad: quien manda los números oficiales es CI.
+SEGUNDOS_RECARGA = 600
+
+#: Cada cuántos segundos el navegador pide marcadores a ESPN por su cuenta.
+SEGUNDOS_VIVO = 60
 
 #: ESPN describe el estado en inglés; aquí se traduce lo que puede aparecer.
 ESTADOS = {
@@ -254,6 +381,30 @@ def _entorno() -> Environment:
     )
 
 
+def generar_manifiesto(ruta_salida: Path, marca: str = MARCA) -> Path:
+    """Escribe el manifiesto que usan iOS y Android al guardar el sitio."""
+    contenido = {
+        "name": f"{marca} · Quiniela NFL",
+        "short_name": marca,
+        "start_url": ".",
+        "scope": ".",
+        "display": "standalone",
+        "orientation": "portrait",
+        "background_color": "#06090f",
+        "theme_color": "#06090f",
+        "lang": "es-MX",
+        "icons": [
+            {"src": "icono-192.png", "sizes": "192x192", "type": "image/png"},
+            {"src": "icono-512.png", "sizes": "512x512", "type": "image/png"},
+            {"src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        ],
+    }
+    ruta = Path(ruta_salida)
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+    ruta.write_text(json.dumps(contenido, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return ruta
+
+
 def generar_html(
     *,
     anio: int,
@@ -334,6 +485,8 @@ def generar_html(
         "anio": anio,
         "actualizado": _fecha_larga(momento),
         "participantes": participantes,
+        "colores": paleta_equipos(),
+        "siglas": _siglas(),
         "general": general,
         "semanas": [_datos_semana(semana, indice_global) for semana in semanas],
         "activa": activa.numero if activa else None,
@@ -342,6 +495,17 @@ def generar_html(
         "cerrados_temporada": cerrados_temporada,
         "umbral_podio": UMBRAL_PODIO,
         "recarga": SEGUNDOS_RECARGA if hay_juego else 0,
+        # Capa en vivo: el navegador consulta ESPN directo. Solo refresca el
+        # marcador de partidos que aquí siguen abiertos; jamás cierra uno ni
+        # toca el conteo oficial, que se calcula en CI y ya está probado.
+        "vivo": {
+            "url": URL_SCOREBOARD,
+            "cada": SEGUNDOS_VIVO,
+            "equipos": ABREVIATURAS_ESPN,
+            # ESPN describe el estado en inglés: se traduce también en el
+            # navegador, no solo en el lado de Python.
+            "estados": ESTADOS,
+        } if hay_juego else None,
     }
 
     podio = _armar_podio(general, participantes, reparto) if podio_listo else []
@@ -370,5 +534,6 @@ def generar_html(
     ruta_salida = Path(ruta_salida)
     ruta_salida.parent.mkdir(parents=True, exist_ok=True)
     ruta_salida.write_text(html, encoding="utf-8")
+    generar_manifiesto(ruta_salida.parent / "manifest.webmanifest")
     _log.info("Escribí %s (%.0f KB).", ruta_salida, len(html.encode("utf-8")) / 1024)
     return ruta_salida
