@@ -9,6 +9,26 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.4.0
+
+Temas de equipo completos y comodidades de uso.
+
+* **Tema completo por equipo**: elegir equipo ya no cambia un acento, cambia el
+  fondo, las superficies, los bordes, el resplandor y las pastillas activas.
+  Cada tema se genera mezclando el color del equipo con la base oscura y pasa
+  una verificación de contraste; los 64 (32 equipos × casa/visita) la cumplen.
+* **Tu partido al frente**: si elegiste equipo, su juego encabeza la lista de
+  la semana con una cinta que lo marca.
+* **Podio rediseñado**: en el teléfono es una lista compacta que se lee de un
+  vistazo; en escritorio es una peana de verdad, con la plata a la izquierda,
+  el oro al centro y más alto, y el bronce a la derecha.
+* **Se queda donde estabas**: al recargar vuelve a la misma vista, la misma
+  pestaña y la misma altura de la página.
+* Pestañas con corredera deslizante, pegadas debajo del encabezado.
+* Buscador en la tabla general y en la de la semana.
+* Botón para volver arriba.
+* La columna de nombres ya no se colapsa cuando la tabla se desborda.
+
 ## alfa v0.3.0
 
 Rediseño completo y herramientas.

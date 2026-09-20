@@ -27,6 +27,9 @@
   --verde:#3ddc84; --rojo:#ff6058; --acento:#5b95ff; --vivo:#ff4757;
   --radio:16px; --sombra:0 16px 48px rgba(0,0,0,.55);
   --campo:rgba(255,255,255,.028);
+  --resplandor:rgba(91,149,255,.15); --resplandor2:rgba(247,201,72,.10);
+  --alto-encabezado:132px;
+  --pastilla:linear-gradient(180deg,#fff,#c9dcff); --pastilla-txt:#08111f;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; min-width:0}
 html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
@@ -35,10 +38,11 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   font-size:16px; line-height:1.45; -webkit-font-smoothing:antialiased;
   background-image:
-    radial-gradient(1200px 560px at 8% -16%, rgba(91,149,255,.15), transparent 60%),
-    radial-gradient(1000px 500px at 94% -10%, rgba(247,201,72,.1), transparent 58%),
+    radial-gradient(1200px 560px at 8% -16%, var(--resplandor), transparent 60%),
+    radial-gradient(1000px 500px at 94% -10%, var(--resplandor2), transparent 58%),
     repeating-linear-gradient(90deg, var(--campo) 0 1px, transparent 1px 84px);
   background-attachment:fixed;
+  transition:background-color .45s ease;
 }
 h1,h2,h3{margin:0; font-weight:800; letter-spacing:-.02em}
 button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
@@ -55,7 +59,8 @@ header{
   border-bottom:1px solid var(--linea); padding-top:env(safe-area-inset-top);
 }
 header::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
-  background:linear-gradient(90deg,transparent,var(--oro),var(--acento),transparent); opacity:.5}
+  background:linear-gradient(90deg,transparent,var(--acento),var(--oro),var(--acento),transparent);
+  opacity:.65; transition:background .45s ease}
 .top{display:flex; align-items:center; gap:.55rem; padding-block:.6rem .45rem; flex-wrap:wrap}
 .logo{display:flex; align-items:center; gap:.55rem; min-width:0; flex:1 1 auto; text-align:left}
 .logo svg{width:34px; height:34px; flex:0 0 auto; filter:drop-shadow(0 3px 10px rgba(247,201,72,.3))}
@@ -108,9 +113,9 @@ header::after{content:""; position:absolute; left:0; right:0; bottom:-1px; heigh
   font-weight:800; color:var(--tenue); border:1px solid var(--linea); white-space:nowrap;
   transition:color .18s,border-color .18s,background .18s}
 .pastillas button:hover{color:var(--txt); border-color:var(--linea2)}
-.pastillas button[aria-selected="true"]{color:#08111f;
-  background:linear-gradient(180deg,#fff,#c9dcff); border-color:transparent;
-  box-shadow:0 4px 18px rgba(91,149,255,.32)}
+.pastillas button[aria-selected="true"]{color:var(--pastilla-txt);
+  background:var(--pastilla); border-color:transparent;
+  box-shadow:0 4px 18px var(--resplandor2)}
 .pastillas button.dorada[aria-selected="true"]{background:linear-gradient(180deg,#ffe193,#f7c948);
   box-shadow:0 4px 18px rgba(247,201,72,.3)}
 .pastillas button.actual{border-color:rgba(255,71,87,.5)}
@@ -129,37 +134,65 @@ main{padding-bottom:3.5rem}
 .titulo .nota{font-size:.74rem; color:var(--tenue2); margin-left:auto; text-align:right}
 
 /* ═══════ podio ═══════ */
-.podio{display:grid; gap:.6rem; grid-template-columns:repeat(auto-fit,minmax(min(100%,185px),1fr))}
-.lugar{position:relative; overflow:hidden; border-radius:var(--radio); padding:1.05rem .85rem .95rem;
+/* En el teléfono es una lista compacta; en escritorio, una peana de verdad
+   con el primero al centro, la plata a la izquierda y el bronce a la derecha. */
+.podio{display:grid; gap:.55rem; grid-template-columns:1fr}
+.lugar{position:relative; overflow:hidden; border-radius:var(--radio);
   background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border:1px solid var(--linea); text-align:center; box-shadow:var(--sombra);
+  border:1px solid var(--linea); box-shadow:var(--sombra);
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center;
+  gap:.75rem; padding:.7rem .85rem;
   animation:brincar .55s cubic-bezier(.2,.8,.3,1) both; animation-delay:calc(var(--i)*90ms)}
 @keyframes brincar{from{opacity:0; transform:translateY(22px) scale(.95)} to{opacity:1; transform:none}}
-.lugar::before{content:""; position:absolute; inset:0 0 auto; height:3px; background:var(--linea2)}
+.lugar::before{content:""; position:absolute; inset:0 auto 0 0; width:3px; height:100%;
+  background:var(--linea2)}
 .lugar.oro{border-color:rgba(247,201,72,.45); box-shadow:0 16px 48px rgba(247,201,72,.1)}
-.lugar.oro::before{background:linear-gradient(90deg,#f7c948,#ffe193,#f7c948)}
-.lugar.plata::before{background:linear-gradient(90deg,#9fb0c6,#e6edf6,#9fb0c6)}
-.lugar.bronce::before{background:linear-gradient(90deg,#b5773f,#e6b183,#b5773f)}
+.lugar.oro::before{background:linear-gradient(180deg,#f7c948,#ffe193,#f7c948)}
+.lugar.plata::before{background:linear-gradient(180deg,#9fb0c6,#e6edf6,#9fb0c6)}
+.lugar.bronce::before{background:linear-gradient(180deg,#b5773f,#e6b183,#b5773f)}
 .lugar.oro::after{content:""; position:absolute; top:0; left:-60%; width:42%; height:100%;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.09),transparent);
-  animation:destello 5s ease-in-out infinite 1.2s}
+  animation:destello 5s ease-in-out infinite 1.2s; pointer-events:none}
 @keyframes destello{0%{left:-60%} 45%,100%{left:140%}}
-.medalla{width:36px; height:36px; margin:0 auto .45rem; border-radius:50%; display:grid; place-items:center;
-  font-size:.95rem; font-weight:900; color:#0a1020; background:linear-gradient(160deg,#dfe7f2,#93a3b8)}
-.oro .medalla{background:linear-gradient(160deg,#ffe193,#e0a92b); box-shadow:0 0 26px rgba(247,201,72,.34)}
+.medalla{width:34px; height:34px; border-radius:50%; display:grid; place-items:center;
+  font-size:.9rem; font-weight:900; color:#0a1020; flex:0 0 auto;
+  background:linear-gradient(160deg,#dfe7f2,#93a3b8)}
+.oro .medalla{background:linear-gradient(160deg,#ffe193,#e0a92b); box-shadow:0 0 22px rgba(247,201,72,.32)}
 .bronce .medalla{background:linear-gradient(160deg,#e9bb92,#b5773f)}
-.lugar .puntos{font-size:clamp(1.9rem,9vw,2.5rem); font-weight:900; letter-spacing:-.04em;
+.lugar .cuerpo{min-width:0}
+.lugar .quien{font-weight:800; font-size:.98rem; line-height:1.25; overflow-wrap:anywhere}
+.lugar .empatados{font-weight:800; font-size:.95rem; color:var(--txt)}
+.lugar .detalle{font-size:.6rem; color:var(--tenue2); text-transform:uppercase; letter-spacing:.1em}
+.lugar .cifra{text-align:right; flex:0 0 auto}
+.lugar .puntos{font-size:1.75rem; font-weight:900; letter-spacing:-.04em;
   font-variant-numeric:tabular-nums; line-height:1}
 .oro .puntos{color:var(--oro)} .plata .puntos{color:var(--plata)} .bronce .puntos{color:var(--bronce)}
-.lugar .detalle{font-size:.62rem; color:var(--tenue2); margin-top:.2rem; text-transform:uppercase; letter-spacing:.12em}
-.lugar .quien{font-weight:800; font-size:clamp(.92rem,4vw,1.05rem); line-height:1.25; margin-top:.5rem;
-  overflow-wrap:anywhere}
-.lugar .empatados{margin-top:.5rem; font-size:.76rem; font-weight:800; color:var(--tenue)}
-.lugar .bolsa{margin-top:.5rem; font-size:.82rem; font-weight:900; color:var(--oro);
-  padding:.2rem .5rem; border-radius:8px; background:rgba(247,201,72,.1); display:inline-block}
+
+@media (min-width:660px){
+  .podio{grid-template-columns:repeat(3,1fr); align-items:end; gap:.7rem}
+  .lugar{display:block; text-align:center; padding:1.1rem .9rem 1rem}
+  .lugar::before{inset:0 0 auto 0; width:100%; height:3px}
+  .lugar.oro::before{background:linear-gradient(90deg,#f7c948,#ffe193,#f7c948)}
+  .lugar.plata::before{background:linear-gradient(90deg,#9fb0c6,#e6edf6,#9fb0c6)}
+  .lugar.bronce::before{background:linear-gradient(90deg,#b5773f,#e6b183,#b5773f)}
+  .medalla{margin:0 auto .5rem; width:38px; height:38px; font-size:.98rem}
+  .lugar .cifra{text-align:center}
+  .lugar .puntos{font-size:2.3rem}
+  .lugar .cuerpo{margin-top:.45rem}
+  /* La peana: plata a la izquierda, oro al centro y más alto, bronce a la derecha. */
+  .podio .lugar:nth-child(1){order:2; padding-block:1.6rem 1.35rem}
+  .podio .lugar:nth-child(2){order:1}
+  .podio .lugar:nth-child(3){order:3}
+  .podio .lugar:nth-child(1) .puntos{font-size:2.8rem}
+}
+.lugar .bolsa{font-size:.78rem; font-weight:900; color:var(--oro); margin-top:.2rem;
+  padding:.14rem .42rem; border-radius:7px; background:rgba(247,201,72,.12); display:inline-block}
 
 /* ═══════ tablas ═══════ */
 .marco{border:1px solid var(--linea); border-radius:var(--radio); background:var(--panel); position:relative}
+/* Las superficies acompañan el cambio de tema sin saltos. */
+.marco,.juego,.split,.lugar,.bolsa-card,.fila-gan,.ficha,.candidato,.perfil,.campeon,
+.boleta .linea,.mi-semana,.aviso,.duelo .cara,.dif .row{transition:background .45s ease,border-color .45s ease}
 .rueda{overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:var(--radio)}
 .rueda::-webkit-scrollbar{height:6px}
 .rueda::-webkit-scrollbar-thumb{background:var(--linea2); border-radius:99px}
@@ -173,7 +206,9 @@ tbody tr:last-child td{border-bottom:0}
 tbody tr{animation:asomar .42s ease both; animation-delay:calc(var(--i)*20ms)}
 @keyframes asomar{from{opacity:0; transform:translateX(-7px)} to{opacity:1; transform:none}}
 .c-pos{width:2.5rem; color:var(--tenue2); font-weight:900; text-align:right}
-.c-nombre{text-align:left; font-weight:700; max-width:0; width:99%; overflow:hidden; text-overflow:ellipsis}
+/* El mínimo evita que la columna se colapse cuando la tabla se desborda. */
+.c-nombre{text-align:left; font-weight:700; width:99%; min-width:9.5rem; max-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .pts{font-weight:900; font-size:1.02em; color:var(--verde)}
 .err{color:var(--rojo); opacity:.8}
 .sem{color:var(--tenue2)}
@@ -192,13 +227,36 @@ tbody tr.clic{cursor:pointer}
   border:1px solid rgba(247,201,72,.3); vertical-align:middle}
 
 /* ═══════ pestañas ═══════ */
-.tabs{position:relative; margin:.2rem 0 .85rem}
-.tabs-int{display:flex; gap:.25rem; overflow-x:auto; scrollbar-width:none; padding-bottom:.1rem}
+.tabs{position:sticky; top:var(--alto-encabezado); z-index:40; margin:.2rem -.2rem .85rem;
+  padding:.35rem .2rem; background:linear-gradient(180deg,var(--bg) 72%,transparent)}
+.tabs-int{position:relative; display:flex; gap:.15rem; overflow-x:auto; scrollbar-width:none;
+  background:var(--panel); border:1px solid var(--linea); border-radius:13px; padding:.22rem}
 .tabs-int::-webkit-scrollbar{display:none}
-.tabs-int button{flex:0 0 auto; padding:.46rem .76rem; border-radius:10px; font-size:.81rem;
-  font-weight:800; color:var(--tenue); white-space:nowrap; transition:background .18s,color .18s}
-.tabs-int button[aria-selected="true"]{color:var(--txt); background:var(--panel2);
-  box-shadow:inset 0 0 0 1px var(--linea)}
+.tabs-int button{position:relative; z-index:2; flex:1 0 auto; padding:.44rem .7rem; border-radius:10px;
+  font-size:.79rem; font-weight:800; color:var(--tenue); white-space:nowrap;
+  transition:color .22s; text-align:center}
+.tabs-int button[aria-selected="true"]{color:var(--txt)}
+.corredera{position:absolute; top:.22rem; bottom:.22rem; left:0; width:0; border-radius:10px;
+  background:var(--panel3); box-shadow:inset 0 0 0 1px var(--linea2); z-index:1;
+  transition:transform .32s cubic-bezier(.3,.8,.35,1), width .32s cubic-bezier(.3,.8,.35,1)}
+
+/* ═══════ volver arriba ═══════ */
+.arriba{position:fixed; right:max(.9rem,env(safe-area-inset-right));
+  bottom:calc(1.1rem + env(safe-area-inset-bottom)); z-index:70;
+  width:44px; height:44px; border-radius:50%; display:grid; place-items:center;
+  background:var(--panel2); border:1px solid var(--linea2); color:var(--txt);
+  box-shadow:0 10px 30px rgba(0,0,0,.5); opacity:0; transform:translateY(14px) scale(.9);
+  pointer-events:none; transition:opacity .25s, transform .25s}
+.arriba.se-ve{opacity:1; transform:none; pointer-events:auto}
+.arriba svg{width:20px; height:20px}
+
+.filtro-tabla{position:relative; margin-bottom:.55rem}
+.filtro-tabla input{width:100%; padding:.5rem .7rem .5rem 2rem; border-radius:11px;
+  background:var(--panel); color:var(--txt); border:1px solid var(--linea); font-size:.85rem}
+.filtro-tabla input:focus{outline:0; border-color:var(--acento)}
+.filtro-tabla::before{content:"⌕"; position:absolute; left:.6rem; top:50%; transform:translateY(-50%);
+  color:var(--tenue2); font-size:1rem}
+.sin-resultados{padding:1rem; text-align:center; color:var(--tenue2); font-size:.85rem}
 
 /* ═══════ campeón ═══════ */
 .campeon{position:relative; overflow:hidden; border-radius:var(--radio); padding:1.3rem 1rem 1.15rem;
@@ -274,6 +332,10 @@ tbody tr.clic{cursor:pointer}
   animation:brincar .42s ease both; animation-delay:calc(var(--i)*30ms)}
 .juego.envivo{border-color:rgba(255,71,87,.4);
   box-shadow:0 0 0 1px rgba(255,71,87,.12), 0 10px 30px rgba(255,71,87,.07)}
+.juego.mi-equipo{border-color:var(--acento); box-shadow:0 0 0 1px var(--resplandor2), 0 12px 34px var(--resplandor2)}
+.cinta-equipo{display:flex; align-items:center; gap:.3rem; padding:.3rem .7rem;
+  background:var(--pastilla); color:var(--pastilla-txt);
+  font-size:.58rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase}
 .lado{display:flex; align-items:center; gap:.55rem; padding:.55rem .7rem; position:relative}
 .lado+.lado{border-top:1px solid rgba(31,41,56,.7)}
 .lado::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--c,var(--linea2))}
@@ -485,14 +547,19 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       {% for escalon in podio %}
       <article class="lugar {% if loop.index0 == 0 %}oro{% elif loop.index0 == 1 %}plata{% else %}bronce{% endif %}" style="--i:{{ loop.index0 }}">
         <div class="medalla">{{ escalon.pos }}</div>
-        <div class="puntos">{{ escalon.total }}</div>
-        <div class="detalle">{% if escalon.total == 1 %}acierto{% else %}aciertos{% endif %}</div>
-        {% if escalon.enlistar %}
-        <div class="quien">{{ escalon.nombres|join(' · ') }}</div>
-        {% else %}
-        <div class="empatados">{{ escalon.cuantos }} empatados</div>
-        {% endif %}
-        {% if escalon.premio %}<div class="bolsa">{{ escalon.premio }}</div>{% endif %}
+        <div class="cuerpo">
+          {% if escalon.enlistar %}
+          <div class="quien">{{ escalon.nombres|join(' · ') }}</div>
+          {% else %}
+          <div class="empatados">{{ escalon.cuantos }} empatados</div>
+          {% endif %}
+          <div class="detalle">{{ escalon.pos }}º lugar</div>
+          {% if escalon.premio %}<div class="bolsa">{{ escalon.premio }}</div>{% endif %}
+        </div>
+        <div class="cifra">
+          <div class="puntos">{{ escalon.total }}</div>
+          <div class="detalle">{% if escalon.total == 1 %}acierto{% else %}aciertos{% endif %}</div>
+        </div>
       </article>
       {% endfor %}
     </div>
@@ -566,6 +633,20 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
   const MAX_NOMBRES = 3, MAX_NOMBRES_OFICIAL = 6;
   let pestana = "tabla", vistaActual = "general", perfilAbierto = null;
 
+  /* Dónde se quedó el usuario, para volver ahí al recargar. */
+  const SITIO = "angabave.sitio";
+  function recordarSitio() {
+    try {
+      sessionStorage.setItem(SITIO, JSON.stringify({
+        vista: vistaActual, pestana, scroll: Math.round(window.scrollY),
+      }));
+    } catch (e) { /* sin memoria: se abre donde toque por omisión */ }
+  }
+  function sitioGuardado() {
+    try { return JSON.parse(sessionStorage.getItem(SITIO) || "null"); }
+    catch (e) { return null; }
+  }
+
   const crear = (tag, clase, texto) => {
     const n = document.createElement(tag);
     if (clase) n.className = clase;
@@ -635,12 +716,18 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     aplicarTema();
   }
 
-  /* Colores de casa si juega de local esta semana, de visita si va de visitante. */
+  /* Colores de casa si juega de local esta semana, de visita si va de visitante.
+     No cambia un acento: cambia fondo, superficies, bordes y resplandor. */
+  let temaPuesto = [];
   function aplicarTema() {
     const raiz = document.documentElement;
     cajaEquipo.classList.toggle("puesto", equipo !== null);
-    if (!equipo || !D.colores[equipo]) {
-      raiz.style.removeProperty("--acento");
+    temaPuesto.forEach((v) => raiz.style.removeProperty(v));
+    temaPuesto = [];
+    const meta = document.querySelector('meta[name="theme-color"]');
+
+    if (!equipo || !D.temas[equipo]) {
+      if (meta) meta.setAttribute("content", "#06090f");
       return;
     }
     const s = porSemana.get(D.activa) || D.semanas[D.semanas.length - 1];
@@ -649,7 +736,12 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       const juego = s.partidos.find((p) => p.v === equipo || p.l === equipo);
       if (juego) donde = juego.l === equipo ? "local" : "visita";
     }
-    raiz.style.setProperty("--acento", D.colores[equipo][donde]);
+    const tema = D.temas[equipo][donde];
+    Object.entries(tema).forEach(([variable, valor]) => {
+      raiz.style.setProperty(variable, valor);
+      temaPuesto.push(variable);
+    });
+    if (meta) meta.setAttribute("content", tema["--bg"]);
   }
 
   /* ═══ marcador en vivo ═══ */
@@ -861,15 +953,35 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     });
     tabla.appendChild(cuerpo);
     marco.appendChild(tabla);
-    return marco;
+    const env = crear("div");
+    env.appendChild(marco);
+    if (s.tabla.length > 12) {
+      ponerFiltro(env, Array.from(cuerpo.children),
+        (fila) => fila.children[1].textContent, "Buscar participante…");
+    }
+    return env;
   }
 
   /* ═══ marcador estilo transmisión ═══ */
   function panelPartidos(s) {
     const caja = crear("div", "juegos");
-    partidosDe(s).forEach((p, i) => {
-      const nodo = crear("article", "juego" + (p.vivo ? " envivo" : ""));
-      nodo.style.setProperty("--i", Math.min(i, 12));
+    const juegos = partidosDe(s).map((p, i) => ({ p, i }));
+    // Si eligió equipo, su partido se va hasta arriba: es el que viene a ver.
+    if (equipo) {
+      juegos.sort((a, b) => {
+        const suyo = (x) => (x.p.v === equipo || x.p.l === equipo ? 0 : 1);
+        return suyo(a) - suyo(b) || a.i - b.i;
+      });
+    }
+    juegos.forEach(({ p, i }, orden) => {
+      const mioEquipo = equipo && (p.v === equipo || p.l === equipo);
+      const nodo = crear("article", "juego" + (p.vivo ? " envivo" : "") + (mioEquipo ? " mi-equipo" : ""));
+      nodo.style.setProperty("--i", Math.min(orden, 12));
+      if (mioEquipo) {
+        const cinta = crear("div", "cinta-equipo");
+        cinta.appendChild(crear("span", null, "Tu equipo"));
+        nodo.appendChild(cinta);
+      }
       [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, eq, marcador]) => {
         const linea = crear("div", "lado" + (p.g === lado ? " gana" : ""));
         const color = (D.colores[eq] || {}).local;
@@ -1369,15 +1481,22 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     if (!disponibles.some(([c]) => c === pestana)) pestana = disponibles[0][0];
 
     const tabs = crear("div", "tabs"), interior = crear("div", "tabs-int");
+    const corredera = crear("span", "corredera");
+    interior.appendChild(corredera);
     disponibles.forEach(([clave, etiqueta]) => {
       const b = crear("button", null, etiqueta);
       b.type = "button";
       b.setAttribute("aria-selected", String(clave === pestana));
-      b.addEventListener("click", () => { pestana = clave; pintarSemana(n); });
+      b.addEventListener("click", () => {
+        pestana = clave;
+        recordarSitio();
+        pintarSemana(n);
+      });
       interior.appendChild(b);
     });
     tabs.appendChild(interior);
     raiz.appendChild(tabs);
+    requestAnimationFrame(() => moverCorredera(interior));
 
     if (pestana === "tabla") raiz.appendChild(tablaSemana(s));
     else if (pestana === "partidos") raiz.appendChild(panelPartidos(s));
@@ -1385,8 +1504,83 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     else raiz.appendChild(panelEscenarios(s));
   }
 
+  /* La corredera sigue a la pestaña activa en vez de pintarle un fondo fijo. */
+  function moverCorredera(interior) {
+    const activa = interior.querySelector('button[aria-selected="true"]');
+    const corredera = interior.querySelector(".corredera");
+    if (!activa || !corredera) return;
+    corredera.style.width = activa.offsetWidth + "px";
+    corredera.style.transform = "translateX(" + activa.offsetLeft + "px)";
+    activa.scrollIntoView({ inline: "nearest", block: "nearest" });
+  }
+
+  /* Filtro de nombres sobre una tabla ya dibujada. */
+  function ponerFiltro(destino, filas, textoDe, etiqueta) {
+    const caja = crear("div", "filtro-tabla");
+    const campo = crear("input");
+    campo.type = "search";
+    campo.placeholder = etiqueta;
+    campo.setAttribute("aria-label", etiqueta);
+    caja.appendChild(campo);
+    const vacio = crear("div", "sin-resultados", "Nadie con ese nombre.");
+    vacio.hidden = true;
+    campo.addEventListener("input", () => {
+      const busca = campo.value.trim().toLowerCase();
+      let visibles = 0;
+      filas.forEach((fila) => {
+        const cabe = !busca || textoDe(fila).toLowerCase().includes(busca);
+        fila.hidden = !cabe;
+        if (cabe) visibles++;
+      });
+      vacio.hidden = visibles > 0;
+    });
+    destino.insertBefore(caja, destino.firstChild);
+    destino.appendChild(vacio);
+  }
+
+  /* ═══ volver arriba ═══ */
+  const botonArriba = crear("button", "arriba");
+  botonArriba.type = "button";
+  botonArriba.setAttribute("aria-label", "Volver arriba");
+  botonArriba.innerHTML =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  botonArriba.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  document.body.appendChild(botonArriba);
+
+  let esperandoScroll = false;
+  window.addEventListener("scroll", () => {
+    if (esperandoScroll) return;
+    esperandoScroll = true;
+    requestAnimationFrame(() => {
+      botonArriba.classList.toggle("se-ve", window.scrollY > 520);
+      recordarSitio();
+      esperandoScroll = false;
+    });
+  }, { passive: true });
+
+  // El acelerador de arriba usa requestAnimationFrame, que no corre con la
+  // pestaña oculta. Al salir se anota la posición a la fuerza.
+  window.addEventListener("pagehide", recordarSitio);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) recordarSitio(); });
+
+  /* Las pestañas se pegan justo debajo del encabezado, que cambia de alto. */
+  const encabezado = document.querySelector("header");
+  function medirEncabezado() {
+    document.documentElement.style.setProperty(
+      "--alto-encabezado", Math.round(encabezado.getBoundingClientRect().height) + "px"
+    );
+  }
+  medirEncabezado();
+  if (window.ResizeObserver) new ResizeObserver(medirEncabezado).observe(encabezado);
+  else window.addEventListener("resize", medirEncabezado);
+
   /* ═══ navegación ═══ */
-  function repintar() { ir(vistaActual, false); }
+  function repintar() {
+    const alto = window.scrollY;
+    ir(vistaActual, false);
+    window.scrollTo({ top: alto });
+  }
 
   function ir(vista, empujar) {
     vistaActual = vista;
@@ -1411,11 +1605,23 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     if (empujar && location.hash !== destino) history.replaceState(null, "", destino);
     const activo = nav.querySelector('[aria-selected="true"]');
     if (activo) activo.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
+    recordarSitio();
   }
 
-  /* La tabla general viene escrita en el HTML: aquí solo se marca tu fila. */
+  /* La tabla general viene escrita en el HTML: aquí se marca tu fila,
+     se hace clicable y se le agrega el buscador. */
+  let generalLista = false;
   function marcarFilasPropias() {
     const filas = vistas.general.querySelectorAll("tbody tr");
+    if (!generalLista && filas.length > 12) {
+      generalLista = true;
+      const marco = vistas.general.querySelector(".marco");
+      const env = crear("div");
+      marco.parentNode.insertBefore(env, marco);
+      env.appendChild(marco);
+      ponerFiltro(env, Array.from(filas),
+        (fila) => fila.children[1].textContent, "Buscar participante…");
+    }
     filas.forEach((tr, i) => {
       const f = D.general[i];
       if (!f) return;
@@ -1438,13 +1644,25 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 
   const hash = location.hash;
   const m = hash.match(/^#s(\d+)$/);
+  const guardado = sitioGuardado();
+  const valida = (v) => v === "general" || v === "premios" || v === "jugadores" ||
+    porSemana.has(Number(v));
+
   const inicio = m && porSemana.has(Number(m[1])) ? Number(m[1])
     : hash === "#premios" ? "premios"
     : hash === "#jugadores" ? "jugadores"
     : hash === "#general" ? "general"
+    : guardado && valida(guardado.vista) ? guardado.vista
     : D.activa !== null && porSemana.has(D.activa) ? D.activa
     : "general";
+
+  if (guardado && guardado.pestana) pestana = guardado.pestana;
   ir(inicio, false);
+
+  // Y a la altura donde se quedó, para que una recarga no te mande al inicio.
+  if (guardado && guardado.scroll > 0 && String(guardado.vista) === String(inicio)) {
+    requestAnimationFrame(() => window.scrollTo({ top: guardado.scroll }));
+  }
 
   if (D.vivo) {
     consultarVivo();

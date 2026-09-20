@@ -65,7 +65,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.3.0"
+VERSION = "v0.4.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -170,6 +170,87 @@ def paleta_equipos() -> dict[str, dict[str, str]]:
             entrada[donde + "_texto"] = texto_encima(seguro)
         salida[equipo] = entrada
     return salida
+
+
+# --- temas por equipo --------------------------------------------------------
+#
+# Elegir equipo no cambia solo un acento: tiñe el fondo, las superficies y los
+# bordes. Todo se deriva del color del equipo mezclándolo con la base oscura, y
+# después se verifica que el texto siga siendo legible encima.
+
+#: Base neutra del portal, sobre la que se mezcla el color del equipo.
+BASE_TEMA: dict[str, str] = {
+    "bg": "#06090F", "bg2": "#0B1018",
+    "panel": "#101724", "panel2": "#161F2E", "panel3": "#1D2838",
+    "linea": "#1F2938", "linea2": "#2B3849",
+}
+
+#: Cuánto color del equipo lleva cada superficie. Poco en el fondo, más en los
+#: bordes: así se nota el tema sin que el texto pierda contraste.
+FUERZA_TEMA: dict[str, float] = {
+    "bg": 0.20, "bg2": 0.24, "panel": 0.22, "panel2": 0.27,
+    "panel3": 0.32, "linea": 0.40, "linea2": 0.48,
+}
+
+#: Textos que tienen que seguir leyéndose sobre el panel teñido.
+_TEXTOS = {"txt": ("#EEF4FB", 7.0), "tenue": ("#8D9BB0", 4.5), "tenue2": ("#5C6A7E", 3.0)}
+
+
+def mezclar(fondo: str, tinte: str, fuerza: float) -> str:
+    """Mezcla dos colores; `fuerza` es cuánto pesa el tinte."""
+    a, b = _a_rgb(fondo), _a_rgb(tinte)
+    return "#%02X%02X%02X" % tuple(
+        round((x + (y - x) * fuerza) * 255) for x, y in zip(a, b)
+    )
+
+
+def _rgba(color: str, alfa: float) -> str:
+    rojo, verde, azul = (round(v * 255) for v in _a_rgb(color))
+    return f"rgba({rojo},{verde},{azul},{alfa})"
+
+
+def tema_equipo(acento: str) -> dict[str, str]:
+    """Paleta completa a partir del color del equipo, ya verificada.
+
+    Devuelve las variables CSS tal cual las aplica el navegador.
+    """
+    tema = {
+        "--" + nombre: mezclar(base, acento, FUERZA_TEMA[nombre])
+        for nombre, base in BASE_TEMA.items()
+    }
+    # Resplandor del fondo, en el color del equipo.
+    tema["--resplandor"] = _rgba(acento, 0.45)
+    tema["--resplandor2"] = _rgba(acento, 0.24)
+
+    # Al teñir, el panel queda más claro que la base neutra, así que el acento
+    # se vuelve a verificar contra ESE panel y no contra el original.
+    panel = tema["--panel"]
+    tema["--acento"] = legible_sobre_oscuro(acento, panel)
+
+    # Las pastillas activas se visten del equipo, con su texto legible encima.
+    tema["--pastilla"] = (
+        f"linear-gradient(180deg,{tema['--acento']},{mezclar(tema['--acento'], '#000000', 0.22)})"
+    )
+    tema["--pastilla-txt"] = texto_encima(tema["--acento"])
+
+    # Los textos se aclaran si el panel teñido les quitó contraste.
+    for nombre, (color, minimo) in _TEXTOS.items():
+        seguro = color
+        for _ in range(30):
+            if contraste(seguro, panel) >= minimo:
+                break
+            seguro = _aclarar(seguro)
+        tema["--" + nombre] = seguro
+    return tema
+
+
+def temas_equipos() -> dict[str, dict[str, dict[str, str]]]:
+    """Un tema por equipo y por dónde juega (casa o visita)."""
+    paleta = paleta_equipos()
+    return {
+        equipo: {donde: tema_equipo(colores[donde]) for donde in ("local", "visita")}
+        for equipo, colores in paleta.items()
+    }
 
 
 def _siglas() -> dict[str, str]:
@@ -487,6 +568,7 @@ def generar_html(
         "participantes": participantes,
         "colores": paleta_equipos(),
         "siglas": _siglas(),
+        "temas": temas_equipos(),
         "general": general,
         "semanas": [_datos_semana(semana, indice_global) for semana in semanas],
         "activa": activa.numero if activa else None,

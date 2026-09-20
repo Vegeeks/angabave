@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.3.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.4.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -210,9 +210,13 @@ Qué trae:
 * **Jugadores**: buscador entre los 34, ficha de cada quien con su línea por
   semana y sus semanas ganadas, y un duelo para comparar a dos y ver en qué
   partidos difieren.
-* **Modo equipo**: eliges tu equipo y el portal se tiñe con sus colores, los de
-  casa o los de visita según dónde juegue esa semana. Todos los colores pasan
-  una verificación de contraste de 4.5:1 contra el fondo.
+* **Modo equipo**: eliges tu equipo y el portal entero se viste de sus colores
+  —fondo, superficies, bordes y resplandor— con los de casa o los de visita
+  según dónde juegue esa semana, y su partido encabeza la lista. Los 64 temas
+  se generan mezclando el color del equipo con la base oscura y cada uno pasa
+  una verificación de contraste antes de salir.
+* **Se queda donde estabas**: al recargar vuelve a la misma vista, pestaña y
+  altura de la página.
 * **Se guarda como app**: al agregarlo a la pantalla de inicio en iPhone o
   Android usa el logo propio y abre a pantalla completa.
 * **Modo jugador**: en el encabezado eliges tu nombre y el sitio se vuelve
