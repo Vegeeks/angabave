@@ -2,23 +2,13 @@
   "semana": 2,
   "partidos": [
     {
-      "visitante": "Panthers",
-      "local": "Falcons",
-      "marcador_visitante": 34,
-      "marcador_local": 3,
-      "ganador": "Panthers",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-20T17:00:00+00:00"
-    },
-    {
       "visitante": "Packers",
       "local": "Jets",
       "marcador_visitante": 17,
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "End of Period",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
@@ -29,16 +19,6 @@
       "ganador": null,
       "finalizado": false,
       "estado": "Delayed",
-      "inicio": "2026-09-20T17:00:00+00:00"
-    },
-    {
-      "visitante": "Bengals",
-      "local": "Texans",
-      "marcador_visitante": 20,
-      "marcador_local": 6,
-      "ganador": "Bengals",
-      "finalizado": true,
-      "estado": "Final",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
@@ -60,6 +40,16 @@
       "finalizado": false,
       "estado": "In Progress",
       "inicio": "2026-09-20T20:05:00+00:00"
+    },
+    {
+      "visitante": "Panthers",
+      "local": "Falcons",
+      "marcador_visitante": 34,
+      "marcador_local": 3,
+      "ganador": "Panthers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
       "visitante": "Vikings",
@@ -97,6 +87,16 @@
       "marcador_visitante": 24,
       "marcador_local": 17,
       "ganador": "Saints",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-20T17:00:00+00:00"
+    },
+    {
+      "visitante": "Bengals",
+      "local": "Texans",
+      "marcador_visitante": 20,
+      "marcador_local": 6,
+      "ganador": "Bengals",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-20T17:00:00+00:00"
