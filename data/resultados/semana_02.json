@@ -6,9 +6,9 @@
       "local": "Chargers",
       "marcador_visitante": 26,
       "marcador_local": 14,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "End of Period",
+      "ganador": "Raiders",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-20T20:05:00+00:00"
     },
     {
@@ -36,9 +36,9 @@
       "local": "49ers",
       "marcador_visitante": 13,
       "marcador_local": 35,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "49ers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
