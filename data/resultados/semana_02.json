@@ -4,11 +4,11 @@
     {
       "visitante": "Packers",
       "local": "Jets",
-      "marcador_visitante": 17,
+      "marcador_visitante": 20,
       "marcador_local": 17,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Packers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
