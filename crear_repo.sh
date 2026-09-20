@@ -55,9 +55,18 @@ gh api --method POST "repos/$CUENTA/$NOMBRE/pages" -f build_type=workflow >/dev/
   || echo "    (ya estaba encendido, o enciéndelo a mano en Settings > Pages > Source: GitHub Actions)"
 
 echo "==> Primera publicación"
-gh workflow run actualizar.yml --repo "$CUENTA/$NOMBRE" >/dev/null 2>&1 \
-  && echo "    workflow disparado" \
-  || echo "    dispáralo a mano en la pestaña Actions"
+# El push ya suele disparar el workflow; solo se dispara a mano si no arrancó
+# nada, porque dos corridas a la vez se pelean por el mismo commit.
+sleep 5
+EN_MARCHA="$(gh run list --repo "$CUENTA/$NOMBRE" --limit 5 \
+  --json status --jq '[.[] | select(.status != "completed")] | length' 2>/dev/null || echo 0)"
+if [ "${EN_MARCHA:-0}" -gt 0 ]; then
+  echo "    el push ya disparó el workflow"
+else
+  gh workflow run actualizar.yml --repo "$CUENTA/$NOMBRE" >/dev/null 2>&1 \
+    && echo "    workflow disparado" \
+    || echo "    dispáralo a mano en la pestaña Actions"
+fi
 
 echo
 echo "Listo."
