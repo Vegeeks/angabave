@@ -6,9 +6,9 @@
       "local": "Buccaneers",
       "marcador_visitante": 23,
       "marcador_local": 19,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Browns",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-20T17:00:00+00:00"
     },
     {
@@ -28,13 +28,13 @@
       "marcador_local": 14,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-09-20T20:05:00+00:00"
     },
     {
       "visitante": "Washington",
       "local": "Cowboys",
-      "marcador_visitante": 10,
+      "marcador_visitante": 13,
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
