@@ -9,6 +9,28 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.7.0
+
+Encabezado más chico y fichas de jugador con sustancia.
+
+* **El encabezado bajó de cuatro filas a tres.** Los dos selectores se
+  guardaron tras un botón de identidad que muestra tus iniciales y a quién le
+  vas; se abre con un toque y se cierra al tocar fuera o con Escape. Son 18 px
+  menos de barra fija en un teléfono.
+* **La ficha de jugador dejó de ser cuatro números.** Ahora cruza los picks de
+  los 34 y dice:
+  * su promedio por semana y a cuántos aciertos está del primer lugar;
+  * su porcentaje de acierto sobre los partidos cerrados;
+  * **su equipo consentido**, cuántas veces lo eligió y cuántas le salió;
+  * **cuántas veces fue contra la mayoría** de la quiniela y cuántas de esas
+    le funcionó, que es la estadística que de verdad retrata a alguien en una
+    quiniela;
+  * las barras por semana ahora llevan el número encima.
+
+**Lo que se intentó y no se publicó:** que el encabezado se plegara solo al
+hacer scroll. El CSS quedó escrito pero en las pruebas no se pudo confirmar que
+surtiera efecto, así que se retiró en vez de publicar algo sin verificar.
+
 ## alfa v0.6.0
 
 Una pasada crítica a la interfaz.

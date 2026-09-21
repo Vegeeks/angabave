@@ -89,7 +89,20 @@ header::after{content:""; position:absolute; left:0; right:0; bottom:-1px; heigh
 .estado.vivo .punto,.estado.esperando .punto{animation:latir 1.5s ease-in-out infinite}
 @keyframes latir{0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.3; transform:scale(.7)}}
 
-.controles{display:flex; gap:.4rem; padding-bottom:.45rem}
+.identidad{display:flex; align-items:center; gap:.4rem; flex:0 0 auto; max-width:11rem;
+  padding:.24rem .5rem .24rem .28rem; border-radius:999px;
+  border:1px solid var(--linea2); background:rgba(255,255,255,.02); transition:border-color .18s}
+.identidad:hover{border-color:var(--acento)}
+.identidad .ini{width:24px; height:24px; border-radius:50%; display:grid; place-items:center;
+  font-size:.62rem; font-weight:900; color:var(--pastilla-txt); background:var(--pastilla); flex:0 0 auto}
+.identidad .txt{font-size:.74rem; font-weight:800; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; color:var(--tenue)}
+.identidad.puesta .txt{color:var(--txt)}
+.identidad .flecha{font-size:.6rem; color:var(--tenue2); transition:transform .22s}
+.identidad[aria-expanded="true"] .flecha{transform:rotate(180deg)}
+.identidad[aria-expanded="true"]{border-color:var(--acento); background:var(--panel2)}
+.controles{display:flex; gap:.4rem; padding-bottom:.45rem; animation:entrar .22s ease both}
+
 .soy{display:flex; align-items:center; gap:.35rem; flex:1 1 0; min-width:0;
   border:1px solid var(--linea2); border-radius:999px; padding:.2rem .28rem .2rem .58rem;
   background:rgba(255,255,255,.02)}
@@ -472,6 +485,17 @@ input.ancho:focus,select.ancho:focus{outline:0; border-color:var(--acento)}
   min-height:3px; transition:height .7s cubic-bezier(.2,.7,.3,1)}
 .barras .col.mejor .b{background:linear-gradient(180deg,#ffe193,var(--oro))}
 .barras .col small{font-size:.54rem; color:var(--tenue2); font-weight:800}
+.barras .col small.cima{color:var(--tenue); font-size:.58rem}
+.barras{height:76px}
+.nota-perfil{margin-top:.6rem; font-size:.82rem; color:var(--tenue)}
+.rasgos{display:grid; gap:.45rem; margin-top:.9rem;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
+.rasgo{border:1px solid var(--linea); border-radius:11px; padding:.55rem .65rem;
+  background:var(--panel); border-left:3px solid var(--c,var(--linea2))}
+.rasgo .rot{font-size:.56rem; font-weight:900; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--tenue2)}
+.rasgo .val{font-size:1.02rem; font-weight:900; margin-top:.15rem; overflow-wrap:anywhere}
+.rasgo .pie{font-size:.68rem; color:var(--tenue2); margin-top:.1rem}
 
 .duelo{display:grid; gap:.5rem}
 .duelo .caras{display:grid; grid-template-columns:1fr auto 1fr; gap:.5rem; align-items:center}
@@ -543,9 +567,14 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
         <span class="sub">Quiniela NFL {{ anio }} <i class="version">{{ etapa }} {{ version }}</i></span>
       </span>
     </div>
+    <button type="button" class="identidad" id="identidad" aria-expanded="false" aria-controls="controles">
+      <span class="ini" id="identidad-ini">?</span>
+      <span class="txt" id="identidad-txt">Identifícate</span>
+      <span class="flecha">▾</span>
+    </button>
     <span class="estado" id="estado"><span class="punto"></span><span id="estado-txt">Temporada</span></span>
   </div>
-  <div class="env controles">
+  <div class="env controles oculto" id="controles">
     <label class="soy" id="soy"><span>Soy</span><select id="quien-soy" aria-label="Elige tu nombre"></select></label>
     <label class="soy" id="equipo"><span>Equipo</span><select id="mi-equipo" aria-label="Elige tu equipo"></select></label>
   </div>
@@ -702,6 +731,50 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     try { return localStorage.getItem(llave); } catch (e) { return null; }
   }
 
+  /* ═══ identidad: un botón en vez de dos filas de selectores ═══ */
+  const botonIdentidad = document.getElementById("identidad");
+  const panelControles = document.getElementById("controles");
+  const identidadIni = document.getElementById("identidad-ini");
+  const identidadTxt = document.getElementById("identidad-txt");
+
+  function iniciales(texto) {
+    const partes = texto.trim().split(/\s+/).filter(Boolean);
+    if (!partes.length) return "?";
+    const primera = partes[0][0] || "";
+    const segunda = partes.length > 1 ? partes[partes.length - 1][0] : (partes[0][1] || "");
+    return (primera + segunda).toUpperCase();
+  }
+
+  function pintarIdentidad() {
+    const quien = jugador !== null ? nombre(jugador) : null;
+    const partes = [quien, equipo].filter(Boolean);
+    botonIdentidad.classList.toggle("puesta", partes.length > 0);
+    identidadTxt.textContent = partes.length ? partes.join(" · ") : "Identifícate";
+    identidadIni.textContent = quien ? iniciales(quien) : (equipo ? (D.siglas[equipo] || "?") : "?");
+    botonIdentidad.title = partes.length
+      ? "Cambiar tu nombre o tu equipo"
+      : "Elige tu nombre y tu equipo";
+  }
+
+  function abrirControles(abrir) {
+    panelControles.classList.toggle("oculto", !abrir);
+    botonIdentidad.setAttribute("aria-expanded", String(abrir));
+    medirEncabezado();
+  }
+
+  botonIdentidad.addEventListener("click", (evento) => {
+    evento.stopPropagation();
+    abrirControles(panelControles.classList.contains("oculto"));
+  });
+  document.addEventListener("click", (evento) => {
+    if (!panelControles.classList.contains("oculto") && !panelControles.contains(evento.target)) {
+      abrirControles(false);
+    }
+  });
+  document.addEventListener("keydown", (evento) => {
+    if (evento.key === "Escape") abrirControles(false);
+  });
+
   /* ═══ quién soy ═══ */
   const cajaSoy = document.getElementById("soy");
   const selSoy = document.getElementById("quien-soy");
@@ -720,6 +793,7 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       jugador = selSoy.value === "" ? null : Number(selSoy.value);
       guardar("angabave.jugador", jugador === null ? null : D.participantes[jugador]);
       cajaSoy.classList.toggle("puesto", jugador !== null);
+      pintarIdentidad();
       perfilAbierto = null;
       repintar();
     });
@@ -742,6 +816,7 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       equipo = selEquipo.value || null;
       guardar("angabave.equipo", equipo);
       aplicarTema();
+      pintarIdentidad();
       repintar();
     });
     aplicarTema();
@@ -1409,9 +1484,61 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     raiz.appendChild(duelo());
   }
 
+  /* Todo lo que se puede decir de alguien cruzando los picks de los 34. */
+  function retrato(idx) {
+    const linea = [];
+    const porEquipo = new Map();     // equipo -> {veces, aciertos}
+    let contra = 0, contraOk = 0, cerrados = 0, aciertos = 0;
+
+    jugadas.forEach((s) => {
+      const fila = s.jugadores.indexOf(idx);
+      const enTabla = (s.tabla || []).find((f) => f.p === idx);
+      if (enTabla) linea.push({ n: s.n, aciertos: enTabla.f, pos: enTabla.pos });
+      if (fila < 0) return;
+
+      const juegos = partidosDe(s);
+      juegos.forEach((p, col) => {
+        const local = s.picks[fila][col] === 1;
+        const lado = local ? "l" : "v";
+        const eq = local ? p.l : p.v;
+        const registro = porEquipo.get(eq) || { veces: 0, aciertos: 0 };
+        registro.veces++;
+
+        if (p.cerrado) {
+          cerrados++;
+          const acerto = p.g === lado;
+          if (acerto) { aciertos++; registro.aciertos++; }
+
+          // ¿Fue contra la mayoría? Se cuenta cómo votó la quiniela ese partido.
+          let casa = 0;
+          s.jugadores.forEach((_, otra) => { if (s.picks[otra][col] === 1) casa++; }); 
+          const suyos = local ? casa : s.jugadores.length - casa;
+          if (suyos * 2 < s.jugadores.length) {
+            contra++;
+            if (acerto) contraOk++;
+          }
+        }
+        porEquipo.set(eq, registro);
+      });
+    });
+
+    // El equipo que más elige, desempatando por aciertos.
+    let consentido = null;
+    porEquipo.forEach((registro, eq) => {
+      if (!consentido || registro.veces > consentido.veces ||
+          (registro.veces === consentido.veces && registro.aciertos > consentido.aciertos)) {
+        consentido = { eq, ...registro };
+      }
+    });
+
+    return { linea, consentido, contra, contraOk, cerrados, aciertos };
+  }
+
   function perfil(idx) {
     const f = generalPorIdx.get(idx);
+    const datos = retrato(idx);
     const caja = crear("div", "perfil");
+
     const cab = crear("div", "cab");
     const izq = crear("div");
     izq.appendChild(crear("div", "rotulo", f ? f.pos + "º lugar general" : "participante"));
@@ -1424,39 +1551,84 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     cab.appendChild(cerrar);
     caja.appendChild(cab);
 
-    const linea = lineaDe(idx).filter((s) => s.aciertos !== null);
-    const valores = linea.map((s) => s.aciertos);
-    const mejor = valores.length ? Math.max(...valores) : 0;
-    const peor = valores.length ? Math.min(...valores) : 0;
-    const semanasGanadas = jugadas.filter((s) => s.oficial && (s.ganadores || []).includes(idx)).length;
+    const semanas = datos.linea.length || 1;
+    const promedio = (datos.linea.reduce((s, x) => s + x.aciertos, 0) / semanas).toFixed(1);
+    const ganadas = jugadas.filter((s) => s.oficial && (s.ganadores || []).includes(idx)).length;
 
     const cifras = crear("div", "cifras");
     [[f ? f.total : 0, "aciertos"], [f ? f.err : 0, "fallos"],
-     [mejor, "su mejor semana"], [semanasGanadas, semanasGanadas === 1 ? "semana ganada" : "semanas ganadas"]]
-      .forEach(([v, et]) => {
+     [promedio, "por semana"], [ganadas, ganadas === 1 ? "semana ganada" : "semanas ganadas"]]
+      .forEach(([valor, etiqueta]) => {
         const c = crear("div", "cifra");
-        c.appendChild(crear("b", null, String(v)));
-        c.appendChild(crear("span", null, et));
+        c.appendChild(crear("b", null, String(valor)));
+        c.appendChild(crear("span", null, etiqueta));
         cifras.appendChild(c);
       });
     caja.appendChild(cifras);
 
-    if (linea.length) {
+    // A cuántos del primero: el dato que todo el mundo quiere saber.
+    const lider = D.general[0];
+    if (f && lider) {
+      const falta = lider.total - f.total;
+      const nota = crear("div", "nota-perfil");
+      nota.textContent = falta === 0
+        ? "Va en la punta de la general."
+        : "A " + falta + (falta === 1 ? " acierto" : " aciertos") + " del primer lugar.";
+      caja.appendChild(nota);
+    }
+
+    if (datos.linea.length) {
+      const mejor = Math.max(...datos.linea.map((s) => s.aciertos));
+      const peor = Math.min(...datos.linea.map((s) => s.aciertos));
       const barras = crear("div", "barras");
-      linea.forEach((s) => {
+      datos.linea.forEach((s) => {
         const col = crear("div", "col" + (s.aciertos === mejor && mejor !== peor ? " mejor" : ""));
         const b = crear("div", "b");
-        b.title = "Semana " + s.n + ": " + s.aciertos + " aciertos";
+        b.title = "Semana " + s.n + ": " + s.aciertos + " aciertos, " + s.pos + "º de la semana";
+        col.appendChild(crear("small", "cima", String(s.aciertos)));
         col.appendChild(b);
         col.appendChild(crear("small", null, "S" + s.n));
         barras.appendChild(col);
         requestAnimationFrame(() => {
-          b.style.height = Math.max(6, (s.aciertos / Math.max(1, mejor)) * 44) + "px";
+          b.style.height = Math.max(6, (s.aciertos / Math.max(1, mejor)) * 40) + "px";
         });
       });
       caja.appendChild(barras);
     }
+
+    const rasgos = crear("div", "rasgos");
+    if (datos.consentido && datos.consentido.veces > 1) {
+      rasgos.appendChild(rasgo(
+        "Su consentido",
+        datos.consentido.eq,
+        "lo eligió " + datos.consentido.veces + " veces · " +
+          datos.consentido.aciertos + " bien",
+        (D.colores[datos.consentido.eq] || {}).local
+      ));
+    }
+    if (datos.cerrados) {
+      rasgos.appendChild(rasgo(
+        "Contra la mayoría",
+        datos.contra + (datos.contra === 1 ? " vez" : " veces"),
+        datos.contra ? datos.contraOk + " le salieron" : "siempre va con la manada"
+      ));
+      rasgos.appendChild(rasgo(
+        "Acierto",
+        Math.round((datos.aciertos / datos.cerrados) * 100) + "%",
+        "de " + datos.cerrados + " partidos cerrados"
+      ));
+    }
+    if (rasgos.children.length) caja.appendChild(rasgos);
     return caja;
+  }
+
+  function rasgo(titulo, valor, pie, color) {
+    const nodo = crear("div", "rasgo");
+    if (color) nodo.style.setProperty("--c", color);
+    nodo.appendChild(crear("div", "rot", titulo));
+    nodo.appendChild(crear("div", "val", valor));
+    nodo.appendChild(crear("div", "pie", pie));
+    return nodo;
   }
 
   function duelo() {
@@ -1755,6 +1927,7 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 
   montarSoy();
   montarEquipo();
+  pintarIdentidad();
 
   const hash = location.hash;
   const m = hash.match(/^#s(\d+)$/);

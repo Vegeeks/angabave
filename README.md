@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.6.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.7.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -237,9 +237,10 @@ Qué trae:
   la pestaña al frente. Esa capa nunca cierra un partido ni cambia el conteo
   oficial —eso lo decide CI— así que un error de la API no puede producir una
   tabla equivocada; si falla, se ve lo último publicado.
-* **Jugadores**: buscador entre los 34, ficha de cada quien con su línea por
-  semana y sus semanas ganadas, y un duelo para comparar a dos y ver en qué
-  partidos difieren.
+* **Jugadores**: buscador entre los 34 y un duelo para comparar a dos. La
+  ficha de cada quien cruza los picks de todos: promedio, a cuántos está del
+  líder, porcentaje de acierto, su equipo consentido con su récord y cuántas
+  veces fue contra la mayoría de la quiniela (y cuántas le salió).
 * **Modo equipo**: eliges tu equipo y el portal entero se viste de sus colores
   —fondo, superficies, bordes y resplandor— con los de casa o los de visita
   según dónde juegue esa semana, y su partido encabeza la lista. Los 64 temas
