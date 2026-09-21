@@ -27,17 +27,36 @@ python cli.py actualizar --semana 2 --sin-red  # solo usa el caché, no toca la 
 python cli.py tabla --semana 2                 # tabla de la semana en la terminal
 python cli.py general                          # tabla acumulada en la terminal
 python cli.py escenarios --participante "Angel D Luffy"
-python cli.py validar --semana 2               # solo revisa el Excel, no calcula
+python cli.py validar --semana 2               # solo revisa el archivo, no calcula
+python cli.py importar ~/Downloads/"Quiniela 3.pdf"   # lo guarda como Semana_03.pdf
+python cli.py pendientes --semana 2            # cuántos partidos siguen abiertos
+python cli.py proximo                          # segundos al próximo partido
 ```
 
-Si omites `--semana`, se usa la última semana con archivo de picks.
+Si omites `--semana`, se usa la última semana con archivo de picks. `pendientes`
+y `proximo` existen para el workflow **Directo**, que los consulta para saber si
+ponerse a trabajar, esperar o detenerse.
 
-Flujo semanal:
+### Flujo semanal
 
-1. Guarda el Excel del organizador como `data/picks/Semana_NN.xlsx`.
-2. Corre `python cli.py validar --semana NN`. Si el archivo trae algo raro, aquí
-   te enteras, antes de calcular nada.
-3. Haz commit y push. GitHub Actions se encarga del resto durante los partidos.
+Esto es todo lo que hay que hacer cada semana:
+
+```bash
+cd ~/NFL/quiniela-nfl
+python cli.py importar ~/Downloads/"Quiniela 3.pdf"   # Excel o PDF, da igual
+python cli.py validar --semana 3                      # avisa si hay capturas raras
+git add data/picks && git commit -m "Semana 3" && git push
+```
+
+El push dispara el workflow solo. De ahí en adelante no hay que hacer nada más
+en toda la semana: durante los partidos el sitio se recalcula cada dos minutos.
+
+Si el cron de GitHub no arranca el directo —pasa, ver **Automatización**—, se
+lanza a mano:
+
+```bash
+gh workflow run directo.yml --repo <cuenta>/<repo> -f minutos=300 -f cada=120
+```
 
 ## El archivo de picks
 
@@ -385,18 +404,64 @@ No hacen red: las respuestas de ESPN están guardadas como JSON en
 
 ```
 quiniela/
-  equipos.py     mapeo y normalización de nombres
-  espn.py        cliente de marcadores, caché, overrides y el tipo Partido
-  picks.py       lectura del Excel
-  scoring.py     cálculo de tablas y escenarios
-  render_html.py salida web
-  render_png.py  imagen para WhatsApp
-  plantillas/    plantilla Jinja2 de la página
+  equipos.py       32 equipos + las 3 variantes de ESPN; normalizar()
+  espn.py          cliente de marcadores, caché, overrides, tipo Partido, zona CDMX
+  pdf.py           lee la capa de texto del PDF del organizador (sin OCR)
+  picks.py         lee el archivo semanal (Excel o PDF) y sella los picks
+  scoring.py       tablas, escenarios, panorama, premios
+  render_html.py   la página, los temas, el contraste y el orden de la NFL
+  render_png.py    imagen para WhatsApp e iconos de app
+  plantillas/      index.html.j2 (HTML + CSS + JS de la página)
+  tipografia/      Oswald recortada (8 KB) + su licencia OFL
 data/
-  picks/         Semana_01.xlsx, Semana_02.xlsx, ...
-  resultados/    semana_01.json (caché de partidos cerrados)
-  overrides.json correcciones manuales
-docs/            salida publicada (GitHub Pages)
-tests/
+  picks/           Semana_01.xlsx, Semana_02.xlsx, Semana_03.pdf…
+  resultados/      semana_01.json — caché de marcadores (se versiona)
+  overrides.json   correcciones manuales de ganadores
+  sellos.json      huella SHA-256 de los picks, congelada al arrancar la jornada
+docs/              lo que se publica en GitHub Pages
+  index.html       el portal entero, en un solo archivo
+  tabla.png        imagen para WhatsApp
+  version.json     sello de versión contra el caché de Pages
+  icono-*.png      iconos para guardar el sitio como app
+  manifest.webmanifest
+.github/workflows/
+  actualizar.yml   cron cada 5 min en ventanas + push de picks + manual
+  directo.yml      bucle que sigue la jornada y se encadena solo
+tests/             147 pruebas, ninguna toca la red
 cli.py
+crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 ```
+
+## Qué se puede ajustar y dónde
+
+| Qué | Constante | Dónde |
+|---|---|---|
+| Premio semanal, acumulado, reparto | `PREMIO_SEMANAL`, `ACUMULADO_SEMANAL`, `SEMANAS_TEMPORADA`, `REPARTO_FINAL` | `scoring.py` |
+| Nombre de la quiniela y firma | `MARCA`, `DESARROLLADOR`, `ETAPA`, `VERSION` | `render_html.py` |
+| Correo a donde se mandan los picks | `CORREO_ORGANIZADOR` | `render_html.py` |
+| Hora de cierre de cada tanda | `HORA_CIERRE` | `render_html.py` |
+| Cuándo aparece el podio | `UMBRAL_PODIO` (16 partidos cerrados) | `render_html.py` |
+| Cuándo se proyecta el ganador semanal | `UMBRAL_SEMANA` (8 de esa semana) | `render_html.py` |
+| Cuántos empatados se enlistan | `MAXIMO_NOMBRES`, `MAXIMO_NOMBRES_PODIO` | `render_html.py` |
+| Cada cuánto consulta marcadores el navegador | `SEGUNDOS_VIVO` (60 s) | `render_html.py` |
+| Cada cuánto se recarga la página entera | `SEGUNDOS_RECARGA` (600 s) | `render_html.py` |
+| Cuándo se avisa que la tabla va vieja | `MINUTOS_REZAGO` (25 min) | `render_html.py` |
+| Colores y contraste de los temas | `COLORES_EQUIPO`, `FUERZA_TEMA`, `CONTRASTE_MINIMO` | `render_html.py` |
+| Timeout y reintentos de ESPN | `TIEMPO_ESPERA`, `MAX_REINTENTOS`, `ESPERA_BASE` | `espn.py` |
+
+## Decisiones que conviene no deshacer
+
+* **El orden de los partidos es el de la NFL**, por hora de inicio, y se fija en
+  un solo lugar (`_orden_nfl`). Reordenarlos obliga a reordenar los picks de
+  cada quien con ellos; si se despegan, el conteo queda mal y **no se ve**. Hay
+  una prueba que lo verifica pick por pick.
+* **El navegador nunca cierra un partido ni toca el conteo oficial.** La capa en
+  vivo solo refresca marcadores de partidos que CI tiene abiertos. Así, un error
+  de la API jamás puede producir una tabla equivocada.
+* **La tipografía recortada solo se aplica a mayúsculas y cifras.** No tiene
+  minúsculas: un nombre se partiría a media palabra.
+* **Los empates no le dan acierto a nadie** y cuentan como error para todos.
+* **La posición la decide solo el número de aciertos**, que es el que se
+  publica. Nadie queda arriba de nadie por un número que no se ve.
+* **`data/resultados/` se versiona.** Es lo que permite `--sin-red`, la tabla
+  general sin conexión y que no se vuelvan a consultar partidos ya cerrados.
