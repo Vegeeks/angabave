@@ -23,11 +23,15 @@ import pandas as pd
 
 from quiniela.equipos import EquipoDesconocidoError
 from quiniela.espn import ErrorESPN, ahora_cdmx, obtener_partidos
-from quiniela.picks import ErrorPicks, leer_picks, numero_semana
-from quiniela.render_html import SemanaRender, generar_html
+from quiniela.picks import ErrorPicks, PicksAlteradosError, leer_picks, numero_semana, verificar_sello
+from quiniela.render_html import UMBRAL_SEMANA, SemanaRender, generar_html
 from quiniela.render_png import generar_iconos, generar_png
+from quiniela.render_html import _pesos
 from quiniela.scoring import (
     ErrorCalendario,
+    PREMIO_SEMANAL,
+    ganadores as ganadores_de,
+    premio_semanal,
     emparejar_resultados,
     escenarios,
     panorama,
@@ -137,11 +141,27 @@ def imprimir_tabla(tabla: pd.DataFrame, titulo: str) -> None:
     print()
 
 
+def _sellar(ruta: Path, semana: int, resultados) -> None:
+    """Congela los picks en cuanto arranca el primer partido de la semana.
+
+    Es la única vía real de trampa que queda: los picks viven en el repo y solo
+    se cambian con un push autenticado, pero un cambio hecho con resultados ya
+    en la mano no se puede dar por bueno. Aquí truena.
+    """
+    ahora = datetime.now(timezone.utc)
+    ya_empezo = any(
+        partido.finalizado or (partido.inicio is not None and partido.inicio <= ahora)
+        for partido in resultados
+    )
+    verificar_sello(ruta, semana, ya_empezo)
+
+
 def _cargar_semana(semana: int, anio: int, sin_red: bool):
     ruta = ruta_picks(semana)
     partidos, picks = leer_picks(ruta)
     resultados = obtener_partidos(anio, semana, sin_red=sin_red)
     alineados = emparejar_resultados(partidos, resultados)
+    _sellar(ruta, semana, alineados)
     return partidos, picks, alineados
 
 
@@ -168,6 +188,7 @@ def construir_semanas(anio: int, semana_activa: int, sin_red: bool) -> list[Sema
             anio, numero, activa=(numero == semana_activa), sin_red=sin_red
         )
         alineados = emparejar_resultados(partidos, resultados)
+        _sellar(ruta, numero, alineados)
         tabla = tabla_semana(partidos, picks, alineados)
 
         pendientes = [partido for partido in alineados if not partido.finalizado]
@@ -217,6 +238,14 @@ def comando_actualizar(argumentos) -> int:
         momento=momento,
     )
     generar_iconos()
+    # La franja del PNG solo aparece cuando ya hay algo que decir.
+    primeros: list[str] = []
+    monto = None
+    if activa.tabla is not None and activa.cerrados >= UMBRAL_SEMANA:
+        primeros = ganadores_de(activa.tabla)
+        monto = _pesos(
+            premio_semanal(len(primeros)) if activa.estado == "cerrada" else PREMIO_SEMANAL
+        )
     png = generar_png(
         tabla_acumulada=general,
         semana=semana,
@@ -224,6 +253,9 @@ def comando_actualizar(argumentos) -> int:
         cerrados=activa.cerrados,
         total_partidos=len(activa.partidos),
         momento=momento,
+        ganadores=primeros,
+        premio=monto,
+        oficial=activa.estado == "cerrada",
     )
 
     lider = general.iloc[0]
@@ -450,6 +482,9 @@ def main(argumentos: list[str] | None = None) -> int:
     configurar_log(opciones.verboso)
     try:
         return opciones.funcion(opciones)
+    except PicksAlteradosError as error:
+        _log.error("%s", error)
+        return 2
     except (ErrorPicks, ErrorESPN, ErrorCalendario, EquipoDesconocidoError, KeyError) as error:
         _log.error("%s", str(error).strip("'"))
         return 1

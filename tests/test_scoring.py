@@ -10,6 +10,7 @@ from quiniela.espn import Partido, guardar_cache
 from quiniela.picks import leer_picks
 from quiniela.scoring import (
     ErrorCalendario,
+    alertar_nombres_parecidos,
     emparejar_resultados,
     escenarios,
     panorama,
@@ -328,3 +329,46 @@ def test_el_panorama_reparte_todas_las_combinaciones():
 
 def test_el_panorama_sin_participantes():
     assert panorama([sin_empezar("Lions", "Bills")], {}, {}) == {}
+
+
+# --- nombres parecidos -----------------------------------------------------
+
+
+def test_detecta_una_errata_en_el_nombre():
+    parecidos = alertar_nombres_parecidos({
+        "rogelio loredo": "Rogelio Loredo",
+        "rogelio lorero": "Rogelio Lorero",
+        "sol vega": "Sol Vega",
+    })
+    assert parecidos == [("Rogelio Loredo", "Rogelio Lorero")]
+
+
+def test_no_confunde_a_dos_personas_distintas():
+    assert alertar_nombres_parecidos({
+        "luis santoyo": "Luis Santoyo",
+        "luis toledano": "Luis Toledano",
+        "alberto alvarez": "Alberto Alvarez",
+        "alberto santoyo": "Alberto Santoyo",
+    }) == []
+
+
+def test_coincidir_en_una_semana_descarta_la_errata():
+    """Alberto y Beto Alvarez son dos personas: juegan la misma semana."""
+    claves = {"alberto alvarez": "Alberto Alvarez", "beto alvarez": "Beto Alvarez"}
+    assert alertar_nombres_parecidos(claves) == [("Alberto Alvarez", "Beto Alvarez")]
+    juntos = {"alberto alvarez": {1, 2}, "beto alvarez": {1, 2}}
+    assert alertar_nombres_parecidos(claves, juntos) == []
+
+
+def test_una_errata_de_verdad_nunca_coincide():
+    claves = {"rogelio loredo": "Rogelio Loredo", "rogelio lorero": "Rogelio Lorero"}
+    separados = {"rogelio loredo": {1}, "rogelio lorero": {2}}
+    assert alertar_nombres_parecidos(claves, separados) == [
+        ("Rogelio Loredo", "Rogelio Lorero")
+    ]
+
+
+def test_avisa_en_el_log(caplog):
+    with caplog.at_level("WARNING", logger="quiniela.scoring"):
+        alertar_nombres_parecidos({"ana perez": "Ana Perez", "ana peres": "Ana Peres"})
+    assert "se parecen mucho" in caplog.text

@@ -1,0 +1,14 @@
+{
+  "1": {
+    "archivo": "Semana_01.xlsx",
+    "sha256": "f5e36c3069669c3f2cf7bf90050ffd915ce8e4a11e897757e5027fb8c691da29",
+    "sellado": "2026-09-21T14:25:57+00:00",
+    "congelado": true
+  },
+  "2": {
+    "archivo": "Semana_02.xlsx",
+    "sha256": "ab14dc3585731808191721f0544d222133d1504182da7cd0aec88757f8031d7d",
+    "sellado": "2026-09-21T14:25:57+00:00",
+    "congelado": true
+  }
+}

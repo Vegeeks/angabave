@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.4.2**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.5.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -39,7 +39,18 @@ Flujo semanal:
    te enteras, antes de calcular nada.
 3. Haz commit y push. GitHub Actions se encarga del resto durante los partidos.
 
-## El Excel de picks
+## El archivo de picks
+
+Se acepta **Excel o PDF**. El organizador arma la quiniela en Excel pero suele
+repartir el PDF exportado: ese PDF conserva la capa de texto, así que se lee la
+rejilla exacta sin OCR ni transcribir a mano. Hay una prueba que verifica que
+los dos formatos producen exactamente los mismos picks.
+
+Para guardarlo con el nombre que espera el proyecto:
+
+```bash
+python cli.py importar ~/Downloads/"Quiniela 3.pdf"
+```
 
 Formato esperado, que es el que ya usa el organizador:
 
@@ -97,6 +108,21 @@ reparto final aparecen hasta que cierran las 18 semanas.
 
 Los montos viven en `quiniela/scoring.py` (`PREMIO_SEMANAL`,
 `ACUMULADO_SEMANAL`, `SEMANAS_TEMPORADA`, `REPARTO_FINAL`).
+
+## Que nadie toque los picks
+
+Los picks viven en el repo y solo cambian con un `git push` autenticado: el
+sitio publicado es de solo lectura, no hay formulario ni endpoint que reciba
+nada. Pero queda un riesgo real, y es que alguien con acceso edite los picks
+**después** de que empezaron los partidos.
+
+Para eso están los sellos. En cuanto arranca el primer partido de una semana se
+guarda la huella SHA-256 del archivo en `data/sellos.json`. Si más adelante el
+archivo cambia, el cálculo truena con las dos huellas y no publica nada. Antes
+del arranque se siguen pudiendo corregir los picks con toda libertad.
+
+Como el sello vive en el repo, cualquier cambio queda además en el historial de
+git con fecha y autor.
 
 ## Cuándo aparece cada cosa
 

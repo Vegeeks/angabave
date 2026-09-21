@@ -65,7 +65,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.4.2"
+VERSION = "v0.5.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -281,6 +281,10 @@ SEGUNDOS_RECARGA = 600
 
 #: Cada cuántos segundos el navegador pide marcadores a ESPN por su cuenta.
 SEGUNDOS_VIVO = 60
+
+#: A partir de cuántos minutos sin recalcular se avisa que la tabla va vieja.
+#: Con partidos abiertos, quedarse callado es el peor modo de falla.
+MINUTOS_REZAGO = 25
 
 #: ESPN describe el estado en inglés; aquí se traduce lo que puede aparecer.
 ESTADOS = {
@@ -565,6 +569,9 @@ def generar_html(
         "marca": MARCA,
         "anio": anio,
         "actualizado": _fecha_larga(momento),
+        # En ISO para que el navegador pueda medir cuánto lleva sin refrescarse.
+        "generado": momento.isoformat(),
+        "rezago": MINUTOS_REZAGO,
         "participantes": participantes,
         "colores": paleta_equipos(),
         "siglas": _siglas(),

@@ -99,3 +99,59 @@ def crear_excel(
 def excel_s2(tmp_path: Path) -> Path:
     """Excel de la Semana 2 completo y bien formado."""
     return crear_excel(tmp_path / "Semana_02.xlsx")
+
+
+def crear_pdf(ruta: Path, enfrentamientos=None, picks=None, semana: int = 2) -> Path:
+    """Arma un PDF mínimo con la rejilla de la quiniela.
+
+    No es un PDF completo, pero sí tiene lo que lee `quiniela.pdf`: un flujo
+    comprimido con fragmentos de texto posicionados. Así las pruebas no
+    dependen de un archivo real del organizador.
+    """
+    import zlib
+
+    enfrentamientos = enfrentamientos if enfrentamientos is not None else ENFRENTAMIENTOS_S2
+    picks = picks if picks is not None else PICKS_S2
+
+    x_nombre = 20.0
+    x_primera = 120.0
+    paso = 30.0
+    y_visitantes, y_locales = 555.0, 517.0
+
+    fragmentos: list[tuple[float, float, str]] = []
+    for indice, (visitante, local) in enumerate(enfrentamientos):
+        x = x_primera + indice * paso
+        fragmentos.append((y_visitantes, x, visitante))
+        fragmentos.append((y_locales, x, local))
+    fragmentos.append((y_locales, x_nombre, f"Semana {semana}"))
+    # La columna de totales, a la derecha del último partido.
+    x_totales = x_primera + len(enfrentamientos) * paso
+    fragmentos.append((y_locales + 8, x_totales, "Aciertos"))
+    fragmentos.append((y_locales, x_totales, "Totales"))
+
+    for fila, (participante, elegidos) in enumerate(picks.items()):
+        y = y_locales - 14 * (fila + 1)
+        fragmentos.append((y, x_nombre, participante))
+        for indice, pick in enumerate(elegidos):
+            if pick:
+                fragmentos.append((y, x_primera + indice * paso, pick))
+        fragmentos.append((y, x_totales, "99"))
+
+    bloques = "".join(
+        f"BT /F1 6 Tf 1 0 0 1 {x} {y} Tm [({texto})] TJ ET\n"
+        for y, x, texto in fragmentos
+    )
+    comprimido = zlib.compress(bloques.encode("latin-1"))
+
+    cuerpo = (
+        b"%PDF-1.4\n"
+        b"1 0 obj <</Type/Catalog/Pages 2 0 R>> endobj\n"
+        b"2 0 obj <</Type/Pages/Kids[3 0 R]/Count 1>> endobj\n"
+        b"3 0 obj <</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R>> endobj\n"
+        b"4 0 obj <</Length " + str(len(comprimido)).encode() + b"/Filter/FlateDecode>>\nstream\n"
+        + comprimido
+        + b"\nendstream endobj\n"
+        b"trailer <</Root 1 0 R>>\n%%EOF\n"
+    )
+    ruta.write_bytes(cuerpo)
+    return ruta

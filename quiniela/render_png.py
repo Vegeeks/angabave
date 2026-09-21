@@ -81,6 +81,36 @@ def _a_la_derecha(dibujo, x: int, y: int, texto: str, fuente, color) -> None:
     dibujo.text((x - ancho, y), texto, font=fuente, fill=color)
 
 
+def _franja_ganador(dibujo, ganadores: list[str], premio: str | None, oficial: bool) -> None:
+    """Banda con quien se lleva la semana, arriba de la tabla."""
+    arriba, abajo = 146, 218
+    color = AMBAR if oficial else TENUE
+    dibujo.rounded_rectangle(
+        [MARGEN, arriba, ANCHO - MARGEN, abajo], radius=14,
+        fill=PANEL, outline=color, width=2,
+    )
+
+    rotulo = _fuente("negrita", 19)
+    nombre_f = _fuente("negrita", 34)
+    monto_f = _fuente("negrita", 30)
+
+    titulo = (
+        ("Ganadores de la semana" if len(ganadores) > 1 else "Ganador de la semana")
+        if oficial else "Va ganando la semana"
+    )
+    dibujo.text((MARGEN + 22, arriba + 12), titulo.upper(), font=rotulo, fill=color)
+
+    # Con muchos empatados se cuenta, no se enlista: no cabrían.
+    texto = " · ".join(ganadores) if len(ganadores) <= 3 else f"{len(ganadores)} empatados"
+    limite = ANCHO - MARGEN * 2 - 44 - (220 if premio else 0)
+    dibujo.text(
+        (MARGEN + 22, arriba + 34), _recortar(texto, nombre_f, limite),
+        font=nombre_f, fill=TEXTO,
+    )
+    if premio:
+        _a_la_derecha(dibujo, ANCHO - MARGEN - 22, arriba + 26, premio, monto_f, color)
+
+
 def generar_png(
     *,
     tabla_acumulada: pd.DataFrame,
@@ -90,8 +120,15 @@ def generar_png(
     total_partidos: int,
     ruta_salida: Path = RUTA_SALIDA,
     momento: datetime | None = None,
+    ganadores: list[str] | None = None,
+    premio: str | None = None,
+    oficial: bool = False,
 ) -> Path:
-    """Dibuja la tabla general y devuelve la ruta del PNG."""
+    """Dibuja la tabla general y devuelve la ruta del PNG.
+
+    Si se pasan `ganadores`, arriba va una franja con quién se llevó la semana:
+    es el dato que la gente comparte, y sin él la imagen solo cuenta la mitad.
+    """
     momento = momento or ahora_cdmx()
     filas = tabla_acumulada.to_dict("records")
 
@@ -112,7 +149,11 @@ def generar_png(
     chico = _fuente("normal", 24)
     pie = _fuente("normal", 22)
 
-    alto_cabecera = 148
+    ganadores = [g for g in (ganadores or []) if g]
+    franja = bool(ganadores)
+    alto_franja = 86 if franja else 0
+
+    alto_cabecera = 148 + alto_franja
     alto_pie = 62
     alto = alto_cabecera + 34 + por_columna * ALTO_FILA + alto_pie
 
@@ -127,6 +168,9 @@ def generar_png(
         fill=TENUE,
     )
     dibujo.line([(MARGEN, 132), (ANCHO - MARGEN, 132)], fill=BORDE, width=2)
+
+    if franja:
+        _franja_ganador(dibujo, ganadores, premio, oficial)
 
     ancho_columna = (ANCHO - MARGEN * 2 - (24 if columnas == 2 else 0)) // columnas
     for indice_columna in range(columnas):

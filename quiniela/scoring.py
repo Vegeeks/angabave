@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 from collections import Counter
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
@@ -32,6 +33,7 @@ __all__ = [
     "SEMANAS_TEMPORADA",
     "Escenarios",
     "ErrorCalendario",
+    "alertar_nombres_parecidos",
     "emparejar_resultados",
     "escenarios",
     "ganadores",
@@ -161,6 +163,43 @@ def _resultados_de(
     return aplicar_overrides(resultados, semana, ruta_overrides)
 
 
+#: Qué tan parecidos tienen que ser dos nombres para sospechar de una errata.
+PARECIDO_SOSPECHOSO = 0.86
+
+
+def alertar_nombres_parecidos(
+    claves: dict[str, str],
+    semanas_por_clave: dict[str, set[int]] | None = None,
+) -> list[tuple[str, str]]:
+    """Avisa de nombres casi idénticos que podrían ser la misma persona.
+
+    Si el organizador teclea "Rogelio Lorero" una semana, se crearía un
+    participante nuevo y la temporada de alguien quedaría partida en dos sin
+    que nadie lo note.
+
+    Dos nombres que aparecen en la **misma** semana no pueden ser una errata:
+    una errata produce una fila, no dos, y los duplicados ya truenan al leer el
+    archivo. Por eso los pares que coinciden en alguna semana se descartan, y
+    así "Alberto Alvarez" y "Beto Alvarez", que son dos personas, no molestan.
+    """
+    semanas_por_clave = semanas_por_clave or {}
+    nombres = sorted(claves)
+    sospechosos: list[tuple[str, str]] = []
+    for indice, una in enumerate(nombres):
+        for otra in nombres[indice + 1 :]:
+            if semanas_por_clave.get(una, set()) & semanas_por_clave.get(otra, set()):
+                continue  # coincidieron en una semana: son personas distintas
+            if SequenceMatcher(None, una, otra).ratio() >= PARECIDO_SOSPECHOSO:
+                sospechosos.append((claves[una], claves[otra]))
+    for izquierda, derecha in sospechosos:
+        _log.warning(
+            "Ojo: %r y %r se parecen mucho. Si es la misma persona mal escrita, "
+            "su temporada se está contando por separado.",
+            izquierda, derecha,
+        )
+    return sospechosos
+
+
 def tabla_general(
     semanas: list[Path],
     *,
@@ -176,6 +215,7 @@ def tabla_general(
 
     por_clave: dict[str, dict] = {}
     nombres_vistos: dict[str, Counter] = {}
+    semanas_por_clave: dict[str, set[int]] = {}
     columnas_semana: list[str] = []
 
     for ruta in sorted(semanas, key=numero_semana):
@@ -189,6 +229,7 @@ def tabla_general(
         for participante, elegidos in picks.items():
             clave = clave_participante(participante)
             nombres_vistos.setdefault(clave, Counter())[participante] += 1
+            semanas_por_clave.setdefault(clave, set()).add(semana)
             registro = por_clave.setdefault(
                 clave, {"acumulado": 0, "errores": 0, "proyectado": 0}
             )
@@ -197,6 +238,11 @@ def tabla_general(
             registro["errores"] += errores
             registro["proyectado"] += proyectado
             registro[columna] = firme
+
+    alertar_nombres_parecidos(
+        {clave: variantes.most_common(1)[0][0] for clave, variantes in nombres_vistos.items()},
+        semanas_por_clave,
+    )
 
     filas = []
     for clave, registro in por_clave.items():

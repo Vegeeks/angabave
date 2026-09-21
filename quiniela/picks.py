@@ -20,9 +20,12 @@ producir una tabla en silencio.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
 import re
 import unicodedata
+from datetime import datetime, timezone
 from pathlib import Path
 
 import openpyxl
@@ -34,6 +37,9 @@ from .pdf import ErrorPDF, extraer_rejilla
 __all__ = [
     "ErrorPicks",
     "ErrorFormatoExcel",
+    "PicksAlteradosError",
+    "RUTA_SELLOS",
+    "verificar_sello",
     "clave_participante",
     "leer_picks",
     "numero_semana",
@@ -56,6 +62,15 @@ class ErrorPicks(ValueError):
 
 class ErrorFormatoExcel(ErrorPicks):
     """No se reconoce la estructura del archivo."""
+
+
+class PicksAlteradosError(ErrorPicks):
+    """Los picks de una semana cambiaron después de que arrancó."""
+
+
+RAIZ = Path(__file__).resolve().parents[1]
+#: Huella de los picks de cada semana, tomada al arrancar el primer partido.
+RUTA_SELLOS = RAIZ / "data" / "sellos.json"
 
 
 def _texto(valor: object) -> str:
@@ -373,3 +388,93 @@ def _leer_fila_de_picks(celdas: list[str], partidos: list[Partido]) -> tuple[lis
             f"faltan: {', '.join(faltantes)}"
         )
     return elegidos, fallas
+
+
+# --- sellado de los picks ----------------------------------------------------
+#
+# Los picks se pueden corregir mientras no empiece la jornada. En cuanto arranca
+# el primer partido quedan congelados: a partir de ahí, cualquier cambio en el
+# archivo es sospechoso, porque ya se conocen resultados. El sello es la huella
+# del archivo, guardada en el repo, así que el cambio queda además en el
+# historial de git con fecha y autor.
+
+
+def huella(ruta: Path) -> str:
+    """SHA-256 del archivo de picks."""
+    return hashlib.sha256(Path(ruta).read_bytes()).hexdigest()
+
+
+def _leer_sellos(ruta_sellos: Path) -> dict:
+    ruta = Path(ruta_sellos)
+    if not ruta.exists():
+        return {}
+    try:
+        return json.loads(ruta.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise ErrorPicks(f"El archivo de sellos {ruta} no es JSON válido: {error}") from error
+
+
+def verificar_sello(
+    ruta: Path,
+    semana: int,
+    ya_empezo: bool,
+    ruta_sellos: Path = RUTA_SELLOS,
+) -> bool:
+    """Congela los picks de una semana en cuanto arranca su primer partido.
+
+    Devuelve True si acaba de sellar. Lanza `PicksAlteradosError` si el archivo
+    cambió después del sellado: eso significa que alguien tocó los picks con
+    resultados ya en la mano.
+    """
+    ruta, ruta_sellos = Path(ruta), Path(ruta_sellos)
+    sellos = _leer_sellos(ruta_sellos)
+    clave = str(semana)
+    actual = huella(ruta)
+    previo = sellos.get(clave)
+
+    if previo and previo.get("sha256") != actual:
+        if ya_empezo:
+            raise PicksAlteradosError(
+                f"Los picks de la semana {semana} cambiaron después de que arrancó la "
+                f"jornada.\n"
+                f"  archivo sellado: {previo.get('archivo')} el {previo.get('sellado')}\n"
+                f"  huella sellada:  {previo.get('sha256')}\n"
+                f"  huella actual:   {actual}\n"
+                "Con partidos ya jugados, un cambio en los picks no puede darse por bueno. "
+                "Revisa el historial de git; si el cambio es legítimo, borra esa semana de "
+                f"{ruta_sellos.name} a propósito."
+            )
+        _log.warning(
+            "Los picks de la semana %d cambiaron; como no ha empezado la jornada, actualizo el sello.",
+            semana,
+        )
+        previo = None
+
+    if not ya_empezo:
+        # Todavía se puede corregir: el sello se mantiene al día sin congelar.
+        if previo is None:
+            _guardar_sello(sellos, clave, ruta, actual, ruta_sellos, congelado=False)
+        return False
+
+    if previo is None:
+        _guardar_sello(sellos, clave, ruta, actual, ruta_sellos, congelado=True)
+        _log.info("Sellé los picks de la semana %d: ya arrancó la jornada.", semana)
+        return True
+    return False
+
+
+def _guardar_sello(
+    sellos: dict, clave: str, ruta: Path, sha: str, ruta_sellos: Path, congelado: bool
+) -> None:
+    sellos[clave] = {
+        "archivo": ruta.name,
+        "sha256": sha,
+        "sellado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "congelado": congelado,
+    }
+    ruta_sellos.parent.mkdir(parents=True, exist_ok=True)
+    ruta_sellos.write_text(
+        json.dumps(dict(sorted(sellos.items(), key=lambda p: int(p[0]))), ensure_ascii=False, indent=2)
+        + "\n",
+        encoding="utf-8",
+    )

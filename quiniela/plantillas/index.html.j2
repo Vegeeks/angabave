@@ -471,6 +471,16 @@ input.ancho:focus,select.ancho:focus{outline:0; border-color:var(--acento)}
 .dif .row .mid{font-size:.6rem; color:var(--tenue2); text-transform:uppercase; letter-spacing:.06em; text-align:center}
 .dif .row .j.gano{color:var(--verde)} .dif .row .j.perdio{color:var(--rojo); opacity:.7}
 
+.rezago{display:flex; align-items:center; gap:.55rem; margin-bottom:.8rem;
+  padding:.6rem .8rem; border-radius:12px; font-size:.82rem; line-height:1.35;
+  color:#ffd9a8; background:rgba(247,170,72,.12); border:1px solid rgba(247,170,72,.4);
+  animation:brincar .4s ease both}
+.rezago b{color:#ffe7c4}
+.rezago .icono{font-size:1.1rem; flex:0 0 auto}
+
+/* Foco visible para quien navega con teclado. */
+:focus-visible{outline:2px solid var(--acento); outline-offset:2px; border-radius:8px}
+
 .aviso{border:1px dashed var(--linea2); border-radius:var(--radio); padding:1.4rem 1rem; text-align:center;
   color:var(--tenue); font-size:.88rem; background:rgba(16,23,36,.55)}
 .aviso strong{display:block; color:var(--txt); font-size:1.02rem; margin-bottom:.35rem}
@@ -1145,6 +1155,30 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     return env;
   }
 
+  /* Si la tabla oficial lleva mucho sin recalcularse y hay partidos abiertos,
+     se dice. Una página que se ve perfecta con números viejos es peor que una
+     que avisa. Los marcadores sí siguen vivos: esos los pide el navegador. */
+  function avisoDeRezago(s) {
+    if (!s || s.cerrados >= s.total || !D.generado) return null;
+    const minutos = Math.floor((Date.now() - new Date(D.generado).getTime()) / 60000);
+    if (!Number.isFinite(minutos) || minutos < (D.rezago || 25)) return null;
+
+    const caja = crear("div", "rezago");
+    caja.appendChild(crear("span", "icono", "⚠"));
+    const texto = crear("span");
+    const horas = Math.floor(minutos / 60);
+    const cuanto = horas >= 1
+      ? horas + (horas === 1 ? " hora" : " horas")
+      : minutos + " minutos";
+    texto.appendChild(crear("b", null, "La tabla lleva " + cuanto + " sin recalcularse."));
+    texto.appendChild(document.createTextNode(
+      " Los marcadores de abajo sí están al día, pero los aciertos y el ganador " +
+      "pueden estar atrasados."
+    ));
+    caja.appendChild(texto);
+    return caja;
+  }
+
   function aviso(titulo, texto) {
     const n = crear("div", "aviso");
     n.appendChild(crear("strong", null, titulo));
@@ -1464,6 +1498,9 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       ? "Picks por cargar" : s.cerrados + " de " + s.total + " partidos cerrados"));
     raiz.appendChild(titulo);
 
+    const franja = avisoDeRezago(s);
+    if (franja) raiz.appendChild(franja);
+
     if (s.estado === "pendiente") {
       raiz.appendChild(aviso("Actualizando la semana " + s.n,
         "Estos son los partidos programados. En cuanto se cargue el compilado aparecen los picks, la tabla y el ganador."));
@@ -1481,11 +1518,14 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     if (!disponibles.some(([c]) => c === pestana)) pestana = disponibles[0][0];
 
     const tabs = crear("div", "tabs"), interior = crear("div", "tabs-int");
+    interior.setAttribute("role", "tablist");
+    interior.setAttribute("aria-label", "Vistas de la semana " + s.n);
     const corredera = crear("span", "corredera");
     interior.appendChild(corredera);
     disponibles.forEach(([clave, etiqueta]) => {
       const b = crear("button", null, etiqueta);
       b.type = "button";
+      b.setAttribute("role", "tab");
       b.setAttribute("aria-selected", String(clave === pestana));
       b.addEventListener("click", () => {
         pestana = clave;

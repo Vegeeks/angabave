@@ -9,6 +9,35 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.5.0
+
+El PDF del organizador entra solo, y la tabla se protege.
+
+* **`leer_picks` acepta PDF o Excel.** El archivo que reparte el organizador ya
+  no necesita conversión previa: se lee su capa de texto y se reconstruye la
+  rejilla exacta, sin OCR. Hay una prueba que verifica que el PDF y el Excel
+  producen picks idénticos.
+* **`cli.py importar`** guarda el archivo tal como llega ("Quiniela 3.pdf"),
+  deduce de qué semana es y lo deja validado en `data/picks/`.
+* **Picks sellados.** En cuanto arranca el primer partido de una semana se
+  guarda la huella del archivo. Si cambia después, el cálculo truena en vez de
+  publicar una tabla con picks retocados. Antes del arranque se siguen pudiendo
+  corregir.
+* **Aviso de rezago.** Si la tabla lleva más de 25 minutos sin recalcularse y
+  hay partidos abiertos, el sitio lo dice. Una página que se ve perfecta con
+  números viejos es peor que una que avisa.
+* **El PNG lleva al ganador de la semana** y su premio, que es el dato que la
+  gente comparte.
+* **Detección de erratas en nombres.** Avisa si dos participantes se llaman
+  casi igual y nunca coinciden en la misma semana: eso es una errata que
+  partiría la temporada de alguien en dos. Los que sí coinciden —como Alberto y
+  Beto Alvarez— se descartan solos.
+* **El directo se encadena.** Duerme hasta el arranque del próximo partido y,
+  si no le alcanza el tiempo del job, lanza el siguiente eslabón. Se detiene al
+  cerrar el último partido o si el próximo está a más de 12 horas.
+* De 100 a 132 pruebas: se agregaron las del CLI (que no tenía ninguna), las
+  del PDF y las del sellado.
+
 ## alfa v0.4.2
 
 * **Directo se sincroniza en cada vuelta.** Antes el job se quedaba con el
