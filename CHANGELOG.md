@@ -9,6 +9,19 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.8.0
+
+* **Los partidos se ordenan por lo que importa.** Arriba lo que falta por
+  jugarse —bajo "Por jugarse", o "Falta este" cuando queda uno solo— y abajo
+  "Ya jugados", del más reciente al más viejo. Antes iban en orden cronológico
+  puro, así que el único partido pendiente quedaba hasta el final.
+* **Tu equipo se adelanta solo mientras su partido no haya terminado.** Ya
+  cerrado no tiene por qué encabezar nada, y así no estorba el nuevo orden.
+* **Los empatados dicen quiénes son.** Donde antes aparecía "31 empatados" sin
+  más, ahora se despliega la lista con un toque: en el podio, en el ganador de
+  la semana y en los ganadores por semana. Tu nombre va resaltado dentro de la
+  lista.
+
 ## alfa v0.7.0
 
 Encabezado más chico y fichas de jugador con sustancia.

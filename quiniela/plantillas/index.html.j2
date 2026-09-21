@@ -174,7 +174,15 @@ main{padding-bottom:3.5rem}
 .bronce .medalla{background:linear-gradient(160deg,#e9bb92,#b5773f)}
 .lugar .cuerpo{min-width:0}
 .lugar .quien{font-weight:800; font-size:.98rem; line-height:1.25; overflow-wrap:anywhere}
-.lugar .empatados{font-weight:800; font-size:.95rem; color:var(--txt)}
+.empatados{font-weight:800; font-size:.95rem; color:var(--txt)}
+.empatados summary{cursor:pointer; list-style:none; display:inline-flex; align-items:center;
+  gap:.3rem; padding:.1rem .45rem .1rem .1rem; border-radius:8px; transition:background .18s}
+.empatados summary::-webkit-details-marker{display:none}
+.empatados summary::after{content:"▾"; font-size:.65rem; color:var(--tenue2); transition:transform .2s}
+.empatados[open] summary::after{transform:rotate(180deg)}
+.empatados summary:hover{background:var(--panel2)}
+.empatados .gente{margin-top:.4rem; animation:entrar .2s ease both}
+.lugar .empatados .gente{justify-content:center}
 .lugar .detalle{font-size:.6rem; color:var(--tenue2); text-transform:uppercase; letter-spacing:.1em}
 .lugar .cifra{text-align:right; flex:0 0 auto}
 .lugar .puntos{font-size:1.75rem; font-weight:900; letter-spacing:-.04em;
@@ -252,6 +260,10 @@ th.c-sem.vieja,td.c-sem.vieja{display:none}
 .bloque-hora i{flex:1; height:1px; background:var(--linea)}
 .bloque-hora em{font-style:normal; font-size:.6rem; font-weight:900; color:var(--vivo);
   letter-spacing:.1em; text-transform:uppercase}
+.bloque-hora.seccion{margin-top:1.3rem}
+.bloque-hora.seccion:first-child{margin-top:0}
+.bloque-hora.seccion span{font-size:.72rem; color:var(--txt); letter-spacing:.16em}
+.bloque-hora.seccion i{background:linear-gradient(90deg,var(--acento),transparent)}
 
 .chip-vivo{display:inline-block; margin-left:.3rem; padding:.02rem .3rem; border-radius:5px;
   font-size:.6rem; font-weight:900; color:var(--oro); background:rgba(247,201,72,.14);
@@ -713,9 +725,24 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     if (texto !== undefined) n.textContent = texto;
     return n;
   };
-  const listar = (gente, oficial) =>
-    gente.length <= (oficial ? MAX_NOMBRES_OFICIAL : MAX_NOMBRES)
-      ? gente.join(" · ") : gente.length + " empatados";
+  /* "31 empatados" sin decir quiénes no sirve de nada. Se cuenta, pero con la
+     lista a un toque. */
+  function nombrar(gente, oficial) {
+    const tope = oficial ? MAX_NOMBRES_OFICIAL : MAX_NOMBRES;
+    if (gente.length <= tope) return document.createTextNode(gente.join(" · "));
+
+    const caja = crear("details", "empatados");
+    const titulo = crear("summary", null, gente.length + " empatados");
+    caja.appendChild(titulo);
+    const lista = crear("div", "gente");
+    gente.slice().sort((a, b) => a.localeCompare(b, "es")).forEach((quien) => {
+      const et = crear("span", null, quien);
+      if (jugador !== null && quien === nombre(jugador)) et.classList.add("tu");
+      lista.appendChild(et);
+    });
+    caja.appendChild(lista);
+    return caja;
+  }
   const COPA =
     '<svg class="copa" viewBox="0 0 24 24" fill="none" aria-hidden="true">' +
     '<path d="M6 4h12v5a6 6 0 0 1-12 0V4Z" fill="#f7c948"/>' +
@@ -978,7 +1005,9 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     caja.appendChild(crear("div", "rot", oficial
       ? (gente.length > 1 ? "Ganadores de la semana " + s.n : "Ganador de la semana " + s.n)
       : "Va ganando la semana " + s.n));
-    caja.appendChild(crear("div", "nombres", listar(gente, oficial)));
+    const nombres = crear("div", "nombres");
+    nombres.appendChild(nombrar(gente, oficial));
+    caja.appendChild(nombres);
     const fila = s.tabla.find((f) => f.pos === 1);
     const ac = fila ? fila.f : 0;
     caja.appendChild(crear("div", "cifra",
@@ -1073,35 +1102,52 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     const raiz = crear("div");
     const juegos = partidosDe(s).map((p, i) => ({ p, i }));
 
-    // El partido de tu equipo va arriba, en su propio bloque: así no rompe el
-    // orden cronológico de los demás ni parte el horario en dos.
+    // Lo que falta por jugarse manda: va arriba. Lo ya jugado queda abajo,
+    // del más reciente al más viejo, porque es consulta, no expectativa.
     const bloques = [];
     let mios = [];
     if (equipo) {
-      mios = juegos.filter(({ p }) => p.v === equipo || p.l === equipo);
-      if (mios.length) bloques.push({ etiqueta: "Tu equipo", juegos: mios, propio: true });
+      // Tu partido se adelanta solo mientras no haya terminado: una vez
+      // cerrado no tiene por qué encabezar nada.
+      mios = juegos.filter(({ p }) => (p.v === equipo || p.l === equipo) && !p.cerrado);
+      if (mios.length) bloques.push({ etiqueta: "Tu equipo", juegos: mios, suelto: true });
     }
 
-    // El resto se agrupa por horario, como se vive la jornada: los de las once,
-    // los de la tarde, el de la noche. Dieciséis tarjetas seguidas no se leen.
-    const resto = juegos
-      .filter((juego) => !mios.includes(juego))
+    const resto = juegos.filter((juego) => !mios.includes(juego));
+    const porJugar = resto
+      .filter(({ p }) => !p.cerrado)
       .sort((a, b) => (a.p.t || 0) - (b.p.t || 0) || a.i - b.i);
-    resto.forEach((juego) => {
-      const etiqueta = juego.p.grupo || "Por programar";
-      const ultimo = bloques[bloques.length - 1];
-      if (ultimo && !ultimo.propio && ultimo.etiqueta === etiqueta) ultimo.juegos.push(juego);
-      else bloques.push({ etiqueta, juegos: [juego] });
-    });
+    const jugados = resto
+      .filter(({ p }) => p.cerrado)
+      .sort((a, b) => (b.p.t || 0) - (a.p.t || 0) || b.i - a.i);
+
+    const agrupar = (lista, titulo) => {
+      if (!lista.length) return;
+      bloques.push({ etiqueta: titulo, seccion: true });
+      lista.forEach((juego) => {
+        const etiqueta = juego.p.grupo || "Por programar";
+        const ultimo = bloques[bloques.length - 1];
+        if (ultimo && !ultimo.suelto && !ultimo.seccion && ultimo.etiqueta === etiqueta) {
+          ultimo.juegos.push(juego);
+        } else {
+          bloques.push({ etiqueta, juegos: [juego] });
+        }
+      });
+    };
+    agrupar(porJugar, porJugar.length === 1 ? "Falta este" : "Por jugarse");
+    agrupar(jugados, "Ya jugados");
 
     let orden = 0;
     bloques.forEach((bloque) => {
-      const cabeza = crear("div", "bloque-hora");
+      const cabeza = crear("div", "bloque-hora" + (bloque.seccion ? " seccion" : ""));
       cabeza.appendChild(crear("span", null, bloque.etiqueta));
       cabeza.appendChild(crear("i"));
-      const abiertos = bloque.juegos.filter(({ p }) => !p.cerrado).length;
-      if (abiertos) cabeza.appendChild(crear("em", null, abiertos + " por cerrar"));
+      if (!bloque.seccion) {
+        const abiertos = (bloque.juegos || []).filter(({ p }) => !p.cerrado).length;
+        if (abiertos) cabeza.appendChild(crear("em", null, abiertos + " por cerrar"));
+      }
       raiz.appendChild(cabeza);
+      if (bloque.seccion) return;
 
       const caja = crear("div", "juegos");
       raiz.appendChild(caja);
@@ -1406,7 +1452,9 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
         fila.appendChild(q);
         fila.appendChild(crear("span", "monto", "—"));
       } else {
-        const q = crear("div", "quien", !gente.length ? "—" : listar(gente, s.oficial));
+        const q = crear("div", "quien");
+        if (!gente.length) q.appendChild(document.createTextNode("—"));
+        else q.appendChild(nombrar(gente, s.oficial));
         q.appendChild(crear("small", null, s.oficial ? "semana cerrada"
           : "va ganando · " + s.cerrados + " de " + s.total + " cerrados"));
         fila.appendChild(q);
