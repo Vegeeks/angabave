@@ -228,13 +228,20 @@ def comando_actualizar(argumentos) -> int:
     if proxima is not None:
         semanas.append(proxima)
 
-    general = tabla_general(semanas_disponibles())
+    rutas = semanas_disponibles()
+    general = tabla_general(rutas)
+    # La tabla sin la última semana, para saber quién subió y quién bajó.
+    previas: dict[str, int] = {}
+    if len(rutas) > 1:
+        anterior = tabla_general(rutas[:-1])
+        previas = dict(zip(anterior["participante"], anterior["posicion"]))
     momento = ahora_cdmx()
 
     html = generar_html(
         anio=argumentos.anio,
         semanas=semanas,
         tabla_acumulada=general,
+        posiciones_previas=previas,
         momento=momento,
     )
     generar_iconos()

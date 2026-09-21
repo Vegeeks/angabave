@@ -9,6 +9,25 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.6.0
+
+Una pasada crítica a la interfaz.
+
+* **Quién subió y quién bajó.** Cada fila de la general lleva ▲ o ▼ con los
+  lugares que se movió desde la semana pasada. Era lo que más le faltaba a una
+  tabla de posiciones.
+* **El podio vuelve a decir nombres.** Estaba mostrando "4 empatados" sin
+  decir quiénes: el elemento más visible de la página era el menos informativo.
+  Ahora enlista hasta seis y solo cuenta a partir de ahí.
+* **Los partidos se agrupan por horario** —"Domingo 20 · 11:00", "Lunes 21 ·
+  18:15"— como se vive la jornada, en vez de dieciséis tarjetas seguidas. Cada
+  bloque avisa cuántos le faltan por cerrar.
+* **Tu equipo tiene bloque propio** arriba. Antes se colaba entre los demás y
+  rompía el orden cronológico, partiendo el bloque de las once en dos.
+* **La tabla general deja de desbordarse.** Muestra las últimas cuatro semanas
+  y el resto queda a un clic; si no, para diciembre serían veintitrés columnas.
+* **En escenarios siempre te ves**, aunque vayas abajo del lugar doce.
+
 ## alfa v0.5.0
 
 El PDF del organizador entra solo, y la tabla se protege.

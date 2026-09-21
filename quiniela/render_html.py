@@ -65,7 +65,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.5.0"
+VERSION = "v0.6.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -274,6 +274,8 @@ UMBRAL_SEMANA = 8
 
 #: A partir de cuántos empatados se deja de enlistar nombres y solo se cuenta.
 MAXIMO_NOMBRES = 3
+#: En el podio caben más: es el lugar donde la gente viene a buscar su nombre.
+MAXIMO_NOMBRES_PODIO = 6
 
 #: Cada cuántos segundos se recarga la página entera mientras haya juego.
 #: Es la red de seguridad: quien manda los números oficiales es CI.
@@ -301,6 +303,7 @@ ESTADOS = {
 }
 
 _DIAS = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"]
+_DIAS_LARGOS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 _MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
 
 
@@ -358,7 +361,14 @@ def _describir(partido: Partido) -> dict:
         gana = None
 
     en_juego = not partido.finalizado and partido.estado != "Scheduled"
+    local = a_cdmx(partido.inicio)
     return {
+        # Etiqueta del horario: así los partidos se agrupan como se vive la
+        # jornada, por bloques, en vez de en una lista plana de dieciséis.
+        "grupo": f"{_DIAS_LARGOS[local.weekday()]} {local.day} · {local.strftime('%H:%M')}"
+        if local else "Por programar",
+        # Marca de tiempo para ordenar los bloques cronológicamente.
+        "t": int(partido.inicio.timestamp()) if partido.inicio else 0,
         "v": partido.visitante,
         "l": partido.local,
         "mv": partido.marcador_visitante if (partido.finalizado or en_juego) else None,
@@ -443,7 +453,7 @@ def _armar_podio(general: list[dict], participantes: list[str], reparto: list[di
     for escalon in escalones:
         escalon["cuantos"] = len(escalon["nombres"])
         # Con muchos empatados se cuenta, no se enlista.
-        escalon["enlistar"] = escalon["cuantos"] <= MAXIMO_NOMBRES
+        escalon["enlistar"] = escalon["cuantos"] <= MAXIMO_NOMBRES_PODIO
         escalon["premio"] = premios.get(escalon["nombres"][0]) if escalon["cuantos"] == 1 else None
     return escalones
 
@@ -495,6 +505,7 @@ def generar_html(
     anio: int,
     semanas: list[SemanaRender],
     tabla_acumulada: pd.DataFrame,
+    posiciones_previas: dict[str, int] | None = None,
     ruta_salida: Path = RUTA_SALIDA,
     momento: datetime | None = None,
     desarrollador: str = DESARROLLADOR,
@@ -511,16 +522,22 @@ def generar_html(
     indice_global = {nombre: indice for indice, nombre in enumerate(participantes)}
 
     columnas_semana = [c for c in tabla_acumulada.columns if c.startswith("S") and c[1:].isdigit()]
-    general = [
-        {
-            "p": indice_global[fila["participante"]],
-            "pos": int(fila["posicion"]),
-            "total": int(fila["acumulado"]),
-            "err": int(fila["errores"]),
-            "sem": {columna[1:]: int(fila[columna]) for columna in columnas_semana},
-        }
-        for fila in tabla_acumulada.to_dict("records")
-    ]
+    previas = posiciones_previas or {}
+    general = []
+    for fila in tabla_acumulada.to_dict("records"):
+        nombre_fila = fila["participante"]
+        antes = previas.get(nombre_fila)
+        general.append(
+            {
+                "p": indice_global[nombre_fila],
+                "pos": int(fila["posicion"]),
+                "total": int(fila["acumulado"]),
+                "err": int(fila["errores"]),
+                # Cuánto subió o bajó desde la semana pasada. Positivo = subió.
+                "mov": (antes - int(fila["posicion"])) if antes is not None else None,
+                "sem": {columna[1:]: int(fila[columna]) for columna in columnas_semana},
+            }
+        )
 
     activa = next(
         (s for s in reversed(semanas) if s.estado == "en_vivo"),

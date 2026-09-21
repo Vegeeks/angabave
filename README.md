@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.5.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.6.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -227,6 +227,10 @@ Qué trae:
 * **Ganador de la semana** arriba de cada semana, con trofeo y confeti cuando
   la semana ya cerró. Mientras sigue abierta dice quién va ganando y cuánto
   hay en juego.
+* **Movimiento**: cada fila de la general muestra cuántos lugares subió o
+  bajó respecto a la semana anterior.
+* **Partidos agrupados por horario**, con el de tu equipo en un bloque propio
+  arriba.
 * **Navegación por semanas**: General, Premios y una pestaña por cada semana.
   El portal abre en la semana en curso, que además va marcada en el menú.
 * **Marcador en vivo**: el navegador consulta ESPN cada 60 segundos, solo con

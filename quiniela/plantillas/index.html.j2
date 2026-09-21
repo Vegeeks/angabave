@@ -222,6 +222,24 @@ tbody tr.yo td{background:rgba(91,149,255,.1)}
 tbody tr.yo .c-nombre{color:var(--acento)}
 table.fija tbody tr.yo td:nth-child(-n+2){background:#16233a}
 tbody tr.clic{cursor:pointer}
+.mov{display:inline-block; margin-left:.25rem; font-size:.6rem; font-weight:900;
+  letter-spacing:-.01em; vertical-align:1px}
+.mov.sube{color:var(--verde)} .mov.baja{color:var(--rojo); opacity:.75}
+.mov.igual{color:var(--tenue2)}
+th.c-sem.vieja,td.c-sem.vieja{display:none}
+.ver-todas{display:block; width:100%; padding:.5rem; font-size:.72rem; font-weight:800;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--tenue);
+  border-top:1px solid var(--linea); background:rgba(255,255,255,.015)}
+.ver-todas:hover{color:var(--txt)}
+
+.bloque-hora{display:flex; align-items:center; gap:.5rem; margin:.9rem .1rem .45rem}
+.bloque-hora:first-child{margin-top:0}
+.bloque-hora span{font-size:.64rem; font-weight:900; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--tenue2); white-space:nowrap}
+.bloque-hora i{flex:1; height:1px; background:var(--linea)}
+.bloque-hora em{font-style:normal; font-size:.6rem; font-weight:900; color:var(--vivo);
+  letter-spacing:.1em; text-transform:uppercase}
+
 .chip-vivo{display:inline-block; margin-left:.3rem; padding:.02rem .3rem; border-radius:5px;
   font-size:.6rem; font-weight:900; color:var(--oro); background:rgba(247,201,72,.14);
   border:1px solid rgba(247,201,72,.3); vertical-align:middle}
@@ -591,21 +609,24 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
           <tr>
             <th class="c-pos">#</th><th class="c-nombre">Participante</th>
             <th>Aciertos</th><th>Fallos</th>
-            {% for columna in columnas_semana %}<th>{{ columna }}</th>{% endfor %}
+            {% for columna in columnas_semana %}<th class="c-sem{% if loop.revindex > 4 %} vieja{% endif %}">{{ columna }}</th>{% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for fila in general %}
           <tr class="p{{ fila.pos }}" style="--i:{{ loop.index0 }}">
-            <td class="c-pos">{{ fila.pos }}</td>
+            <td class="c-pos">{{ fila.pos }}{% if fila.mov is not none %}{% if fila.mov > 0 %}<span class="mov sube" title="Subió {{ fila.mov }} lugares">▲{{ fila.mov }}</span>{% elif fila.mov < 0 %}<span class="mov baja" title="Bajó {{ -fila.mov }} lugares">▼{{ -fila.mov }}</span>{% else %}<span class="mov igual" title="Sin cambio">=</span>{% endif %}{% endif %}</td>
             <td class="c-nombre">{{ participantes[fila.p] }}</td>
             <td class="pts">{{ fila.total }}</td>
             <td class="err">{{ fila.err }}</td>
-            {% for columna in columnas_semana %}<td class="sem">{{ fila.sem[columna[1:]] }}</td>{% endfor %}
+            {% for columna in columnas_semana %}<td class="sem c-sem{% if loop.revindex > 4 %} vieja{% endif %}">{{ fila.sem[columna[1:]] }}</td>{% endfor %}
           </tr>
           {% endfor %}
         </tbody>
       </table>
+      {% if columnas_semana|length > 4 %}
+      <button type="button" class="ver-todas" id="ver-todas">Ver las {{ columnas_semana|length }} semanas</button>
+      {% endif %}
     </div>
   </section>
 
@@ -974,54 +995,83 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 
   /* ═══ marcador estilo transmisión ═══ */
   function panelPartidos(s) {
-    const caja = crear("div", "juegos");
+    const raiz = crear("div");
     const juegos = partidosDe(s).map((p, i) => ({ p, i }));
-    // Si eligió equipo, su partido se va hasta arriba: es el que viene a ver.
-    if (equipo) {
-      juegos.sort((a, b) => {
-        const suyo = (x) => (x.p.v === equipo || x.p.l === equipo ? 0 : 1);
-        return suyo(a) - suyo(b) || a.i - b.i;
-      });
-    }
-    juegos.forEach(({ p, i }, orden) => {
-      const mioEquipo = equipo && (p.v === equipo || p.l === equipo);
-      const nodo = crear("article", "juego" + (p.vivo ? " envivo" : "") + (mioEquipo ? " mi-equipo" : ""));
-      nodo.style.setProperty("--i", Math.min(orden, 12));
-      if (mioEquipo) {
-        const cinta = crear("div", "cinta-equipo");
-        cinta.appendChild(crear("span", null, "Tu equipo"));
-        nodo.appendChild(cinta);
-      }
-      [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, eq, marcador]) => {
-        const linea = crear("div", "lado" + (p.g === lado ? " gana" : ""));
-        const color = (D.colores[eq] || {}).local;
-        if (color) linea.style.setProperty("--c", color);
-        linea.appendChild(crear("span", "sig", D.siglas[eq] || eq.slice(0, 3).toUpperCase()));
-        linea.appendChild(crear("span", "nom", eq));
-        linea.appendChild(crear("span", "mrc", marcador === null ? "—" : String(marcador)));
-        nodo.appendChild(linea);
-      });
-      const pie = crear("div", "pie");
-      if (p.vivo) pie.appendChild(crear("span", "punto"));
-      pie.appendChild(crear("span", null, p.e));
-      if (p.cerrado && p.g === "x") pie.appendChild(crear("span", "der", "empate"));
-      nodo.appendChild(pie);
 
-      const mio = miPick(s, i);
-      if (mio) {
-        if (p.g === null) nodo.classList.add("mio-esp");
-        else if (p.cerrado) nodo.classList.add(p.g === mio.lado ? "mio-ok" : "mio-no");
-        else nodo.classList.add(p.g === mio.lado ? "mio-vivo-ok" : "mio-vivo-no");
-        const marca = crear("div", "mi-pick");
-        marca.appendChild(crear("span", null, "Tu pick"));
-        marca.appendChild(crear("b", null, mio.equipo));
-        if (p.cerrado) marca.appendChild(crear("span", null, p.g === "x" ? "· empate" : (p.g === mio.lado ? "· acierto" : "· fallo")));
-        else if (p.g !== null) marca.appendChild(crear("span", null, p.g === mio.lado ? "· vas ganando" : "· vas perdiendo"));
-        nodo.appendChild(marca);
-      }
-      caja.appendChild(nodo);
+    // El partido de tu equipo va arriba, en su propio bloque: así no rompe el
+    // orden cronológico de los demás ni parte el horario en dos.
+    const bloques = [];
+    let mios = [];
+    if (equipo) {
+      mios = juegos.filter(({ p }) => p.v === equipo || p.l === equipo);
+      if (mios.length) bloques.push({ etiqueta: "Tu equipo", juegos: mios, propio: true });
+    }
+
+    // El resto se agrupa por horario, como se vive la jornada: los de las once,
+    // los de la tarde, el de la noche. Dieciséis tarjetas seguidas no se leen.
+    const resto = juegos
+      .filter((juego) => !mios.includes(juego))
+      .sort((a, b) => (a.p.t || 0) - (b.p.t || 0) || a.i - b.i);
+    resto.forEach((juego) => {
+      const etiqueta = juego.p.grupo || "Por programar";
+      const ultimo = bloques[bloques.length - 1];
+      if (ultimo && !ultimo.propio && ultimo.etiqueta === etiqueta) ultimo.juegos.push(juego);
+      else bloques.push({ etiqueta, juegos: [juego] });
     });
-    return caja;
+
+    let orden = 0;
+    bloques.forEach((bloque) => {
+      const cabeza = crear("div", "bloque-hora");
+      cabeza.appendChild(crear("span", null, bloque.etiqueta));
+      cabeza.appendChild(crear("i"));
+      const abiertos = bloque.juegos.filter(({ p }) => !p.cerrado).length;
+      if (abiertos) cabeza.appendChild(crear("em", null, abiertos + " por cerrar"));
+      raiz.appendChild(cabeza);
+
+      const caja = crear("div", "juegos");
+      raiz.appendChild(caja);
+      bloque.juegos.forEach(({ p, i }) => dibujarJuego(caja, s, p, i, orden++));
+    });
+    return raiz;
+  }
+
+  function dibujarJuego(caja, s, p, i, orden) {
+    const mioEquipo = equipo && (p.v === equipo || p.l === equipo);
+    const nodo = crear("article", "juego" + (p.vivo ? " envivo" : "") + (mioEquipo ? " mi-equipo" : ""));
+    nodo.style.setProperty("--i", Math.min(orden, 12));
+    if (mioEquipo) {
+      const cinta = crear("div", "cinta-equipo");
+      cinta.appendChild(crear("span", null, "Tu equipo"));
+      nodo.appendChild(cinta);
+    }
+    [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, eq, marcador]) => {
+      const linea = crear("div", "lado" + (p.g === lado ? " gana" : ""));
+      const color = (D.colores[eq] || {}).local;
+      if (color) linea.style.setProperty("--c", color);
+      linea.appendChild(crear("span", "sig", D.siglas[eq] || eq.slice(0, 3).toUpperCase()));
+      linea.appendChild(crear("span", "nom", eq));
+      linea.appendChild(crear("span", "mrc", marcador === null ? "—" : String(marcador)));
+      nodo.appendChild(linea);
+    });
+    const pie = crear("div", "pie");
+    if (p.vivo) pie.appendChild(crear("span", "punto"));
+    pie.appendChild(crear("span", null, p.e));
+    if (p.cerrado && p.g === "x") pie.appendChild(crear("span", "der", "empate"));
+    nodo.appendChild(pie);
+
+    const mio = miPick(s, i);
+    if (mio) {
+      if (p.g === null) nodo.classList.add("mio-esp");
+      else if (p.cerrado) nodo.classList.add(p.g === mio.lado ? "mio-ok" : "mio-no");
+      else nodo.classList.add(p.g === mio.lado ? "mio-vivo-ok" : "mio-vivo-no");
+      const marca = crear("div", "mi-pick");
+      marca.appendChild(crear("span", null, "Tu pick"));
+      marca.appendChild(crear("b", null, mio.equipo));
+      if (p.cerrado) marca.appendChild(crear("span", null, p.g === "x" ? "· empate" : (p.g === mio.lado ? "· acierto" : "· fallo")));
+      else if (p.g !== null) marca.appendChild(crear("span", null, p.g === mio.lado ? "· vas ganando" : "· vas perdiendo"));
+      nodo.appendChild(marca);
+    }
+    caja.appendChild(nodo);
   }
 
   /* ═══ quién le fue a quién, con consenso ═══ */
@@ -1138,10 +1188,16 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     env.appendChild(intro);
     const caja = crear("div", "escena");
     const tope = filas[0].suma || 1;
-    filas.slice(0, 12).forEach((f, i) => {
+    // Se muestran los doce primeros, pero si vas más abajo igual te ves: para
+    // eso entraste.
+    const visibles = filas.slice(0, 12);
+    const miLugar = filas.findIndex((f) => f.idx === jugador);
+    if (miLugar >= 12) visibles.push(filas[miLugar]);
+    visibles.forEach((f, i) => {
+      const puesto = i < 12 ? i + 1 : miLugar + 1;
       const nodo = crear("div", "candidato" + (i === 0 ? " lider" : "") + (f.idx === jugador ? " yo" : ""));
       nodo.style.setProperty("--i", Math.min(i, 12));
-      nodo.appendChild(crear("span", "n", String(i + 1)));
+      nodo.appendChild(crear("span", "n", String(puesto)));
       nodo.appendChild(crear("span", "quien", nombre(f.idx)));
       nodo.appendChild(crear("span", "pct", ((f.suma / total) * 100).toFixed(1) + "%"));
       const barra = crear("div", "progreso");
@@ -1646,6 +1702,24 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     const activo = nav.querySelector('[aria-selected="true"]');
     if (activo) activo.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
     recordarSitio();
+  }
+
+  /* Con muchas semanas la tabla se desborda: se muestran las últimas y el
+     resto queda a un clic. */
+  const botonTodas = document.getElementById("ver-todas");
+  if (botonTodas) {
+    let desplegadas = false;
+    botonTodas.addEventListener("click", () => {
+      desplegadas = !desplegadas;
+      vistas.general.querySelectorAll(".c-sem").forEach((celda) => {
+        celda.classList.toggle("vieja", !desplegadas && celda.dataset.vieja === "1");
+      });
+      botonTodas.textContent = desplegadas ? "Ver solo las últimas" : botonTodas.dataset.todas;
+    });
+    botonTodas.dataset.todas = botonTodas.textContent;
+    vistas.general.querySelectorAll(".c-sem.vieja").forEach((celda) => {
+      celda.dataset.vieja = "1";
+    });
   }
 
   /* La tabla general viene escrita en el HTML: aquí se marca tu fila,
