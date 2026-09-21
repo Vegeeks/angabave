@@ -9,6 +9,20 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.9.0
+
+Escenarios agrupados: los empatados también cuando hay posibles ganadores.
+
+* **Los posibles ganadores se agrupan por situación.** Con un partido por
+  jugarse, seis personas compartían exactamente el mismo 100 % y salían como
+  seis filas idénticas. Ahora es una sola fila —"6 empatados"— desplegable con
+  los nombres, igual que en el podio y en el ganador de la semana.
+* **Cada grupo explica qué significa su porcentaje**, que no es obvio:
+  "Terminan primeros pase lo que pase, compartiendo el premio", "Solo le
+  alcanza para empatar el primer lugar", "Gana solo en N y empata en M".
+* La entrada dice cuántos desenlaces quedan en vez de cuántas combinaciones,
+  que se lee mejor cuando falta un solo partido.
+
 ## alfa v0.8.0
 
 * **Los partidos se ordenan por lo que importa.** Arriba lo que falta por

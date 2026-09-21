@@ -468,6 +468,12 @@ input.ancho:focus,select.ancho:focus{outline:0; border-color:var(--acento)}
 .progreso i{display:block; height:100%; width:0; border-radius:99px;
   background:linear-gradient(90deg,var(--acento),#9dc0ff); transition:width .9s cubic-bezier(.2,.7,.3,1)}
 .candidato.lider .progreso i{background:linear-gradient(90deg,#f7c948,#ffe193)}
+.candidato{grid-template-columns:1.6rem minmax(0,1fr) auto}
+.candidato .quien{white-space:normal; overflow:visible}
+.que-significa{grid-column:2/4; font-size:.68rem; color:var(--tenue2); margin-top:.25rem; line-height:1.35}
+.candidato .empatados{font-size:.95rem; font-weight:800}
+.candidato .empatados .gente{margin-top:.35rem}
+.candidato .empatados .gente span{font-size:.68rem}
 
 /* ═══════ jugadores ═══════ */
 .fichas{display:grid; gap:.42rem}
@@ -1296,37 +1302,73 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
   function panelEscenarios(s) {
     const total = s.combinaciones || 0;
     const filas = Object.entries(s.panorama || {})
-      .map(([i, [solo, emp]]) => ({ idx: Number(i), suma: solo + emp }))
-      .sort((a, b) => b.suma - a.suma || nombre(a.idx).localeCompare(nombre(b.idx), "es"));
+      .map(([i, [solo, emp]]) => ({ idx: Number(i), solo, emp, suma: solo + emp }))
+      .sort((a, b) => b.suma - a.suma || b.solo - a.solo ||
+        nombre(a.idx).localeCompare(nombre(b.idx), "es"));
     if (!total || !filas.length) {
       return aviso("Sin escenarios que calcular", "La semana ya cerró: el primer lugar está definido.");
     }
+
+    // Los que están en la misma situación van juntos: con un partido por jugar
+    // media quiniela comparte el mismo porcentaje y serían seis filas idénticas.
+    const grupos = [];
+    filas.forEach((f) => {
+      const ultimo = grupos[grupos.length - 1];
+      if (ultimo && ultimo.suma === f.suma && ultimo.solo === f.solo) ultimo.gente.push(f.idx);
+      else grupos.push({ suma: f.suma, solo: f.solo, emp: f.emp, gente: [f.idx] });
+    });
+
     const env = crear("div");
+    const faltan = s.total - s.cerrados;
     const intro = crear("p", "mini");
     intro.style.margin = "0 .1rem .7rem";
-    intro.textContent = "Faltan " + (s.total - s.cerrados) + " partidos: " +
-      total.toLocaleString("es-MX") + " combinaciones. Quién termina primero en cuántas.";
+    intro.textContent = "Falta" + (faltan === 1 ? " 1 partido" : "n " + faltan + " partidos") +
+      ": " + total.toLocaleString("es-MX") +
+      (total === 1 ? " desenlace posible." : " desenlaces posibles.");
     env.appendChild(intro);
+
     const caja = crear("div", "escena");
-    const tope = filas[0].suma || 1;
-    // Se muestran los doce primeros, pero si vas más abajo igual te ves: para
-    // eso entraste.
-    const visibles = filas.slice(0, 12);
-    const miLugar = filas.findIndex((f) => f.idx === jugador);
-    if (miLugar >= 12) visibles.push(filas[miLugar]);
-    visibles.forEach((f, i) => {
-      const puesto = i < 12 ? i + 1 : miLugar + 1;
-      const nodo = crear("div", "candidato" + (i === 0 ? " lider" : "") + (f.idx === jugador ? " yo" : ""));
+    const tope = grupos[0].suma || 1;
+    const mio = grupos.findIndex((g) => g.gente.includes(jugador));
+    const visibles = grupos.slice(0, 8);
+    if (mio >= 8) visibles.push(grupos[mio]);
+
+    visibles.forEach((g, i) => {
+      const puesto = i < 8 ? i + 1 : mio + 1;
+      const soyYo = g.gente.includes(jugador);
+      const nodo = crear("div", "candidato" + (puesto === 1 ? " lider" : "") + (soyYo ? " yo" : ""));
       nodo.style.setProperty("--i", Math.min(i, 12));
       nodo.appendChild(crear("span", "n", String(puesto)));
-      nodo.appendChild(crear("span", "quien", nombre(f.idx)));
-      nodo.appendChild(crear("span", "pct", ((f.suma / total) * 100).toFixed(1) + "%"));
+
+      const quien = crear("span", "quien");
+      quien.appendChild(nombrar(g.gente.map(nombre), false));
+      nodo.appendChild(quien);
+      nodo.appendChild(crear("span", "pct", ((g.suma / total) * 100).toFixed(0) + "%"));
+
       const barra = crear("div", "progreso");
       const relleno = crear("i");
       barra.appendChild(relleno);
       nodo.appendChild(barra);
+
+      // Qué significa ese porcentaje, que no es obvio.
+      const nota = crear("div", "que-significa");
+      if (g.suma >= total && g.solo === 0) {
+        nota.textContent = g.gente.length > 1
+          ? "Terminan primeros pase lo que pase, compartiendo el premio."
+          : "Termina primero pase lo que pase.";
+      } else if (g.suma >= total) {
+        nota.textContent = "Termina primero pase lo que pase.";
+      } else if (g.solo === 0) {
+        nota.textContent = "Solo le alcanza para empatar el primer lugar.";
+      } else if (g.emp === 0) {
+        nota.textContent = "Si gana, gana solo.";
+      } else {
+        nota.textContent = "Gana solo en " + g.solo + " y empata en " + g.emp + ".";
+      }
+      nodo.appendChild(nota);
+
       caja.appendChild(nodo);
-      requestAnimationFrame(() => { relleno.style.width = (f.suma / tope) * 100 + "%"; });
+      requestAnimationFrame(() => { relleno.style.width = (g.suma / tope) * 100 + "%"; });
     });
     env.appendChild(caja);
     return env;
