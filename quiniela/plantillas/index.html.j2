@@ -471,6 +471,7 @@ input.ancho:focus,select.ancho:focus{outline:0; border-color:var(--acento)}
 .candidato{grid-template-columns:1.6rem minmax(0,1fr) auto}
 .candidato .quien{white-space:normal; overflow:visible}
 .que-significa{grid-column:2/4; font-size:.68rem; color:var(--tenue2); margin-top:.25rem; line-height:1.35}
+.que-significa.tuya{color:var(--acento); font-weight:700}
 .candidato .empatados{font-size:.95rem; font-weight:800}
 .candidato .empatados .gente{margin-top:.35rem}
 .candidato .empatados .gente span{font-size:.68rem}
@@ -1299,10 +1300,45 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     return caja;
   }
 
+  /* Una línea que diga qué falta. En segunda persona cuando es tu fila: es
+     la diferencia entre leer una tabla y que te hablen a ti. */
+  function queSignifica(g, total, soyYo) {
+    const varios = g.gente.length > 1;
+    if (g.suma >= total) {
+      if (soyYo) {
+        return g.solo === 0
+          ? "Ya aseguraste el primer lugar, compartido."
+          : "Ya aseguraste el primer lugar.";
+      }
+      if (varios) return "Ya aseguraron el primer lugar, compartido.";
+      return g.solo === 0 ? "Ya aseguró el primer lugar, compartido." : "Ya aseguró el primer lugar.";
+    }
+
+    const equipos = g.req.map((x) => x.split("→")[1]);
+    if (equipos.length) {
+      const verbo = soyYo ? "Necesitas" : (varios ? "Necesitan" : "Necesita");
+      if (equipos.length === 1) return verbo + " que gane " + equipos[0] + ".";
+      if (equipos.length === 2) return verbo + " que ganen " + equipos.join(" y ") + ".";
+      return verbo + " que ganen " + equipos.slice(0, 2).join(", ") +
+        " y " + (equipos.length - 2) + " más.";
+    }
+
+    if (g.solo === 0) {
+      return soyYo ? "Solo te alcanza para empatar el primer lugar."
+                   : "Solo le alcanza para empatar el primer lugar.";
+    }
+    if (g.emp === 0) return soyYo ? "Si llegas, llegas solo." : "Si llega, llega solo.";
+    return (soyYo ? "Ganas" : "Gana") + " solo en " + g.solo + " y " +
+      (soyYo ? "empatas" : "empata") + " en " + g.emp + ".";
+  }
+
   function panelEscenarios(s) {
     const total = s.combinaciones || 0;
     const filas = Object.entries(s.panorama || {})
-      .map(([i, [solo, emp]]) => ({ idx: Number(i), solo, emp, suma: solo + emp }))
+      .map(([i, [solo, emp, req]]) => ({
+        idx: Number(i), solo, emp, suma: solo + emp,
+        req: (req || []).map(([clave, equipo]) => clave + "→" + equipo),
+      }))
       .sort((a, b) => b.suma - a.suma || b.solo - a.solo ||
         nombre(a.idx).localeCompare(nombre(b.idx), "es"));
     if (!total || !filas.length) {
@@ -1314,8 +1350,14 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     const grupos = [];
     filas.forEach((f) => {
       const ultimo = grupos[grupos.length - 1];
-      if (ultimo && ultimo.suma === f.suma && ultimo.solo === f.solo) ultimo.gente.push(f.idx);
-      else grupos.push({ suma: f.suma, solo: f.solo, emp: f.emp, gente: [f.idx] });
+      if (ultimo && ultimo.suma === f.suma && ultimo.solo === f.solo) {
+        ultimo.gente.push(f.idx);
+        // Lo que el grupo necesita en común: si a uno no le hace falta, al
+        // grupo tampoco se lo pedimos.
+        ultimo.req = ultimo.req.filter((x) => f.req.includes(x));
+      } else {
+        grupos.push({ suma: f.suma, solo: f.solo, emp: f.emp, gente: [f.idx], req: f.req.slice() });
+      }
     });
 
     const env = crear("div");
@@ -1350,21 +1392,8 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       barra.appendChild(relleno);
       nodo.appendChild(barra);
 
-      // Qué significa ese porcentaje, que no es obvio.
-      const nota = crear("div", "que-significa");
-      if (g.suma >= total && g.solo === 0) {
-        nota.textContent = g.gente.length > 1
-          ? "Terminan primeros pase lo que pase, compartiendo el premio."
-          : "Termina primero pase lo que pase.";
-      } else if (g.suma >= total) {
-        nota.textContent = "Termina primero pase lo que pase.";
-      } else if (g.solo === 0) {
-        nota.textContent = "Solo le alcanza para empatar el primer lugar.";
-      } else if (g.emp === 0) {
-        nota.textContent = "Si gana, gana solo.";
-      } else {
-        nota.textContent = "Gana solo en " + g.solo + " y empata en " + g.emp + ".";
-      }
+      const nota = crear("div", "que-significa" + (soyYo ? " tuya" : ""));
+      nota.textContent = queSignifica(g, total, soyYo);
       nodo.appendChild(nota);
 
       caja.appendChild(nodo);

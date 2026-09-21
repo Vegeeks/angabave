@@ -372,3 +372,32 @@ def test_avisa_en_el_log(caplog):
     with caplog.at_level("WARNING", logger="quiniela.scoring"):
         alertar_nombres_parecidos({"ana perez": "Ana Perez", "ana peres": "Ana Peres"})
     assert "se parecen mucho" in caplog.text
+
+
+def test_el_panorama_dice_que_necesita_cada_quien():
+    """Lo mismo que calcula `escenarios`, pero para todos de una pasada."""
+    pendientes = [sin_empezar("Lions", "Bills"), sin_empezar("Panthers", "Falcons")]
+    picks = {"Atras": ["Bills", "Falcons"], "Lider": ["Lions", "Panthers"]}
+    firmes = {"Atras": 4, "Lider": 6}
+
+    vista = panorama(pendientes, picks, firmes)
+    # Atrás por dos: necesita ganar los dos pendientes para siquiera empatar.
+    assert vista["Atras"]["requiere"] == {"Lions@Bills": "Bills", "Panthers@Falcons": "Falcons"}
+    # Y coincide con el cálculo individual.
+    assert vista["Atras"]["requiere"] == escenarios("Atras", pendientes, picks, firmes).indispensables
+
+
+def test_quien_ya_no_puede_ganar_no_pide_nada():
+    pendientes = [sin_empezar("Lions", "Bills")]
+    picks = {"Atras": ["Bills"], "Lider": ["Bills"]}
+    vista = panorama(pendientes, picks, {"Atras": 3, "Lider": 9})
+    assert vista["Atras"]["gana_solo"] == vista["Atras"]["empata"] == 0
+    assert vista["Atras"]["requiere"] == {}
+
+
+def test_quien_tiene_el_primer_lugar_asegurado_no_necesita_nada():
+    pendientes = [sin_empezar("Lions", "Bills")]
+    picks = {"Comodo": ["Bills"], "Lejos": ["Lions"]}
+    vista = panorama(pendientes, picks, {"Comodo": 10, "Lejos": 2})
+    assert vista["Comodo"]["gana_solo"] == 2   # gana pase lo que pase
+    assert vista["Comodo"]["requiere"] == {}

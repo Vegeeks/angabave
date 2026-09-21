@@ -412,7 +412,16 @@ def panorama(
     ajustadas = [firmes.get(nombre, 0) + total for nombre in nombres]
     lista = [mascaras[nombre] for nombre in nombres]
 
-    resumen = {nombre: {"gana_solo": 0, "empata": 0} for nombre in nombres}
+    resumen = {nombre: {"gana_solo": 0, "empata": 0, "requiere": {}} for nombre in nombres}
+
+    # Para saber qué resultados le hacen falta a cada quien se acumulan dos
+    # máscaras sobre sus desenlaces favorables: los bits encendidos en TODOS
+    # (tiene que ganar el local) y los apagados en todos (tiene que ganar el
+    # visitante). Sale en una sola operación por desenlace, no recorriendo bits.
+    completo = 2**total - 1
+    en_todos = [completo] * len(nombres)
+    en_alguno = [0] * len(nombres)
+    favorables = [0] * len(nombres)
 
     for desenlace in range(2**total):
         mejor = -1
@@ -430,6 +439,22 @@ def panorama(
         else:
             for indice in lideres:
                 resumen[nombres[indice]]["empata"] += 1
+
+        for indice in lideres:
+            favorables[indice] += 1
+            en_todos[indice] &= desenlace
+            en_alguno[indice] |= desenlace
+
+    for indice, nombre in enumerate(nombres):
+        if not favorables[indice]:
+            continue
+        requiere: dict[str, str] = {}
+        for bit, partido in enumerate(partidos_pendientes):
+            if en_todos[indice] >> bit & 1:
+                requiere[partido.clave] = partido.local
+            elif not (en_alguno[indice] >> bit & 1):
+                requiere[partido.clave] = partido.visitante
+        resumen[nombre]["requiere"] = requiere
 
     return resumen
 

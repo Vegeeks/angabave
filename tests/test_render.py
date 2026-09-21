@@ -159,8 +159,10 @@ def test_los_escenarios_viajan_con_la_pagina(armado, tmp_path: Path):
     semana2 = datos["semanas"][0]
     assert semana2["combinaciones"] == 2**15
     assert semana2["panorama"]
-    for solo, empata in semana2["panorama"].values():
+    for solo, empata, requiere in semana2["panorama"].values():
         assert solo + empata > 0
+        # Cada requisito es [partido, equipo que tiene que ganar].
+        assert all(len(par) == 2 for par in requiere)
 
 
 def test_el_png_mide_1080_de_ancho(armado, tmp_path: Path):

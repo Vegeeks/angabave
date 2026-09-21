@@ -9,6 +9,25 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.10.0
+
+Los escenarios dicen qué falta, no solo cuánto falta.
+
+* **Cada fila dice qué resultado hace falta**: "Necesita que gane Giants",
+  "Necesitan que ganen Rams y Chiefs". Sale del mismo cálculo que ya usaba
+  `cli.py escenarios` para los partidos indispensables, ahora para los 34 de
+  una sola pasada y publicado en el sitio.
+* **Cuando ya está resuelto se dice así**: "Ya aseguraron el primer lugar,
+  compartido". Sin porcentajes que interpretar.
+* **Tu fila te habla de tú** y va resaltada: "Ya aseguraste el primer lugar",
+  "Necesitas que gane Giants". El resto va en tercera persona.
+* Todo en una línea por fila: la idea era que dijera más, no que ocupara más.
+
+Los requisitos se calculan acumulando dos máscaras sobre los desenlaces
+favorables de cada quien —los bits encendidos en todos y los apagados en
+todos— en lugar de recorrer partido por partido, que multiplicaba el trabajo
+por dieciséis.
+
 ## alfa v0.9.0
 
 Escenarios agrupados: los empatados también cuando hay posibles ganadores.

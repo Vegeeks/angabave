@@ -65,7 +65,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.9.0"
+VERSION = "v0.10.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -426,7 +426,12 @@ def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
     if semana.panorama:
         bloque["combinaciones"] = 2**semana.pendientes
         bloque["panorama"] = {
-            str(indice_global[nombre]): [valores["gana_solo"], valores["empata"]]
+            str(indice_global[nombre]): [
+                valores["gana_solo"],
+                valores["empata"],
+                # Resultados que le hacen falta: [partido, equipo que debe ganar].
+                [[clave, equipo] for clave, equipo in valores.get("requiere", {}).items()],
+            ]
             for nombre, valores in semana.panorama.items()
             if valores["gana_solo"] or valores["empata"]
         }

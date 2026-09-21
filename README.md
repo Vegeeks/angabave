@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.9.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.10.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -265,9 +265,10 @@ Qué trae:
   una barra que muestra cómo se dividió la quiniela y los nombres de cada lado
   en verde o rojo según cómo salió; o la boleta completa de una persona, con
   palomita y tache partido por partido.
-* **Escenarios** ordena a los que todavía pueden ganar la semana por el
-  porcentaje de desenlaces en que terminan primeros, agrupando a los que están
-  en la misma situación y explicando qué significa cada porcentaje.
+* **Escenarios** ordena a los que todavía pueden ganar la semana, agrupa a los
+  que están en la misma situación y dice en una línea qué les hace falta:
+  "Necesita que gane Giants", "Ya aseguraron el primer lugar, compartido". Tu
+  fila te habla de tú.
 * Cuando todavía no se sube el Excel de la semana en curso, el sitio publica
   esa semana con sus partidos programados y el letrero **"Actualizando la
   semana N"**, en lugar de quedarse en la anterior.
