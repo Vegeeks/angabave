@@ -1,12 +1,16 @@
 name: Directo
 
-# El cron de GitHub no es de fiar: en repos nuevos tarda en activarse y el
-# propio GitHub avisa que retrasa o descarta corridas programadas cuando hay
-# carga. Depender de que dispare 70 veces un domingo es frágil.
+# El cron de GitHub no es de fiar: tardó horas en activarse en este repo y de
+# ~40 corridas solo 3 fueron programadas. Así que este workflow no depende de
+# que dispare seguido, sino de arrancar y encadenarse:
 #
-# Este workflow necesita disparar UNA vez por ventana: en cuanto arranca se
-# queda corriendo y recalcula cada dos minutos hasta que cierra el último
-# partido. Si el cron llega tarde, el resto de la tarde ya queda cubierta.
+#   1. Pregunta cuándo es el próximo partido.
+#   2. Si falta mucho pero cabe en este eslabón, duerme hasta unos minutos
+#      antes y se pone a recalcular cada dos minutos.
+#   3. Si no cabe (un job dura como máximo 6 horas), duerme lo que puede y
+#      lanza el siguiente eslabón antes de morir.
+#   4. Cuando cierra el último partido, o si el próximo está a más de 12 horas,
+#      se detiene. No se queda encendido toda la semana.
 #
 # CDMX está fija en UTC-6, así que la hora local + 6 da la UTC.
 on:
@@ -17,17 +21,22 @@ on:
   workflow_dispatch:
     inputs:
       minutos:
-        description: "Cuántos minutos seguir en directo"
+        description: "Minutos de vida de este eslabón"
         required: false
         default: "300"
       cada:
         description: "Segundos entre cada recálculo"
         required: false
         default: "120"
+      eslabon:
+        description: "Número de eslabón (interno, no tocar)"
+        required: false
+        default: "1"
 
-# GitHub Pages publica solo, con cada commit a docs/: basta con poder escribir.
+# contents para publicar, actions para poder encadenar el siguiente eslabón.
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: quiniela-directo
@@ -38,6 +47,14 @@ jobs:
     runs-on: ubuntu-latest
     # El tope de un job en GitHub es de 6 horas; nos quedamos debajo.
     timeout-minutes: 330
+    env:
+      MINUTOS: ${{ inputs.minutos || '300' }}
+      CADA: ${{ inputs.cada || '120' }}
+      ESLABON: ${{ inputs.eslabon || '1' }}
+      MAX_ESLABONES: "6"
+      # Si el próximo partido está más lejos que esto, no vale la pena seguir.
+      VENTANA: "43200"   # 12 horas
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -48,9 +65,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Seguir la jornada
-        env:
-          MINUTOS: ${{ inputs.minutos || '300' }}
-          CADA: ${{ inputs.cada || '120' }}
+        id: jornada
         run: |
           git config user.name "Angel Barrera"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -62,8 +77,6 @@ jobs:
               return 1
             fi
             git commit -q -m "Directo: $(date -u '+%Y-%m-%d %H:%M UTC')"
-            # Si alguien se adelantó, no se fuerza nada: la siguiente vuelta
-            # arranca del remoto y recalcula encima.
             if git push -q; then
               echo "Publicado."
               return 0
@@ -72,28 +85,69 @@ jobs:
             return 1
           }
 
-          FIN=$(( $(date -u +%s) + MINUTOS * 60 ))
-          VUELTA=0
-          while [ "$(date -u +%s)" -lt "$FIN" ]; do
-            VUELTA=$(( VUELTA + 1 ))
-            echo "── vuelta $VUELTA · $(date -u '+%H:%M:%S UTC') ──"
-
-            # Cada vuelta arranca de lo que está publicado. Sin esto, el job se
-            # quedaría con el código del momento en que empezó: un arreglo o un
-            # Excel nuevo no entrarían hasta reiniciar el directo, y peor, la
-            # siguiente vuelta pisaría lo que alguien más hubiera publicado.
+          sincronizar() {
+            # Cada vuelta arranca de lo publicado: así un arreglo o un Excel
+            # nuevo entran sin reiniciar el directo.
             git fetch -q origin main
             git reset -q --hard origin/main
+          }
 
+          LIMITE=$(( $(date -u +%s) + MINUTOS * 60 ))
+          echo "Eslabón $ESLABON de máximo $MAX_ESLABONES."
+
+          PROXIMO=$(python cli.py proximo 2>/dev/null || echo -1)
+          echo "Próximo partido en $PROXIMO segundos."
+
+          if [ "$PROXIMO" -lt 0 ]; then
+            echo "No hay partidos pendientes: nada que seguir."
+            exit 0
+          fi
+
+          if [ "$PROXIMO" -gt "$VENTANA" ]; then
+            echo "El próximo partido está a más de $(( VENTANA / 3600 )) horas. Me detengo."
+            exit 0
+          fi
+
+          if [ "$PROXIMO" -gt 0 ]; then
+            # Despertar cinco minutos antes del saque inicial.
+            ESPERA=$(( PROXIMO - 300 ))
+            [ "$ESPERA" -lt 0 ] && ESPERA=0
+            MARGEN=$(( LIMITE - $(date -u +%s) - 120 ))
+            if [ "$ESPERA" -ge "$MARGEN" ]; then
+              echo "No alcanzo el partido en este eslabón: duermo $(( MARGEN / 60 )) min y encadeno."
+              [ "$MARGEN" -gt 0 ] && sleep "$MARGEN"
+              echo "encadenar=si" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Duermo $(( ESPERA / 60 )) min hasta el arranque."
+            sleep "$ESPERA"
+          fi
+
+          VUELTA=0
+          while [ "$(date -u +%s)" -lt "$LIMITE" ]; do
+            VUELTA=$(( VUELTA + 1 ))
+            echo "── vuelta $VUELTA · $(date -u '+%H:%M:%S UTC') ──"
+            sincronizar
             python cli.py actualizar
-
             publicar || true
 
             ABIERTOS=$(python cli.py pendientes 2>/dev/null || echo 1)
             echo "Partidos abiertos: $ABIERTOS"
             if [ "$ABIERTOS" = "0" ]; then
               echo "Todo cerrado: se acabó la jornada."
-              break
+              exit 0
             fi
             sleep "$CADA"
           done
+
+          echo "Se acabó el tiempo de este eslabón."
+          echo "encadenar=si" >> "$GITHUB_OUTPUT"
+
+      - name: Encadenar el siguiente eslabón
+        if: steps.jornada.outputs.encadenar == 'si' && fromJSON(env.ESLABON) < fromJSON(env.MAX_ESLABONES)
+        run: |
+          SIGUIENTE=$(( ESLABON + 1 ))
+          echo "Lanzando el eslabón $SIGUIENTE."
+          gh workflow run directo.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            -f minutos="$MINUTOS" -f cada="$CADA" -f eslabon="$SIGUIENTE"

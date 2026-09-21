@@ -10,6 +10,10 @@ Formato del archivo (confirmado contra la Semana 2 real):
 * La última columna, "Aciertos Totales", se ignora por completo: viene
   precargada con valores incorrectos y es justo lo que este proyecto arregla.
 
+El organizador arma el archivo en Excel pero suele repartir el PDF exportado.
+Los dos se leen igual: cada formato se convierte a la misma rejilla y de ahí en
+adelante pasan por las mismas validaciones.
+
 Todo lo que huela a captura equivocada truena con el detalle completo en vez de
 producir una tabla en silencio.
 """
@@ -25,6 +29,7 @@ import openpyxl
 
 from .equipos import EquipoDesconocidoError, normalizar
 from .espn import Partido
+from .pdf import ErrorPDF, extraer_rejilla
 
 __all__ = [
     "ErrorPicks",
@@ -195,6 +200,44 @@ def _equipos_repetidos(partidos: list[Partido]) -> set[str]:
     return repetidos
 
 
+def _rejilla_excel(ruta: Path) -> list[tuple]:
+    libro = openpyxl.load_workbook(ruta, data_only=True, read_only=True)
+    hoja = libro.worksheets[0]
+    if len(libro.worksheets) > 1:
+        _log.warning(
+            "El archivo tiene %d hojas; uso la primera (%r).", len(libro.worksheets), hoja.title
+        )
+    filas = [fila for fila in hoja.iter_rows(values_only=True)]
+    libro.close()
+    return filas
+
+
+def _rejilla_pdf(ruta: Path) -> list[tuple]:
+    """Arma la misma rejilla que el Excel, para que el resto no note diferencia."""
+    try:
+        semana, visitantes, locales, participantes = extraer_rejilla(ruta)
+    except ErrorPDF as error:
+        raise ErrorFormatoExcel(str(error)) from error
+
+    filas: list[tuple] = [
+        (None, *visitantes, None),
+        (f"Semana {semana}", *locales, COLUMNA_IGNORADA),
+    ]
+    filas.extend((nombre, *picks) for nombre, picks in participantes)
+    return filas
+
+
+def _rejilla(ruta: Path) -> list[tuple]:
+    """La rejilla del archivo, sea Excel o PDF."""
+    if ruta.suffix.lower() == ".pdf":
+        return _rejilla_pdf(ruta)
+    if ruta.suffix.lower() in (".xlsx", ".xlsm"):
+        return _rejilla_excel(ruta)
+    raise ErrorPicks(
+        f"No sé leer {ruta.name}: se esperaba .xlsx o .pdf."
+    )
+
+
 def leer_picks(ruta: Path) -> tuple[list[Partido], dict[str, list[str]]]:
     """Lee el Excel de una semana.
 
@@ -205,15 +248,7 @@ def leer_picks(ruta: Path) -> tuple[list[Partido], dict[str, list[str]]]:
     if not ruta.exists():
         raise ErrorPicks(f"No existe el archivo de picks: {ruta}")
 
-    libro = openpyxl.load_workbook(ruta, data_only=True, read_only=True)
-    hoja = libro.worksheets[0]
-    if len(libro.worksheets) > 1:
-        _log.warning(
-            "El archivo tiene %d hojas; uso la primera (%r).", len(libro.worksheets), hoja.title
-        )
-    filas = [fila for fila in hoja.iter_rows(values_only=True)]
-    libro.close()
-
+    filas = _rejilla(ruta)
     if not filas:
         raise ErrorFormatoExcel(f"El archivo {ruta.name} está vacío.")
 

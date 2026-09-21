@@ -14,8 +14,9 @@ from __future__ import annotations
 import argparse
 import logging
 import re
+import shutil
 import sys
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -69,24 +70,41 @@ def anio_por_defecto() -> int:
     return hoy.year if hoy.month >= 3 else hoy.year - 1
 
 
+#: Formatos que sabe leer el proyecto, en orden de preferencia.
+EXTENSIONES = (".xlsx", ".pdf")
+
+
 def ruta_picks(semana: int) -> Path:
-    ruta = DIR_PICKS / f"Semana_{semana:02d}.xlsx"
-    if ruta.exists():
-        return ruta
-    alternativas = sorted(DIR_PICKS.glob(f"*emana*{semana}*.xls*"))
+    for extension in EXTENSIONES:
+        ruta = DIR_PICKS / f"Semana_{semana:02d}{extension}"
+        if ruta.exists():
+            return ruta
+    alternativas = [p for p in semanas_disponibles() if numero_semana(p) == semana]
     if alternativas:
         return alternativas[0]
     disponibles = ", ".join(p.name for p in semanas_disponibles()) or "ninguno"
     raise ErrorPicks(
-        f"No encontré {ruta}. Archivos de picks disponibles: {disponibles}."
+        f"No encontré los picks de la semana {semana} en {DIR_PICKS}. "
+        f"Archivos disponibles: {disponibles}."
     )
 
 
 def semanas_disponibles() -> list[Path]:
+    """Los archivos de picks, en Excel o PDF, ordenados por semana.
+
+    Si una semana está en los dos formatos gana el Excel, que es el original.
+    """
     if not DIR_PICKS.exists():
         return []
-    rutas = [p for p in DIR_PICKS.glob("*.xlsx") if not p.name.startswith("~$")]
-    return sorted((p for p in rutas if re.search(r"emana", p.name)), key=numero_semana)
+    rutas = [
+        p for p in DIR_PICKS.iterdir()
+        if p.suffix.lower() in EXTENSIONES and not p.name.startswith("~$")
+        and re.search(r"emana", p.name)
+    ]
+    por_semana: dict[int, Path] = {}
+    for ruta in sorted(rutas, key=lambda p: EXTENSIONES.index(p.suffix.lower())):
+        por_semana.setdefault(numero_semana(ruta), ruta)
+    return [por_semana[s] for s in sorted(por_semana)]
 
 
 def ultima_semana() -> int:
@@ -285,12 +303,78 @@ def comando_escenarios(argumentos) -> int:
     return 0
 
 
+def comando_importar(argumentos) -> int:
+    """Guarda el archivo del organizador con el nombre que espera el proyecto.
+
+    Acepta el Excel o el PDF tal como llega ("Quiniela 3.pdf"), detecta de qué
+    semana es leyendo su contenido y lo deja en data/picks/ ya validado.
+    """
+    origen = Path(argumentos.archivo).expanduser()
+    if not origen.exists():
+        raise ErrorPicks(f"No existe el archivo: {origen}")
+
+    partidos, picks = leer_picks(origen)
+    semana = argumentos.semana
+    if semana is None:
+        try:
+            semana = numero_semana(origen)
+        except ErrorPicks:
+            raise ErrorPicks(
+                f"No pude deducir la semana de {origen.name!r}. "
+                "Pásala con --semana."
+            ) from None
+
+    destino = DIR_PICKS / f"Semana_{semana:02d}{origen.suffix.lower()}"
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    if destino.exists() and not argumentos.forzar:
+        raise ErrorPicks(f"Ya existe {destino}. Usa --forzar para reemplazarlo.")
+    shutil.copy2(origen, destino)
+
+    _log.info(
+        "Guardé %s como %s: %d partidos, %d participantes.",
+        origen.name, destino.name, len(partidos), len(picks),
+    )
+    print(destino)
+    return 0
+
+
 def comando_pendientes(argumentos) -> int:
     """Cuántos partidos siguen abiertos. Lo usa el workflow para saber si parar."""
     semana = argumentos.semana or ultima_semana()
     partidos, _, resultados = _cargar_semana(semana, argumentos.anio, sin_red=True)
     abiertos = sum(1 for partido in resultados if not partido.finalizado)
     print(abiertos)
+    return 0
+
+
+def comando_proximo(argumentos) -> int:
+    """Segundos hasta el próximo partido por empezar.
+
+    Imprime 0 si alguno ya arrancó y sigue abierto, y -1 si no queda ninguno.
+    Con eso el workflow sabe si ponerse a trabajar, esperar o irse a dormir.
+    """
+    rutas = semanas_disponibles()
+    if not rutas:
+        print(-1)
+        return 0
+
+    ahora = datetime.now(timezone.utc)
+    faltantes: list[float] = []
+    for ruta in rutas:
+        semana = numero_semana(ruta)
+        try:
+            resultados = obtener_partidos(argumentos.anio, semana, sin_red=True)
+        except ErrorESPN:
+            continue
+        for partido in resultados:
+            if partido.finalizado:
+                continue
+            if partido.inicio is None or partido.inicio <= ahora:
+                print(0)  # ya empezó (o no sabemos cuándo): hay que mirarlo
+                return 0
+            faltantes.append((partido.inicio - ahora).total_seconds())
+
+    print(int(min(faltantes)) if faltantes else -1)
     return 0
 
 
@@ -334,13 +418,26 @@ def construir_parser() -> argparse.ArgumentParser:
     escenarios_.add_argument("--semana", type=int)
     escenarios_.set_defaults(funcion=comando_escenarios)
 
+    importar = subcomandos.add_parser(
+        "importar", help="guarda el archivo del organizador (Excel o PDF) en data/picks/"
+    )
+    importar.add_argument("archivo", help="ruta del archivo tal como llegó")
+    importar.add_argument("--semana", type=int, help="si no se puede deducir del nombre")
+    importar.add_argument("--forzar", action="store_true", help="reemplaza si ya existe")
+    importar.set_defaults(funcion=comando_importar)
+
     pendientes = subcomandos.add_parser(
         "pendientes", help="imprime cuántos partidos siguen abiertos"
     )
     pendientes.add_argument("--semana", type=int)
     pendientes.set_defaults(funcion=comando_pendientes)
 
-    validar = subcomandos.add_parser("validar", help="solo revisa el Excel, no calcula")
+    proximo = subcomandos.add_parser(
+        "proximo", help="segundos hasta el próximo partido (0 si ya empezó, -1 si no hay)"
+    )
+    proximo.set_defaults(funcion=comando_proximo)
+
+    validar = subcomandos.add_parser("validar", help="solo revisa el archivo, no calcula")
     validar.add_argument("--semana", type=int)
     validar.set_defaults(funcion=comando_validar)
 
