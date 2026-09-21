@@ -70,7 +70,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.12.1"
+VERSION = "v0.13.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -432,11 +432,33 @@ def _tandas(partidos: list[Partido]) -> list[dict]:
     return tandas
 
 
+def _orden_nfl(partidos: list[Partido]) -> list[int]:
+    """Índices de los partidos en el orden oficial de la jornada.
+
+    La NFL publica la semana por hora de inicio —jueves, domingo temprano,
+    domingo tarde, domingo por la noche, lunes— y así la lee todo el mundo. El
+    Excel del organizador los trae en otro orden y ESPN en un tercero, así que
+    aquí se fija uno solo. El orden del archivo queda de desempate, para que
+    dos partidos a la misma hora no se muevan de una semana a otra.
+    """
+    return sorted(
+        range(len(partidos)),
+        key=lambda i: (
+            partidos[i].inicio.timestamp() if partidos[i].inicio else float("inf"),
+            i,
+        ),
+    )
+
+
 def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
-    """Arma el bloque JSON de una semana."""
+    """Arma el bloque JSON de una semana, ya en el orden de la NFL."""
+    orden = _orden_nfl(semana.partidos)
+    partidos = [semana.partidos[i] for i in orden]
+
     jugadores = list(semana.picks)
+    # Los picks se reordenan junto con los partidos: cada fila sigue alineada.
     matriz = [
-        [1 if pick == partido.local else 0 for pick, partido in zip(picks, semana.partidos)]
+        [1 if picks[i] == semana.partidos[i].local else 0 for i in orden]
         for picks in semana.picks.values()
     ]
 
@@ -445,7 +467,7 @@ def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
         "estado": semana.estado,
         "cerrados": semana.cerrados,
         "total": len(semana.partidos),
-        "partidos": [_describir(partido) for partido in semana.partidos],
+        "partidos": [_describir(partido) for partido in partidos],
         "jugadores": [indice_global[nombre] for nombre in jugadores],
         "picks": matriz,
         "tabla": [],
@@ -465,7 +487,7 @@ def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
             for fila in semana.tabla.to_dict("records")
         ]
 
-    bloque["tandas"] = _tandas(semana.partidos)
+    bloque["tandas"] = _tandas(partidos)
     bloque["proyectable"] = semana.cerrados >= UMBRAL_SEMANA
     bloque["umbral"] = UMBRAL_SEMANA
     if semana.tabla is not None and not semana.tabla.empty and bloque["proyectable"]:

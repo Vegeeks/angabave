@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.12.1**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.13.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -137,6 +137,16 @@ El sitio calla lo que todavía no significa nada:
 Y cuando hay muchos empatados no enlista a todos: dice cuántos son. Los
 nombres sí se escriben cuando el resultado ya es oficial y hay dinero de por
 medio (`MAXIMO_NOMBRES` en `quiniela/render_html.py`).
+
+## De dónde sale cada cosa
+
+* **Los enfrentamientos** salen del archivo del organizador: su quiniela manda.
+* **Marcadores, horarios y el cierre de cada partido** salen de la API pública
+  de ESPN. Cada semana se cotejan contra el archivo: si trae un partido que no
+  existe en el calendario de esa semana, el cálculo truena.
+* **El orden es el de la NFL**, por hora de inicio, que no coincide ni con el
+  del Excel ni con el que devuelve ESPN. Se fija en un solo lugar
+  (`_orden_nfl`) y los partidos a la misma hora conservan el orden del archivo.
 
 ## Cómo se cuenta
 

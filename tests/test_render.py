@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -371,3 +371,55 @@ def test_la_pagina_vigila_su_propia_version(armado, tmp_path: Path):
     # Y al recargar se salta el caché con un parámetro nuevo.
     assert "recargarFresco" in html
     assert "location.reload()" not in html
+
+
+def test_los_partidos_salen_en_el_orden_de_la_nfl(armado, tmp_path: Path):
+    """Por hora de inicio: jueves, domingo, lunes. No el del Excel ni el de ESPN."""
+    datos = datos_embebidos(render(armado, tmp_path))
+    for semana in datos["semanas"]:
+        horas = [p["t"] for p in semana["partidos"] if p["t"]]
+        assert horas == sorted(horas), f"semana {semana['n']} desordenada"
+
+
+def test_reordenar_no_desfasa_los_picks(tmp_path: Path):
+    """Si los picks se despegan de su partido, todo el conteo queda mal y no se ve.
+
+    Se compara pick por pick contra el archivo del organizador.
+    """
+    from quiniela.render_html import _orden_nfl
+
+    dir_cache = tmp_path / "resultados"
+    ruta = crear_excel(tmp_path / "Semana_02.xlsx")
+    partidos, picks = leer_picks(ruta)
+
+    # Horarios deliberadamente al revés del orden del Excel.
+    base = datetime(2026, 9, 25, 0, 15, tzinfo=timezone.utc)
+    resultados = [
+        Partido(v, l, 24, 17, l, True, "Final", base + timedelta(hours=len(ENFRENTAMIENTOS_S2) - i))
+        for i, (v, l) in enumerate(ENFRENTAMIENTOS_S2)
+    ]
+    guardar_cache(2, resultados, dir_cache)
+    tabla = tabla_semana(partidos, picks, resultados)
+    general = tabla_general([ruta], dir_cache=dir_cache, ruta_overrides=tmp_path / "no.json")
+
+    html = generar_html(
+        anio=2026, semanas=[SemanaRender(2, resultados, picks, tabla)],
+        tabla_acumulada=general, ruta_salida=tmp_path / "index.html", momento=MOMENTO,
+    ).read_text(encoding="utf-8")
+    datos = datos_embebidos(html)
+    semana = datos["semanas"][0]
+
+    # El orden publicado no puede ser el del Excel: los horarios van al revés.
+    assert _orden_nfl(resultados) != list(range(len(resultados)))
+
+    verdad = {
+        nombre: dict(zip((p.clave for p in partidos), elegidos))
+        for nombre, elegidos in picks.items()
+    }
+    claves = [p["v"] + "@" + p["l"] for p in semana["partidos"]]
+    for fila, idx in enumerate(semana["jugadores"]):
+        quien = datos["participantes"][idx]
+        for col, clave in enumerate(claves):
+            visitante, local = clave.split("@")
+            publicado = local if semana["picks"][fila][col] == 1 else visitante
+            assert publicado == verdad[quien][clave], f"{quien} desfasado en {clave}"

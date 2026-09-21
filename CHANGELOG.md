@@ -9,6 +9,28 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.13.0
+
+* **Los partidos van en el orden de la NFL**: por hora de inicio —jueves,
+  domingo temprano, domingo tarde, domingo por la noche, lunes—, que es como
+  publica la liga la jornada y como la lee todo el mundo.
+
+  Antes la base era el orden del Excel del organizador, y ESPN devuelve un
+  tercero distinto (en la Semana 2 pone el Giants @ Rams del lunes en primer
+  lugar). Ahora el orden se fija en un solo sitio, al armar los datos, así que
+  sale igual en "Quién le fue a quién", en la boleta de cada quien, en el
+  generador de picks y en la imagen que se manda. Los partidos a la misma hora
+  conservan el orden del archivo, para que no bailen de una semana a otra.
+
+  La pestaña **Partidos** sigue con su propio criterio a propósito: primero lo
+  que falta por jugarse.
+
+* **Prueba nueva contra el error silencioso.** Reordenar los partidos obliga a
+  reordenar los picks de cada quien con ellos; si se despegan, el conteo entero
+  queda mal y no se nota a simple vista. Hay una prueba que arma una semana con
+  los horarios al revés del archivo y verifica **pick por pick** —los 544 de
+  esta semana— que cada quien conserva el suyo.
+
 ## alfa v0.12.1
 
 * **El sitio ya no se queda pegado en una versión vieja.** GitHub Pages sirve
