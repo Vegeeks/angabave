@@ -16,7 +16,7 @@ import json
 import logging
 from decimal import Decimal
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -69,7 +69,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.11.0"
+VERSION = "v0.12.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -288,6 +288,13 @@ SEGUNDOS_RECARGA = 600
 #: Cada cuántos segundos el navegador pide marcadores a ESPN por su cuenta.
 SEGUNDOS_VIVO = 60
 
+#: A dónde se mandan los picks. Lo usa el generador de imagen del sitio.
+CORREO_ORGANIZADOR = "quinielanfl@hotmail.com"
+
+#: Los picks se reciben hasta las 23:59 del día anterior al primer partido de
+#: cada tanda: la del jueves cierra el miércoles, la del domingo el sábado.
+HORA_CIERRE = 23, 59
+
 #: A partir de cuántos minutos sin recalcular se avisa que la tabla va vieja.
 #: Con partidos abiertos, quedarse callado es el peor modo de falla.
 MINUTOS_REZAGO = 25
@@ -384,6 +391,46 @@ def _describir(partido: Partido) -> dict:
     }
 
 
+def _tandas(partidos: list[Partido]) -> list[dict]:
+    """Agrupa la jornada en tandas y calcula hasta cuándo se reciben picks.
+
+    El organizador cierra a las 23:59 del día anterior al primer partido de
+    cada tanda: los de jueves cierran el miércoles, y los de domingo y lunes
+    cierran el sábado. Se separa en "antes del domingo" y "del domingo en
+    adelante", que es como está armado el calendario de la NFL.
+    """
+    con_hora = [p for p in partidos if p.inicio is not None]
+    if not con_hora:
+        return []
+
+    def es_entre_semana(partido: Partido) -> bool:
+        # weekday(): lunes=0 … domingo=6. Antes del domingo y después del lunes.
+        return a_cdmx(partido.inicio).weekday() not in (6, 0)
+
+    grupos: list[list[Partido]] = []
+    entre_semana = [p for p in con_hora if es_entre_semana(p)]
+    fin_de_semana = [p for p in con_hora if not es_entre_semana(p)]
+    for grupo in (entre_semana, fin_de_semana):
+        if grupo:
+            grupos.append(sorted(grupo, key=lambda p: p.inicio))
+
+    tandas = []
+    for grupo in grupos:
+        primero = a_cdmx(grupo[0].inicio)
+        cierre = (primero - timedelta(days=1)).replace(
+            hour=HORA_CIERRE[0], minute=HORA_CIERRE[1], second=0, microsecond=0
+        )
+        tandas.append(
+            {
+                "cierre": cierre.isoformat(),
+                "cierre_texto": f"{_DIAS_LARGOS[cierre.weekday()].lower()} {cierre.day} "
+                f"de {_MESES[cierre.month - 1]} a las {cierre.strftime('%H:%M')}",
+                "claves": [p.clave for p in grupo],
+            }
+        )
+    return tandas
+
+
 def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
     """Arma el bloque JSON de una semana."""
     jugadores = list(semana.picks)
@@ -417,6 +464,7 @@ def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
             for fila in semana.tabla.to_dict("records")
         ]
 
+    bloque["tandas"] = _tandas(semana.partidos)
     bloque["proyectable"] = semana.cerrados >= UMBRAL_SEMANA
     bloque["umbral"] = UMBRAL_SEMANA
     if semana.tabla is not None and not semana.tabla.empty and bloque["proyectable"]:
@@ -617,6 +665,7 @@ def generar_html(
         "podio_listo": podio_listo,
         "cerrados_temporada": cerrados_temporada,
         "umbral_podio": UMBRAL_PODIO,
+        "correo": CORREO_ORGANIZADOR,
         "recarga": SEGUNDOS_RECARGA if hay_juego else 0,
         # Capa en vivo: el navegador consulta ESPN directo. Solo refresca el
         # marcador de partidos que aquí siguen abiertos; jamás cierra uno ni

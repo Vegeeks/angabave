@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 from PIL import Image
 
-from quiniela.espn import ZONA_CDMX, guardar_cache
+from quiniela.espn import ZONA_CDMX, Partido, guardar_cache
 from quiniela.picks import leer_picks
 from quiniela.render_html import SemanaRender, generar_html
 from quiniela.render_png import ANCHO, generar_png
@@ -39,7 +39,14 @@ def armado(tmp_path: Path):
     pendientes = [p for p in resultados if not p.finalizado]
 
     semana2 = SemanaRender(2, resultados, picks, tabla, panorama(pendientes, picks, firmes))
-    semana3 = SemanaRender(3, [sin_empezar("Bears", "Vikings"), sin_empezar("Jets", "Titans")])
+    # Con horarios reales: es lo que necesita el generador de picks para saber
+    # cuándo cierra cada tanda.
+    jueves = datetime(2026, 9, 25, 0, 15, tzinfo=timezone.utc)
+    domingo = datetime(2026, 9, 27, 17, 0, tzinfo=timezone.utc)
+    semana3 = SemanaRender(3, [
+        Partido("Bears", "Vikings", 0, 0, None, False, "Scheduled", jueves),
+        Partido("Jets", "Titans", 0, 0, None, False, "Scheduled", domingo),
+    ])
     general = tabla_general([ruta], dir_cache=dir_cache, ruta_overrides=tmp_path / "no.json")
     return [semana2, semana3], general
 
@@ -295,3 +302,49 @@ def test_hay_animacion_para_los_cambios_de_marcador(armado, tmp_path: Path):
     html = render(armado, tmp_path)
     assert "@keyframes anotacion" in html
     assert "anotaciones.set" in html          # se detecta el cambio
+
+
+def test_las_tandas_cierran_el_dia_anterior_a_las_23_59(tmp_path: Path):
+    """El jueves cierra el miércoles; el domingo y el lunes, el sábado."""
+    from quiniela.render_html import _tandas
+
+    jueves = datetime(2026, 9, 25, 0, 15, tzinfo=timezone.utc)      # jue 24, 18:15 CDMX
+    domingo = datetime(2026, 9, 27, 17, 0, tzinfo=timezone.utc)     # dom 27, 11:00 CDMX
+    lunes = datetime(2026, 9, 29, 0, 15, tzinfo=timezone.utc)       # lun 28, 18:15 CDMX
+
+    tandas = _tandas([
+        Partido("Falcons", "Packers", inicio=jueves),
+        Partido("Chargers", "Bills", inicio=domingo),
+        Partido("Giants", "Rams", inicio=lunes),
+    ])
+    assert len(tandas) == 2
+    assert tandas[0]["claves"] == ["Falcons@Packers"]
+    assert "miércoles 23" in tandas[0]["cierre_texto"] and "23:59" in tandas[0]["cierre_texto"]
+    assert tandas[1]["claves"] == ["Chargers@Bills", "Giants@Rams"]
+    assert "sábado 26" in tandas[1]["cierre_texto"]
+
+
+def test_sin_horarios_no_hay_tandas(tmp_path: Path):
+    from quiniela.render_html import _tandas
+
+    assert _tandas([Partido("Lions", "Bills")]) == []
+
+
+def test_el_generador_de_picks_esta_en_la_semana_pendiente(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert "Arma tu quiniela y mándala" in html
+    assert "quinielanfl@hotmail.com" in html
+    assert "exportarPicks" in html
+    # Las tandas de la semana pendiente viajan con su fecha de cierre.
+    datos = datos_embebidos(html)
+    pendiente = next(s for s in datos["semanas"] if s["estado"] == "pendiente")
+    assert pendiente["tandas"]
+    assert all("cierre_texto" in t and t["claves"] for t in pendiente["tandas"])
+
+
+def test_el_generador_no_manda_nada_por_su_cuenta(armado, tmp_path: Path):
+    """Solo arma la imagen: nada de subir picks ni registrar nada."""
+    html = render(armado, tmp_path)
+    assert "fetch(" in html          # solo la consulta de marcadores
+    assert "method: \"POST\"" not in html and "method:'POST'" not in html
+    assert "FormData" not in html

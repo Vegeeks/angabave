@@ -9,6 +9,30 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.12.0
+
+Generador de picks para la semana que todavía no se carga.
+
+* **"Arma tu quiniela y mándala"**, donde antes solo había un letrero de
+  "picks por cargar". Eliges los partidos que quieras —no tienen que ser todos—
+  y el sitio genera una **imagen membretada** con tu nombre y tus picks.
+* **Se comparte o se descarga** según el teléfono: en móvil abre el menú de
+  compartir con la imagen adjunta; en escritorio la descarga. Y hay un enlace
+  de correo a `quinielanfl@hotmail.com` con el asunto ya puesto.
+* **Dice hasta cuándo se reciben.** Cada tanda muestra su cierre, calculado
+  como las 23:59 del día anterior a su primer partido: la del jueves cierra el
+  miércoles, la del domingo y el lunes cierra el sábado. Si ya pasó, lo marca
+  en rojo.
+* **Lo que elijas se guarda en tu navegador** mientras armas la quiniela, así
+  que puedes cerrar y volver sin perderlo.
+* **No sube ni registra nada.** La tabla la sigue armando el organizador con su
+  compilado; esto solo produce la imagen para mandársela. Hay una prueba que
+  falla si alguien mete un POST o un envío de formulario.
+
+La imagen quedó en **192 KB**: el primer intento pesaba 1.7 MB por un degradado
+de fondo que el PNG no comprime, y esta imagen está hecha para mandarse por
+correo y por WhatsApp.
+
 ## alfa v0.11.0
 
 Identidad visual: tipografía propia, jerarquía y movimiento que informa.

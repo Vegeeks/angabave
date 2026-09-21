@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.11.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.12.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -273,9 +273,13 @@ Qué trae:
   que están en la misma situación y dice en una línea qué les hace falta:
   "Necesita que gane Giants", "Ya aseguraron el primer lugar, compartido". Tu
   fila te habla de tú.
-* Cuando todavía no se sube el Excel de la semana en curso, el sitio publica
-  esa semana con sus partidos programados y el letrero **"Actualizando la
-  semana N"**, en lugar de quedarse en la anterior.
+* Cuando todavía no se sube el Excel de una semana, el sitio la publica con
+  sus partidos programados y, sobre todo, con el **generador de picks**: cada
+  quien elige los suyos, el sitio arma una imagen membretada y la comparte o la
+  descarga para mandarla a `quinielanfl@hotmail.com`. Cada tanda muestra hasta
+  cuándo se reciben —las 23:59 del día anterior a su primer partido— y lo
+  elegido se guarda en el navegador mientras tanto. El sitio no sube ni
+  registra nada: la tabla la sigue armando el organizador.
 
 Todo es responsivo y está pensado primero para el teléfono; se probó desde 320
 px. Las animaciones se apagan solas si el dispositivo pide movimiento reducido.

@@ -581,6 +581,49 @@ input.ancho:focus,select.ancho:focus{outline:0; border-color:var(--acento)}
 /* Foco visible para quien navega con teclado. */
 :focus-visible{outline:2px solid var(--acento); outline-offset:2px; border-radius:8px}
 
+/* ═══════ generador de picks ═══════ */
+.generador{border:1px solid var(--linea2); border-radius:var(--radio); background:var(--panel);
+  padding:.95rem .9rem 1rem; margin-bottom:.9rem; animation:brincar .45s ease both}
+.generador .rot{font-family:var(--rotulo); font-size:.6rem; font-weight:700; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--acento)}
+.generador h3{font-size:clamp(1.05rem,5vw,1.3rem); margin:.2rem 0 .3rem; font-weight:900}
+.generador .pie-gen{font-size:.8rem; color:var(--tenue); line-height:1.4; margin:0 0 .8rem}
+.generador .quien-soy{display:flex; align-items:center; gap:.5rem; margin-bottom:.85rem;
+  flex-wrap:wrap; font-size:.82rem; color:var(--tenue)}
+.generador .quien-soy b{color:var(--txt)}
+.tanda{margin-top:.9rem}
+.tanda:first-of-type{margin-top:.3rem}
+.tanda .cab{display:flex; align-items:baseline; gap:.5rem; flex-wrap:wrap; margin-bottom:.5rem}
+.tanda .cab span{font-family:var(--rotulo); font-size:.64rem; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--tenue2)}
+.tanda .cab em{font-style:normal; font-size:.7rem; color:var(--oro); font-weight:700}
+.tanda .cab em.vencida{color:var(--rojo)}
+.duelo-pick{display:grid; grid-template-columns:1fr auto 1fr; gap:.35rem; align-items:stretch;
+  margin-bottom:.4rem}
+.duelo-pick .vs{display:grid; place-items:center; font-family:var(--rotulo); font-size:.58rem;
+  font-weight:700; color:var(--tenue2); letter-spacing:.1em}
+.opcion{display:flex; align-items:center; gap:.45rem; padding:.5rem .55rem; border-radius:11px;
+  border:1px solid var(--linea); background:var(--panel2); text-align:left; min-width:0;
+  transition:border-color .16s, background .16s, transform .12s}
+.opcion:active{transform:scale(.98)}
+.opcion .sig{font-family:var(--rotulo); font-size:.6rem; font-weight:700; color:#070b12;
+  background:var(--c,var(--tenue2)); padding:.14rem .3rem; border-radius:5px; min-width:2.3rem;
+  text-align:center; flex:0 0 auto}
+.opcion .nom{font-size:.85rem; font-weight:700; color:var(--tenue); overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap}
+.opcion[aria-pressed="true"]{border-color:var(--c); background:color-mix(in srgb, var(--c) 16%, var(--panel2))}
+.opcion[aria-pressed="true"] .nom{color:var(--txt)}
+.acciones-gen{display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:1rem;
+  padding-top:.85rem; border-top:1px solid var(--linea)}
+.acciones-gen .cuenta{font-family:var(--rotulo); font-size:.8rem; font-weight:700; color:var(--tenue);
+  margin-right:auto}
+.boton{padding:.6rem 1rem; border-radius:12px; font-size:.84rem; font-weight:800;
+  background:var(--pastilla); color:var(--pastilla-txt); border:0; transition:opacity .16s}
+.boton:disabled{opacity:.4}
+.boton.suave{background:var(--panel2); color:var(--txt); box-shadow:inset 0 0 0 1px var(--linea2)}
+.aviso-gen{font-size:.74rem; color:var(--tenue2); margin-top:.6rem; line-height:1.4}
+.aviso-gen a{color:var(--acento)}
+
 .invitacion{position:relative; overflow:hidden; border-radius:var(--radio);
   border:1px solid var(--acento); margin-bottom:.9rem; padding:1.05rem 1rem 1rem;
   background:radial-gradient(120% 100% at 0% 0%, var(--resplandor), transparent 60%),
@@ -1550,6 +1593,298 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     return caja;
   }
 
+  /* ═══ generador de picks para la semana que aún no se carga ═══
+     No manda nada ni guarda nada aquí: arma una imagen membretada para que
+     cada quien la mande por su cuenta antes de que cierre la tanda. */
+  const LLAVE_BORRADOR = (n) => "angabave.borrador." + n;
+
+  /* Dibuja el escudo de la marca en el canvas, igual que el del encabezado. */
+  function escudoEnLienzo(ctx, x, y, lado) {
+    const u = lado / 40;
+    ctx.save();
+    ctx.translate(x, y);
+    const escudo = new Path2D(
+      "M20 2.6 L35.2 7.7 V20.8 C35.2 29.7 28.6 36 20 38.4 C11.4 36 4.8 29.7 4.8 20.8 V7.7 Z"
+    );
+    const m = new DOMMatrix([u, 0, 0, u, 0, 0]);
+    const escalado = new Path2D();
+    escalado.addPath(escudo, m);
+    const grad = ctx.createLinearGradient(0, 0, lado, lado);
+    grad.addColorStop(0, "#ffe193");
+    grad.addColorStop(0.55, "#f7c948");
+    grad.addColorStop(1, "#d09617");
+    ctx.fillStyle = grad;
+    ctx.fill(escalado);
+
+    ctx.save();
+    ctx.translate(lado / 2, lado * 0.49);
+    ctx.rotate(-0.47);
+    ctx.fillStyle = "#070b12";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, lado * 0.23, lado * 0.145, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#f7c948";
+    ctx.lineWidth = Math.max(1, lado * 0.022);
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(-lado * 0.12, 0);
+    ctx.lineTo(lado * 0.12, 0);
+    ctx.stroke();
+    ctx.restore();
+    ctx.restore();
+  }
+
+  /* Arma la imagen membretada con los picks elegidos y la comparte o descarga. */
+  async function exportarPicks(s, elegidos, porClave) {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+    const ANCHO = 1080, MARGEN = 56, ALTO_FILA = 96;
+    const claves = s.partidos
+      .map((p) => p.v + "@" + p.l)
+      .filter((clave) => elegidos.has(clave));
+
+    const cabecera = 320;
+    const pie = 96;
+    const alto = cabecera + claves.length * ALTO_FILA + pie;
+
+    const escala = 2;
+    const lienzo = document.createElement("canvas");
+    lienzo.width = ANCHO * escala;
+    lienzo.height = alto * escala;
+    const ctx = lienzo.getContext("2d");
+    ctx.scale(escala, escala);
+
+    const rotulo = (peso, tam) => peso + " " + tam + "px Rotulo, 'Arial Narrow', sans-serif";
+    const cuerpo = (peso, tam) => peso + " " + tam + "px -apple-system, Segoe UI, Roboto, sans-serif";
+
+    // Fondo plano a propósito: un degradado multiplica por diez el peso del PNG
+    // y esta imagen se manda por correo y por WhatsApp.
+    ctx.fillStyle = "#06090f";
+    ctx.fillRect(0, 0, ANCHO, alto);
+    ctx.fillStyle = "#0e1420";
+    ctx.fillRect(0, 0, ANCHO, 140);
+    ctx.fillStyle = "#f7c948";
+    ctx.fillRect(0, 138, ANCHO, 2);
+
+    escudoEnLienzo(ctx, MARGEN, 46, 62);
+    ctx.fillStyle = "#f7c948";
+    ctx.font = rotulo(700, 46);
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText("ANGABAVE", MARGEN + 82, 84);
+    ctx.fillStyle = "#5c6a7e";
+    ctx.font = rotulo(500, 20);
+    ctx.fillText("QUINIELA NFL " + D.anio, MARGEN + 84, 108);
+
+    ctx.strokeStyle = "#222c3b";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(MARGEN, 140);
+    ctx.lineTo(ANCHO - MARGEN, 140);
+    ctx.stroke();
+
+    ctx.fillStyle = "#eaf1f9";
+    ctx.font = rotulo(700, 84);
+    ctx.fillText("SEMANA " + s.n, MARGEN, 226);
+
+    if (jugador !== null) {
+      ctx.fillStyle = "#5b95ff";
+      ctx.font = cuerpo(800, 34);
+      ctx.fillText(nombre(jugador), MARGEN, 272);
+    }
+    ctx.fillStyle = "#8e9cb0";
+    ctx.font = rotulo(500, 22);
+    const cuantos = claves.length === 1 ? "1 PICK" : claves.length + " PICKS";
+    ctx.textAlign = "right";
+    ctx.fillText(cuantos, ANCHO - MARGEN, 226);
+    ctx.textAlign = "left";
+
+    claves.forEach((clave, i) => {
+      const p = porClave.get(clave);
+      const lado = elegidos.get(clave);
+      const elegido = lado === "l" ? p.l : p.v;
+      const rival = lado === "l" ? p.v : p.l;
+      const color = (D.colores[elegido] || {}).local || "#5b95ff";
+      const y = cabecera + i * ALTO_FILA;
+
+      if (i % 2 === 0) {
+        ctx.fillStyle = "#0b1018";
+        ctx.fillRect(MARGEN, y - 30, ANCHO - MARGEN * 2, ALTO_FILA - 12);
+      }
+      ctx.fillStyle = color;
+      ctx.fillRect(MARGEN, y - 30, 6, ALTO_FILA - 12);
+
+      ctx.fillStyle = color;
+      const sigla = D.siglas[elegido] || elegido.slice(0, 3).toUpperCase();
+      ctx.font = rotulo(700, 26);
+      const anchoSigla = ctx.measureText(sigla).width + 22;
+      ctx.beginPath();
+      ctx.roundRect(MARGEN + 24, y - 24, anchoSigla, 38, 8);
+      ctx.fill();
+      ctx.fillStyle = (D.colores[elegido] || {}).local_texto || "#070b12";
+      ctx.fillText(sigla, MARGEN + 35, y + 4);
+
+      ctx.fillStyle = "#eaf1f9";
+      ctx.font = cuerpo(800, 34);
+      ctx.fillText(elegido, MARGEN + 40 + anchoSigla, y + 6);
+
+      ctx.fillStyle = "#5c6a7e";
+      ctx.font = cuerpo(600, 24);
+      ctx.textAlign = "right";
+      ctx.fillText((lado === "l" ? "vs " : "@ ") + rival, ANCHO - MARGEN - 18, y + 4);
+      ctx.textAlign = "left";
+    });
+
+    ctx.strokeStyle = "#222c3b";
+    ctx.beginPath();
+    ctx.moveTo(MARGEN, alto - pie + 18);
+    ctx.lineTo(ANCHO - MARGEN, alto - pie + 18);
+    ctx.stroke();
+    ctx.fillStyle = "#5c6a7e";
+    ctx.font = rotulo(500, 20);
+    const sello = new Date();
+    ctx.fillText(
+      "GENERADO " + sello.toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" })
+        .toUpperCase() + "  ·  MANDAR A " + D.correo.toUpperCase(),
+      MARGEN, alto - pie + 54
+    );
+
+    const blob = await new Promise((listo) => lienzo.toBlob(listo, "image/png"));
+    if (!blob) return;
+    const archivo = new File([blob], "picks-semana-" + s.n + ".png", { type: "image/png" });
+    const titulo = "Picks semana " + s.n + (jugador !== null ? " · " + nombre(jugador) : "");
+
+    // En el teléfono se abre el menú de compartir; en escritorio se descarga.
+    if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+      try {
+        await navigator.share({ files: [archivo], title: titulo, text: titulo });
+        return;
+      } catch (e) { /* si cancela, se descarga igual */ }
+    }
+    const url = URL.createObjectURL(blob);
+    const enlace = document.createElement("a");
+    enlace.href = url;
+    enlace.download = archivo.name;
+    document.body.appendChild(enlace);
+    enlace.click();
+    enlace.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
+  function moduloPicks(s) {
+    const elegidos = new Map();   // clave del partido -> "v" | "l"
+    try {
+      const guardado = JSON.parse(leer(LLAVE_BORRADOR(s.n)) || "{}");
+      Object.entries(guardado).forEach(([clave, lado]) => elegidos.set(clave, lado));
+    } catch (e) { /* borrador ilegible: se empieza de cero */ }
+
+    const caja = crear("div", "generador");
+    caja.appendChild(crear("div", "rot", "Tus picks · semana " + s.n));
+    caja.appendChild(crear("h3", null, "Arma tu quiniela y mándala"));
+    const explica = crear("p", "pie-gen");
+    explica.textContent = "Elige los que quieras —no tienen que ser todos— y genera una " +
+      "imagen para mandarla. Aquí no se guarda ni se registra nada: la tabla la arma el " +
+      "organizador cuando reparte el compilado.";
+    caja.appendChild(explica);
+
+    const quien = crear("div", "quien-soy");
+    if (jugador !== null) {
+      quien.appendChild(document.createTextNode("Van a nombre de "));
+      quien.appendChild(crear("b", null, nombre(jugador)));
+    } else {
+      quien.appendChild(document.createTextNode("Elige tu nombre arriba para que la imagen lo lleve."));
+    }
+    caja.appendChild(quien);
+
+    const porClave = new Map(s.partidos.map((p) => [p.v + "@" + p.l, p]));
+    const ahora = Date.now();
+
+    (s.tandas || []).forEach((tanda) => {
+      const bloque = crear("div", "tanda");
+      const cab = crear("div", "cab");
+      const cuantos = tanda.claves.length;
+      cab.appendChild(crear("span", null, cuantos === 1 ? "1 partido" : cuantos + " partidos"));
+      const cierra = new Date(tanda.cierre);
+      const vencida = cierra.getTime() < ahora;
+      cab.appendChild(crear("em", vencida ? "vencida" : null,
+        vencida ? "cerró el " + tanda.cierre_texto : "hasta el " + tanda.cierre_texto));
+      bloque.appendChild(cab);
+
+      tanda.claves.forEach((clave) => {
+        const p = porClave.get(clave);
+        if (!p) return;
+        const fila = crear("div", "duelo-pick");
+        [["v", p.v], ["l", p.l]].forEach(([lado, eq], i) => {
+          const boton = crear("button", "opcion");
+          boton.type = "button";
+          const color = (D.colores[eq] || {}).local;
+          if (color) boton.style.setProperty("--c", color);
+          boton.setAttribute("aria-pressed", String(elegidos.get(clave) === lado));
+          boton.appendChild(crear("span", "sig", D.siglas[eq] || eq.slice(0, 3).toUpperCase()));
+          boton.appendChild(crear("span", "nom", eq));
+          boton.addEventListener("click", () => {
+            if (elegidos.get(clave) === lado) elegidos.delete(clave);
+            else elegidos.set(clave, lado);
+            fila.querySelectorAll(".opcion").forEach((otro, n) => {
+              otro.setAttribute("aria-pressed",
+                String(elegidos.get(clave) === (n === 0 ? "v" : "l")));
+            });
+            guardar(LLAVE_BORRADOR(s.n), JSON.stringify(Object.fromEntries(elegidos)));
+            refrescar();
+          });
+          if (i === 1) fila.appendChild(crear("span", "vs", "@"));
+          fila.appendChild(boton);
+        });
+        bloque.appendChild(fila);
+      });
+      caja.appendChild(bloque);
+    });
+
+    const acciones = crear("div", "acciones-gen");
+    const cuenta = crear("span", "cuenta");
+    const descargar = crear("button", "boton", "Generar imagen");
+    descargar.type = "button";
+    const limpiar = crear("button", "boton suave", "Borrar");
+    limpiar.type = "button";
+    acciones.appendChild(cuenta);
+    acciones.appendChild(limpiar);
+    acciones.appendChild(descargar);
+    caja.appendChild(acciones);
+
+    const nota = crear("p", "aviso-gen");
+    nota.innerHTML = "Se descarga o se abre el menú de compartir, según tu teléfono. " +
+      'Mándala a <a href="mailto:' + D.correo + '?subject=' +
+      encodeURIComponent("Picks semana " + s.n + (jugador !== null ? " · " + nombre(jugador) : "")) +
+      '">' + D.correo + "</a> con la imagen adjunta.";
+    caja.appendChild(nota);
+
+    function refrescar() {
+      const n = elegidos.size;
+      cuenta.textContent = n === 0 ? "Ninguno elegido"
+        : n + " de " + s.partidos.length + " elegidos";
+      descargar.disabled = n === 0;
+      limpiar.disabled = n === 0;
+    }
+    limpiar.addEventListener("click", () => {
+      elegidos.clear();
+      guardar(LLAVE_BORRADOR(s.n), null);
+      caja.querySelectorAll(".opcion").forEach((b) => b.setAttribute("aria-pressed", "false"));
+      refrescar();
+    });
+    descargar.addEventListener("click", async () => {
+      descargar.disabled = true;
+      const antes = descargar.textContent;
+      descargar.textContent = "Generando…";
+      try {
+        await exportarPicks(s, elegidos, porClave);
+      } finally {
+        descargar.textContent = antes;
+        refrescar();
+      }
+    });
+    refrescar();
+    return caja;
+  }
+
   function aviso(titulo, texto) {
     const n = crear("div", "aviso");
     n.appendChild(crear("strong", null, titulo));
@@ -1975,8 +2310,9 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     if (franja) raiz.appendChild(franja);
 
     if (s.estado === "pendiente") {
-      raiz.appendChild(aviso("Actualizando la semana " + s.n,
-        "Estos son los partidos programados. En cuanto se cargue el compilado aparecen los picks, la tabla y el ganador."));
+      raiz.appendChild(aviso("Todavía no se cargan los picks de la semana " + s.n,
+        "El organizador los reparte y aquí aparecen la tabla y el ganador. Mientras, puedes armar los tuyos y mandarlos."));
+      raiz.appendChild(moduloPicks(s));
       raiz.appendChild(panelPartidos(s));
       return;
     }
