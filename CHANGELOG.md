@@ -9,6 +9,16 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.12.1
+
+* **El sitio ya no se queda pegado en una versión vieja.** GitHub Pages sirve
+  el HTML con `cache-control: max-age=600` y esa cabecera no se puede cambiar
+  publicando por rama, así que cualquiera podía estar diez minutos viendo una
+  copia atrasada —justo en domingo, que es cuando importa—. Ahora se publica
+  `version.json`, de unos cien bytes, y la página lo consulta sin caché cada
+  minuto y medio: si detecta que el sitio se regeneró, se recarga sola con un
+  parámetro nuevo para saltarse el caché.
+
 ## alfa v0.12.0
 
 Generador de picks para la semana que todavía no se carga.

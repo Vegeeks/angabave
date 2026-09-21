@@ -348,3 +348,26 @@ def test_el_generador_no_manda_nada_por_su_cuenta(armado, tmp_path: Path):
     assert "fetch(" in html          # solo la consulta de marcadores
     assert "method: \"POST\"" not in html and "method:'POST'" not in html
     assert "FormData" not in html
+
+
+def test_se_publica_un_sello_de_version(armado, tmp_path: Path):
+    """Pages cachea el HTML diez minutos; este archivo es el que avisa."""
+    import json as _json
+
+    semanas, general = armado
+    generar_html(
+        anio=2026, semanas=semanas, tabla_acumulada=general,
+        ruta_salida=tmp_path / "index.html", momento=MOMENTO,
+    )
+    sello = _json.loads((tmp_path / "version.json").read_text(encoding="utf-8"))
+    assert sello["generado"] == MOMENTO.isoformat()
+    assert sello["version"].startswith("v")
+
+
+def test_la_pagina_vigila_su_propia_version(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert 'fetch("version.json?t="' in html
+    assert 'cache: "no-store"' in html
+    # Y al recargar se salta el caché con un parámetro nuevo.
+    assert "recargarFresco" in html
+    assert "location.reload()" not in html

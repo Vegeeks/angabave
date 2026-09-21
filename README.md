@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.12.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.12.1**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -283,6 +283,10 @@ Qué trae:
 
 Todo es responsivo y está pensado primero para el teléfono; se probó desde 320
 px. Las animaciones se apagan solas si el dispositivo pide movimiento reducido.
+
+**No se queda con copias viejas.** Pages cachea el HTML diez minutos y esa
+cabecera no se puede cambiar. Por eso se publica `docs/version.json`: la página
+lo consulta sin caché y se recarga sola en cuanto el sitio se regenera.
 
 **Se actualiza solo.** El workflow regenera el sitio cada 15 minutos durante
 las ventanas de juego, y la página abierta en un teléfono se recarga sola cada

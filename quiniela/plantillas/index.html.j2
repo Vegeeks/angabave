@@ -2555,7 +2555,31 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     setInterval(consultarVivo, D.vivo.cada * 1000);
     document.addEventListener("visibilitychange", () => { if (!document.hidden) consultarVivo(); });
   }
-  if (D.recarga > 0) setTimeout(() => location.reload(), D.recarga * 1000);
+  /* ═══ que nadie se quede con una copia vieja ═══
+     Pages cachea el HTML diez minutos y esa cabecera no se puede cambiar. Así
+     que se consulta un archivo de cien bytes sin caché; si el sitio se
+     regeneró, se recarga con un parámetro nuevo para saltarse el caché. */
+  function recargarFresco() {
+    const url = new URL(location.href);
+    url.searchParams.set("v", String(Date.now()));
+    location.replace(url.toString());
+  }
+
+  async function revisarVersion() {
+    if (document.hidden) return;
+    try {
+      const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" });
+      if (!r.ok) return;
+      const sello = await r.json();
+      if (sello.generado && D.generado && sello.generado !== D.generado) recargarFresco();
+    } catch (e) { /* sin red o archivo viejo: se sigue con lo que hay */ }
+  }
+
+  setInterval(revisarVersion, 90000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) revisarVersion(); });
+  revisarVersion();
+
+  if (D.recarga > 0) setTimeout(recargarFresco, D.recarga * 1000);
 })();
 </script>
 </body>
