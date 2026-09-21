@@ -2,14 +2,24 @@
   "semana": 2,
   "partidos": [
     {
-      "visitante": "Colts",
-      "local": "Chiefs",
-      "marcador_visitante": 10,
-      "marcador_local": 10,
+      "visitante": "Giants",
+      "local": "Rams",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-09-21T00:20:00+00:00"
+      "estado": "Scheduled",
+      "inicio": "2026-09-22T00:15:00+00:00"
+    },
+    {
+      "visitante": "Lions",
+      "local": "Bills",
+      "marcador_visitante": 31,
+      "marcador_local": 41,
+      "ganador": "Bills",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-18T00:15:00+00:00"
     },
     {
       "visitante": "Panthers",
@@ -142,24 +152,14 @@
       "inicio": "2026-09-20T20:25:00+00:00"
     },
     {
-      "visitante": "Lions",
-      "local": "Bills",
-      "marcador_visitante": 31,
-      "marcador_local": 41,
-      "ganador": "Bills",
+      "visitante": "Colts",
+      "local": "Chiefs",
+      "marcador_visitante": 30,
+      "marcador_local": 33,
+      "ganador": "Chiefs",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-09-18T00:15:00+00:00"
-    },
-    {
-      "visitante": "Giants",
-      "local": "Rams",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-09-22T00:15:00+00:00"
+      "inicio": "2026-09-21T00:20:00+00:00"
     }
   ]
 }
