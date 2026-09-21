@@ -9,6 +9,31 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.11.0
+
+Identidad visual: tipografía propia, jerarquía y movimiento que informa.
+
+* **Tipografía propia.** El sitio usaba una sola familia, la del sistema, y por
+  eso se sentía a panel de control y no a producto de deportes. Ahora los
+  marcadores, las cifras y los rótulos van en **Oswald condensada** (SIL OFL),
+  recortada a mayúsculas y dígitos: pesa **8 KB** y viaja incrustada en el
+  HTML, así que el sitio sigue sin pedirle un archivo a nadie. Los nombres de
+  los participantes siguen en la fuente del sistema a propósito: llevan
+  minúsculas, que el recorte no incluye, y se partirían a media palabra.
+* **Jerarquía.** Los marcadores, los puntos del podio y los montos crecieron de
+  verdad. Antes todo pesaba lo mismo: el ganador de la semana se leía igual que
+  una etiqueta.
+* **El marcador avisa cuando cambia.** Si estabas viendo la pantalla en el
+  momento de la anotación, no pasaba nada: ahora la tarjeta destella y la cifra
+  pulsa un par de veces. Solo cuando el cambio se observa en vivo, no al
+  cargar.
+* **Las cifras cuentan hacia arriba** al entrar, en el podio y en tu resumen de
+  la semana.
+* **Invitación de primera visita.** Un chip gris que decía "Identifícate" no lo
+  iba a ver nadie, y con él se perdía el modo jugador entero. Ahora la primera
+  vez aparece una tarjeta que pregunta cuál de los 34 eres, con el selector a
+  un toque. Se muestra una sola vez.
+
 ## alfa v0.10.0
 
 Los escenarios dicen qué falta, no solo cuánto falta.

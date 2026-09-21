@@ -11,6 +11,7 @@ aunque el navegador no ejecute nada; las vistas por semana se arman al vuelo.
 
 from __future__ import annotations
 
+import base64
 import json
 import logging
 from decimal import Decimal
@@ -50,6 +51,9 @@ _log = logging.getLogger(__name__)
 
 RAIZ = Path(__file__).resolve().parents[1]
 DIR_PLANTILLAS = Path(__file__).resolve().parent / "plantillas"
+#: Fuente de titulares y números, recortada a mayúsculas y dígitos. Se incrusta
+#: en el HTML para no pedirle un archivo a nadie. Licencia en tipografia/OFL.txt.
+RUTA_TIPOGRAFIA = Path(__file__).resolve().parent / "tipografia" / "oswald-recortada.woff2"
 RUTA_SALIDA = RAIZ / "docs" / "index.html"
 
 #: Cómo se llama la quiniela.
@@ -65,7 +69,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.10.0"
+VERSION = "v0.11.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -471,6 +475,14 @@ def _pesos(cantidad) -> str:
     return f"${cantidad:,.2f}"
 
 
+def _tipografia() -> str:
+    """La fuente en base64, lista para meterse en un `src:` del CSS."""
+    if not RUTA_TIPOGRAFIA.exists():
+        _log.warning("No encontré %s; la página usará la fuente del sistema.", RUTA_TIPOGRAFIA)
+        return ""
+    return base64.b64encode(RUTA_TIPOGRAFIA.read_bytes()).decode("ascii")
+
+
 def _entorno() -> Environment:
     return Environment(
         loader=FileSystemLoader(DIR_PLANTILLAS),
@@ -621,6 +633,7 @@ def generar_html(
 
     podio = _armar_podio(general, participantes, reparto) if podio_listo else []
     contexto = {
+        "tipografia": _tipografia(),
         "marca": MARCA,
         "etapa": ETAPA,
         "version": VERSION,

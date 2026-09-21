@@ -18,6 +18,14 @@
 <meta property="og:image" content="tabla.png">
 <title>{{ marca }} · Quiniela NFL {{ anio }}</title>
 <style>
+{% if tipografia %}
+/* Oswald recortada a mayúsculas y números (SIL OFL 1.1, ver
+   quiniela/tipografia/OFL.txt). Va incrustada: el sitio no pide archivos. */
+@font-face{
+  font-family:'Rotulo'; font-style:normal; font-weight:500 700; font-display:swap;
+  src:url(data:font/woff2;base64,{{ tipografia }}) format('woff2');
+}
+{% endif %}
 :root{
   --bg:#06090f; --bg2:#0b1018;
   --panel:#101724; --panel2:#161f2e; --panel3:#1d2838;
@@ -26,6 +34,10 @@
   --oro:#f7c948; --oro2:#ffe193; --plata:#cfd9e6; --bronce:#d58f52;
   --verde:#3ddc84; --rojo:#ff6058; --acento:#5b95ff; --vivo:#ff4757;
   --radio:16px; --sombra:0 16px 48px rgba(0,0,0,.55);
+  /* Solo para mayúsculas y cifras: los nombres llevan minúsculas y usan la
+     del sistema, que las tiene todas. */
+  --rotulo:'Rotulo','Oswald','Arial Narrow',var(--cuerpo);
+  --cuerpo:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
   --campo:rgba(255,255,255,.028);
   --resplandor:rgba(91,149,255,.15); --resplandor2:rgba(247,201,72,.10);
   --alto-encabezado:132px;
@@ -35,7 +47,7 @@
 html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
 body{
   margin:0; background:var(--bg); color:var(--txt); overflow-x:hidden;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-family:var(--cuerpo);
   font-size:16px; line-height:1.45; -webkit-font-smoothing:antialiased;
   background-image:
     radial-gradient(1200px 560px at 8% -16%, var(--resplandor), transparent 60%),
@@ -45,6 +57,21 @@ body{
   transition:background-color .45s ease;
 }
 h1,h2,h3{margin:0; font-weight:800; letter-spacing:-.02em}
+
+/* ═══════ rótulos y cifras ═══════ */
+.rotulo,.titulo h2,.estado,.version,.logo .marca,.logo .sub,
+.campeon .rot,.mi-semana .rot,.mi-semana .dato span,.bolsa-card .rot,.rasgo .rot,
+.lugar .detalle,.lado .sig,.juego .pie,.mi-pick,.bloque-hora span,.cuenta-lado,
+.mini,.sello-consenso,.fila-gan .sN,.perfil .cifra span,.ver-todas,thead th{
+  font-family:var(--rotulo); font-weight:700;
+}
+.lugar .puntos,.lado .mrc,.candidato .pct,.perfil .cifra b,.mi-semana .dato b,
+.bolsa-card .val,.ficha .tot,.medalla,.pts,.err,.sem,.c-pos,.duelo .cara .t,
+.campeon .bolsa,.fila-gan .monto,.split .cab .mr,.barras .col small,.candidato .n{
+  font-family:var(--rotulo); font-variant-numeric:tabular-nums;
+}
+/* Las flechas y los ordinales no están en el recorte: que usen la del sistema. */
+.mov,.ficha .pos{font-family:var(--cuerpo)}
 button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 input,select{font:inherit}
 .oculto{display:none !important}
@@ -88,6 +115,20 @@ header::after{content:""; position:absolute; left:0; right:0; bottom:-1px; heigh
 .punto{width:7px; height:7px; border-radius:50%; background:currentColor; flex:0 0 auto}
 .estado.vivo .punto,.estado.esperando .punto{animation:latir 1.5s ease-in-out infinite}
 @keyframes latir{0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.3; transform:scale(.7)}}
+
+/* El marcador que acaba de cambiar se anuncia: antes podías estar viendo la
+   pantalla en el momento del touchdown y no enterarte. */
+@keyframes anotacion{
+  0%{transform:scale(1); color:var(--txt)}
+  18%{transform:scale(1.35); color:var(--verde)}
+  100%{transform:scale(1); color:var(--txt)}
+}
+.lado.anoto .mrc{animation:anotacion 1.4s cubic-bezier(.2,.8,.3,1) 2}
+.juego.anoto{animation:destello-juego 1.6s ease 2}
+@keyframes destello-juego{
+  0%,100%{box-shadow:0 0 0 1px transparent}
+  30%{box-shadow:0 0 0 1px rgba(61,220,132,.45), 0 8px 28px rgba(61,220,132,.16)}
+}
 
 .identidad{display:flex; align-items:center; gap:.4rem; flex:0 0 auto; max-width:11rem;
   padding:.24rem .5rem .24rem .28rem; border-radius:999px;
@@ -185,8 +226,7 @@ main{padding-bottom:3.5rem}
 .lugar .empatados .gente{justify-content:center}
 .lugar .detalle{font-size:.6rem; color:var(--tenue2); text-transform:uppercase; letter-spacing:.1em}
 .lugar .cifra{text-align:right; flex:0 0 auto}
-.lugar .puntos{font-size:1.75rem; font-weight:900; letter-spacing:-.04em;
-  font-variant-numeric:tabular-nums; line-height:1}
+.lugar .puntos{font-size:2.1rem; font-weight:700; letter-spacing:0; line-height:.95}
 .oro .puntos{color:var(--oro)} .plata .puntos{color:var(--plata)} .bronce .puntos{color:var(--bronce)}
 
 @media (min-width:660px){
@@ -198,13 +238,13 @@ main{padding-bottom:3.5rem}
   .lugar.bronce::before{background:linear-gradient(90deg,#b5773f,#e6b183,#b5773f)}
   .medalla{margin:0 auto .5rem; width:38px; height:38px; font-size:.98rem}
   .lugar .cifra{text-align:center}
-  .lugar .puntos{font-size:2.3rem}
+  .lugar .puntos{font-size:2.9rem}
   .lugar .cuerpo{margin-top:.45rem}
   /* La peana: plata a la izquierda, oro al centro y más alto, bronce a la derecha. */
   .podio .lugar:nth-child(1){order:2; padding-block:1.6rem 1.35rem}
   .podio .lugar:nth-child(2){order:1}
   .podio .lugar:nth-child(3){order:3}
-  .podio .lugar:nth-child(1) .puntos{font-size:2.8rem}
+  .podio .lugar:nth-child(1) .puntos{font-size:3.6rem}
 }
 .lugar .bolsa{font-size:.78rem; font-weight:900; color:var(--oro); margin-top:.2rem;
   padding:.14rem .42rem; border-radius:7px; background:rgba(247,201,72,.12); display:inline-block}
@@ -315,13 +355,13 @@ th.c-sem.vieja,td.c-sem.vieja{display:none}
 @keyframes palpitar{0%,100%{transform:scale(1)} 50%{transform:scale(1.07)}}
 .campeon .rot{font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; font-weight:900; color:var(--tenue)}
 .campeon.oficial .rot{color:var(--oro)}
-.campeon .nombres{font-size:clamp(1.25rem,6.2vw,2rem); font-weight:900; letter-spacing:-.03em;
+.campeon .nombres{font-size:clamp(1.45rem,7.4vw,2.4rem); font-weight:900; letter-spacing:-.03em;
   line-height:1.15; margin:.3rem 0 .1rem; overflow-wrap:anywhere}
 .campeon.oficial .nombres{background:linear-gradient(94deg,#fff,#ffe193 55%,#f7c948);
   -webkit-background-clip:text; background-clip:text; color:transparent}
 .campeon .cifra{font-size:.78rem; color:var(--tenue); margin-top:.15rem}
-.campeon .bolsa{display:inline-block; margin-top:.6rem; padding:.34rem .8rem; border-radius:999px;
-  font-weight:900; font-size:1rem; color:var(--oro);
+.campeon .bolsa{display:inline-block; margin-top:.7rem; padding:.4rem 1rem; border-radius:999px;
+  font-weight:700; font-size:1.35rem; letter-spacing:.01em; color:var(--oro);
   background:rgba(247,201,72,.12); border:1px solid rgba(247,201,72,.3)}
 .campeon.provisional .bolsa{color:var(--tenue); background:rgba(255,255,255,.04); border-color:var(--linea2)}
 .confetis{position:absolute; inset:0; pointer-events:none; overflow:hidden}
@@ -339,7 +379,7 @@ th.c-sem.vieja,td.c-sem.vieja{display:none}
 .mi-semana .rot{font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; color:var(--acento); font-weight:900}
 .mi-semana .cuentas{display:flex; gap:.9rem; margin-left:auto; flex-wrap:wrap}
 .mi-semana .dato{text-align:right}
-.mi-semana .dato b{display:block; font-size:1.25rem; font-weight:900; line-height:1; font-variant-numeric:tabular-nums}
+.mi-semana .dato b{display:block; font-size:1.6rem; font-weight:700; line-height:1}
 .mi-semana .dato span{font-size:.58rem; text-transform:uppercase; letter-spacing:.1em; color:var(--tenue2)}
 .mi-semana .dato.ok b{color:var(--verde)} .mi-semana .dato.no b{color:var(--rojo)}
 .mi-semana .dato.vivo b{color:var(--oro)}
@@ -350,7 +390,7 @@ th.c-sem.vieja,td.c-sem.vieja{display:none}
   background:linear-gradient(180deg,var(--panel2),var(--panel));
   animation:brincar .45s ease both; animation-delay:calc(var(--i)*70ms)}
 .bolsa-card .rot{font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--tenue2); font-weight:900}
-.bolsa-card .val{font-size:clamp(1.5rem,7vw,1.9rem); font-weight:900; letter-spacing:-.03em;
+.bolsa-card .val{font-size:clamp(1.8rem,8.4vw,2.4rem); font-weight:700; letter-spacing:0;
   margin-top:.25rem; color:var(--oro)}
 .bolsa-card .pie{font-size:.73rem; color:var(--tenue2); margin-top:.25rem}
 .bolsa-card.neutra .val{color:var(--txt)}
@@ -387,8 +427,7 @@ th.c-sem.vieja,td.c-sem.vieja{display:none}
   text-align:center; flex:0 0 auto}
 .lado .nom{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--tenue);
   font-weight:700; font-size:.94rem}
-.lado .mrc{font-weight:900; font-size:1.18rem; font-variant-numeric:tabular-nums; color:var(--tenue2);
-  letter-spacing:-.02em}
+.lado .mrc{font-weight:700; font-size:1.5rem; color:var(--tenue2); letter-spacing:0; line-height:1}
 .lado.gana .nom{color:var(--txt); font-weight:900}
 .lado.gana .mrc{color:var(--txt)}
 .lado.gana::after{content:"◀"; font-size:.5rem; color:var(--verde); margin-left:-.25rem}
@@ -462,7 +501,7 @@ input.ancho:focus,select.ancho:focus{outline:0; border-color:var(--acento)}
   animation:asomar .38s ease both; animation-delay:calc(var(--i)*35ms)}
 .candidato .n{color:var(--tenue2); font-weight:900; font-size:.78rem}
 .candidato .quien{font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.candidato .pct{font-weight:900; font-variant-numeric:tabular-nums; color:var(--oro); font-size:.9rem}
+.candidato .pct{font-weight:700; color:var(--oro); font-size:1.15rem; letter-spacing:0}
 .candidato.yo{border-color:rgba(91,149,255,.5); background:rgba(91,149,255,.08)}
 .progreso{grid-column:2/4; height:6px; border-radius:99px; background:var(--linea); overflow:hidden; margin-top:.15rem}
 .progreso i{display:block; height:100%; width:0; border-radius:99px;
@@ -495,7 +534,7 @@ input.ancho:focus,select.ancho:focus{outline:0; border-color:var(--acento)}
 .perfil .nom{font-size:clamp(1.15rem,5.4vw,1.5rem); font-weight:900; letter-spacing:-.02em; overflow-wrap:anywhere}
 .perfil .cerrar{margin-left:auto; font-size:1.1rem; color:var(--tenue2); padding:.1rem .4rem; line-height:1}
 .perfil .cifras{display:flex; gap:1.1rem; flex-wrap:wrap; margin-top:.7rem}
-.perfil .cifra b{display:block; font-size:1.35rem; font-weight:900; line-height:1; font-variant-numeric:tabular-nums}
+.perfil .cifra b{display:block; font-size:1.7rem; font-weight:700; line-height:1}
 .perfil .cifra span{font-size:.58rem; text-transform:uppercase; letter-spacing:.1em; color:var(--tenue2)}
 .barras{display:flex; align-items:flex-end; gap:5px; height:58px; margin-top:.85rem}
 .barras .col{flex:1 1 0; max-width:44px; display:flex; flex-direction:column;
@@ -541,6 +580,20 @@ input.ancho:focus,select.ancho:focus{outline:0; border-color:var(--acento)}
 
 /* Foco visible para quien navega con teclado. */
 :focus-visible{outline:2px solid var(--acento); outline-offset:2px; border-radius:8px}
+
+.invitacion{position:relative; overflow:hidden; border-radius:var(--radio);
+  border:1px solid var(--acento); margin-bottom:.9rem; padding:1.05rem 1rem 1rem;
+  background:radial-gradient(120% 100% at 0% 0%, var(--resplandor), transparent 60%),
+             linear-gradient(180deg,var(--panel2),var(--panel));
+  animation:brincar .5s cubic-bezier(.2,.8,.3,1) both}
+.invitacion .rot{font-family:var(--rotulo); font-size:.6rem; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--acento)}
+.invitacion h3{font-size:clamp(1.1rem,5.2vw,1.4rem); margin:.25rem 0 .3rem; font-weight:900}
+.invitacion p{margin:0 0 .75rem; font-size:.85rem; color:var(--tenue); line-height:1.4}
+.invitacion .fila{display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
+.invitacion select{flex:1 1 160px; margin:0}
+.invitacion .luego{font-size:.78rem; font-weight:700; color:var(--tenue2); padding:.5rem .4rem}
+.invitacion .luego:hover{color:var(--txt)}
 
 .aviso{border:1px dashed var(--linea2); border-radius:var(--radio); padding:1.4rem 1rem; text-align:center;
   color:var(--tenue); font-size:.88rem; background:rgba(16,23,36,.55)}
@@ -886,7 +939,25 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 
   /* ═══ marcador en vivo ═══ */
   const marcadores = new Map();
+  const anotaciones = new Map();   // clave -> cuándo cambió el marcador
+  const SEGUNDOS_ANOTACION = 9;
   let fallosVivo = 0, ultimaConsulta = null;
+
+  /* Una cifra que sube contando se nota; una que aparece ya puesta, no. */
+  function contarHasta(nodo, destino, ms) {
+    if (suave || destino <= 0 || destino > 999) { nodo.textContent = String(destino); return; }
+    const arranque = performance.now();
+    nodo.textContent = "0";
+    const paso = (ahora) => {
+      const avance = Math.min(1, (ahora - arranque) / ms);
+      // Desacelera al final, como un marcador mecánico.
+      const suavizado = 1 - Math.pow(1 - avance, 3);
+      nodo.textContent = String(Math.round(destino * suavizado));
+      if (avance < 1) requestAnimationFrame(paso);
+      else nodo.textContent = String(destino);
+    };
+    requestAnimationFrame(paso);
+  }
 
   function parsearVivo(carga) {
     if (!carga || !Array.isArray(carga.events)) return null;
@@ -933,7 +1004,16 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       if (!r.ok) throw new Error(r.status);
       const frescos = parsearVivo(await r.json());
       if (!frescos) throw new Error("formato inesperado");
-      frescos.forEach((valor, clave) => marcadores.set(clave, valor));
+      frescos.forEach((valor, clave) => {
+        const previo = marcadores.get(clave);
+        if (previo && (previo.mv !== valor.mv || previo.ml !== valor.ml)) {
+          anotaciones.set(clave, {
+            cuando: Date.now(),
+            lado: previo.mv !== valor.mv ? "v" : "l",
+          });
+        }
+        marcadores.set(clave, valor);
+      });
       fallosVivo = 0;
       ultimaConsulta = new Date();
       repintar();
@@ -1047,7 +1127,9 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     [["ok", ok, ok === 1 ? "acierto" : "aciertos"], ["no", mal, mal === 1 ? "fallo" : "fallos"],
      ["vivo", ganando, "ganando"], ["", faltan, "por jugar"]].forEach(([c, v, et]) => {
       const d = crear("div", "dato" + (c ? " " + c : ""));
-      d.appendChild(crear("b", null, String(v)));
+      const cifra = crear("b");
+      contarHasta(cifra, v, 700);
+      d.appendChild(cifra);
       d.appendChild(crear("span", null, et));
       cuentas.appendChild(d);
     });
@@ -1165,7 +1247,10 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 
   function dibujarJuego(caja, s, p, i, orden) {
     const mioEquipo = equipo && (p.v === equipo || p.l === equipo);
-    const nodo = crear("article", "juego" + (p.vivo ? " envivo" : "") + (mioEquipo ? " mi-equipo" : ""));
+    const anotacion = anotaciones.get(p.v + "@" + p.l);
+    const reciente = anotacion && (Date.now() - anotacion.cuando) < SEGUNDOS_ANOTACION * 1000;
+    const nodo = crear("article", "juego" + (p.vivo ? " envivo" : "") +
+      (mioEquipo ? " mi-equipo" : "") + (reciente ? " anoto" : ""));
     nodo.style.setProperty("--i", Math.min(orden, 12));
     if (mioEquipo) {
       const cinta = crear("div", "cinta-equipo");
@@ -1173,7 +1258,8 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       nodo.appendChild(cinta);
     }
     [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, eq, marcador]) => {
-      const linea = crear("div", "lado" + (p.g === lado ? " gana" : ""));
+      const linea = crear("div", "lado" + (p.g === lado ? " gana" : "") +
+        (reciente && anotacion.lado === lado ? " anoto" : ""));
       const color = (D.colores[eq] || {}).local;
       if (color) linea.style.setProperty("--c", color);
       linea.appendChild(crear("span", "sig", D.siglas[eq] || eq.slice(0, 3).toUpperCase()));
@@ -1424,6 +1510,43 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       "pueden estar atrasados."
     ));
     caja.appendChild(texto);
+    return caja;
+  }
+
+  /* Un chip que dice "Identifícate" no lo ve nadie. Esto sí, una sola vez. */
+  const LLAVE_INVITACION = "angabave.invitado";
+  function invitacion() {
+    if (jugador !== null || leer(LLAVE_INVITACION) === "no") return null;
+
+    const caja = crear("div", "invitacion");
+    caja.appendChild(crear("div", "rot", "Primera vez por aquí"));
+    caja.appendChild(crear("h3", null, "¿Cuál de los " + D.participantes.length + " eres?"));
+    caja.appendChild(crear("p", null,
+      "Elígete una vez y el portal se vuelve tuyo: marca tus picks partido por " +
+      "partido, resalta tu fila y te dice qué necesitas para ganar la semana."));
+
+    const fila = crear("div", "fila");
+    const lista = crear("select", "ancho");
+    lista.innerHTML = '<option value="">Elige tu nombre</option>';
+    D.participantes.map((q, i) => [i, q]).sort((a, b) => a[1].localeCompare(b[1], "es"))
+      .forEach(([i, q]) => { const o = crear("option", null, q); o.value = String(i); lista.appendChild(o); });
+    lista.addEventListener("change", () => {
+      if (lista.value === "") return;
+      jugador = Number(lista.value);
+      guardar("angabave.jugador", D.participantes[jugador]);
+      guardar(LLAVE_INVITACION, "no");
+      selSoy.value = String(jugador);
+      cajaSoy.classList.toggle("puesto", true);
+      pintarIdentidad();
+      repintar();
+    });
+    fila.appendChild(lista);
+
+    const luego = crear("button", "luego", "Ahora no");
+    luego.type = "button";
+    luego.addEventListener("click", () => { guardar(LLAVE_INVITACION, "no"); repintar(); });
+    fila.appendChild(luego);
+    caja.appendChild(fila);
     return caja;
   }
 
@@ -1832,6 +1955,9 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     raiz.textContent = "";
     if (!s) return;
 
+    const bienvenida = invitacion();
+    if (bienvenida) raiz.appendChild(bienvenida);
+
     const titulo = crear("div", "titulo");
     titulo.appendChild(crear("h2", null, "Semana " + s.n));
     if (s.estado === "en_vivo" && ultimaConsulta && fallosVivo === 0) {
@@ -2016,7 +2142,25 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
   /* La tabla general viene escrita en el HTML: aquí se marca tu fila,
      se hace clicable y se le agrega el buscador. */
   let generalLista = false;
+  /* El podio viene escrito en el HTML; aquí sus cifras arrancan de cero. */
+  let podioAnimado = false;
+  function animarPodio() {
+    if (podioAnimado || suave) return;
+    podioAnimado = true;
+    vistas.general.querySelectorAll(".lugar .puntos").forEach((nodo, i) => {
+      const destino = Number(nodo.textContent);
+      if (!Number.isFinite(destino)) return;
+      nodo.textContent = "0";
+      setTimeout(() => contarHasta(nodo, destino, 900), 180 + i * 110);
+    });
+  }
+
   function marcarFilasPropias() {
+    animarPodio();
+    const previa = vistas.general.querySelector(".invitacion");
+    if (previa) previa.remove();
+    const bienvenida = invitacion();
+    if (bienvenida) vistas.general.insertBefore(bienvenida, vistas.general.firstChild);
     const filas = vistas.general.querySelectorAll("tbody tr");
     if (!generalLista && filas.length > 12) {
       generalLista = true;

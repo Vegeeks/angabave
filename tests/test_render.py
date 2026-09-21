@@ -263,3 +263,35 @@ def test_la_semana_en_curso_queda_destacada(armado, tmp_path: Path):
     assert datos["activa"] == 2
     # La pastilla de la semana activa lleva su marca.
     assert 'data-vista="2"' in html and 'class="actual"' in html
+
+
+def test_la_tipografia_viaja_dentro_del_html(armado, tmp_path: Path):
+    """La fuente va incrustada: el sitio no pide un solo archivo de afuera."""
+    html = render(armado, tmp_path)
+    assert "@font-face" in html
+    assert "src:url(data:font/woff2;base64," in html
+    # Y sigue sin haber más direcciones externas que la de los marcadores.
+    externas = set(re.findall(r"https?://[^\s\"'<>]+", html))
+    externas.discard("http://www.w3.org/2000/svg")
+    assert externas == {"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"}
+
+
+def test_la_fuente_solo_se_usa_en_mayusculas_y_cifras(armado, tmp_path: Path):
+    """Los nombres llevan minúsculas: si usaran la recortada, se partirían."""
+    html = render(armado, tmp_path)
+    reglas = re.findall(r"([^{}]+)\{[^{}]*var\(--rotulo\)[^{}]*\}", html)
+    selectores = " ".join(reglas)
+    for nombres in (".c-nombre", ".lugar .quien", ".campeon .nombres", ".ficha .quien"):
+        assert nombres not in selectores
+
+
+def test_la_invitacion_de_primera_visita_existe(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert "Primera vez por aquí" in html
+    assert "angabave.invitado" in html       # se recuerda que ya la vio
+
+
+def test_hay_animacion_para_los_cambios_de_marcador(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert "@keyframes anotacion" in html
+    assert "anotaciones.set" in html          # se detecta el cambio

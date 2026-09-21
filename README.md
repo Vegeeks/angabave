@@ -7,7 +7,7 @@ estático y como una imagen lista para WhatsApp.
 El trabajo semanal se reduce a subir el Excel a `data/picks/`. Lo demás corre
 solo: GitHub Actions recalcula cada 15 minutos durante los partidos.
 
-Versión **alfa v0.10.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
+Versión **alfa v0.11.0**. El historial está en [CHANGELOG.md](CHANGELOG.md).
 
 ## Instalación
 
@@ -211,8 +211,8 @@ cuáles se aplicaron y qué decía la API.
 
 ## El sitio
 
-`docs/index.html` es **un solo archivo**: HTML, CSS, JavaScript y la temporada
-entera en JSON, todo adentro. No hay servidor, ni CDN, ni peticiones de red al
+`docs/index.html` es **un solo archivo**: HTML, CSS, JavaScript, la tipografía
+y la temporada entera en JSON, todo adentro. No hay servidor, ni CDN, ni peticiones de red al
 abrirlo. Se regenera completo en cada corrida.
 
 Qué trae:
@@ -253,6 +253,10 @@ Qué trae:
   altura de la página.
 * **Se guarda como app**: al agregarlo a la pantalla de inicio en iPhone o
   Android usa el logo propio y abre a pantalla completa.
+* **Tipografía propia** incrustada (Oswald recortada, 8 KB) para marcadores,
+  cifras y rótulos. Ver `quiniela/tipografia/LEEME.md`.
+* **El marcador avisa cuando cambia** en vivo, y las cifras cuentan al entrar.
+* **Invitación de primera visita** para que cada quien se identifique una vez.
 * **Modo jugador**: en el encabezado eliges tu nombre y el sitio se vuelve
   tuyo. Cada partido de la semana se pinta según tu pick —verde si vas
   ganando, rojo si vas perdiendo, gris si no empieza— con un resumen de
