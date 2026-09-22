@@ -6,9 +6,9 @@
       "local": "Rams",
       "marcador_visitante": 6,
       "marcador_local": 28,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Rams",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-22T00:15:00+00:00"
     },
     {
