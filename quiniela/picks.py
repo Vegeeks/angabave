@@ -39,6 +39,7 @@ __all__ = [
     "ErrorFormatoExcel",
     "PicksAlteradosError",
     "RUTA_SELLOS",
+    "huellas_por_partido",
     "verificar_sello",
     "clave_participante",
     "leer_picks",
@@ -114,7 +115,10 @@ def _es_fila_de_equipos(fila: tuple, columnas: range) -> bool:
     """¿Todas las celdas con contenido de esta fila son equipos válidos?"""
     valores = [_texto(fila[columna]) for columna in columnas if columna < len(fila)]
     con_contenido = [valor for valor in valores if valor]
-    if len(con_contenido) < 2:
+    # Basta un equipo: la hoja del jueves trae un solo partido. Lo que sostiene
+    # la búsqueda no es cuántos equipos hay, sino que la fila de visitantes y la
+    # de locales vengan pegadas y todas sus celdas sean equipos válidos.
+    if not con_contenido:
         return False
     for valor in con_contenido:
         try:
@@ -414,63 +418,119 @@ def _leer_sellos(ruta_sellos: Path) -> dict:
         raise ErrorPicks(f"El archivo de sellos {ruta} no es JSON válido: {error}") from error
 
 
+def huellas_por_partido(ruta: Path) -> dict[str, str]:
+    """SHA-256 de los picks de cada partido, por separado.
+
+    Se sella partido por partido y no el archivo entero porque el organizador
+    reparte la jornada en tandas: la del jueves cierra el miércoles y la del
+    domingo el sábado, así que llegan dos hojas distintas de la misma semana.
+    Con la huella por partido, la segunda hoja puede traer partidos nuevos sin
+    que nada truene, y a la vez sigue siendo imposible cambiar un pick de un
+    partido ya jugado.
+    """
+    partidos, picks = leer_picks(Path(ruta))
+    huellas: dict[str, str] = {}
+    for indice, partido in enumerate(partidos):
+        renglones = sorted(
+            f"{clave_participante(nombre)}={elegidos[indice]}"
+            for nombre, elegidos in picks.items()
+        )
+        huellas[partido.clave] = hashlib.sha256(
+            "\n".join(renglones).encode("utf-8")
+        ).hexdigest()
+    return huellas
+
+
+def _sellados_previos(registro: dict, ruta: Path, semana: int) -> dict[str, str]:
+    """Los partidos ya sellados, convirtiendo el formato viejo si hace falta.
+
+    El formato viejo guardaba la huella del archivo completo. Solo se puede
+    convertir si el archivo sigue siendo idéntico: entonces su contenido está
+    probado y las huellas por partido que salen de él valen lo mismo.
+    """
+    if "partidos" in registro:
+        return dict(registro["partidos"])
+    sha_viejo = registro.get("sha256")
+    if not sha_viejo:
+        return {}
+    if huella(ruta) == sha_viejo:
+        return huellas_por_partido(ruta) if registro.get("congelado") else {}
+    if registro.get("congelado"):
+        raise PicksAlteradosError(
+            f"Los picks de la semana {semana} cambiaron después de que arrancó la jornada.\n"
+            f"  archivo sellado: {registro.get('archivo')} el {registro.get('sellado')}\n"
+            f"  huella sellada:  {sha_viejo}\n"
+            f"  huella actual:   {huella(ruta)}\n"
+            "Con partidos ya jugados, un cambio en los picks no puede darse por bueno. "
+            "Revisa el historial de git; si el cambio es legítimo, borra esa semana de "
+            "sellos.json a propósito."
+        )
+    return {}
+
+
 def verificar_sello(
     ruta: Path,
     semana: int,
-    ya_empezo: bool,
+    arrancados,
     ruta_sellos: Path = RUTA_SELLOS,
-) -> bool:
-    """Congela los picks de una semana en cuanto arranca su primer partido.
+) -> set[str]:
+    """Congela los picks de cada partido en cuanto ese partido arranca.
 
-    Devuelve True si acaba de sellar. Lanza `PicksAlteradosError` si el archivo
-    cambió después del sellado: eso significa que alguien tocó los picks con
-    resultados ya en la mano.
+    `arrancados` son las claves de los partidos que ya empezaron. Devuelve las
+    que acaba de sellar. Lanza `PicksAlteradosError` si el pick de un partido ya
+    arrancado cambió o desapareció del archivo: eso solo puede significar que
+    alguien tocó los picks con el resultado ya en la mano.
     """
     ruta, ruta_sellos = Path(ruta), Path(ruta_sellos)
     sellos = _leer_sellos(ruta_sellos)
     clave = str(semana)
-    actual = huella(ruta)
-    previo = sellos.get(clave)
+    registro = sellos.get(clave) or {}
+    sellados = _sellados_previos(registro, ruta, semana)
+    convertido = "partidos" not in registro and bool(sellados)
 
-    if previo and previo.get("sha256") != actual:
-        if ya_empezo:
+    huellas = huellas_por_partido(ruta)
+    for partido, sha in sellados.items():
+        if partido not in huellas:
             raise PicksAlteradosError(
-                f"Los picks de la semana {semana} cambiaron después de que arrancó la "
-                f"jornada.\n"
-                f"  archivo sellado: {previo.get('archivo')} el {previo.get('sellado')}\n"
-                f"  huella sellada:  {previo.get('sha256')}\n"
-                f"  huella actual:   {actual}\n"
-                "Con partidos ya jugados, un cambio en los picks no puede darse por bueno. "
-                "Revisa el historial de git; si el cambio es legítimo, borra esa semana de "
+                f"Los picks del partido {partido} (semana {semana}) desaparecieron del "
+                f"archivo {ruta.name}, y ese partido ya había arrancado.\n"
+                "Los picks de un partido jugado no se borran. Revisa el historial de git."
+            )
+        if huellas[partido] != sha:
+            raise PicksAlteradosError(
+                f"Los picks del partido {partido} (semana {semana}) cambiaron después de "
+                f"que arrancó.\n"
+                f"  archivo sellado: {registro.get('archivo')} el {registro.get('sellado')}\n"
+                f"  huella sellada:  {sha}\n"
+                f"  huella actual:   {huellas[partido]}\n"
+                "Con el partido ya jugado, un cambio en sus picks no puede darse por bueno. "
+                "Revisa el historial de git; si el cambio es legítimo, borra ese partido de "
                 f"{ruta_sellos.name} a propósito."
             )
-        _log.warning(
-            "Los picks de la semana %d cambiaron; como no ha empezado la jornada, actualizo el sello.",
-            semana,
+
+    nuevos = {
+        partido: huellas[partido]
+        for partido in arrancados
+        if partido in huellas and partido not in sellados
+    }
+    if nuevos or convertido or not registro:
+        sellados.update(nuevos)
+        _guardar_sello(sellos, clave, ruta, sellados, ruta_sellos)
+    if nuevos:
+        _log.info(
+            "Sellé %d partido(s) de la semana %d: %s.",
+            len(nuevos), semana, ", ".join(sorted(nuevos)),
         )
-        previo = None
-
-    if not ya_empezo:
-        # Todavía se puede corregir: el sello se mantiene al día sin congelar.
-        if previo is None:
-            _guardar_sello(sellos, clave, ruta, actual, ruta_sellos, congelado=False)
-        return False
-
-    if previo is None:
-        _guardar_sello(sellos, clave, ruta, actual, ruta_sellos, congelado=True)
-        _log.info("Sellé los picks de la semana %d: ya arrancó la jornada.", semana)
-        return True
-    return False
+    return set(nuevos)
 
 
 def _guardar_sello(
-    sellos: dict, clave: str, ruta: Path, sha: str, ruta_sellos: Path, congelado: bool
+    sellos: dict, clave: str, ruta: Path, sellados: dict[str, str], ruta_sellos: Path
 ) -> None:
     sellos[clave] = {
         "archivo": ruta.name,
-        "sha256": sha,
         "sellado": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "congelado": congelado,
+        "partidos": dict(sorted(sellados.items())),
     }
     ruta_sellos.parent.mkdir(parents=True, exist_ok=True)
     ruta_sellos.write_text(

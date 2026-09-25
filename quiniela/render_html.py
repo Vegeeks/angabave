@@ -70,7 +70,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.13.0"
+VERSION = "v0.14.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -330,20 +330,29 @@ class SemanaRender:
     tabla: pd.DataFrame | None = None
     #: participante -> {"gana_solo": n, "empata": n}, solo si quedan pendientes.
     panorama: dict[str, dict[str, int]] | None = None
+    #: Partidos de esa semana de la NFL que la quiniela todavía no tiene. El
+    #: organizador reparte por tandas, así que la hoja del jueves llega días
+    #: antes que la del resto y la semana se publica a medias.
+    faltantes: list[Partido] = field(default_factory=list)
 
     @property
     def cerrados(self) -> int:
         return sum(1 for partido in self.partidos if partido.finalizado)
 
     @property
+    def total(self) -> int:
+        """Los de la jornada completa, tenga o no la quiniela sus picks."""
+        return len(self.partidos) + len(self.faltantes)
+
+    @property
     def pendientes(self) -> int:
-        return len(self.partidos) - self.cerrados
+        return self.total - self.cerrados
 
     @property
     def estado(self) -> str:
         if not self.picks:
             return "pendiente"
-        if self.cerrados == len(self.partidos):
+        if self.cerrados == self.total:
             return "cerrada"
         return "en_vivo"
 
@@ -466,7 +475,7 @@ def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
         "n": semana.numero,
         "estado": semana.estado,
         "cerrados": semana.cerrados,
-        "total": len(semana.partidos),
+        "total": semana.total,
         "partidos": [_describir(partido) for partido in partidos],
         "jugadores": [indice_global[nombre] for nombre in jugadores],
         "picks": matriz,
@@ -488,6 +497,12 @@ def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
         ]
 
     bloque["tandas"] = _tandas(partidos)
+    # Los que todavía no llegan siguen necesitando picks: el generador tiene que
+    # seguir ahí aunque la semana ya esté a medias en el sitio.
+    por_entregar = [p for p in semana.faltantes if not p.finalizado]
+    por_entregar = [por_entregar[i] for i in _orden_nfl(por_entregar)]
+    bloque["por_entregar"] = [_describir(partido) for partido in por_entregar]
+    bloque["tandas_por_entregar"] = _tandas(por_entregar)
     bloque["proyectable"] = semana.cerrados >= UMBRAL_SEMANA
     bloque["umbral"] = UMBRAL_SEMANA
     if semana.tabla is not None and not semana.tabla.empty and bloque["proyectable"]:

@@ -65,3 +65,33 @@ def test_formato_desconocido(tmp_path: Path):
     ruta.write_text("nada", encoding="utf-8")
     with pytest.raises(ErrorPicks, match="No sé leer"):
         leer_picks(ruta)
+
+
+def test_hoja_de_una_sola_tanda(tmp_path: Path):
+    """El organizador manda el jueves aparte: un partido y la rejilla centrada.
+
+    Ahí los nombres empiezan mucho más a la derecha que en la hoja completa, así
+    que el margen de la columna de nombres no se puede dar por fijo.
+    """
+    ruta = crear_pdf(
+        tmp_path / "Quiniela 3 Jueves.pdf",
+        enfrentamientos=[("Falcons", "Packers")],
+        picks={"Ismael Reyna": ["Packers"], "Emir Ibarra": ["Falcons"]},
+        semana=3,
+        centrado=True,
+    )
+    semana, visitantes, locales, participantes = extraer_rejilla(ruta)
+    assert (semana, visitantes, locales) == (3, ["Falcons"], ["Packers"])
+    assert participantes == [("Ismael Reyna", ["Packers"]), ("Emir Ibarra", ["Falcons"])]
+
+
+def test_la_hoja_centrada_tambien_ignora_los_totales(tmp_path: Path):
+    ruta = crear_pdf(
+        tmp_path / "Semana_03.pdf",
+        enfrentamientos=[("Falcons", "Packers")],
+        picks={"Ismael Reyna": ["Packers"]},
+        semana=3,
+        centrado=True,
+    )
+    _, picks = leer_picks(ruta)
+    assert picks == {"Ismael Reyna": ["Packers"]}

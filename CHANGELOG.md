@@ -9,6 +9,39 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.14.0
+
+* **La semana puede llegar en partes.** El organizador manda la hoja del jueves
+  aparte del resto, porque esa tanda cierra el miércoles y la del domingo el
+  sábado. Ahora el proyecto lee esa hoja suelta y publica la semana con los
+  partidos que ya tiene; cuando llega la hoja completa, la reemplaza sin más.
+
+  Tres cosas tuvieron que ceder para eso:
+
+  * **El margen de la columna de nombres ya no es un número fijo.** La hoja de
+    una sola tanda viene centrada y los nombres empiezan pasados los 160 pt, no
+    antes de los 110. Ahora el margen se deduce de la celda "Semana N", que es
+    justo el encabezado de esa columna.
+  * **Una hoja puede traer un solo partido.** La búsqueda del encabezado pedía
+    al menos dos equipos por fila; ahora le basta uno, y lo que sostiene la
+    búsqueda sigue siendo que las filas de visitantes y locales vengan pegadas
+    y que todas sus celdas sean equipos válidos.
+  * **El aviso de partidos que faltan se agrupa.** Con quince partidos por
+    llegar eran quince líneas en cada corrida; ahora es una sola, y dice que
+    seguramente es una tanda sin repartir.
+
+* **El sello es por partido, no por semana.** Antes se congelaba la jornada
+  entera en cuanto arrancaba el primer partido, y eso ya no corresponde a cómo
+  cierra la quiniela: con el jueves jugado, los picks del domingo todavía se
+  entregan hasta el sábado a las 23:59. Ahora cada partido se congela cuando
+  arranca **ese** partido.
+
+  Es más estricto donde importa y más fiel a las reglas: sigue siendo imposible
+  cambiar el pick de un partido ya jugado —y el error dice cuál—, pero la
+  segunda hoja de la semana entra sin pelear. Los sellos de las semanas 1 y 2 se
+  convierten solos al formato nuevo, y solo si el archivo sigue siendo idéntico:
+  si cambió, truena igual que antes.
+
 ## alfa v0.13.0
 
 * **Los partidos van en el orden de la NFL**: por hora de inicio —jueves,

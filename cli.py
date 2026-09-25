@@ -142,18 +142,23 @@ def imprimir_tabla(tabla: pd.DataFrame, titulo: str) -> None:
 
 
 def _sellar(ruta: Path, semana: int, resultados) -> None:
-    """Congela los picks en cuanto arranca el primer partido de la semana.
+    """Congela los picks de cada partido en cuanto ese partido arranca.
 
     Es la única vía real de trampa que queda: los picks viven en el repo y solo
-    se cambian con un push autenticado, pero un cambio hecho con resultados ya
+    se cambian con un push autenticado, pero un cambio hecho con el resultado ya
     en la mano no se puede dar por bueno. Aquí truena.
+
+    Se sella partido por partido, no la semana entera, porque la jornada cierra
+    por tandas: con el jueves ya jugado, los picks del domingo todavía se pueden
+    entregar y el organizador manda esa hoja aparte.
     """
     ahora = datetime.now(timezone.utc)
-    ya_empezo = any(
-        partido.finalizado or (partido.inicio is not None and partido.inicio <= ahora)
+    arrancados = {
+        partido.clave
         for partido in resultados
-    )
-    verificar_sello(ruta, semana, ya_empezo)
+        if partido.finalizado or (partido.inicio is not None and partido.inicio <= ahora)
+    }
+    verificar_sello(ruta, semana, arrancados)
 
 
 def _cargar_semana(semana: int, anio: int, sin_red: bool):
@@ -200,7 +205,11 @@ def construir_semanas(anio: int, semana_activa: int, sin_red: bool) -> list[Sema
                 "Semana %d: %d combinaciones posibles con %d partidos abiertos.",
                 numero, 2 ** len(pendientes), len(pendientes),
             )
-        construidas.append(SemanaRender(numero, alineados, picks, tabla, vista))
+        cargados = {partido.clave for partido in alineados}
+        faltantes = [r for r in resultados if r.clave not in cargados]
+        construidas.append(
+            SemanaRender(numero, alineados, picks, tabla, vista, faltantes)
+        )
     return construidas
 
 
@@ -268,7 +277,7 @@ def comando_actualizar(argumentos) -> int:
     lider = general.iloc[0]
     _log.info(
         "Semana %d lista: %d de %d partidos cerrados. Lidera %s con %d.",
-        semana, activa.cerrados, len(activa.partidos), lider["participante"], lider["acumulado"],
+        semana, activa.cerrados, activa.total, lider["participante"], lider["acumulado"],
     )
     print(f"{html}\n{png}")
     return 0

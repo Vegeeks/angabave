@@ -26,8 +26,11 @@ _log = logging.getLogger(__name__)
 _TOLERANCIA_FILA = 2.0
 #: Tolerancia horizontal para asignar un fragmento a una columna.
 _TOLERANCIA_COLUMNA = 20.0
-#: Los nombres de participante viven en el margen izquierdo.
-_MARGEN_NOMBRES = 110.0
+#: Ancho que se le concede a la columna de nombres a partir de la celda
+#: "Semana N", que es su encabezado. No se fija un margen absoluto porque el
+#: organizador manda la hoja de una sola tanda centrada, no pegada a la
+#: izquierda: ahí los nombres empiezan pasados los 160 pt.
+_HOLGURA_NOMBRES = 20.0
 
 _RE_SEMANA = re.compile(r"semana\s*(\d{1,2})", re.IGNORECASE)
 
@@ -95,17 +98,21 @@ def extraer_rejilla(ruta: Path) -> tuple[int, list[str], list[str], list[tuple[s
     filas = _agrupar_en_filas(_fragmentos(ruta))
     alturas = sorted(filas, reverse=True)
 
-    # La fila de locales es la que lleva "Semana N" en la primera columna.
+    # La fila de locales es la que lleva "Semana N" en la primera columna. Esa
+    # celda encabeza la columna de nombres, así que también marca dónde termina
+    # el margen izquierdo: los nombres son más largos y empiezan a su izquierda.
     y_locales = None
     semana = None
+    margen = 0.0
     for altura in alturas:
-        for x, texto in filas[altura]:
-            if x < _MARGEN_NOMBRES:
-                encontrado = _RE_SEMANA.search(texto)
-                if encontrado:
-                    y_locales, semana = altura, int(encontrado.group(1))
-                    break
-        if y_locales is not None:
+        celdas = sorted(filas[altura])
+        if not celdas:
+            continue
+        x, contenido = celdas[0]
+        encontrado = _RE_SEMANA.search(contenido)
+        if encontrado:
+            y_locales, semana = altura, int(encontrado.group(1))
+            margen = x + _HOLGURA_NOMBRES
             break
     if y_locales is None:
         raise ErrorPDF(
@@ -118,18 +125,18 @@ def extraer_rejilla(ruta: Path) -> tuple[int, list[str], list[str], list[tuple[s
     if not candidatas:
         raise ErrorPDF(f"{ruta.name}: no hay ninguna fila arriba de la de locales.")
     y_visitantes = max(
-        candidatas, key=lambda a: sum(1 for x, _ in filas[a] if x > _MARGEN_NOMBRES)
+        candidatas, key=lambda a: sum(1 for x, _ in filas[a] if x > margen)
     )
 
     encabezado = sorted(filas[y_visitantes])
-    visitantes = [t for x, t in encabezado if x > _MARGEN_NOMBRES]
-    columnas = [x for x, _ in encabezado if x > _MARGEN_NOMBRES]
+    visitantes = [t for x, t in encabezado if x > margen]
+    columnas = [x for x, _ in encabezado if x > margen]
     if not visitantes:
         raise ErrorPDF(f"{ruta.name}: la fila de visitantes salió vacía.")
 
     # Todo lo que esté a la derecha del último partido es la columna de totales.
     limite_totales = max(columnas) + _TOLERANCIA_COLUMNA + 5
-    locales = [t for x, t in sorted(filas[y_locales]) if _MARGEN_NOMBRES < x < limite_totales]
+    locales = [t for x, t in sorted(filas[y_locales]) if margen < x < limite_totales]
 
     if len(visitantes) != len(locales):
         raise ErrorPDF(
@@ -142,7 +149,7 @@ def extraer_rejilla(ruta: Path) -> tuple[int, list[str], list[str], list[tuple[s
         if altura >= y_locales:
             continue
         orden = sorted(filas[altura])
-        if not orden or orden[0][0] > _MARGEN_NOMBRES:
+        if not orden or orden[0][0] > margen:
             continue
         nombre = orden[0][1]
         picks = [""] * len(visitantes)

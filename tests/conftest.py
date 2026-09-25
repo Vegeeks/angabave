@@ -101,21 +101,38 @@ def excel_s2(tmp_path: Path) -> Path:
     return crear_excel(tmp_path / "Semana_02.xlsx")
 
 
-def crear_pdf(ruta: Path, enfrentamientos=None, picks=None, semana: int = 2) -> Path:
+def crear_pdf(
+    ruta: Path,
+    enfrentamientos=None,
+    picks=None,
+    semana: int = 2,
+    *,
+    centrado: bool = False,
+) -> Path:
     """Arma un PDF mínimo con la rejilla de la quiniela.
 
     No es un PDF completo, pero sí tiene lo que lee `quiniela.pdf`: un flujo
     comprimido con fragmentos de texto posicionados. Así las pruebas no
     dependen de un archivo real del organizador.
+
+    Con `centrado` arma la hoja como la manda el organizador cuando trae una
+    sola tanda: la rejilla corrida a la derecha y los nombres colgados de una
+    misma orilla, de modo que los largos empiezan antes que "Semana N".
     """
     import zlib
 
     enfrentamientos = enfrentamientos if enfrentamientos is not None else ENFRENTAMIENTOS_S2
     picks = picks if picks is not None else PICKS_S2
 
-    x_nombre = 20.0
-    x_primera = 120.0
+    x_nombre = 180.0 if centrado else 20.0
+    x_primera = 280.0 if centrado else 120.0
     paso = 30.0
+
+    def x_de(celda: str) -> float:
+        """En la hoja centrada los nombres cuelgan de la misma orilla derecha."""
+        if not centrado:
+            return x_nombre
+        return x_nombre + (len("Semana 99") - len(celda)) * 3.0
     y_visitantes, y_locales = 555.0, 517.0
 
     fragmentos: list[tuple[float, float, str]] = []
@@ -123,7 +140,8 @@ def crear_pdf(ruta: Path, enfrentamientos=None, picks=None, semana: int = 2) -> 
         x = x_primera + indice * paso
         fragmentos.append((y_visitantes, x, visitante))
         fragmentos.append((y_locales, x, local))
-    fragmentos.append((y_locales, x_nombre, f"Semana {semana}"))
+    etiqueta = f"Semana {semana}"
+    fragmentos.append((y_locales, x_de(etiqueta), etiqueta))
     # La columna de totales, a la derecha del último partido.
     x_totales = x_primera + len(enfrentamientos) * paso
     fragmentos.append((y_locales + 8, x_totales, "Aciertos"))
@@ -131,7 +149,7 @@ def crear_pdf(ruta: Path, enfrentamientos=None, picks=None, semana: int = 2) -> 
 
     for fila, (participante, elegidos) in enumerate(picks.items()):
         y = y_locales - 14 * (fila + 1)
-        fragmentos.append((y, x_nombre, participante))
+        fragmentos.append((y, x_de(participante), participante))
         for indice, pick in enumerate(elegidos):
             if pick:
                 fragmentos.append((y, x_primera + indice * paso, pick))

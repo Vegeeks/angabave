@@ -51,6 +51,13 @@ git add data/picks && git commit -m "Semana 3" && git push
 El push dispara el workflow solo. De ahí en adelante no hay que hacer nada más
 en toda la semana: durante los partidos el sitio se recalcula cada dos minutos.
 
+**La semana puede llegar en partes.** El organizador manda la hoja del jueves
+aparte, porque esa tanda cierra el miércoles y la del domingo el sábado. Esa
+hoja se importa igual —un solo partido y la rejilla centrada, el lector la
+reconoce— y la semana se publica a medias: el encabezado dice "1 de 16", no se
+corona ganador, y el generador de picks sigue abajo con los partidos que faltan.
+Cuando llega la hoja completa se importa encima con `--forzar` y ya.
+
 Si el cron de GitHub no arranca el directo —pasa, ver **Automatización**—, se
 lanza a mano:
 
@@ -135,10 +142,16 @@ sitio publicado es de solo lectura, no hay formulario ni endpoint que reciba
 nada. Pero queda un riesgo real, y es que alguien con acceso edite los picks
 **después** de que empezaron los partidos.
 
-Para eso están los sellos. En cuanto arranca el primer partido de una semana se
-guarda la huella SHA-256 del archivo en `data/sellos.json`. Si más adelante el
-archivo cambia, el cálculo truena con las dos huellas y no publica nada. Antes
-del arranque se siguen pudiendo corregir los picks con toda libertad.
+Para eso están los sellos. **El sello es por partido, no por semana**: en cuanto
+arranca un partido se guarda en `data/sellos.json` la huella SHA-256 de los picks
+de *ese* partido. Si más adelante alguno cambia o desaparece, el cálculo truena
+diciendo cuál y no publica nada.
+
+Va por partido y no por jornada porque la quiniela cierra por tandas: con el
+jueves ya jugado, los picks del domingo se siguen recibiendo hasta el sábado a
+las 23:59, y la segunda hoja de la semana tiene que poder entrar. Lo que queda
+prohibido es exactamente lo que importa: cambiar el pick de un partido que ya se
+jugó.
 
 Como el sello vive en el repo, cualquier cambio queda además en el historial de
 git con fecha y autor.

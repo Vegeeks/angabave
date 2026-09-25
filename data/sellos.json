@@ -1,14 +1,53 @@
 {
   "1": {
     "archivo": "Semana_01.xlsx",
-    "sha256": "f5e36c3069669c3f2cf7bf90050ffd915ce8e4a11e897757e5027fb8c691da29",
-    "sellado": "2026-09-21T14:25:57+00:00",
-    "congelado": true
+    "sellado": "2026-09-25T13:28:05+00:00",
+    "partidos": {
+      "49ers@Rams": "4ff07535525a94651f54518fed9d08d6dee7a088a7f4113a80485af74dc8f10e",
+      "Bears@Panthers": "fbfeab1ac031f18f745859bb0631e330241eca432943a07f9fbc6fb638991233",
+      "Bills@Texans": "179e63026ec6fcfd1ae854b2ae4d0ba688ddd82b111b8b39c888bc3deb485b51",
+      "Broncos@Chiefs": "e3fa11abfedb8dc7971270997f43fc306a8b19b1b277ea68950454fefc0a9979",
+      "Browns@Jaguars": "02f5e8cb6e9a68a2bc80729fda268f368f8b1b70b3955c609970929b3bb88588",
+      "Buccaneers@Bengals": "fdb7e0c4d6280bad0bc40b902996d9c7b27b9172b7d9aab9d05f6370c9d76c75",
+      "Cardinals@Chargers": "c540460fc057050c8501e4900be92914e02867cbbeca87ab320aeb2308bd27b8",
+      "Cowboys@Giants": "d8e605b981297edf73ff5bf586bb1f132fba7da7efc14cd0d880600110165bf8",
+      "Dolphins@Raiders": "10e2644565cfb1d34b87ca0046526941588f3f31f00fcbbba4669e2ae605622a",
+      "Falcons@Steelers": "ea11840471cc7c9ba3de6349ca81e96555683f4590cb9c86b68a1980baec6901",
+      "Jets@Titans": "9c8dc8536d46b4a9945adafb57e3d1f8835892d7a3a423de02b9d25e4f60f43a",
+      "Packers@Vikings": "98b1efed26b1c11bf53ace968cbde7d77596c6df9108619c8e96426f9874296e",
+      "Patriots@Seahawks": "307cac1e4f0f96ea6faac0909478c9c1859b41335fbcbe232cf7c897ea06a1a3",
+      "Ravens@Colts": "f9f2d79f43b70bf531e52e88e357b4a664e0bccb0c25a61cb707e5e75f265aed",
+      "Saints@Lions": "3a0e71baff008815c66840d8a0b8fc0f8a8c94efbd67945609c528bd867f7812",
+      "Washington@Eagles": "b673540a153bc056901f610fc1bffa6f4ccdd69a9760c4978a64cb7eab927c1a"
+    }
   },
   "2": {
     "archivo": "Semana_02.xlsx",
-    "sha256": "ab14dc3585731808191721f0544d222133d1504182da7cd0aec88757f8031d7d",
-    "sellado": "2026-09-21T14:25:57+00:00",
-    "congelado": true
+    "sellado": "2026-09-25T13:28:05+00:00",
+    "partidos": {
+      "Bengals@Texans": "ca4443be7a6ab37190d4b315fd80dee211f2de78708950f70057ce4f36d1c8c9",
+      "Browns@Buccaneers": "7ed43807218dcc54e384381002494d37d60e226fd0901c7ae48ff65a7c80a692",
+      "Colts@Chiefs": "16d30eb0a8591380acb5920dc332ef744275dd0f17a27867ae9743a69626785e",
+      "Dolphins@49ers": "ab68f8b606d9202b6368cd7b56b552528350a7e6a876bb8cbcc0f8b6bc79ce1f",
+      "Eagles@Titans": "b8f8fc72261a3b3ffba85561f79cf2d87c49a97710346c88e622d11d918b7085",
+      "Giants@Rams": "437cccafd69f76db74cecf670b3c602193fd203a8b795de7176945bd52c204d2",
+      "Jaguars@Broncos": "2fa15ad1e7e96f4a03ef06d4175f1fc19542eb11c1192465b51f22b4addd0c0d",
+      "Lions@Bills": "cf6047353c1f0126c033f3cc0dcececd33fc6213132fa12fd1fb479711bc96cf",
+      "Packers@Jets": "d516bc4bf36bd118c59bb780402170670d7cb3c80ca106d25e2e712366181b9e",
+      "Panthers@Falcons": "1a801f9310178809f15ffe3eec1cc2490c4e556fa9c330c8f1466331813dc246",
+      "Raiders@Chargers": "1dfad56eccf7555dfcecabf03f85e94465ba1cf9fc2ecba877c92ee434495c0d",
+      "Saints@Ravens": "7e3e19220a3a412286dee4222fc8c14590be26253b3737922136516adac35f28",
+      "Seahawks@Cardinals": "353a5f25590c410b3f86f4b9e101571c408e698f81213958fd917990bda789bb",
+      "Steelers@Patriots": "6343d9d37ce28d7516837c70d734fee000dc5354378ebd4929cb0be828c6a10b",
+      "Vikings@Bears": "f92acb772069123524f9915cedef08ca97371cb1cad8144bd331beb0a86a14b8",
+      "Washington@Cowboys": "e31da252fed7e82e113213b40b6198111c779d9f151b9cd8746f348dec74a933"
+    }
+  },
+  "3": {
+    "archivo": "Semana_03.pdf",
+    "sellado": "2026-09-25T13:28:05+00:00",
+    "partidos": {
+      "Falcons@Packers": "27b98c543d7bc129cd03da9eaae039eeb503c7746e22ee9c261ebe2a08339c12"
+    }
   }
 }

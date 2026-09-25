@@ -77,8 +77,18 @@ def emparejar_resultados(partidos: list[Partido], resultados: list[Partido]) -> 
             "Estos enfrentamientos del Excel no existen en el calendario de la NFL de esa "
             "semana: " + ", ".join(faltantes) + ". Revisa la captura o usa data/overrides.json."
         )
-    for sobrante in por_clave:
-        _log.warning("El partido %s se juega esta semana pero no está en la quiniela.", sobrante)
+    if por_clave:
+        # Cuando falta casi toda la semana no es un error de captura: es que el
+        # organizador todavía no manda esa tanda. Un solo aviso en vez de quince.
+        sobrantes = ", ".join(sorted(por_clave))
+        if len(por_clave) == 1:
+            _log.warning("El partido %s se juega esta semana pero no está en la quiniela.", sobrantes)
+        else:
+            _log.warning(
+                "Faltan %d partidos de esta semana en la quiniela, seguramente por tandas "
+                "todavía sin repartir: %s.",
+                len(por_clave), sobrantes,
+            )
     return alineados
 
 

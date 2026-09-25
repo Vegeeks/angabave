@@ -1770,7 +1770,7 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
 
-  function moduloPicks(s) {
+  function moduloPicks(s, lista, tandas, parcial) {
     const elegidos = new Map();   // clave del partido -> "v" | "l"
     try {
       const guardado = JSON.parse(leer(LLAVE_BORRADOR(s.n)) || "{}");
@@ -1781,7 +1781,10 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     caja.appendChild(crear("div", "rot", "Tus picks · semana " + s.n));
     caja.appendChild(crear("h3", null, "Arma tu quiniela y mándala"));
     const explica = crear("p", "pie-gen");
-    explica.textContent = "Elige los que quieras —no tienen que ser todos— y genera una " +
+    explica.textContent = (parcial
+      ? "Estos son los partidos de la semana que el organizador todavía no reparte. "
+      : "") +
+      "Elige los que quieras —no tienen que ser todos— y genera una " +
       "imagen para mandarla. Aquí no se guarda ni se registra nada: la tabla la arma el " +
       "organizador cuando reparte el compilado.";
     caja.appendChild(explica);
@@ -1795,10 +1798,10 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     }
     caja.appendChild(quien);
 
-    const porClave = new Map(s.partidos.map((p) => [p.v + "@" + p.l, p]));
+    const porClave = new Map((lista || []).map((p) => [p.v + "@" + p.l, p]));
     const ahora = Date.now();
 
-    (s.tandas || []).forEach((tanda) => {
+    (tandas || []).forEach((tanda) => {
       const bloque = crear("div", "tanda");
       const cab = crear("div", "cab");
       const cuantos = tanda.claves.length;
@@ -2309,10 +2312,19 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     const franja = avisoDeRezago(s);
     if (franja) raiz.appendChild(franja);
 
+    const porRepartir = (s.por_entregar || []).length;
+    if (s.estado !== "pendiente" && porRepartir) {
+      const cierre = (s.tandas_por_entregar || [])[0];
+      raiz.appendChild(aviso(
+        "Faltan " + porRepartir + " partidos de esta semana",
+        "El organizador todavía no reparte esa tanda. Puedes armar tus picks aquí abajo" +
+        (cierre ? " hasta el " + cierre.cierre_texto : "") + "."));
+    }
+
     if (s.estado === "pendiente") {
       raiz.appendChild(aviso("Todavía no se cargan los picks de la semana " + s.n,
         "El organizador los reparte y aquí aparecen la tabla y el ganador. Mientras, puedes armar los tuyos y mandarlos."));
-      raiz.appendChild(moduloPicks(s));
+      raiz.appendChild(moduloPicks(s, s.partidos, s.tandas, false));
       raiz.appendChild(panelPartidos(s));
       return;
     }
@@ -2351,6 +2363,14 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     else if (pestana === "partidos") raiz.appendChild(panelPartidos(s));
     else if (pestana === "picks") raiz.appendChild(panelReparto(s));
     else raiz.appendChild(panelEscenarios(s));
+
+    /* El organizador reparte por tandas: la hoja del jueves llega días antes
+       que la del resto. Mientras falten partidos por repartir, el generador
+       sigue abajo, después de la tabla, que es lo que se viene a ver. */
+    const faltan = (s.por_entregar || []);
+    if (faltan.length) {
+      raiz.appendChild(moduloPicks(s, faltan, s.tandas_por_entregar, true));
+    }
   }
 
   /* La corredera sigue a la pestaña activa en vez de pintarle un fondo fijo. */
