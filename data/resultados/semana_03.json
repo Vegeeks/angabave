@@ -4,11 +4,11 @@
     {
       "visitante": "Falcons",
       "local": "Packers",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
+      "marcador_visitante": 35,
+      "marcador_local": 14,
+      "ganador": "Falcons",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-25T00:15:00+00:00"
     },
     {
