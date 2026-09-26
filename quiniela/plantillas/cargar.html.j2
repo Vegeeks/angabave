@@ -67,7 +67,8 @@ button{appearance:none; border:0; border-radius:12px; font:inherit; font-weight:
 .datos li{display:flex; justify-content:space-between; gap:12px; background:var(--panel2); border-radius:10px;
   padding:9px 12px; font-size:.93rem}
 .datos li b{font-variant-numeric:tabular-nums}
-h2{font-size:.72rem; font-family:var(--rotulo); letter-spacing:.18em; color:var(--tenue); margin:18px 0 6px; font-weight:700}
+h2{font-size:.72rem; font-family:var(--rotulo); letter-spacing:.18em; text-transform:uppercase; color:var(--tenue);
+  margin:18px 0 6px; font-weight:700}
 .lista{margin:0; padding-left:1.1rem; font-size:.93rem}
 .lista li{margin:.25rem 0}
 .error{background:rgba(255,96,88,.08); border:1px solid rgba(255,96,88,.35); border-radius:12px; padding:12px 14px;
@@ -279,7 +280,7 @@ footer{margin-top:22px; text-align:center; font-size:.78rem; color:var(--tenue)}
         return;
       }
       if (!respuesta.ok) {
-        aviso("❌", "No se subió", await error(respuesta)).append(botonOtra("Intentar de nuevo"));
+        aviso("❌", "No se cargó", await error(respuesta)).append(botonOtra("Intentar de nuevo"));
         return;
       }
       const { id } = await respuesta.json();

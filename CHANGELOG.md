@@ -9,6 +9,12 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.16.1
+
+* Página del enlace: los rótulos chicos van en mayúsculas, como en el portal (la
+  fuente recortada no tiene minúsculas), y un envío que no se pudo revisar dice
+  "No se cargó" en vez de "No se subió", que contradecía al texto de abajo.
+
 ## alfa v0.16.0
 
 * **Carga por enlace, sin cuenta de nada.** Quien carga la semana recibe su
