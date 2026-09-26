@@ -171,6 +171,10 @@ def revisar_token(valor: str, consultar=_github) -> None:
 
 def token() -> None:
     """Guarda en Supabase el token de GitHub con el que la función pide revisar cada carga."""
+    print("Si todavía no tienes el token, créalo con este formulario (ya viene lleno):\n")
+    print(f"  {FORMA_TOKEN}\n")
+    print("Lo único que falta elegir: en «Repository access», «Only select repositories» → angabave.")
+    print("Luego «Generate token» y cópialo.\n")
     print("Pega el token de GitHub (no se ve mientras lo pegas) y oprime Enter:")
     valor = getpass.getpass(prompt="").strip()
     revisar_token(valor)
@@ -184,7 +188,7 @@ def main(argumentos: list[str] | None = None) -> int:
     sub.add_parser("nueva", help="crea un enlace e imprime la liga").add_argument("nombre")
     sub.add_parser("quitar", help="anula el enlace de alguien").add_argument("nombre")
     sub.add_parser("lista", help="quién tiene enlace")
-    sub.add_parser("token", help=f"guarda el token de GitHub de la función; se crea en {FORMA_TOKEN}")
+    sub.add_parser("token", help="guarda el token de GitHub de la función (una vez)")
     opciones = parser.parse_args(argumentos)
     try:
         if opciones.accion == "nueva":

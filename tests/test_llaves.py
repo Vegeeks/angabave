@@ -122,3 +122,12 @@ def test_un_token_bueno_pasa_y_uno_viejo_ni_se_consulta():
 def test_el_formulario_del_token_viene_prellenado():
     assert "target_name=Vegeeks" in llaves.FORMA_TOKEN and "actions=write" in llaves.FORMA_TOKEN
     assert "expires_in=366" in llaves.FORMA_TOKEN
+
+
+@pytest.mark.parametrize("argumentos", [["--help"], ["nueva", "--help"], ["quitar", "--help"],
+                                        ["lista", "--help"], ["token", "--help"]])
+def test_la_ayuda_no_truena(argumentos, capsys):
+    """Un % en un texto de ayuda hacía tronar --help (argparse lo toma como formato)."""
+    with pytest.raises(SystemExit) as salida:
+        llaves.main(argumentos)
+    assert salida.value.code == 0 and "usage" in capsys.readouterr().out

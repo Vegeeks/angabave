@@ -18,6 +18,9 @@ La versión se muestra junto a la marca en el portal y vive en
   contador tenía el mismo error ("5 de 1 elegidos"). Ahora los dos salen de los
   partidos que ofrece el generador, y el borrador guardado ya no cuenta picks de
   partidos que dejaron de ofrecerse. Hay prueba para que no vuelva.
+* `herramientas/llaves.py --help` tronaba: el enlace del formulario del token
+  traía un `%` que argparse toma como formato. Ahora `token` muestra ese enlace
+  al correr, antes de pedir el token.
 
 ## alfa v0.16.1
 
