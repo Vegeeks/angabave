@@ -61,8 +61,11 @@ aparte, porque esa tanda cierra el miércoles y la del domingo el sábado. Esa
 hoja se importa igual —un solo partido y la rejilla centrada, el lector la
 reconoce— y la semana se publica a medias: el encabezado dice "1 de 16", no se
 corona ganador, y el generador de picks sigue abajo con los partidos que faltan.
-Cuando llega el resto se carga igual: si es la semana completa la reemplaza, y
-si es solo la tanda que faltaba se junta con la del jueves.
+Lo demás se carga igual, cuando llegue y en las partes que sea. La hoja
+completa reemplaza la semana. Una hoja parcial **suma**: agrega los partidos
+que falten, corrige los que repite si no han empezado y conserva los que no
+trae. O sea que se puede mandar el jueves el miércoles, el resto el sábado, y
+si a alguna hoja se le olvidó un partido, después solo ese.
 
 Si el cron de GitHub no arranca el directo —pasa, ver **Automatización**—, se
 lanza a mano:
@@ -255,9 +258,10 @@ hilo.
 4. Que no se salte una semana.
 5. Que cada partido exista esa semana en el calendario de la NFL, con local y
    visitante en su lugar (si viene al revés, lo dice).
-6. Cómo encaja con lo que ya estaba: semana nueva, la tanda que faltaba (se
-   juntan si los participantes son los mismos), o la semana entera otra vez. Una
-   hoja que repite parte de lo cargado y omite otra parte se rechaza.
+6. Cómo encaja con lo que ya estaba: semana nueva, la semana entera otra vez
+   (reemplaza), o una hoja parcial que suma: agrega los partidos que falten,
+   corrige los que repite y conserva los que no trae. Para sumar, los
+   participantes tienen que ser los mismos; si no, dice quién sobra o falta.
 7. Que no cambie, aparezca ni desaparezca ningún pick de un partido que ya
    empezó. Se compara contra lo publicado y además contra los sellos.
 

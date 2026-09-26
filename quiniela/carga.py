@@ -16,9 +16,9 @@ Qué se revisa, en este orden:
 4. Que no se salte ninguna semana.
 5. Que cada partido exista en el calendario de la NFL de esa semana, con el
    local y el visitante en su lugar.
-6. Cómo encaja con lo que ya estaba: semana nueva, la tanda que faltaba, o la
-   semana entera otra vez. Una hoja que repite parte de lo cargado y omite otra
-   parte se rechaza: no hay forma segura de adivinar qué quiso decir.
+6. Cómo encaja con lo que ya estaba: semana nueva, la semana entera otra vez,
+   o una hoja que suma: agrega los partidos que falten, corrige los que repite
+   y conserva los que no trae.
 7. Que no cambie ni un pick de un partido que ya empezó.
 
 Nada se escribe hasta que todo cuadra. El archivo que se guarda lo escribe este
@@ -353,7 +353,16 @@ def _leer_guardada(ruta: Path, numero: int) -> Hoja:
 def _combinar(
     actual: Hoja | None, hoja: Hoja, avisos: list[str]
 ) -> tuple[str, list[Partido], dict[str, list[str]]]:
-    """Decide cómo entra la hoja: semana nueva, tanda nueva o semana otra vez."""
+    """Decide cómo entra la hoja en lo que ya estaba cargado de la semana.
+
+    * Nada cargado: semana nueva.
+    * La hoja trae todo lo cargado (o más): es la semana otra vez y la reemplaza.
+    * Si no, la hoja **suma**: agrega los partidos que falten, de los que repite
+      se queda con lo nuevo y lo que no trae se conserva. Así el organizador
+      puede mandar solo el jueves, luego solo lo que falte, o solo los partidos
+      que quiera corregir. Que nada cambie en un partido ya empezado lo cuida
+      aparte `_proteger_arrancados`.
+    """
     if actual is None:
         return "nueva", list(hoja.partidos), dict(hoja.picks)
 
@@ -361,39 +370,47 @@ def _combinar(
     ahora = {partido.clave for partido in hoja.partidos}
     if ahora >= antes:
         return "reemplazo", list(hoja.partidos), dict(hoja.picks)
-    if not ahora & antes:
-        return ("tanda", *_juntar(actual, hoja, avisos))
-
-    faltan = sorted(antes - ahora)
-    raise ErrorCarga(
-        f"La hoja repite {len(ahora & antes)} partido(s) que ya estaban cargados, pero le "
-        f"faltan otros {len(faltan)} que también estaban ({', '.join(faltan)}). Manda la semana "
-        "completa, o solo la tanda que falta."
-    )
+    partidos, picks = _sumar(actual, hoja, avisos)
+    return ("tanda" if ahora - antes else "reemplazo"), partidos, picks
 
 
-def _juntar(
+def _sumar(
     actual: Hoja, hoja: Hoja, avisos: list[str]
 ) -> tuple[list[Partido], dict[str, list[str]]]:
-    """Pega una tanda nueva a la que ya estaba. Los participantes deben ser los mismos."""
+    """Suma la hoja a lo que ya estaba. Los participantes tienen que ser los mismos.
+
+    Sin los mismos participantes no hay forma de armar la semana: quien falte en
+    la hoja se quedaría sin pick en los partidos nuevos, y quien sobre, sin pick
+    en los que ya estaban.
+    """
     antes = {clave_participante(nombre): nombre for nombre in actual.picks}
     ahora = {clave_participante(nombre): nombre for nombre in hoja.picks}
     if set(antes) != set(ahora):
-        partes = ["Para juntar esta tanda con la que ya estaba, los participantes tienen que ser los mismos."]
+        partes = [
+            "Para sumar esta hoja a lo que ya estaba cargado, los participantes tienen que ser los mismos."
+        ]
         solo_antes = sorted(antes[c] for c in set(antes) - set(ahora))
         solo_ahora = sorted(ahora[c] for c in set(ahora) - set(antes))
         if solo_antes:
             partes.append(f"No vienen en esta hoja: {', '.join(solo_antes)}.")
         if solo_ahora:
-            partes.append(f"Vienen en esta hoja pero no en la anterior: {', '.join(solo_ahora)}.")
+            partes.append(f"Vienen en esta hoja pero no en lo cargado: {', '.join(solo_ahora)}.")
         raise ErrorCarga(" ".join(partes))
+
+    columna_antes = {partido.clave: i for i, partido in enumerate(actual.partidos)}
+    columna_ahora = {partido.clave: i for i, partido in enumerate(hoja.partidos)}
+    partidos = list(actual.partidos) + [p for p in hoja.partidos if p.clave not in columna_antes]
 
     picks: dict[str, list[str]] = {}
     for clave, nombre in ahora.items():
         if antes[clave] != nombre:
             avisos.append(f"{antes[clave]!r} ahora viene escrito {nombre!r}; me quedo con lo nuevo.")
-        picks[nombre] = actual.picks[antes[clave]] + hoja.picks[nombre]
-    return list(actual.partidos) + list(hoja.partidos), picks
+        viejos, nuevos = actual.picks[antes[clave]], hoja.picks[nombre]
+        picks[nombre] = [
+            nuevos[columna_ahora[p.clave]] if p.clave in columna_ahora else viejos[columna_antes[p.clave]]
+            for p in partidos
+        ]
+    return partidos, picks
 
 
 def _en_orden_nfl(

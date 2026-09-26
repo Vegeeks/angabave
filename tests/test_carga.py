@@ -220,19 +220,72 @@ def test_pero_si_se_puede_cambiar_uno_que_no_ha_empezado(entorno, tmp_path):
     assert resultado.aceptado and resultado.accion == "reemplazo"
 
 
-def test_una_hoja_que_repite_parte_y_omite_parte_se_rechaza(entorno, tmp_path):
-    entorno.recibir(_archivo(
-        tmp_path, "a.xlsx", semana=1,
-        enfrentamientos=ENFRENTAMIENTOS_S2[:2], picks={n: e[:2] for n, e in PICKS_S2.items()},
-    ))
+def _tanda(tmp_path, nombre, desde, hasta, picks=None, semana=1):
+    """Una hoja con solo los partidos [desde, hasta) de la semana de prueba."""
+    picks = picks if picks is not None else PICKS_S2
+    return _archivo(
+        tmp_path, nombre, semana=semana,
+        enfrentamientos=ENFRENTAMIENTOS_S2[desde:hasta],
+        picks={n: e[desde:hasta] for n, e in picks.items()},
+    )
+
+
+def test_el_jueves_luego_el_domingo_y_luego_el_lunes(entorno, tmp_path):
+    """Una tanda por vez, como las reparte el organizador."""
+    assert entorno.recibir(_tanda(tmp_path, "jueves.xlsx", 0, 1)).accion == "nueva"
+    entorno.empezados, entorno.ahora = {JUEVES}, DESPUES_DEL_JUEVES
+    assert entorno.recibir(_tanda(tmp_path, "domingo.xlsx", 1, 14)).accion == "tanda"
+    resultado = entorno.recibir(_tanda(tmp_path, "lunes.xlsx", 14, 16))
+    assert resultado.accion == "tanda" and resultado.partidos_cargados == 16
+    assert leer_hoja(resultado.destino).picks == PICKS_S2
+
+
+def test_si_a_la_hoja_le_falta_un_partido_se_carga_despues_solo_ese(entorno, tmp_path):
+    entorno.recibir(_tanda(tmp_path, "jueves.xlsx", 0, 1))
+    sin_el_ultimo = entorno.recibir(_tanda(tmp_path, "casi.xlsx", 1, 15))
+    assert sin_el_ultimo.partidos_cargados == 15 and "Faltan 1 partido" in reporte_markdown(sin_el_ultimo)
+    resultado = entorno.recibir(_tanda(tmp_path, "el-que-faltaba.xlsx", 15, 16))
+    assert resultado.accion == "tanda" and resultado.partidos_cargados == 16
+    assert leer_hoja(resultado.destino).picks == PICKS_S2
+
+
+def test_una_hoja_que_repite_parte_y_trae_otros_suma(entorno, tmp_path):
+    """Repite el partido 2 (con un pick corregido), trae el 3 y no trae el 1: el 1 se conserva."""
+    entorno.recibir(_tanda(tmp_path, "a.xlsx", 0, 2))
+    corregidos = _picks(Ismael_Reyna=(1, "Falcons"))
+    resultado = entorno.recibir(_tanda(tmp_path, "b.xlsx", 1, 3, picks=corregidos))
+    assert resultado.aceptado and resultado.accion == "tanda" and resultado.partidos_cargados == 3
+    assert any("Se agregan 1 partido" in c for c in resultado.cambios)
+    assert any("Ismael Reyna cambia Panthers → Falcons" in c for c in resultado.cambios)
+    guardada = leer_hoja(resultado.destino)
+    assert guardada.picks["Ismael Reyna"] == [PICKS_S2["Ismael Reyna"][0], "Falcons", PICKS_S2["Ismael Reyna"][2]]
+
+
+def test_una_hoja_solo_con_correcciones_corrige_esos_y_deja_lo_demas(entorno, tmp_path):
+    entorno.recibir(_archivo(tmp_path, "Quiniela 1.xlsx", semana=1))
+    corregidos = _picks(Ismael_Reyna=(3, "Vikings"))
+    resultado = entorno.recibir(_tanda(tmp_path, "correccion.xlsx", 3, 4, picks=corregidos))
+    assert resultado.accion == "reemplazo" and resultado.partidos_cargados == 16
+    esperado = list(PICKS_S2["Ismael Reyna"])
+    esperado[3] = "Vikings"
+    assert leer_hoja(resultado.destino).picks["Ismael Reyna"] == esperado
+
+
+def test_una_correccion_suelta_no_toca_un_partido_ya_empezado(entorno, tmp_path):
+    entorno.recibir(_archivo(tmp_path, "Quiniela 1.xlsx", semana=1))
+    entorno.empezados, entorno.ahora = {JUEVES}, DESPUES_DEL_JUEVES
     foto = _foto(entorno)
-    resultado = entorno.recibir(_archivo(
-        tmp_path, "b.xlsx", semana=1,
-        enfrentamientos=ENFRENTAMIENTOS_S2[1:3], picks={n: e[1:3] for n, e in PICKS_S2.items()},
-    ))
-    assert not resultado.aceptado
-    assert "repite 1 partido" in resultado.error and JUEVES in resultado.error
+    tramposos = _picks(Tristan_Mejia=(0, "Bills"))
+    resultado = entorno.recibir(_tanda(tmp_path, "solo-jueves.xlsx", 0, 1, picks=tramposos))
+    assert not resultado.aceptado and JUEVES in resultado.error and "Tristan Mejia" in resultado.error
     assert _intacto(entorno, foto)
+
+
+def test_una_hoja_que_suma_con_otros_participantes_no_entra(entorno, tmp_path):
+    entorno.recibir(_tanda(tmp_path, "a.xlsx", 0, 2))
+    sin_ismael = {n: e for n, e in PICKS_S2.items() if n != "Ismael Reyna"}
+    resultado = entorno.recibir(_tanda(tmp_path, "b.xlsx", 1, 3, picks=sin_ismael))
+    assert not resultado.aceptado and "No vienen en esta hoja: Ismael Reyna" in resultado.error
 
 
 def test_una_tanda_con_otros_participantes_no_se_junta(entorno, tmp_path):

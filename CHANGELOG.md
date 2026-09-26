@@ -9,6 +9,20 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.17.0
+
+* **La semana se puede cargar en las partes que sea.** Antes, una hoja que
+  repetía algunos partidos ya cargados y omitía otros se rechazaba. Ahora
+  cualquier hoja parcial **suma**: agrega los partidos que falten, de los que
+  repite se queda con lo nuevo (si no han empezado) y lo que no trae se
+  conserva. Así se puede mandar el jueves el miércoles, el resto el sábado, y si
+  a una hoja se le olvidó un partido, después solo ese; o mandar solo los
+  partidos que haya que corregir.
+
+  Los candados no cambian: ningún pick de un partido ya empezado cambia,
+  aparece ni desaparece, y para sumar los participantes tienen que ser los
+  mismos. La hoja completa sigue reemplazando la semana.
+
 ## alfa v0.16.2
 
 * **La imagen de picks salía vacía en la semana 3.** Desde la v0.14.0, con la

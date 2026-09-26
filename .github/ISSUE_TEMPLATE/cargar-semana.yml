@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Adjunta el archivo tal como lo repartes, Excel o PDF: la semana completa o solo una tanda, como la del jueves.
+        Adjunta el archivo tal como lo repartes, Excel o PDF: la semana completa o solo los partidos que falten, como la tanda del jueves.
 
         En uno o dos minutos te contesto aquí mismo: o quedó publicado, o te digo exactamente qué corregir. Si algo no cuadra, no se toca nada.
   - type: textarea
