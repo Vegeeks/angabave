@@ -21,6 +21,11 @@ La versión se muestra junto a la marca en el portal y vive en
 * `herramientas/llaves.py --help` tronaba: el enlace del formulario del token
   traía un `%` que argparse toma como formato. Ahora `token` muestra ese enlace
   al correr, antes de pedir el token.
+* `herramientas/llaves.py token` tronaba con `CERTIFICATE_VERIFY_FAILED` en el
+  Python de python.org para Mac, que no trae certificados hasta instalarlos
+  aparte. Ahora usa los de `certifi` o los de macOS (`/etc/ssl/cert.pem`), sin
+  dejar de validarlos, y un problema de conexión se explica en vez de soltar un
+  traceback. Probado con los cuatro Python de la Mac.
 
 ## alfa v0.16.1
 

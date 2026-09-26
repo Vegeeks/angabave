@@ -26,6 +26,7 @@ import getpass
 import hashlib
 import json
 import secrets
+import ssl
 import subprocess
 import sys
 import unicodedata
@@ -129,6 +130,24 @@ def quitar(nombre: str, *, ruta: Path = RUTA, publicar=_supabase_secreto) -> Non
     escribir(quedan, ruta)
 
 
+def _contexto_ssl() -> ssl.SSLContext:
+    """Certificados para hablar con GitHub, corra esto el Python que lo corra.
+
+    El Python de python.org para Mac no trae certificados hasta que se corre su
+    «Install Certificates.command»: sin ellos, toda conexión segura truena con
+    CERTIFICATE_VERIFY_FAILED. Se usan los de certifi si está, y si no, los que
+    trae macOS en /etc/ssl/cert.pem.
+    """
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        pass
+    if Path("/etc/ssl/cert.pem").exists():
+        return ssl.create_default_context(cafile="/etc/ssl/cert.pem")
+    return ssl.create_default_context()
+
+
 def _github(metodo: str, ruta: str, token: str) -> int:
     """Código de respuesta de GitHub. El token viaja en la cabecera, nunca en un comando."""
     peticion = urllib.request.Request(
@@ -139,10 +158,13 @@ def _github(metodo: str, ruta: str, token: str) -> int:
         },
     )
     try:
-        with urllib.request.urlopen(peticion, timeout=20) as respuesta:
+        with urllib.request.urlopen(peticion, timeout=20, context=_contexto_ssl()) as respuesta:
             return respuesta.status
     except urllib.error.HTTPError as error:
         return error.code
+    except (urllib.error.URLError, OSError) as error:
+        motivo = getattr(error, "reason", error)
+        raise ErrorLlaves(f"No pude conectarme con GitHub ({motivo}). Revisa tu internet e intenta de nuevo.")
 
 
 def revisar_token(valor: str, consultar=_github) -> None:

@@ -131,3 +131,18 @@ def test_la_ayuda_no_truena(argumentos, capsys):
     with pytest.raises(SystemExit) as salida:
         llaves.main(argumentos)
     assert salida.value.code == 0 and "usage" in capsys.readouterr().out
+
+
+def test_sin_internet_o_sin_certificados_se_explica(monkeypatch):
+    """El Python de python.org para Mac tronaba con CERTIFICATE_VERIFY_FAILED y un traceback."""
+    import urllib.error
+
+    def sin_conexion(*_a, **_k):
+        raise urllib.error.URLError("CERTIFICATE_VERIFY_FAILED")
+    monkeypatch.setattr(llaves.urllib.request, "urlopen", sin_conexion)
+    with pytest.raises(llaves.ErrorLlaves, match="No pude conectarme con GitHub"):
+        llaves.revisar_token("github_pat_x")
+
+
+def test_siempre_hay_certificados_con_que_validar():
+    assert llaves._contexto_ssl().verify_mode.name == "CERT_REQUIRED"
