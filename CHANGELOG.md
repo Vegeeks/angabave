@@ -9,6 +9,15 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.17.2
+
+* **Prueba de conexión** (`red.html`, sin enlace en ningún menú): desde el
+  teléfono de quien la abra, prueba una por una las conexiones que usan las dos
+  páginas —el aviso de versión, el portal completo, la página del enlace, el
+  servidor de cargas y los marcadores de ESPN— con tiempo, versión recibida y
+  nodo del CDN. Para lo que no se puede reproducir desde aquí: una red celular,
+  un teléfono viejo, un nodo distinto. Con una captura basta.
+
 ## alfa v0.17.1
 
 * **Se acabó la página en blanco después de cada publicación.** El portal se

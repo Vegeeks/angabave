@@ -44,6 +44,7 @@ __all__ = [
     "RUTA_SALIDA",
     "generar_manifiesto",
     "generar_pagina_de_carga",
+    "generar_prueba_de_red",
     "generar_sello_version",
     "SemanaRender",
     "UMBRAL_PODIO",
@@ -74,7 +75,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.17.1"
+VERSION = "v0.17.2"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -626,6 +627,29 @@ def generar_pagina_de_carga(ruta_salida: Path, url_funcion: str = URL_FUNCION) -
     return ruta
 
 
+def generar_prueba_de_red(ruta_salida: Path, url_funcion: str = URL_FUNCION) -> Path:
+    """Escribe una página que prueba, desde el teléfono de quien la abra, cada
+    conexión que usan el portal y la página del enlace.
+
+    Sirve para lo que no se puede reproducir desde aquí: una red celular, un
+    teléfono viejo, un nodo del CDN distinto. Con una captura basta.
+    """
+    partes, espn = urlsplit(url_funcion), urlsplit(URL_SCOREBOARD)
+    html = _entorno().get_template("red.html.j2").render(
+        marca=MARCA,
+        etapa=ETAPA,
+        version=VERSION,
+        url_funcion=url_funcion,
+        url_espn=URL_SCOREBOARD,
+        origen_funcion=f"{partes.scheme}://{partes.netloc}",
+        origen_espn=f"{espn.scheme}://{espn.netloc}",
+    )
+    ruta = Path(ruta_salida)
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+    ruta.write_text(html, encoding="utf-8")
+    return ruta
+
+
 def generar_manifiesto(ruta_salida: Path, marca: str = MARCA) -> Path:
     """Escribe el manifiesto que usan iOS y Android al guardar el sitio."""
     contenido = {
@@ -795,5 +819,6 @@ def generar_html(
     generar_manifiesto(ruta_salida.parent / "manifest.webmanifest")
     generar_sello_version(ruta_salida.parent / "version.json", momento)
     generar_pagina_de_carga(ruta_salida.parent / "cargar.html")
+    generar_prueba_de_red(ruta_salida.parent / "red.html")
     _log.info("Escribí %s (%.0f KB).", ruta_salida, len(html.encode("utf-8")) / 1024)
     return ruta_salida

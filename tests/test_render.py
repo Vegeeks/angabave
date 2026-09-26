@@ -526,3 +526,18 @@ def test_compatibilidad_con_safari_viejo():
     assert "if (ctx.roundRect)" in portal            # iOS 16
     assert ".replaceChildren(" not in carga           # iOS 14
     assert "signal: control.signal" in carga         # nada se queda esperando para siempre
+
+
+def test_la_prueba_de_red_sale_con_el_portal(armado, tmp_path: Path):
+    render(armado, tmp_path)
+    pagina = (tmp_path / "red.html").read_text(encoding="utf-8")
+    politica = re.search(r'Content-Security-Policy" content="([^"]+)"', pagina).group(1)
+    assert re.search(r"connect-src ([^;]+)", politica).group(1).split() == [
+        "'self'", "https://hxaajhsizdnlismnelqu.supabase.co", "https://site.api.espn.com",
+    ]
+    script = pagina[pagina.index("<script>"):]
+    for moderno in ("=>", "let ", "const ", "`", "?.", "??", "async ", "class "):
+        assert moderno not in script, moderno   # tiene que correr donde las otras fallan
+    assert "<script src" not in pagina and "innerHTML" not in pagina
+    for rastro in ("claude", "anthropic", "inteligencia artificial", "gpt", "automáticamente"):
+        assert rastro not in pagina.lower()
