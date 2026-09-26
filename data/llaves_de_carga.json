@@ -1,4 +1,10 @@
 {
   "_nota": "Quién tiene enlace para cargar la semana. Solo la huella: la llave no se guarda. Se administra con herramientas/llaves.py.",
-  "llaves": []
+  "llaves": [
+    {
+      "nombre": "Organizador",
+      "huella": "293eb196f02f35688c8067b11e2dff29aa6b1c8428798f5c05f9abff41e9acc9",
+      "creada": "2026-09-26T15:02:23+00:00"
+    }
+  ]
 }
