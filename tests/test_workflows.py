@@ -64,3 +64,14 @@ def test_la_forma_coincide_con_lo_que_busca_el_workflow():
     forma = FORMA.read_text(encoding="utf-8")
     assert "labels: [carga]" in forma
     assert "label: Archivo de la semana" in forma
+
+
+def test_el_secreto_del_enlace_solo_existe_en_ese_camino():
+    """Un hilo lo puede abrir cualquiera: ese camino nunca tiene el secreto a mano."""
+    lineas = [l for l in _codigo(RAIZ / ".github" / "workflows" / "cargar.yml") if "secrets.ANGABAVE_SECRETO" in l]
+    assert lineas and all("github.event_name == 'workflow_dispatch' &&" in l for l in lineas)
+
+
+def test_la_carga_del_enlace_entra_por_variable_y_no_en_el_comando():
+    lineas = [l.strip() for l in _codigo(RAIZ / ".github" / "workflows" / "cargar.yml") if "inputs.carga" in l]
+    assert lineas == ["CARGA: ${{ inputs.carga }}"]

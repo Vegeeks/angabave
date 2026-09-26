@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -21,7 +22,10 @@ from pathlib import Path
 import pandas as pd
 
 from quiniela.buzon import ErrorBuzon, cargadores, descargar, leer_solicitud, reporte_rechazo
-from quiniela.carga import recibir, reporte_markdown, reporte_texto
+from quiniela.carga import recibir, reporte_markdown, reporte_texto, resumen
+from quiniela.enlace import ESTADOS, ErrorEnlace
+from quiniela.enlace import bajar as bajar_enlace
+from quiniela.enlace import contestar as contestar_enlace
 from quiniela.equipos import EquipoDesconocidoError
 from quiniela.espn import ErrorESPN, ahora_cdmx, obtener_partidos
 from quiniela.picks import (
@@ -400,10 +404,7 @@ def comando_importar(argumentos) -> int:
         )
     if argumentos.resumen:
         Path(argumentos.resumen).write_text(
-            json.dumps(
-                {"aceptado": resultado.aceptado, "accion": resultado.accion, "semana": resultado.semana}
-            ),
-            encoding="utf-8",
+            json.dumps(resumen(resultado), ensure_ascii=False), encoding="utf-8"
         )
     print(reporte_texto(resultado))
     return 0 if resultado.aceptado else 1
@@ -434,6 +435,45 @@ def comando_buzon(argumentos) -> int:
     Path(argumentos.salida).write_text(str(archivo), encoding="utf-8")
     _log.info("Hilo #%d de @%s: bajé %s.", solicitud.numero, solicitud.usuario, archivo.name)
     return 0
+
+
+#: Lo que ve la página del enlace cuando algo falla de este lado.
+RESULTADO_FALLA = {
+    "aceptado": False,
+    "titulo": "No pude terminar",
+    "error": "Algo falló de nuestro lado, no en tu archivo. No se tocó nada y Angel ya tiene el aviso.",
+}
+
+
+def comando_enlace(argumentos) -> int:
+    """El lado del workflow del buzón por enlace: bajar el archivo o contestar.
+
+    El secreto compartido con la función sale de ANGABAVE_SECRETO. Devuelve 0
+    si todo bien y 3 si no se pudo hablar con la función. Aquí no se rechaza
+    nada: qué entra y qué no lo decide `importar`.
+    """
+    secreto = os.environ.get("ANGABAVE_SECRETO", "")
+    try:
+        if argumentos.accion == "bajar":
+            archivo, cargador = bajar_enlace(argumentos.carga, Path(argumentos.carpeta), secreto=secreto)
+            Path(argumentos.salida).write_text(str(archivo), encoding="utf-8")
+            if argumentos.cargador:
+                Path(argumentos.cargador).write_text(cargador, encoding="utf-8")
+            _log.info("Carga %s, del enlace de %s: bajé %s.", argumentos.carga, cargador, archivo.name)
+            return 0
+
+        if argumentos.estado == "falla":
+            resultado = dict(RESULTADO_FALLA)
+        else:
+            resultado = json.loads(Path(argumentos.resumen).read_text(encoding="utf-8"))
+        if argumentos.nota:
+            resultado["error"] = argumentos.nota
+        contestar_enlace(argumentos.carga, argumentos.estado, resultado, secreto=secreto)
+        _log.info("Carga %s: contesté %s.", argumentos.carga, argumentos.estado)
+        return 0
+    except (ErrorEnlace, OSError, ValueError) as error:
+        _log.error("%s", error)
+        return 3
 
 
 def comando_pendientes(argumentos) -> int:
@@ -542,6 +582,22 @@ def construir_parser() -> argparse.ArgumentParser:
     buzon.add_argument("--salida", required=True, help="dónde escribir la ruta del archivo bajado")
     buzon.add_argument("--forma", help="enlace para volver a subir, va en el reporte")
     buzon.set_defaults(funcion=comando_buzon)
+
+    enlace = subcomandos.add_parser(
+        "enlace", help="baja o contesta una carga del enlace personal (lo usa el workflow)"
+    )
+    acciones = enlace.add_subparsers(dest="accion", required=True)
+    bajar_ = acciones.add_parser("bajar", help="baja el archivo de una carga")
+    bajar_.add_argument("--carga", required=True, help="prefijo/id, la manda la función")
+    bajar_.add_argument("--carpeta", required=True)
+    bajar_.add_argument("--salida", required=True, help="dónde escribir la ruta del archivo")
+    bajar_.add_argument("--cargador", help="dónde escribir quién lo subió")
+    contestar_ = acciones.add_parser("contestar", help="deja el resultado para la página")
+    contestar_.add_argument("--carga", required=True)
+    contestar_.add_argument("--estado", required=True, choices=ESTADOS)
+    contestar_.add_argument("--resumen", help="el JSON que escribe importar --resumen")
+    contestar_.add_argument("--nota", help="reemplaza el texto del error que se muestra")
+    enlace.set_defaults(funcion=comando_enlace)
 
     pendientes = subcomandos.add_parser(
         "pendientes", help="imprime cuántos partidos siguen abiertos"

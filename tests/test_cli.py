@@ -34,7 +34,7 @@ def test_todos_los_subcomandos_existen():
     )
     assert set(subcomandos) == {
         "actualizar", "tabla", "general", "escenarios", "validar",
-        "importar", "buzon", "pendientes", "proximo",
+        "importar", "buzon", "enlace", "pendientes", "proximo",
     }
 
 
@@ -141,9 +141,12 @@ def test_importar_deja_reporte_y_resumen(carga_en: Path, tmp_path: Path):
     assert _importar(str(origen), "--reporte", str(reporte), "--resumen", str(resumen),
                      "--forma", "https://forma") == 0
     assert reporte.read_text(encoding="utf-8").startswith("### ✅ Semana 1 cargada")
-    assert json.loads(resumen.read_text(encoding="utf-8")) == {
-        "aceptado": True, "accion": "nueva", "semana": 1,
-    }
+    datos = json.loads(resumen.read_text(encoding="utf-8"))
+    assert (datos["aceptado"], datos["accion"], datos["semana"]) == (True, "nueva", 1)
+    assert datos["titulo"] == "Semana 1 cargada"
+    assert (datos["participantes"], datos["partidos_cargados"], datos["partidos_semana"]) == (
+        len(PICKS_S2), 16, 16,
+    )
 
 
 def test_importar_solo_revisar_no_guarda(carga_en: Path, tmp_path: Path):

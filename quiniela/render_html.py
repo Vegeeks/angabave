@@ -18,10 +18,13 @@ from decimal import Decimal
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 
+from .carga import TAMANO_MAXIMO
+from .enlace import URL_FUNCION
 from .equipos import ABREVIATURAS_ESPN
 from .espn import URL_SCOREBOARD, Partido, a_cdmx, ahora_cdmx
 from .scoring import (
@@ -40,6 +43,7 @@ __all__ = [
     "MARCA",
     "RUTA_SALIDA",
     "generar_manifiesto",
+    "generar_pagina_de_carga",
     "generar_sello_version",
     "SemanaRender",
     "UMBRAL_PODIO",
@@ -70,7 +74,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.15.0"
+VERSION = "v0.16.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -599,6 +603,29 @@ def generar_sello_version(ruta_salida: Path, momento: datetime) -> Path:
     return ruta
 
 
+def generar_pagina_de_carga(ruta_salida: Path, url_funcion: str = URL_FUNCION) -> Path:
+    """Escribe la página del enlace personal para cargar la semana.
+
+    No sale en ningún menú: la abre solo quien tiene su enlace, que trae la
+    llave después del "#". Sin una llave válida la página no deja hacer nada, y
+    lo único a lo que se puede conectar es la función que recibe los archivos.
+    """
+    partes = urlsplit(url_funcion)
+    html = _entorno().get_template("cargar.html.j2").render(
+        marca=MARCA,
+        desarrollador=DESARROLLADOR,
+        etapa=ETAPA,
+        version=VERSION,
+        tipografia=_tipografia(),
+        origen_funcion=f"{partes.scheme}://{partes.netloc}",
+        config={"funcion": url_funcion, "portal": "./", "maximo": TAMANO_MAXIMO},
+    )
+    ruta = Path(ruta_salida)
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+    ruta.write_text(html, encoding="utf-8")
+    return ruta
+
+
 def generar_manifiesto(ruta_salida: Path, marca: str = MARCA) -> Path:
     """Escribe el manifiesto que usan iOS y Android al guardar el sitio."""
     contenido = {
@@ -767,5 +794,6 @@ def generar_html(
     ruta_salida.write_text(html, encoding="utf-8")
     generar_manifiesto(ruta_salida.parent / "manifest.webmanifest")
     generar_sello_version(ruta_salida.parent / "version.json", momento)
+    generar_pagina_de_carga(ruta_salida.parent / "cargar.html")
     _log.info("Escribí %s (%.0f KB).", ruta_salida, len(html.encode("utf-8")) / 1024)
     return ruta_salida

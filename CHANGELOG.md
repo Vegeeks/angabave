@@ -9,6 +9,28 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.16.0
+
+* **Carga por enlace, sin cuenta de nada.** Quien carga la semana recibe su
+  propio enlace; lo abre en el teléfono, elige el archivo y la página le dice
+  cómo quedó, con lo que cambió o lo que hay que corregir. Solo quien tiene el
+  enlace puede cargar, y cada enlace se anula por separado.
+
+  Como el portal no tiene servidor, el archivo lo recibe una función de
+  Supabase (`angabave-carga`, en el proyecto de la app pero aparte: su cubeta,
+  sus secretos, ninguna tabla). La función comprueba la llave, guarda el
+  archivo y le pide a GitHub que lo revise con la misma puerta de siempre,
+  `quiniela/carga.py`; el resultado vuelve a la página.
+
+  La llave va después del `#`, que nunca viaja al servidor del portal ni a la
+  vista previa de WhatsApp, y no se guarda en ningún lado: solo su huella. El
+  token con que la función llama a GitHub solo puede correr workflows de este
+  repo. La página solo puede hablar con la función.
+
+* `herramientas/llaves.py` crea, lista y anula enlaces, y guarda el token.
+
+* La forma de Issues sigue, para quien sí tiene cuenta de GitHub.
+
 ## alfa v0.15.0
 
 * **El organizador carga la semana él mismo.** Hay una forma en GitHub, "Cargar

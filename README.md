@@ -40,10 +40,10 @@ ponerse a trabajar, esperar o detenerse.
 
 ### Flujo semanal
 
-Lo normal es que **el organizador cargue la semana él mismo** con la forma
-"Cargar semana" de GitHub (ver **Carga desde GitHub**, abajo): adjunta el
-archivo desde el teléfono y en uno o dos minutos está publicado, o le dice qué
-corregir. Nadie tiene que tocar la terminal.
+Lo normal es que **el organizador cargue la semana él mismo** con su enlace
+personal (ver **Carga por enlace**, abajo): lo abre en el teléfono, elige el
+archivo y en uno o dos minutos está publicado, o la página le dice qué
+corregir. No necesita cuenta de nada, y nadie tiene que tocar la terminal.
 
 Desde la Mac se hace con la misma revisión:
 
@@ -141,10 +141,76 @@ reparto final aparecen hasta que cierran las 18 semanas.
 Los montos viven en `quiniela/scoring.py` (`PREMIO_SEMANAL`,
 `ACUMULADO_SEMANAL`, `SEMANAS_TEMPORADA`, `REPARTO_FINAL`).
 
+## Carga por enlace
+
+Para quien carga la semana sin cuenta de GitHub. Cada persona tiene **su
+propio enlace**, y solo quien tiene el enlace puede cargar:
+
+```
+https://vegeeks.github.io/angabave/cargar.html#k=<llave>
+```
+
+Lo abre, elige el archivo tal como lo reparte (Excel o PDF, la semana completa
+o una tanda) y lo sube. La página espera la revisión y le dice cómo quedó: lo
+que cambió, o qué corregir. Si cierra la página, al volver a abrir su enlace ve
+el resultado de su última carga.
+
+```bash
+python herramientas/llaves.py nueva "Organizador"   # imprime su enlace, solo esa vez
+python herramientas/llaves.py lista                 # quién tiene enlace
+python herramientas/llaves.py quitar "Organizador"  # su enlace deja de servir
+```
+
+**Cómo funciona.** El portal no tiene servidor, así que el archivo lo recibe
+una función de Supabase, `angabave-carga`, que vive en el mismo proyecto que la
+app pero como pieza aparte: su propia cubeta privada (`angabave-cargas`), sus
+propios secretos (`ANGABAVE_*`) y ninguna tabla. La función comprueba la llave,
+guarda el archivo y le pide a GitHub que corra `cargar.yml`, que baja el
+archivo, lo revisa con `quiniela/carga.py` —la misma puerta de siempre—, lo
+publica y le devuelve el resultado a la función, que es lo que ve la página.
+
+**Qué protege a quién.**
+
+* **La llave es el enlace.** Tiene 256 bits al azar y va después del `#`, que el
+  navegador nunca manda al servidor del portal ni a la vista previa de
+  WhatsApp. No se guarda en ningún lado: en `data/llaves_de_carga.json` y en
+  Supabase queda solo su huella SHA-256. Por eso `nueva` la muestra una sola
+  vez. **Hay que mandarla por privado**: quien la tenga puede cargar.
+* **Si un enlace se filtra**, `quitar` lo anula sin afectar a los demás. Lo peor
+  que alguien podría hacer con él es cargar una hoja que pase toda la revisión:
+  nunca cambiar un partido que ya empezó, ni saltarse semanas, ni meter
+  partidos que no existen. Cada carga queda en el historial de git con el
+  nombre del enlace que la hizo, y se puede deshacer.
+* **La función solo revisa lo mínimo** (quién llama, tamaño, que sea Excel o PDF
+  de verdad) y deja pasar como mucho 12 cargas por hora por enlace. Lo demás lo
+  decide el workflow, para que no haya dos revisiones que se desalineen.
+* **La página solo puede hablar con la función** (política de contenido), no
+  aparece en buscadores, no manda de dónde viene y pinta todo como texto.
+* **La función y el workflow comparten un secreto**, `ANGABAVE_SECRETO`, que
+  solo existe en el camino del enlace: un hilo de Issues, que puede abrir
+  cualquiera, nunca lo tiene a mano.
+* **Para pedirle a GitHub que corra la revisión**, la función usa un token que
+  solo puede correr workflows de este repo (`ANGABAVE_GITHUB`). No puede tocar
+  el código ni los datos.
+
+**Configuración, una sola vez.** El token lo crea Angel en GitHub → Settings →
+Developer settings → Personal access tokens → **Fine-grained tokens** →
+*Generate new token*: solo el repo `Vegeeks/angabave`, permiso de
+**Actions: Read and write** y nada más. Luego:
+
+```bash
+python herramientas/llaves.py token    # lo pide sin mostrarlo y comprueba que GitHub lo acepte
+```
+
+Cuando el token venza, se genera otro y se vuelve a correr ese comando. Si la
+función cambia: `supabase functions deploy angabave-carga --project-ref
+hxaajhsizdnlismnelqu --no-verify-jwt --use-api`. Sus pruebas:
+`deno test --allow-env supabase/functions/angabave-carga/`.
+
 ## Carga desde GitHub
 
-El organizador carga la semana sin terminal y sin acceso al repo, con la forma
-**Cargar semana** de Issues:
+Para quien sí tiene cuenta de GitHub (hoy, Angel) hay además una forma en
+Issues. Pasa por la misma revisión que el enlace:
 
 <https://github.com/Vegeeks/angabave/issues/new?template=cargar-semana.yml>
 
@@ -501,10 +567,11 @@ quiniela/
   picks.py         lee el archivo semanal (Excel o PDF) y sella los picks
   carga.py         la puerta de entrada: revisa todo, guarda y sella
   buzon.py         la forma "Cargar semana": quién la manda y qué adjuntó
+  enlace.py        el lado del workflow de la carga por enlace
   scoring.py       tablas, escenarios, panorama, premios
   render_html.py   la página, los temas, el contraste y el orden de la NFL
   render_png.py    imagen para WhatsApp e iconos de app
-  plantillas/      index.html.j2 (HTML + CSS + JS de la página)
+  plantillas/      index.html.j2 (el portal) y cargar.html.j2 (la página del enlace)
   tipografia/      Oswald recortada (8 KB) + su licencia OFL
 data/
   picks/           Semana_01.xlsx, Semana_02.xlsx… (una por semana)
@@ -512,8 +579,10 @@ data/
   overrides.json   correcciones manuales de ganadores
   sellos.json      huella SHA-256 de los picks de cada partido, al arrancar
   cargadores.json  cuentas de GitHub que pueden cargar semanas
+  llaves_de_carga.json  quién tiene enlace de carga (solo huellas)
 docs/              lo que se publica en GitHub Pages
   index.html       el portal entero, en un solo archivo
+  cargar.html      la página del enlace de carga
   tabla.png        imagen para WhatsApp
   version.json     sello de versión contra el caché de Pages
   icono-*.png      iconos para guardar el sitio como app
@@ -522,10 +591,12 @@ docs/              lo que se publica en GitHub Pages
   workflows/
     actualizar.yml cron cada 5 min en ventanas + push de picks + manual
     directo.yml    bucle que sigue la jornada y se encadena solo
-    cargar.yml     atiende la forma "Cargar semana"
+    cargar.yml     revisa y publica lo que llega por el enlace o por la forma
   ISSUE_TEMPLATE/
     cargar-semana.yml  la forma
-tests/             255 pruebas, ninguna toca la red
+supabase/functions/angabave-carga/   la función que recibe los archivos del enlace
+herramientas/llaves.py               crea, lista y anula enlaces de carga
+tests/             284 pruebas de Python y 13 de la función; ninguna toca la red
 cli.py
 crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 ```

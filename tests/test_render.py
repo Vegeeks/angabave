@@ -439,3 +439,31 @@ def test_un_nombre_con_codigo_no_entra_crudo_a_la_pagina(armado, tmp_path: Path)
     html = render((semanas, general), tmp_path)
     assert malicioso not in html
     assert "&lt;img src=x onerror=&#34;alert(1)&#34;&gt;" in html
+
+
+def test_la_pagina_de_carga_sale_con_el_portal(armado, tmp_path: Path):
+    render(armado, tmp_path)
+    pagina = (tmp_path / "cargar.html").read_text(encoding="utf-8")
+
+    # No aparece en buscadores ni manda de dónde viene.
+    assert '<meta name="robots" content="noindex, nofollow">' in pagina
+    assert '<meta name="referrer" content="no-referrer">' in pagina
+    # Solo se puede conectar con la función que recibe los archivos.
+    politica = re.search(r'Content-Security-Policy" content="([^"]+)"', pagina).group(1)
+    assert "default-src 'none'" in politica
+    assert re.search(r"connect-src ([^;]+)", politica).group(1) == "https://hxaajhsizdnlismnelqu.supabase.co"
+    assert "form-action 'none'" in politica and "base-uri 'none'" in politica
+    # Nada de afuera, y los datos se pintan como texto.
+    assert "<script src" not in pagina and 'rel="stylesheet"' not in pagina
+    assert "innerHTML" not in pagina and "insertAdjacentHTML" not in pagina
+    # La llave se lee del "#", que no viaja al servidor; nunca de "?".
+    assert "location.hash" in pagina and "location.search" not in pagina
+    config = json.loads(re.search(r'<script id="config" type="application/json">(.*?)</script>', pagina).group(1))
+    assert config["funcion"].endswith("/functions/v1/angabave-carga")
+
+
+def test_la_pagina_de_carga_no_deja_rastro(armado, tmp_path: Path):
+    render(armado, tmp_path)
+    pagina = (tmp_path / "cargar.html").read_text(encoding="utf-8").lower()
+    for rastro in ("claude", "anthropic", "inteligencia artificial", "gpt", "automáticamente"):
+        assert rastro not in pagina

@@ -5,3 +5,6 @@ __pycache__/
 # Archivos temporales que Excel deja al lado del original.
 ~$*.xlsx
 .DS_Store
+
+# Estado local de la CLI de Supabase.
+supabase/.temp/

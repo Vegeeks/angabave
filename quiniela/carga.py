@@ -65,6 +65,7 @@ __all__ = [
     "revisar_archivo",
     "reporte_markdown",
     "reporte_texto",
+    "resumen",
     "TAMANO_MAXIMO",
 ]
 
@@ -658,6 +659,32 @@ def reporte_markdown(resultado: Resultado, *, forma: str = "") -> str:
     if resultado.accion != "sin_cambios":
         lineas += ["", f"En un par de minutos se ve en el portal: {SITIO}"]
     return "\n".join(lineas) + "\n"
+
+
+def _titulo(resultado: Resultado) -> str:
+    if resultado.aceptado:
+        return _TITULOS[resultado.accion].format(n=resultado.semana)
+    return f"No se cargó la semana {resultado.semana}" if resultado.semana else "No se cargó"
+
+
+def resumen(resultado: Resultado) -> dict:
+    """El resultado en datos: lo lee el workflow y lo pinta la página del enlace."""
+    return {
+        "aceptado": resultado.aceptado,
+        "accion": resultado.accion,
+        "semana": resultado.semana,
+        "titulo": _titulo(resultado),
+        "archivo": resultado.archivo,
+        "error": resultado.error,
+        "participantes": resultado.participantes,
+        "partidos_hoja": resultado.partidos_hoja,
+        "partidos_cargados": resultado.partidos_cargados,
+        "partidos_semana": resultado.partidos_semana,
+        "cambios": resultado.cambios,
+        "avisos": resultado.avisos,
+        "faltan": _faltantes(resultado),
+        "sellados": resultado.sellados,
+    }
 
 
 def reporte_texto(resultado: Resultado) -> str:

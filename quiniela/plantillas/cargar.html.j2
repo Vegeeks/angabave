@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src data:; img-src data:; connect-src {{ origen_funcion }}; base-uri 'none'; form-action 'none'">
+<meta name="author" content="{{ desarrollador }}">
+<meta name="theme-color" content="#06090f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 3 35 8v13c0 8.5-6.5 14.5-15 17C11.5 35.5 5 29.5 5 21V8z' fill='%23f7c948'/%3E%3Cellipse cx='20' cy='19' rx='9' ry='5.6' transform='rotate(-28 20 19)' fill='%23090d14'/%3E%3Cpath d='M15.8 22.2 24.2 15.8' stroke='%23f7c948' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Cargar semana · {{ marca }}</title>
+<style>
+{% if tipografia %}
+@font-face{
+  font-family:'Rotulo'; font-style:normal; font-weight:500 700; font-display:swap;
+  src:url(data:font/woff2;base64,{{ tipografia }}) format('woff2');
+}
+{% endif %}
+:root{
+  --bg:#06090f; --panel:#101724; --panel2:#161f2e; --linea:#1f2938; --linea2:#2b3849;
+  --txt:#eef4fb; --tenue:#8d9bb0; --oro:#f7c948; --oro2:#ffe193;
+  --verde:#3ddc84; --rojo:#ff6058; --ambar:#ffb547;
+  --rotulo:'Rotulo','Oswald','Arial Narrow',var(--cuerpo);
+  --cuerpo:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  min-height:100vh; background:var(--bg); color:var(--txt); font-family:var(--cuerpo);
+  line-height:1.5; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(247,201,72,.12), transparent 70%);
+}
+main{max-width:520px; margin:0 auto; padding:28px 16px 48px}
+.marca{display:flex; align-items:center; gap:12px; margin-bottom:22px}
+.marca svg{width:38px; height:38px; flex:none}
+.marca b{font-family:var(--rotulo); font-weight:700; letter-spacing:.14em; font-size:1.15rem}
+.marca span{display:block; font-family:var(--rotulo); font-size:.68rem; letter-spacing:.2em; color:var(--tenue)}
+.tarjeta{background:var(--panel); border:1px solid var(--linea); border-radius:18px; padding:22px 20px;
+  box-shadow:0 16px 48px rgba(0,0,0,.45)}
+h1{font-size:1.35rem; line-height:1.25; margin:0 0 .35rem; font-weight:800}
+p{margin:.35rem 0}
+.tenue{color:var(--tenue); font-size:.92rem}
+.zona{display:block; margin:18px 0 14px; border:2px dashed var(--linea2); border-radius:14px; padding:26px 16px;
+  text-align:center; cursor:pointer; transition:border-color .15s, background .15s}
+.zona:hover,.zona.encima{border-color:var(--oro); background:rgba(247,201,72,.05)}
+.zona:focus-within{outline:2px solid var(--oro); outline-offset:2px}
+.zona input{position:absolute; width:1px; height:1px; opacity:0}
+.zona .grande{font-weight:700; font-size:1.02rem}
+.elegido{display:none; align-items:center; gap:10px; background:var(--panel2); border-radius:12px; padding:12px 14px;
+  margin:0 0 14px; word-break:break-all}
+.elegido.visible{display:flex}
+.elegido .icono{font-size:1.3rem}
+button{appearance:none; border:0; border-radius:12px; font:inherit; font-weight:800; cursor:pointer;
+  min-height:50px; width:100%; padding:12px 16px; font-size:1.02rem}
+.principal{background:var(--oro); color:#171203}
+.principal:disabled{opacity:.45; cursor:not-allowed}
+.secundario{background:transparent; color:var(--txt); border:1px solid var(--linea2); margin-top:12px}
+.estado{display:flex; gap:12px; align-items:flex-start}
+.estado .icono{font-size:1.6rem; line-height:1.2; flex:none}
+.giro{width:22px; height:22px; border-radius:50%; border:3px solid var(--linea2); border-top-color:var(--oro);
+  animation:girar .9s linear infinite; flex:none; margin-top:3px}
+@keyframes girar{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.giro{animation:none; border-top-color:var(--linea2)}}
+.datos{list-style:none; padding:0; margin:14px 0 0; display:grid; gap:6px}
+.datos li{display:flex; justify-content:space-between; gap:12px; background:var(--panel2); border-radius:10px;
+  padding:9px 12px; font-size:.93rem}
+.datos li b{font-variant-numeric:tabular-nums}
+h2{font-size:.72rem; font-family:var(--rotulo); letter-spacing:.18em; color:var(--tenue); margin:18px 0 6px; font-weight:700}
+.lista{margin:0; padding-left:1.1rem; font-size:.93rem}
+.lista li{margin:.25rem 0}
+.error{background:rgba(255,96,88,.08); border:1px solid rgba(255,96,88,.35); border-radius:12px; padding:12px 14px;
+  margin-top:12px; white-space:pre-wrap; font-size:.95rem}
+.ok{color:var(--verde)} .mal{color:var(--rojo)} .aviso{color:var(--ambar)}
+.ultima{margin-top:16px; padding-top:14px; border-top:1px solid var(--linea); font-size:.9rem; color:var(--tenue)}
+a{color:var(--oro2)}
+footer{margin-top:22px; text-align:center; font-size:.78rem; color:var(--tenue)}
+</style>
+</head>
+<body>
+<main>
+  <div class="marca" aria-hidden="true">
+    <svg viewBox="0 0 40 40"><path d="M20 3 35 8v13c0 8.5-6.5 14.5-15 17C11.5 35.5 5 29.5 5 21V8z" fill="#f7c948"/><ellipse cx="20" cy="19" rx="9" ry="5.6" transform="rotate(-28 20 19)" fill="#090d14"/><path d="M15.8 22.2 24.2 15.8" stroke="#f7c948" stroke-width="1.3" stroke-linecap="round"/></svg>
+    <div><b>{{ marca }}</b><span>CARGAR SEMANA</span></div>
+  </div>
+  <section class="tarjeta" id="tarjeta" aria-live="polite">
+    <div class="estado"><div class="giro"></div><div><h1>Revisando tu enlace…</h1></div></div>
+  </section>
+  <footer>Desarrollado por {{ desarrollador }} · {{ etapa }} {{ version }}</footer>
+</main>
+<script id="config" type="application/json">{{ config|tojson }}</script>
+<script>
+(() => {
+  "use strict";
+  const CONFIG = JSON.parse(document.getElementById("config").textContent);
+  const tarjeta = document.getElementById("tarjeta");
+  // La llave va después del "#": esa parte nunca viaja al servidor del portal
+  // ni a la vista previa de WhatsApp. Solo se manda a la función, por cabecera.
+  const llave = new URLSearchParams(location.hash.slice(1)).get("k") || "";
+  const CADA = 4000, PACIENCIA = 6 * 60 * 1000;
+
+  const crear = (tag, clase, texto) => {
+    const nodo = document.createElement(tag);
+    if (clase) nodo.className = clase;
+    if (texto != null) nodo.textContent = texto;
+    return nodo;
+  };
+  const vaciar = () => { tarjeta.replaceChildren(); return tarjeta; };
+
+  function pedir(que, opciones = {}) {
+    const url = new URL(CONFIG.funcion);
+    url.searchParams.set("que", que);
+    for (const [k, v] of Object.entries(opciones.params || {})) url.searchParams.set(k, v);
+    const cabeceras = Object.assign({ "x-llave": llave }, opciones.cabeceras || {});
+    return fetch(url, { method: opciones.metodo || "GET", headers: cabeceras, body: opciones.cuerpo, cache: "no-store" });
+  }
+
+  async function error(respuesta) {
+    try { return (await respuesta.json()).error || "Algo salió mal."; } catch (e) { return "Algo salió mal."; }
+  }
+
+  function hace(iso) {
+    const minutos = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+    if (!isFinite(minutos)) return "";
+    if (minutos < 1) return "hace un momento";
+    if (minutos < 60) return "hace " + minutos + " min";
+    const horas = Math.round(minutos / 60);
+    if (horas < 24) return "hace " + horas + (horas === 1 ? " hora" : " horas");
+    const dias = Math.round(horas / 24);
+    return "hace " + dias + (dias === 1 ? " día" : " días");
+  }
+
+  function aviso(icono, titulo, texto) {
+    const t = vaciar();
+    const fila = crear("div", "estado");
+    fila.append(crear("div", "icono", icono));
+    const cuerpo = crear("div");
+    cuerpo.append(crear("h1", null, titulo));
+    if (texto) cuerpo.append(crear("p", "tenue", texto));
+    fila.append(cuerpo);
+    t.append(fila);
+    return t;
+  }
+
+  function esperando(titulo, texto) {
+    const t = vaciar();
+    const fila = crear("div", "estado");
+    fila.append(crear("div", "giro"));
+    const cuerpo = crear("div");
+    cuerpo.append(crear("h1", null, titulo));
+    if (texto) cuerpo.append(crear("p", "tenue", texto));
+    fila.append(cuerpo);
+    t.append(fila);
+  }
+
+  function lista(titulo, elementos, clase) {
+    const caja = crear("div");
+    caja.append(crear("h2", null, titulo));
+    const ul = crear("ul", "lista" + (clase ? " " + clase : ""));
+    elementos.forEach((texto) => ul.append(crear("li", null, texto)));
+    caja.append(ul);
+    return caja;
+  }
+
+  function botonOtra(texto) {
+    const b = crear("button", "secundario", texto || "Subir otro archivo");
+    b.type = "button";
+    b.addEventListener("click", () => formulario(nombreCargador, null));
+    return b;
+  }
+
+  function resultado(estado) {
+    const r = estado.resultado || {};
+    if (estado.estado === "listo") {
+      const t = aviso("✅", r.titulo || "Listo", r.accion === "sin_cambios"
+        ? "El archivo dice exactamente lo mismo que ya estaba publicado. No hubo nada que cambiar."
+        : "Ya quedó. En un par de minutos se ve en el portal.");
+      if (r.accion !== "sin_cambios") {
+        const datos = crear("ul", "datos");
+        const fila = (a, b) => { const li = crear("li"); li.append(crear("span", null, a), crear("b", null, String(b))); datos.append(li); };
+        fila("Participantes", r.participantes);
+        fila("Partidos de la semana", r.partidos_cargados + " de " + r.partidos_semana);
+        if (r.sellados && r.sellados.length) fila("Sellados porque ya empezaron", r.sellados.length);
+        t.append(datos);
+      }
+      if (r.cambios && r.cambios.length) t.append(lista("Qué cambió", r.cambios));
+      if (r.faltan) t.append(crear("p", "tenue", r.faltan));
+      if (r.avisos && r.avisos.length) t.append(lista("Para revisar", r.avisos, "aviso"));
+      const enlace = crear("p");
+      const a = crear("a", null, "Ver el portal");
+      a.href = CONFIG.portal;
+      enlace.append(a);
+      t.append(enlace, botonOtra());
+      return;
+    }
+    if (estado.estado === "rechazado") {
+      const t = aviso("❌", r.titulo || "No se cargó", "No se tocó nada: el portal sigue exactamente como estaba.");
+      t.append(crear("div", "error", r.error || "El archivo no pasó la revisión."));
+      if (r.avisos && r.avisos.length) t.append(lista("Además", r.avisos, "aviso"));
+      t.append(botonOtra("Corregir y volver a subir"));
+      return;
+    }
+    const t = aviso("⚠️", r.titulo || "No pude terminar",
+      r.error || "Algo falló de nuestro lado, no en tu archivo. No se tocó nada y Angel ya tiene el aviso.");
+    t.append(botonOtra("Intentar de nuevo"));
+  }
+
+  async function seguir(id, inicio) {
+    esperando("Revisando la quiniela…", "Tarda uno o dos minutos. No cierres esta página.");
+    while (Date.now() - inicio < PACIENCIA) {
+      await new Promise((listo) => setTimeout(listo, CADA));
+      let respuesta;
+      try { respuesta = await pedir("estado", { params: { id } }); } catch (e) { continue; }
+      if (!respuesta.ok) continue;
+      const estado = await respuesta.json();
+      if (estado.estado !== "en_cola") return resultado(estado);
+    }
+    aviso("⏳", "Sigue en proceso",
+      "Está tardando más de lo normal. Puedes cerrar esta página: cuando vuelvas a abrir tu enlace verás cómo quedó.");
+  }
+
+  let nombreCargador = "";
+
+  function formulario(nombre, ultima) {
+    const t = vaciar();
+    t.append(crear("h1", null, "Hola, " + nombre));
+    t.append(crear("p", "tenue",
+      "Sube el archivo de la semana tal como lo repartes: Excel o PDF, la semana completa o solo una tanda. " +
+      "Se revisa todo antes de publicar; si algo no cuadra, no se toca nada y te digo qué corregir."));
+
+    const zona = crear("label", "zona");
+    const entrada = crear("input");
+    entrada.type = "file";
+    entrada.accept = ".xlsx,.xlsm,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    zona.append(entrada, crear("div", "grande", "Toca para elegir el archivo"), crear("div", "tenue", "o arrástralo aquí"));
+    const elegido = crear("div", "elegido");
+    const boton = crear("button", "principal", "Subir y publicar");
+    boton.type = "button";
+    boton.disabled = true;
+    t.append(zona, elegido, boton);
+
+    let archivo = null;
+    const elegir = (f) => {
+      archivo = f || null;
+      elegido.replaceChildren();
+      if (!archivo) { elegido.classList.remove("visible"); boton.disabled = true; return; }
+      const kb = Math.max(1, Math.round(archivo.size / 1024));
+      elegido.append(crear("span", "icono", "📄"), crear("span", null, archivo.name + " · " + kb + " KB"));
+      elegido.classList.add("visible");
+      boton.disabled = false;
+    };
+    entrada.addEventListener("change", () => elegir(entrada.files[0]));
+    zona.addEventListener("dragover", (e) => { e.preventDefault(); zona.classList.add("encima"); });
+    zona.addEventListener("dragleave", () => zona.classList.remove("encima"));
+    zona.addEventListener("drop", (e) => {
+      e.preventDefault();
+      zona.classList.remove("encima");
+      if (e.dataTransfer.files.length) elegir(e.dataTransfer.files[0]);
+    });
+
+    boton.addEventListener("click", async () => {
+      if (!archivo) return;
+      if (archivo.size > CONFIG.maximo) {
+        aviso("❌", "El archivo es demasiado grande", "Una quiniela no pasa de 1 MB. ¿Es el archivo correcto?");
+        t.append(botonOtra("Elegir otro"));
+        return;
+      }
+      esperando("Subiendo " + archivo.name + "…");
+      let respuesta;
+      try {
+        respuesta = await pedir("subir", {
+          metodo: "POST",
+          cuerpo: archivo,
+          cabeceras: { "x-archivo": encodeURIComponent(archivo.name), "content-type": "application/octet-stream" },
+        });
+      } catch (e) {
+        aviso("⚠️", "No se pudo subir", "Revisa tu conexión e inténtalo otra vez.").append(botonOtra("Intentar de nuevo"));
+        return;
+      }
+      if (!respuesta.ok) {
+        aviso("❌", "No se subió", await error(respuesta)).append(botonOtra("Intentar de nuevo"));
+        return;
+      }
+      const { id } = await respuesta.json();
+      seguir(id, Date.now());
+    });
+
+    if (ultima) {
+      const caja = crear("div", "ultima");
+      const r = ultima.resultado || {};
+      const texto = ultima.estado === "en_cola" ? "revisándose todavía"
+        : ultima.estado === "listo" ? "✅ " + (r.titulo || "quedó")
+        : ultima.estado === "rechazado" ? "❌ " + (r.titulo || "no se cargó")
+        : "⚠️ no se pudo terminar";
+      caja.textContent = "Tu última carga (" + (ultima.archivo || "archivo") + ", " + hace(ultima.creado) + "): " + texto;
+      t.append(caja);
+      if (ultima.estado === "en_cola" && Date.now() - new Date(ultima.creado).getTime() < PACIENCIA) {
+        seguir(ultima.id, new Date(ultima.creado).getTime());
+      }
+    }
+  }
+
+  async function empezar() {
+    if (!/^[A-Za-z0-9_-]{32,64}$/.test(llave)) {
+      aviso("🔒", "Este enlace no está completo", "Ábrelo tal como te lo mandaron. Si sigue igual, pídele a Angel el tuyo.");
+      return;
+    }
+    let respuesta;
+    try { respuesta = await pedir("quien"); } catch (e) {
+      aviso("⚠️", "No me pude conectar", "Revisa tu conexión y vuelve a abrir el enlace.");
+      return;
+    }
+    if (!respuesta.ok) { aviso("🔒", "Este enlace no sirve", await error(respuesta)); return; }
+    const datos = await respuesta.json();
+    nombreCargador = datos.nombre;
+    formulario(datos.nombre, datos.ultima);
+  }
+
+  empezar();
+})();
+</script>
+</body>
+</html>
