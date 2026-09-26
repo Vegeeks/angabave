@@ -1,0 +1,41 @@
+{#- Red de seguridad común al portal y a la página del enlace.
+
+    Va en JavaScript viejo a propósito (var, function, nada de flechas): si el
+    script principal no arranca —un navegador que no lo entiende, un error a
+    medio camino—, esto sí corre. En vez de una pantalla en blanco se ve qué
+    hacer, y el detalle del error con el navegador exacto, para que una captura
+    baste para arreglarlo.
+
+    La página avisa que arrancó con window.angabaveListo = true. Si no lo hace
+    en `espera_rescate` milisegundos, sale este aviso. -#}
+<div id="rescate" role="alert" style="display:none; position:fixed; left:16px; right:16px; top:16px; z-index:2147483647; max-width:520px; margin:0 auto; background:#101724; color:#eef4fb; border:1px solid #ff6058; border-radius:16px; padding:18px 18px 16px; font:15px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; box-shadow:0 16px 48px rgba(0,0,0,.6)">
+  <strong style="display:block; font-size:17px; margin-bottom:6px">No se pudo abrir la página en este navegador</strong>
+  <span style="display:block; color:#b7c3d3">Ciérrala y vuelve a abrir el enlace. Si sigue igual, actualiza tu teléfono (Ajustes → General → Actualización de software) o ábrela desde otro teléfono o una computadora, y mándale a Angel una captura de esta pantalla.</span>
+  <a href="" style="display:inline-block; margin-top:12px; color:#ffe193; font-weight:700">Volver a intentar</a>
+  <small id="rescate-detalle" style="display:block; margin-top:10px; color:#8d9bb0; word-break:break-word"></small>
+</div>
+<noscript><div style="margin:16px; padding:16px; border:1px solid #ff6058; border-radius:12px; background:#101724; color:#eef4fb; font:15px/1.45 -apple-system,Arial,sans-serif">Esta página necesita JavaScript. Actívalo en los ajustes del navegador, o ábrela desde otro.</div></noscript>
+<script>
+(function () {
+  var detalle = "";
+  function anotar(texto) {
+    if (!detalle && texto) detalle = String(texto).slice(0, 300);
+  }
+  window.addEventListener("error", function (e) {
+    anotar(e && (e.message || (e.error && e.error.message)));
+  });
+  window.addEventListener("unhandledrejection", function (e) {
+    anotar(e && e.reason && (e.reason.message || e.reason));
+  });
+  window.setTimeout(function () {
+    if (window.angabaveListo) return;
+    var caja = document.getElementById("rescate");
+    var nota = document.getElementById("rescate-detalle");
+    if (!caja || !nota) return;
+    nota.appendChild(document.createTextNode(
+      "Detalle: " + (detalle || "la página no terminó de arrancar") + " · " + navigator.userAgent
+    ));
+    caja.style.display = "block";
+  }, {{ espera_rescate }});
+})();
+</script>

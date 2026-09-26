@@ -482,3 +482,47 @@ def test_el_generador_de_picks_no_usa_los_partidos_ya_cargados():
     tramo = plantilla[plantilla.index("async function exportarPicks("):plantilla.index("function aviso(titulo, texto)")]
     codigo = [l for l in tramo.splitlines() if not l.strip().startswith(("//", "/*", "*"))]
     assert not [l for l in codigo if "s.partidos" in l or "s.tandas" in l]
+
+
+# --- que ninguna página se quede en blanco -----------------------------------------
+
+
+def _rescate(pagina: str) -> str:
+    """El script de la red de seguridad, que va justo después del aviso."""
+    inicio = pagina.index('<div id="rescate"')
+    return pagina[inicio:pagina.index("</script>", inicio)]
+
+
+@pytest.mark.parametrize("nombre", ["index.html", "cargar.html"])
+def test_las_dos_paginas_traen_la_red_de_seguridad(armado, tmp_path: Path, nombre: str):
+    render(armado, tmp_path)
+    pagina = (tmp_path / nombre).read_text(encoding="utf-8")
+    rescate = _rescate(pagina)
+    # Está antes del script principal, para escuchar sus errores desde el principio.
+    assert pagina.index('<div id="rescate"') < pagina.index("window.angabaveListo = true")
+    # En JavaScript viejo: nada que un Safari de hace años no entienda.
+    script = rescate[rescate.index("<script>"):]
+    for moderno in ("=>", "let ", "const ", "`", "?.", "??", "async ", "class "):
+        assert moderno not in script, moderno
+    assert "navigator.userAgent" in script   # el detalle dice qué navegador era
+    assert "<noscript>" in pagina
+
+
+def test_el_portal_no_se_recarga_en_bucle():
+    """El CDN de GitHub ignora el ?v=: recargar sin candado era un bucle en blanco."""
+    plantilla = (Path(__file__).resolve().parents[1] / "quiniela" / "plantillas" / "index.html.j2").read_text(
+        encoding="utf-8"
+    )
+    assert "sello.generado !== D.generado" not in plantilla
+    assert "if (!(publicada > esta)) return;" in plantilla
+    assert "ahora - previa.cuando < TRES_MIN" in plantilla
+    assert "previa.version === version && ahora - previa.cuando < ONCE_MIN" in plantilla
+
+
+def test_compatibilidad_con_safari_viejo():
+    raiz = Path(__file__).resolve().parents[1] / "quiniela" / "plantillas"
+    portal = (raiz / "index.html.j2").read_text(encoding="utf-8")
+    carga = (raiz / "cargar.html.j2").read_text(encoding="utf-8")
+    assert "if (ctx.roundRect)" in portal            # iOS 16
+    assert ".replaceChildren(" not in carga           # iOS 14
+    assert "signal: control.signal" in carga         # nada se queda esperando para siempre

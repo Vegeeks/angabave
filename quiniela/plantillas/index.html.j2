@@ -660,6 +660,7 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 </style>
 </head>
 <body>
+{% set espera_rescate = 8000 %}{% include "_rescate.html.j2" %}
 
 <header>
   <div class="env top">
@@ -1721,7 +1722,9 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       ctx.font = rotulo(700, 26);
       const anchoSigla = ctx.measureText(sigla).width + 22;
       ctx.beginPath();
-      ctx.roundRect(MARGEN + 24, y - 24, anchoSigla, 38, 8);
+      // roundRect no existe en Safari anterior a iOS 16: ahí va con esquinas rectas.
+      if (ctx.roundRect) ctx.roundRect(MARGEN + 24, y - 24, anchoSigla, 38, 8);
+      else ctx.rect(MARGEN + 24, y - 24, anchoSigla, 38);
       ctx.fill();
       ctx.fillStyle = (D.colores[elegido] || {}).local_texto || "#070b12";
       ctx.fillText(sigla, MARGEN + 35, y + 4);
@@ -2582,11 +2585,44 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
   }
   /* ═══ que nadie se quede con una copia vieja ═══
      Pages cachea el HTML diez minutos y esa cabecera no se puede cambiar. Así
-     que se consulta un archivo de cien bytes sin caché; si el sitio se
-     regeneró, se recarga con un parámetro nuevo para saltarse el caché. */
-  function recargarFresco() {
+     que se consulta un archivo de cien bytes; si el sitio se regeneró, se
+     recarga.
+
+     Con candados, porque el CDN de GitHub ignora el ?v= (medido: una dirección
+     con un ?v= nunca pedido sale del caché). Recargar en seguida puede traer la
+     misma página vieja, y sin candados eso era un bucle que recargaba cada
+     segundo y dejaba la pantalla en blanco hasta diez minutos después de cada
+     publicación. Ahora:
+       · solo se recarga si lo publicado es más nuevo que esta página;
+       · por cada versión nueva, una sola vez cada once minutos (lo que tarda
+         en vencer el caché del CDN);
+       · y nunca más de una recarga cada tres minutos, pase lo que pase. */
+  const LLAVE_RECARGA = "angabave.recarga";
+  const TRES_MIN = 3 * 60 * 1000, ONCE_MIN = 11 * 60 * 1000;
+
+  function marca(iso) {
+    // Safari no siempre entiende seis decimales en los segundos.
+    const t = Date.parse(String(iso || "").replace(/(\.\d{3})\d+/, "$1"));
+    return isFinite(t) ? t : NaN;
+  }
+
+  function leerRecarga() {
+    try { return JSON.parse(sessionStorage.getItem(LLAVE_RECARGA) || "null") || {}; }
+    catch (e) { return {}; }
+  }
+
+  function recargarFresco(version) {
+    const ahora = Date.now(), previa = leerRecarga();
+    if (previa.cuando && ahora - previa.cuando < TRES_MIN) return;
+    if (version && previa.version === version && ahora - previa.cuando < ONCE_MIN) return;
+    try {
+      sessionStorage.setItem(LLAVE_RECARGA, JSON.stringify({ cuando: ahora, version: version || "" }));
+    } catch (e) {
+      // Sin dónde anotar la recarga no hay candado: mejor no recargar solo.
+      if (version) return;
+    }
     const url = new URL(location.href);
-    url.searchParams.set("v", String(Date.now()));
+    url.searchParams.set("v", String(ahora));
     location.replace(url.toString());
   }
 
@@ -2596,7 +2632,9 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
       const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" });
       if (!r.ok) return;
       const sello = await r.json();
-      if (sello.generado && D.generado && sello.generado !== D.generado) recargarFresco();
+      const publicada = marca(sello.generado), esta = marca(D.generado);
+      if (!(publicada > esta)) return;   // igual, más vieja o ilegible: nada que hacer
+      recargarFresco(sello.generado);
     } catch (e) { /* sin red o archivo viejo: se sigue con lo que hay */ }
   }
 
@@ -2604,7 +2642,10 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
   document.addEventListener("visibilitychange", () => { if (!document.hidden) revisarVersion(); });
   revisarVersion();
 
-  if (D.recarga > 0) setTimeout(recargarFresco, D.recarga * 1000);
+  if (D.recarga > 0) setTimeout(() => recargarFresco(), D.recarga * 1000);
+
+  // Arrancó bien: la red de seguridad ya no hace falta.
+  window.angabaveListo = true;
 })();
 </script>
 </body>

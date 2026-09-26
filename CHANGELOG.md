@@ -9,6 +9,32 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.17.1
+
+* **Se acabó la página en blanco después de cada publicación.** El portal se
+  recarga solo cuando detecta una versión nueva, y para saltarse el caché le
+  agregaba `?v=` a la dirección. Pero el CDN de GitHub ignora ese parámetro
+  (medido: una dirección con un `?v=` nunca pedido sale del caché), así que la
+  recarga traía la misma página vieja, volvía a detectar la versión nueva y
+  volvía a recargar: en una prueba local, **346 recargas en 8 segundos**. Pasaba
+  hasta diez minutos después de cada publicación, y en día de partido se
+  publica cada dos minutos.
+
+  Ahora solo recarga si lo publicado es más nuevo que la página, una sola vez
+  por versión cada once minutos (lo que tarda en vencer el caché del CDN) y
+  nunca más de una vez cada tres. Misma prueba: dos cargas y quieta.
+
+* **Red de seguridad en las dos páginas.** Si algo impide que arranquen, en vez
+  de una pantalla en blanco sale un aviso con qué hacer y el detalle del error
+  y del navegador, para que una captura baste para arreglarlo. Está escrita en
+  JavaScript viejo a propósito, para que corra en cualquier teléfono.
+
+* **Compatibilidad con iPhones viejos.** La página del enlace ya no usa
+  `replaceChildren` (no existe antes de iOS 14) y ninguna consulta se queda
+  esperando para siempre. La imagen de picks ya no usa `roundRect` sin
+  revisarlo (no existe antes de iOS 16: en iOS 15, "Generar imagen" no hacía
+  nada).
+
 ## alfa v0.17.0
 
 * **La semana se puede cargar en las partes que sea.** Antes, una hoja que
