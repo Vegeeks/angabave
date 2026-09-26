@@ -156,10 +156,12 @@ que cambió, o qué corregir. Si cierra la página, al volver a abrir su enlace 
 el resultado de su última carga.
 
 ```bash
-python herramientas/llaves.py nueva "Organizador"   # imprime su enlace, solo esa vez
-python herramientas/llaves.py lista                 # quién tiene enlace
-python herramientas/llaves.py quitar "Organizador"  # su enlace deja de servir
+python3 herramientas/llaves.py nueva "Organizador"   # imprime su enlace, solo esa vez
+python3 herramientas/llaves.py lista                 # quién tiene enlace
+python3 herramientas/llaves.py quitar "Organizador"  # su enlace deja de servir
 ```
+
+Anular un enlace surte efecto en segundos (medido: 1 s).
 
 **Cómo funciona.** El portal no tiene servidor, así que el archivo lo recibe
 una función de Supabase, `angabave-carga`, que vive en el mismo proyecto que la
@@ -193,14 +195,22 @@ publica y le devuelve el resultado a la función, que es lo que ve la página.
   solo puede correr workflows de este repo (`ANGABAVE_GITHUB`). No puede tocar
   el código ni los datos.
 
-**Configuración, una sola vez.** El token lo crea Angel en GitHub → Settings →
-Developer settings → Personal access tokens → **Fine-grained tokens** →
-*Generate new token*: solo el repo `Vegeeks/angabave`, permiso de
-**Actions: Read and write** y nada más. Luego:
+**Configuración, una sola vez.** El token lo crea Angel con este formulario de
+GitHub, que ya viene lleno (nombre, dueño, un año de vigencia y solo Actions:
+Read and write):
+
+<https://github.com/settings/personal-access-tokens/new?name=Carga+ANGABAVE&description=Solo+corre+el+workflow+de+carga+de+Vegeeks%2Fangabave&target_name=Vegeeks&expires_in=366&actions=write>
+
+Lo único que GitHub no deja prellenar es el repo: en *Repository access* se
+elige **Only select repositories** → `angabave`. Luego:
 
 ```bash
-python herramientas/llaves.py token    # lo pide sin mostrarlo y comprueba que GitHub lo acepte
+python3 herramientas/llaves.py token   # lo pide sin mostrarlo y comprueba que sirva
 ```
+
+La comprobación es una escritura inofensiva (habilitar el workflow de carga, que
+ya está habilitado): si el token solo pudiera leer, truena ahí y no el día que
+el organizador suba la quiniela.
 
 Cuando el token venza, se genera otro y se vuelve a correr ese comando. Si la
 función cambia: `supabase functions deploy angabave-carga --project-ref

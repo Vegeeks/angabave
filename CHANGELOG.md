@@ -14,6 +14,10 @@ La versión se muestra junto a la marca en el portal y vive en
 * Página del enlace: los rótulos chicos van en mayúsculas, como en el portal (la
   fuente recortada no tiene minúsculas), y un envío que no se pudo revisar dice
   "No se cargó" en vez de "No se subió", que contradecía al texto de abajo.
+* `herramientas/llaves.py token` comprueba el token con una escritura inofensiva
+  (habilitar el workflow de carga, que ya lo está): un token que solo puede leer
+  se descubre al guardarlo. Usa solo la biblioteca estándar, así que corre con el
+  `python3` del sistema, y el token nunca pasa por la línea de comandos.
 
 ## alfa v0.16.0
 

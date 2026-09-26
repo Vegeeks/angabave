@@ -5,10 +5,13 @@ el archivo de la semana desde cargar.html, y nadie más. La llave se muestra una
 sola vez, al crearla, y no se guarda en ningún lado: aquí y en Supabase queda
 solo su huella SHA-256.
 
-    python herramientas/llaves.py nueva "Organizador"    # imprime el enlace
-    python herramientas/llaves.py lista
-    python herramientas/llaves.py quitar "Organizador"   # su enlace deja de servir
-    python herramientas/llaves.py token                  # una vez: el token de GitHub
+    python3 herramientas/llaves.py nueva "Organizador"    # imprime el enlace
+    python3 herramientas/llaves.py lista
+    python3 herramientas/llaves.py quitar "Organizador"   # su enlace deja de servir
+    python3 herramientas/llaves.py token                  # una vez: el token de GitHub
+
+Solo usa la biblioteca estándar de Python y la CLI de Supabase: no hace falta
+activar el entorno del proyecto.
 
 Cada cambio actualiza el secreto ANGABAVE_LLAVES de la función y deja
 constancia en data/llaves_de_carga.json de quién tiene enlace y desde cuándo.
@@ -26,6 +29,8 @@ import secrets
 import subprocess
 import sys
 import unicodedata
+import urllib.error
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -34,6 +39,12 @@ RUTA = RAIZ / "data" / "llaves_de_carga.json"
 PROYECTO = "hxaajhsizdnlismnelqu"
 REPO = "Vegeeks/angabave"
 PAGINA = "https://vegeeks.github.io/angabave/cargar.html"
+#: El formulario de GitHub para el token, ya lleno salvo el repo, que no se puede prellenar.
+FORMA_TOKEN = (
+    "https://github.com/settings/personal-access-tokens/new?name=Carga+ANGABAVE"
+    "&description=Solo+corre+el+workflow+de+carga+de+Vegeeks%2Fangabave"
+    "&target_name=Vegeeks&expires_in=366&actions=write"
+)
 _SIGNOS = set(" .'’-_&()")
 
 
@@ -118,24 +129,53 @@ def quitar(nombre: str, *, ruta: Path = RUTA, publicar=_supabase_secreto) -> Non
     escribir(quedan, ruta)
 
 
+def _github(metodo: str, ruta: str, token: str) -> int:
+    """Código de respuesta de GitHub. El token viaja en la cabecera, nunca en un comando."""
+    peticion = urllib.request.Request(
+        f"https://api.github.com{ruta}", method=metodo,
+        headers={
+            "Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "angabave-llaves",
+        },
+    )
+    try:
+        with urllib.request.urlopen(peticion, timeout=20) as respuesta:
+            return respuesta.status
+    except urllib.error.HTTPError as error:
+        return error.code
+
+
+def revisar_token(valor: str, consultar=_github) -> None:
+    """Comprueba que el token pueda correr workflows de angabave, y nada más hace falta.
+
+    La prueba es una escritura inofensiva: "habilitar" el workflow de carga, que
+    ya está habilitado. Si el token solo pudiera leer, aquí truena, y no el
+    sábado en la noche con el organizador subiendo la quiniela.
+    """
+    if not valor.startswith("github_pat_"):
+        raise ErrorLlaves("Ese no parece un token de GitHub de los nuevos (empiezan con github_pat_).")
+    codigo = consultar("PUT", f"/repos/{REPO}/actions/workflows/cargar.yml/enable", valor)
+    if codigo == 204:
+        return
+    if codigo == 401:
+        raise ErrorLlaves("GitHub no reconoce ese token. ¿Se copió completo?")
+    if codigo == 404:
+        raise ErrorLlaves(
+            f"El token no llega al repo {REPO}. En «Repository access» elige «Only select "
+            "repositories» y marca angabave."
+        )
+    if codigo == 403:
+        raise ErrorLlaves("El token llega al repo pero no puede correr workflows: dale Actions «Read and write».")
+    raise ErrorLlaves(f"GitHub respondió {codigo}. Intenta de nuevo en unos minutos.")
+
+
 def token() -> None:
     """Guarda en Supabase el token de GitHub con el que la función pide revisar cada carga."""
     print("Pega el token de GitHub (no se ve mientras lo pegas) y oprime Enter:")
     valor = getpass.getpass(prompt="").strip()
-    if not valor.startswith("github_pat_"):
-        raise ErrorLlaves("Ese no parece un token de GitHub de los nuevos (empiezan con github_pat_).")
-    prueba = subprocess.run(
-        ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", "-H", f"Authorization: Bearer {valor}",
-         "-H", "Accept: application/vnd.github+json", f"https://api.github.com/repos/{REPO}/actions/workflows"],
-        capture_output=True, text=True,
-    )
-    if prueba.stdout.strip() != "200":
-        raise ErrorLlaves(
-            f"GitHub no aceptó el token para {REPO} (respondió {prueba.stdout.strip()}). "
-            "Revisa que tenga acceso a ese repo y permiso de Actions: Read and write."
-        )
+    revisar_token(valor)
     _supabase_secreto("ANGABAVE_GITHUB", valor)
-    print("Listo: el token quedó guardado en Supabase y GitHub lo aceptó.")
+    print("Listo: GitHub aceptó el token y quedó guardado en Supabase.")
 
 
 def main(argumentos: list[str] | None = None) -> int:
@@ -144,7 +184,7 @@ def main(argumentos: list[str] | None = None) -> int:
     sub.add_parser("nueva", help="crea un enlace e imprime la liga").add_argument("nombre")
     sub.add_parser("quitar", help="anula el enlace de alguien").add_argument("nombre")
     sub.add_parser("lista", help="quién tiene enlace")
-    sub.add_parser("token", help="guarda el token de GitHub de la función (una vez)")
+    sub.add_parser("token", help=f"guarda el token de GitHub de la función; se crea en {FORMA_TOKEN}")
     opciones = parser.parse_args(argumentos)
     try:
         if opciones.accion == "nueva":
@@ -152,7 +192,7 @@ def main(argumentos: list[str] | None = None) -> int:
             print(f"Enlace para {opciones.nombre}. Se muestra solo esta vez; mándaselo por privado:\n")
             print(f"  {enlace(llave)}\n")
             print("Quien tenga este enlace puede cargar la semana. Si se filtra: "
-                  f'python herramientas/llaves.py quitar "{opciones.nombre}"')
+                  f'python3 herramientas/llaves.py quitar "{opciones.nombre}"')
         elif opciones.accion == "quitar":
             quitar(opciones.nombre)
             print(f"El enlace de {opciones.nombre} ya no sirve.")

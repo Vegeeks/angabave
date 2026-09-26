@@ -98,3 +98,27 @@ def test_el_archivo_del_repo_solo_tiene_huellas():
     for l in llaves.leer(ruta):
         assert set(l) == {"nombre", "huella", "creada"}
         assert re.fullmatch(r"[0-9a-f]{64}", l["huella"])
+
+
+@pytest.mark.parametrize("codigo, mensaje", [
+    (401, "no reconoce"), (404, "Only select"), (403, "Read and write"), (500, "500"),
+])
+def test_el_token_se_revisa_con_una_escritura_inofensiva(codigo: int, mensaje: str):
+    pedidas = []
+    def github(metodo, ruta, token):
+        pedidas.append((metodo, ruta))
+        return codigo
+    with pytest.raises(llaves.ErrorLlaves, match=mensaje):
+        llaves.revisar_token("github_pat_x", consultar=github)
+    assert pedidas == [("PUT", "/repos/Vegeeks/angabave/actions/workflows/cargar.yml/enable")]
+
+
+def test_un_token_bueno_pasa_y_uno_viejo_ni_se_consulta():
+    llaves.revisar_token("github_pat_x", consultar=lambda *a: 204)
+    with pytest.raises(llaves.ErrorLlaves, match="github_pat_"):
+        llaves.revisar_token("ghp_viejo", consultar=lambda *a: pytest.fail("no debía consultar"))
+
+
+def test_el_formulario_del_token_viene_prellenado():
+    assert "target_name=Vegeeks" in llaves.FORMA_TOKEN and "actions=write" in llaves.FORMA_TOKEN
+    assert "expires_in=366" in llaves.FORMA_TOKEN
