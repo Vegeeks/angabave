@@ -1639,9 +1639,12 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
     const ANCHO = 1080, MARGEN = 56, ALTO_FILA = 96;
-    const claves = s.partidos
-      .map((p) => p.v + "@" + p.l)
-      .filter((clave) => elegidos.has(clave));
+    // Los partidos salen de los que ofrece este generador (porClave), no de
+    // s.partidos: con la semana a medias, s.partidos solo trae la tanda ya
+    // cargada y la imagen salía vacía. El orden es el de la NFL, el mismo en
+    // que se armó porClave.
+    const claves = [...porClave.keys()].filter((clave) => elegidos.has(clave));
+    if (!claves.length) return;
 
     const cabecera = 320;
     const pie = 96;
@@ -1861,9 +1864,11 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
     caja.appendChild(nota);
 
     function refrescar() {
-      const n = elegidos.size;
+      // Solo cuentan los de este generador: el borrador guardado puede traer
+      // picks de partidos que ya no se ofrecen (una tanda que ya se cargó).
+      const n = [...elegidos.keys()].filter((clave) => porClave.has(clave)).length;
       cuenta.textContent = n === 0 ? "Ninguno elegido"
-        : n + " de " + s.partidos.length + " elegidos";
+        : n + " de " + porClave.size + " elegidos";
       descargar.disabled = n === 0;
       limpiar.disabled = n === 0;
     }

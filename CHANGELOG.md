@@ -9,6 +9,16 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.16.2
+
+* **La imagen de picks salía vacía en la semana 3.** Desde la v0.14.0, con la
+  semana a medias, el generador ofrece los partidos que faltan por repartir,
+  pero la imagen seguía cruzando los picks con los partidos ya cargados (solo
+  el del jueves): salía "0 PICKS", sin renglones, y se veía cortada. El
+  contador tenía el mismo error ("5 de 1 elegidos"). Ahora los dos salen de los
+  partidos que ofrece el generador, y el borrador guardado ya no cuenta picks de
+  partidos que dejaron de ofrecerse. Hay prueba para que no vuelva.
+
 ## alfa v0.16.1
 
 * Página del enlace: los rótulos chicos van en mayúsculas, como en el portal (la

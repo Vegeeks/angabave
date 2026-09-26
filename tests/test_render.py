@@ -467,3 +467,18 @@ def test_la_pagina_de_carga_no_deja_rastro(armado, tmp_path: Path):
     pagina = (tmp_path / "cargar.html").read_text(encoding="utf-8").lower()
     for rastro in ("claude", "anthropic", "inteligencia artificial", "gpt", "automáticamente"):
         assert rastro not in pagina
+
+
+def test_el_generador_de_picks_no_usa_los_partidos_ya_cargados():
+    """Con la semana a medias, s.partidos solo trae la tanda cargada.
+
+    El generador ofrece otros partidos (los que faltan por repartir), así que la
+    imagen y el contador tienen que salir de su propia lista. Cuando la imagen
+    leía s.partidos, salía con "0 PICKS" y cortada.
+    """
+    plantilla = (Path(__file__).resolve().parents[1] / "quiniela" / "plantillas" / "index.html.j2").read_text(
+        encoding="utf-8"
+    )
+    tramo = plantilla[plantilla.index("async function exportarPicks("):plantilla.index("function aviso(titulo, texto)")]
+    codigo = [l for l in tramo.splitlines() if not l.strip().startswith(("//", "/*", "*"))]
+    assert not [l for l in codigo if "s.partidos" in l or "s.tandas" in l]
