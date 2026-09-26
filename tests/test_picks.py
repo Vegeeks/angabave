@@ -8,7 +8,18 @@ from pathlib import Path
 import openpyxl
 import pytest
 
-from quiniela.picks import ErrorFormatoExcel, ErrorPicks, clave_participante, leer_picks, numero_semana
+from quiniela.picks import (
+    ErrorFormatoExcel,
+    ErrorPicks,
+    Hoja,
+    archivos_por_semana,
+    clave_participante,
+    escribir_hoja,
+    leer_hoja,
+    leer_picks,
+    numero_semana,
+    semana_en_el_nombre,
+)
 
 from .conftest import ENFRENTAMIENTOS_S2, PICKS_S2, crear_excel
 
@@ -168,3 +179,56 @@ def test_equipo_repetido_en_la_semana(tmp_path: Path):
 def test_archivo_inexistente(tmp_path: Path):
     with pytest.raises(ErrorPicks, match="No existe"):
         leer_picks(tmp_path / "no_esta.xlsx")
+
+
+# --- la hoja canónica y los nombres ------------------------------------------------
+
+
+@pytest.mark.parametrize("nombre, semana", [
+    ("Quiniela 3.xlsx", 3),
+    ("Quiniela.3.Jueves.pdf", 3),
+    ("Semana_03.xlsx", 3),
+    ("semana 12 final.pdf", 12),
+    ("Quiniela 2026.xlsx", None),
+    ("picks.xlsx", None),
+])
+def test_semana_en_el_nombre(nombre, semana):
+    assert semana_en_el_nombre(nombre) == semana
+
+
+def test_la_hoja_que_se_escribe_se_lee_identica(tmp_path: Path):
+    original = leer_hoja(crear_excel(tmp_path / "Semana_02.xlsx"))
+    copia = escribir_hoja(tmp_path / "Semana_02_copia.xlsx", 2, original.partidos, original.picks)
+    releida = leer_hoja(copia)
+    assert releida == Hoja(2, original.partidos, original.picks)
+
+
+def test_leer_hoja_dice_la_semana(excel_s2: Path):
+    assert leer_hoja(excel_s2).semana == 2
+
+
+@pytest.mark.parametrize("nombre", ["<b>Ana</b>", "=1+1", "@Ana", "Ana\u200bLópez", "A" * 41])
+def test_el_lector_rechaza_lo_que_no_es_un_nombre(tmp_path: Path, nombre: str):
+    picks = {**PICKS_S2, nombre: list(PICKS_S2["Ismael Reyna"])}
+    with pytest.raises(ErrorPicks, match="nombre"):
+        leer_picks(crear_excel(tmp_path / "Semana_02.xlsx", picks=picks))
+
+
+@pytest.mark.parametrize("nombre", ["Chucho el Destructor", "Chilangos Norteños", "O'Brien",
+                                    "Raider79", "Ana-María", "Pérez & Hijos", "J. López (2)"])
+def test_el_lector_acepta_nombres_de_verdad(tmp_path: Path, nombre: str):
+    picks = {**PICKS_S2, nombre: list(PICKS_S2["Ismael Reyna"])}
+    _, leidos = leer_picks(crear_excel(tmp_path / "Semana_02.xlsx", picks=picks))
+    assert nombre in leidos
+
+
+def test_archivos_por_semana_prefiere_el_excel_y_ignora_temporales(tmp_path: Path):
+    crear_excel(tmp_path / "Semana_02.xlsx")
+    crear_excel(tmp_path / "Semana_01.xlsx", semana=1)
+    (tmp_path / "Semana_02.pdf").write_bytes(b"%PDF-")
+    (tmp_path / ".Semana_03.nuevo.xlsx").write_bytes(b"")
+    (tmp_path / "~$Semana_01.xlsx").write_bytes(b"")
+    (tmp_path / "notas.txt").write_text("x")
+    grupos = archivos_por_semana(tmp_path)
+    assert list(grupos) == [1, 2]
+    assert [p.name for p in grupos[2]] == ["Semana_02.xlsx", "Semana_02.pdf"]

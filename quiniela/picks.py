@@ -25,6 +25,7 @@ import json
 import logging
 import re
 import unicodedata
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -42,8 +43,15 @@ __all__ = [
     "huellas_por_partido",
     "verificar_sello",
     "clave_participante",
+    "Hoja",
+    "leer_hoja",
     "leer_picks",
+    "escribir_hoja",
     "numero_semana",
+    "semana_en_el_nombre",
+    "archivos_por_semana",
+    "EXTENSIONES_DE_PICKS",
+    "LARGO_MAXIMO_NOMBRE",
 ]
 
 _log = logging.getLogger(__name__)
@@ -55,6 +63,20 @@ COLUMNA_IGNORADA = "Aciertos Totales"
 _MAX_FILAS_ENCABEZADO = 12
 
 _RE_SEMANA = re.compile(r"semana\s*_?\s*(\d{1,2})", re.IGNORECASE)
+
+#: Pistas del número de semana en el nombre de un archivo tal como llega:
+#: "Quiniela 3.xlsx", "Quiniela.3.Jueves.pdf" (GitHub cambia espacios por
+#: puntos al adjuntar) o "Semana_03.xlsx".
+_RE_PISTAS_SEMANA = (
+    re.compile(r"semana[\s._-]*(\d{1,2})(?!\d)", re.IGNORECASE),
+    re.compile(r"quiniela[\s._-]*(\d{1,2})(?!\d)", re.IGNORECASE),
+)
+
+#: Un nombre más largo no cabe en la tabla ni en la imagen, y ninguno de los 34
+#: pasa de 20 caracteres.
+LARGO_MAXIMO_NOMBRE = 40
+#: Además de letras y números, lo único que aparece en un nombre de verdad.
+_SIGNOS_EN_NOMBRES = set(" .'’-_&()")
 
 
 class ErrorPicks(ValueError):
@@ -70,8 +92,18 @@ class PicksAlteradosError(ErrorPicks):
 
 
 RAIZ = Path(__file__).resolve().parents[1]
-#: Huella de los picks de cada semana, tomada al arrancar el primer partido.
+#: Huella de los picks de cada partido, tomada en cuanto ese partido arranca.
 RUTA_SELLOS = RAIZ / "data" / "sellos.json"
+
+
+@dataclass(frozen=True, slots=True)
+class Hoja:
+    """Lo que trae una hoja de la quiniela, ya validado."""
+
+    #: La que dice la celda "Semana N"; None si la hoja no lo dice.
+    semana: int | None
+    partidos: list[Partido]
+    picks: dict[str, list[str]]
 
 
 def _texto(valor: object) -> str:
@@ -109,6 +141,94 @@ def numero_semana(ruta: Path) -> int:
             "Se espera algo como 'Semana_02.xlsx'."
         )
     return int(coincidencia.group(1))
+
+
+#: Formatos en que se guardan los picks, en orden de preferencia.
+EXTENSIONES_DE_PICKS = (".xlsx", ".pdf")
+
+
+def archivos_por_semana(directorio: Path) -> dict[int, list[Path]]:
+    """Los archivos de picks guardados, agrupados por semana.
+
+    En cada semana va primero el que se usa: si hay Excel y PDF, gana el Excel.
+    Que una semana tenga dos archivos es un resto de otra época; la carga deja
+    siempre uno solo.
+    """
+    directorio = Path(directorio)
+    if not directorio.exists():
+        return {}
+    candidatos = [
+        ruta for ruta in directorio.iterdir()
+        if ruta.is_file()
+        and ruta.suffix.lower() in EXTENSIONES_DE_PICKS
+        and not ruta.name.startswith(("~$", "."))
+        and _RE_SEMANA.search(ruta.stem)
+    ]
+    por_semana: dict[int, list[Path]] = {}
+    for ruta in sorted(
+        candidatos, key=lambda p: (EXTENSIONES_DE_PICKS.index(p.suffix.lower()), p.name)
+    ):
+        por_semana.setdefault(numero_semana(ruta), []).append(ruta)
+    return dict(sorted(por_semana.items()))
+
+
+def semana_en_el_nombre(nombre: str) -> int | None:
+    """El número de semana que sugiere el nombre del archivo, si sugiere uno.
+
+    Es solo una pista para cotejar contra la hoja: si el archivo se llama
+    "Quiniela 4" y por dentro dice "Semana 3", algo se mezcló.
+    """
+    for patron in _RE_PISTAS_SEMANA:
+        coincidencia = patron.search(nombre)
+        if coincidencia:
+            return int(coincidencia.group(1))
+    return None
+
+
+def _problema_con_el_nombre(nombre: str) -> str | None:
+    """Explica qué tiene de raro un nombre de participante, o None si está bien.
+
+    Los nombres terminan en la página, en la imagen para WhatsApp y en el Excel
+    que se guarda. Solo se aceptan letras, números, espacios y los pocos signos
+    que aparecen en un nombre de verdad: así ninguno puede colar código en la
+    página ni una fórmula en el Excel, ni desbordar la tabla.
+    """
+    if len(nombre) > LARGO_MAXIMO_NOMBRE:
+        return f"el nombre {nombre[:20]!r}… tiene {len(nombre)} caracteres; el máximo es {LARGO_MAXIMO_NOMBRE}"
+    if not (nombre[0].isalpha() or nombre[0].isdigit()):
+        return f"el nombre {nombre!r} empieza con {nombre[0]!r}; tiene que empezar con letra o número"
+    raros = sorted({
+        caracter for caracter in nombre
+        if not (caracter.isalpha() or caracter.isdigit() or caracter in _SIGNOS_EN_NOMBRES)
+    })
+    if raros:
+        return f"el nombre {nombre!r} trae caracteres que no van en un nombre: {' '.join(raros)}"
+    return None
+
+
+def escribir_hoja(
+    ruta: Path, semana: int, partidos: list[Partido], picks: dict[str, list[str]]
+) -> Path:
+    """Escribe la quiniela en la misma rejilla que usa el organizador.
+
+    Es como se guarda lo que llega por la forma de carga: un formato conocido y
+    probado, sin logos ni formato condicional, que sirve igual si la semana se
+    armó con la hoja de una sola tanda o juntando dos.
+    """
+    libro = openpyxl.Workbook()
+    hoja = libro.active
+    hoja.title = f"Semana {semana}"
+    hoja.cell(row=2, column=1, value=f"Semana {semana}")
+    for columna, partido in enumerate(partidos, start=2):
+        hoja.cell(row=1, column=columna, value=partido.visitante)
+        hoja.cell(row=2, column=columna, value=partido.local)
+    hoja.cell(row=1, column=len(partidos) + 2, value=COLUMNA_IGNORADA)
+    for fila, (nombre, elegidos) in enumerate(picks.items(), start=3):
+        hoja.cell(row=fila, column=1, value=nombre)
+        for columna, pick in enumerate(elegidos, start=2):
+            hoja.cell(row=fila, column=columna, value=pick)
+    libro.save(ruta)
+    return Path(ruta)
 
 
 def _es_fila_de_equipos(fila: tuple, columnas: range) -> bool:
@@ -263,6 +383,12 @@ def leer_picks(ruta: Path) -> tuple[list[Partido], dict[str, list[str]]]:
     Devuelve los enfrentamientos en el orden del archivo y un diccionario de
     participante a lista de picks ya normalizados, uno por partido.
     """
+    hoja = leer_hoja(ruta)
+    return hoja.partidos, hoja.picks
+
+
+def leer_hoja(ruta: Path) -> Hoja:
+    """Como `leer_picks`, pero dice también de qué semana es según la hoja."""
     ruta = Path(ruta)
     if not ruta.exists():
         raise ErrorPicks(f"No existe el archivo de picks: {ruta}")
@@ -316,7 +442,7 @@ def leer_picks(ruta: Path) -> tuple[list[Partido], dict[str, list[str]]]:
         )
 
     _log.info("Leí los picks de %d participantes.", len(picks))
-    return partidos, picks
+    return Hoja(semana_hoja, partidos, picks)
 
 
 def _leer_participantes(
@@ -345,6 +471,11 @@ def _leer_participantes(
             _log.info(
                 "Fila %d: corregí espacios o acentos en %r -> %r.", numero_fila, crudo_nombre, nombre
             )
+
+        falla_nombre = _problema_con_el_nombre(nombre)
+        if falla_nombre:
+            problemas.append(f"fila {numero_fila}: {falla_nombre}")
+            continue
 
         clave = clave_participante(nombre)
         if clave in claves_vistas:
@@ -396,10 +527,10 @@ def _leer_fila_de_picks(celdas: list[str], partidos: list[Partido]) -> tuple[lis
 
 # --- sellado de los picks ----------------------------------------------------
 #
-# Los picks se pueden corregir mientras no empiece la jornada. En cuanto arranca
-# el primer partido quedan congelados: a partir de ahí, cualquier cambio en el
-# archivo es sospechoso, porque ya se conocen resultados. El sello es la huella
-# del archivo, guardada en el repo, así que el cambio queda además en el
+# Los picks de un partido se pueden corregir mientras ese partido no empiece. En
+# cuanto arranca quedan congelados: a partir de ahí cualquier cambio es
+# sospechoso, porque ya se sabe cómo va. El sello es la huella de los picks de
+# cada partido, guardada en el repo, así que el cambio queda además en el
 # historial de git con fecha y autor.
 
 

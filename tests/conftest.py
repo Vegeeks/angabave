@@ -7,10 +7,13 @@ tercera fila y una última columna "Aciertos Totales" con valores basura.
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import openpyxl
 import pytest
+
+from quiniela.espn import Partido
 
 #: Enfrentamientos reales de la Semana 2 de 2026, en el orden del archivo.
 ENFRENTAMIENTOS_S2: list[tuple[str, str]] = [
@@ -173,3 +176,29 @@ def crear_pdf(
     )
     ruta.write_bytes(cuerpo)
     return ruta
+
+
+#: Un domingo cualquiera de la temporada, para armar calendarios de prueba.
+DOMINGO = datetime(2026, 9, 27, 17, 0, tzinfo=timezone.utc)
+
+
+def calendario_nfl(enfrentamientos=None, *, empezados=(), inicio=DOMINGO):
+    """Los partidos de una semana como los entrega ESPN, con horario.
+
+    Los de `empezados` ya terminaron (arrancaron un día antes); el resto
+    arranca en `inicio`, uno por minuto y en el orden dado.
+    """
+    enfrentamientos = enfrentamientos if enfrentamientos is not None else ENFRENTAMIENTOS_S2
+    partidos = []
+    for indice, (visitante, local) in enumerate(enfrentamientos):
+        if f"{visitante}@{local}" in empezados:
+            partidos.append(Partido(
+                visitante, local, 17, 24, local, True, "Final",
+                inicio - timedelta(days=1) + timedelta(minutes=indice),
+            ))
+        else:
+            partidos.append(Partido(
+                visitante, local, 0, 0, None, False, "Scheduled",
+                inicio + timedelta(minutes=indice),
+            ))
+    return partidos

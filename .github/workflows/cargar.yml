@@ -1,0 +1,131 @@
+name: Cargar semana
+
+# La forma "Cargar semana" (en Issues) es la puerta del organizador: adjunta el
+# archivo tal como lo reparte, y esto lo revisa, lo publica y le contesta en el
+# mismo hilo. Solo atiende a las cuentas de data/cargadores.json.
+#
+# Seguridad:
+# * El texto del hilo nunca se pega en un comando. Python lo lee del archivo
+#   del evento (quiniela/buzon.py). Aquí solo se usan el número del hilo y lo
+#   que escribe nuestro propio código.
+# * El código que corre es siempre el de main: un hilo no puede cambiarlo.
+# * La revisión completa está en quiniela/carga.py. Si algo no cuadra no se
+#   publica nada, y el hilo dice por qué.
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write   # publicar los picks y el sitio
+  issues: write     # contestar y cerrar el hilo
+  actions: write    # despertar el directo si hay partido pronto
+
+jobs:
+  cargar:
+    # Los hilos de la forma traen la etiqueta. Por si GitHub no la pusiera, se
+    # reconoce también el encabezado que la forma escribe en el texto.
+    if: >-
+      contains(github.event.issue.labels.*.name, 'carga') ||
+      contains(github.event.issue.body, '### Archivo de la semana')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NUMERO: ${{ github.event.issue.number }}
+      FORMA: ${{ github.server_url }}/${{ github.repository }}/issues/new?template=cargar-semana.yml
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Revisar, publicar y contestar
+        run: |
+          git config user.name "Angel Barrera"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          REPORTE="$RUNNER_TEMP/reporte.md"
+          RESUMEN="$RUNNER_TEMP/resumen.json"
+
+          contestar() {
+            gh issue comment "$NUMERO" --body-file "$REPORTE"
+            gh issue close "$NUMERO" --reason "$1"
+          }
+
+          # Los comandos devuelven 0 si todo bien, 1 si hubo que rechazar algo
+          # del archivo o del hilo (se contesta y el workflow queda en verde) y
+          # 3 si algo falló de este lado (se contesta y queda en rojo, para que
+          # llegue el aviso).
+          terminar_si_fallo() {
+            if [ "$1" -ne 0 ]; then
+              contestar "not planned"
+              [ "$1" -eq 1 ] && exit 0 || exit 1
+            fi
+          }
+
+          # 1. Quién es y qué adjuntó.
+          set +e
+          python cli.py buzon --evento "$GITHUB_EVENT_PATH" --carpeta "$RUNNER_TEMP/entrada" \
+            --reporte "$REPORTE" --salida "$RUNNER_TEMP/archivo.txt" --forma "$FORMA"
+          codigo=$?
+          set -e
+          terminar_si_fallo "$codigo"
+          ARCHIVO="$(cat "$RUNNER_TEMP/archivo.txt")"
+
+          # 2. Revisar y publicar. Si otra corrida publica en medio, se vuelve a
+          #    revisar todo encima de lo que ella dejó: nunca se sube una
+          #    revisión hecha contra datos viejos.
+          for intento in 1 2 3 4; do
+            set +e
+            python cli.py importar "$ARCHIVO" \
+              --reporte "$REPORTE" --resumen "$RESUMEN" --forma "$FORMA"
+            codigo=$?
+            set -e
+            terminar_si_fallo "$codigo"
+
+            if [ -z "$(git status --porcelain -- data/picks data/sellos.json)" ]; then
+              contestar completed   # ya estaba igual
+              exit 0
+            fi
+            SEMANA="$(jq -r '.semana' "$RESUMEN")"
+
+            if ! python cli.py actualizar; then
+              printf '\n---\n⚠️ El archivo está bien, pero no pude regenerar el portal (seguramente ESPN no respondió), así que no publiqué nada. Vuelve a subirlo en unos minutos.\n' >> "$REPORTE"
+              contestar "not planned"
+              exit 1
+            fi
+
+            git add data/picks data/sellos.json docs data/resultados
+            git commit -q -m "Semana $SEMANA cargada desde #$NUMERO"
+            if git push -q; then
+              # Si hay partido en las próximas 12 horas, que el directo no
+              # dependa del cron de GitHub para arrancar.
+              PROXIMO="$(python cli.py proximo 2>/dev/null || echo -1)"
+              if [ "$PROXIMO" -ge 0 ] 2>/dev/null && [ "$PROXIMO" -le 43200 ]; then
+                gh workflow run directo.yml --repo "$GITHUB_REPOSITORY" || true
+              fi
+              contestar completed
+              exit 0
+            fi
+            echo "Otra corrida publicó primero; reviso otra vez encima ($intento)."
+            git fetch -q origin main
+            git reset -q --hard origin/main
+          done
+
+          printf '\n---\n⚠️ No pude publicar después de varios intentos. No se tocó nada.\n' >> "$REPORTE"
+          contestar "not planned"
+          exit 1
+
+      - name: Contestar aunque algo truene
+        if: failure()
+        run: |
+          # Si el paso anterior alcanzó a contestar, no se repite.
+          if [ "$(gh issue view "$NUMERO" --json state --jq .state)" = "OPEN" ]; then
+            printf '### ⚠️ No pude terminar de revisar el archivo\n\nAlgo falló de mi lado, no en tu archivo. No se tocó nada y Angel ya tiene el aviso.\n' > "$RUNNER_TEMP/fallo.md"
+            gh issue comment "$NUMERO" --body-file "$RUNNER_TEMP/fallo.md"
+            gh issue close "$NUMERO" --reason "not planned"
+          fi

@@ -73,9 +73,17 @@ def emparejar_resultados(partidos: list[Partido], resultados: list[Partido]) -> 
             alineados.append(real)
 
     if faltantes:
+        todas = {resultado.clave for resultado in resultados}
+        detalles = []
+        for clave in faltantes:
+            visitante, _, local = clave.partition("@")
+            if f"{local}@{visitante}" in todas:
+                detalles.append(f"{clave} (está al revés: {local} es visitante y {visitante} local)")
+            else:
+                detalles.append(clave)
         raise ErrorCalendario(
             "Estos enfrentamientos del Excel no existen en el calendario de la NFL de esa "
-            "semana: " + ", ".join(faltantes) + ". Revisa la captura o usa data/overrides.json."
+            "semana: " + ", ".join(detalles) + ". Revisa la captura o usa data/overrides.json."
         )
     if por_clave:
         # Cuando falta casi toda la semana no es un error de captura: es que el
@@ -180,6 +188,8 @@ PARECIDO_SOSPECHOSO = 0.86
 def alertar_nombres_parecidos(
     claves: dict[str, str],
     semanas_por_clave: dict[str, set[int]] | None = None,
+    *,
+    registrar: bool = True,
 ) -> list[tuple[str, str]]:
     """Avisa de nombres casi idénticos que podrían ser la misma persona.
 
@@ -201,7 +211,7 @@ def alertar_nombres_parecidos(
                 continue  # coincidieron en una semana: son personas distintas
             if SequenceMatcher(None, una, otra).ratio() >= PARECIDO_SOSPECHOSO:
                 sospechosos.append((claves[una], claves[otra]))
-    for izquierda, derecha in sospechosos:
+    for izquierda, derecha in sospechosos if registrar else ():
         _log.warning(
             "Ojo: %r y %r se parecen mucho. Si es la misma persona mal escrita, "
             "su temporada se está contando por separado.",

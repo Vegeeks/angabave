@@ -28,7 +28,8 @@ python cli.py tabla --semana 2                 # tabla de la semana en la termin
 python cli.py general                          # tabla acumulada en la terminal
 python cli.py escenarios --participante "Angel D Luffy"
 python cli.py validar --semana 2               # solo revisa el archivo, no calcula
-python cli.py importar ~/Downloads/"Quiniela 3.pdf"   # lo guarda como Semana_03.pdf
+python cli.py importar ~/Downloads/"Quiniela 3.pdf"   # lo revisa todo y lo guarda
+python cli.py importar archivo.xlsx --solo-revisar    # revisa todo sin guardar nada
 python cli.py pendientes --semana 2            # cuántos partidos siguen abiertos
 python cli.py proximo                          # segundos al próximo partido
 ```
@@ -39,13 +40,17 @@ ponerse a trabajar, esperar o detenerse.
 
 ### Flujo semanal
 
-Esto es todo lo que hay que hacer cada semana:
+Lo normal es que **el organizador cargue la semana él mismo** con la forma
+"Cargar semana" de GitHub (ver **Carga desde GitHub**, abajo): adjunta el
+archivo desde el teléfono y en uno o dos minutos está publicado, o le dice qué
+corregir. Nadie tiene que tocar la terminal.
+
+Desde la Mac se hace con la misma revisión:
 
 ```bash
 cd ~/NFL/quiniela-nfl
 python cli.py importar ~/Downloads/"Quiniela 3.pdf"   # Excel o PDF, da igual
-python cli.py validar --semana 3                      # avisa si hay capturas raras
-git add data/picks && git commit -m "Semana 3" && git push
+git add data && git commit -m "Semana 3" && git push
 ```
 
 El push dispara el workflow solo. De ahí en adelante no hay que hacer nada más
@@ -56,7 +61,8 @@ aparte, porque esa tanda cierra el miércoles y la del domingo el sábado. Esa
 hoja se importa igual —un solo partido y la rejilla centrada, el lector la
 reconoce— y la semana se publica a medias: el encabezado dice "1 de 16", no se
 corona ganador, y el generador de picks sigue abajo con los partidos que faltan.
-Cuando llega la hoja completa se importa encima con `--forzar` y ya.
+Cuando llega el resto se carga igual: si es la semana completa la reemplaza, y
+si es solo la tanda que faltaba se junta con la del jueves.
 
 Si el cron de GitHub no arranca el directo —pasa, ver **Automatización**—, se
 lanza a mano:
@@ -135,6 +141,69 @@ reparto final aparecen hasta que cierran las 18 semanas.
 Los montos viven en `quiniela/scoring.py` (`PREMIO_SEMANAL`,
 `ACUMULADO_SEMANAL`, `SEMANAS_TEMPORADA`, `REPARTO_FINAL`).
 
+## Carga desde GitHub
+
+El organizador carga la semana sin terminal y sin acceso al repo, con la forma
+**Cargar semana** de Issues:
+
+<https://github.com/Vegeeks/angabave/issues/new?template=cargar-semana.yml>
+
+Abre el enlace (desde el teléfono sirve), adjunta el archivo tal como lo
+reparte y lo manda. El workflow `cargar.yml` lo revisa, lo publica y le contesta
+en el mismo hilo en uno o dos minutos: o quedó publicado, con lo que cambió, o
+qué hay que corregir. Luego cierra el hilo, que queda como constancia.
+
+**Quién puede.** Solo las cuentas de `data/cargadores.json`, comparadas por su
+número de cuenta, que no cambia aunque la persona cambie su usuario ni lo puede
+reclamar otro. Para agregar a alguien:
+
+```bash
+gh api users/USUARIO --jq .id    # y se agrega a data/cargadores.json con ese id
+```
+
+A cualquier otra cuenta se le contesta que no está autorizada y no se toca nada.
+La cuenta no necesita permisos sobre el repo: nunca escribe en él, solo abre un
+hilo.
+
+**Qué se revisa** (todo en `quiniela/carga.py`, la misma puerta que usa
+`importar` en la Mac):
+
+1. Que el archivo sea Excel o PDF de verdad: de tamaño razonable, sin
+   contraseña, que no sea un `.xls` viejo ni un zip hecho para reventar.
+2. Lo del lector: equipos válidos, nadie repetido, un pick por partido y de uno
+   de los dos equipos de ese partido, y nombres que sean nombres (letras,
+   números y pocos signos, 40 caracteres como máximo; nada que pueda colar
+   código en la página ni una fórmula en el Excel).
+3. La semana: manda la celda "Semana N"; el nombre del archivo solo avisa si no
+   coincide.
+4. Que no se salte una semana.
+5. Que cada partido exista esa semana en el calendario de la NFL, con local y
+   visitante en su lugar (si viene al revés, lo dice).
+6. Cómo encaja con lo que ya estaba: semana nueva, la tanda que faltaba (se
+   juntan si los participantes son los mismos), o la semana entera otra vez. Una
+   hoja que repite parte de lo cargado y omite otra parte se rechaza.
+7. Que no cambie, aparezca ni desaparezca ningún pick de un partido que ya
+   empezó. Se compara contra lo publicado y además contra los sellos.
+
+Además avisa, sin rechazar, de nombres nuevos, de quien estaba la semana
+anterior y no viene, y de nombres sospechosamente parecidos a otros.
+
+Si todo cuadra, escribe la semana en la rejilla de siempre, la vuelve a leer
+para comprobar que dice lo mismo, la pone en `data/picks/Semana_NN.xlsx` (una
+sola por semana: si había PDF, lo quita), la sella, regenera el sitio y lo
+publica. Si hay partido en las próximas 12 horas, despierta también al
+directo. Si algo falla en cualquier punto, no se publica nada y el hilo lo dice.
+
+**Del lado de la seguridad**, el texto del hilo nunca se pega en un comando:
+Python lo lee del archivo del evento (`quiniela/buzon.py`) y solo toma el número
+de cuenta y el enlace del adjunto, que tiene que ser uno solo y de GitHub. La
+descarga sigue las redirecciones a mano, revisando que cada una se quede en los
+servidores de GitHub, y se corta si pasa de 10 MB. Hay pruebas que fallan si
+un workflow vuelve a meter texto de un hilo en la terminal.
+
+Si el repo se vuelve privado, los adjuntos dejan de poder bajarse sin sesión y
+esta descarga habría que cambiarla.
+
 ## Que nadie toque los picks
 
 Los picks viven en el repo y solo cambian con un `git push` autenticado: el
@@ -152,6 +221,11 @@ jueves ya jugado, los picks del domingo se siguen recibiendo hasta el sábado a
 las 23:59, y la segunda hoja de la semana tiene que poder entrar. Lo que queda
 prohibido es exactamente lo que importa: cambiar el pick de un partido que ya se
 jugó.
+
+Los sellos los sube cada workflow junto con el sitio. Hasta la v0.15.0 no se
+subían: se calculaban en la nube y se perdían al terminar, así que solo valían
+los que se sellaban desde la Mac. Por eso la carga, además de los sellos,
+compara cada partido ya empezado contra lo publicado.
 
 Como el sello vive en el repo, cualquier cambio queda además en el historial de
 git con fecha y autor.
@@ -361,8 +435,12 @@ gh workflow run directo.yml --repo <cuenta>/<repo> -f minutos=300 -f cada=120
 **`actualizar.yml`** es el respaldo: corre cada 5 minutos en las mismas
 ventanas, cuando subes un Excel nuevo y cuando lo disparas a mano.
 
-Cada corrida recalcula y hace commit de `docs/` y `data/resultados/` si algo
-cambió. GitHub Pages está configurado para publicar **desde la rama**
+Cada corrida recalcula y hace commit de `docs/`, `data/resultados/` y
+`data/sellos.json` si algo cambió. Si otra corrida publicó mientras tanto, se
+pone encima de lo publicado y **recalcula** antes de volver a intentar: nunca
+reintenta con `reset --soft`, que volvía a subir los archivos viejos de esa
+corrida y deshacía en silencio lo que la otra hubiera cambiado, incluidos los
+picks. GitHub Pages está configurado para publicar **desde la rama**
 (`main`, carpeta `/docs`), así que cada commit se ve en el sitio sin más pasos.
 Si el script falla, el workflow falla en rojo: nunca publica una tabla vieja
 como si fuera buena.
@@ -421,26 +499,33 @@ quiniela/
   espn.py          cliente de marcadores, caché, overrides, tipo Partido, zona CDMX
   pdf.py           lee la capa de texto del PDF del organizador (sin OCR)
   picks.py         lee el archivo semanal (Excel o PDF) y sella los picks
+  carga.py         la puerta de entrada: revisa todo, guarda y sella
+  buzon.py         la forma "Cargar semana": quién la manda y qué adjuntó
   scoring.py       tablas, escenarios, panorama, premios
   render_html.py   la página, los temas, el contraste y el orden de la NFL
   render_png.py    imagen para WhatsApp e iconos de app
   plantillas/      index.html.j2 (HTML + CSS + JS de la página)
   tipografia/      Oswald recortada (8 KB) + su licencia OFL
 data/
-  picks/           Semana_01.xlsx, Semana_02.xlsx, Semana_03.pdf…
+  picks/           Semana_01.xlsx, Semana_02.xlsx… (una por semana)
   resultados/      semana_01.json — caché de marcadores (se versiona)
   overrides.json   correcciones manuales de ganadores
-  sellos.json      huella SHA-256 de los picks, congelada al arrancar la jornada
+  sellos.json      huella SHA-256 de los picks de cada partido, al arrancar
+  cargadores.json  cuentas de GitHub que pueden cargar semanas
 docs/              lo que se publica en GitHub Pages
   index.html       el portal entero, en un solo archivo
   tabla.png        imagen para WhatsApp
   version.json     sello de versión contra el caché de Pages
   icono-*.png      iconos para guardar el sitio como app
   manifest.webmanifest
-.github/workflows/
-  actualizar.yml   cron cada 5 min en ventanas + push de picks + manual
-  directo.yml      bucle que sigue la jornada y se encadena solo
-tests/             147 pruebas, ninguna toca la red
+.github/
+  workflows/
+    actualizar.yml cron cada 5 min en ventanas + push de picks + manual
+    directo.yml    bucle que sigue la jornada y se encadena solo
+    cargar.yml     atiende la forma "Cargar semana"
+  ISSUE_TEMPLATE/
+    cargar-semana.yml  la forma
+tests/             255 pruebas, ninguna toca la red
 cli.py
 crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 ```
@@ -454,6 +539,9 @@ crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 | Correo a donde se mandan los picks | `CORREO_ORGANIZADOR` | `render_html.py` |
 | Hora de cierre de cada tanda | `HORA_CIERRE` | `render_html.py` |
 | Cuándo aparece el podio | `UMBRAL_PODIO` (16 partidos cerrados) | `render_html.py` |
+| Quién puede cargar semanas | la lista de cuentas | `data/cargadores.json` |
+| Tamaño máximo de un archivo cargado | `TAMANO_MAXIMO` (10 MB) | `carga.py` |
+| Largo máximo de un nombre | `LARGO_MAXIMO_NOMBRE` (40) | `picks.py` |
 | Cuándo se proyecta el ganador semanal | `UMBRAL_SEMANA` (8 de esa semana) | `render_html.py` |
 | Cuántos empatados se enlistan | `MAXIMO_NOMBRES`, `MAXIMO_NOMBRES_PODIO` | `render_html.py` |
 | Cada cuánto consulta marcadores el navegador | `SEGUNDOS_VIVO` (60 s) | `render_html.py` |
@@ -478,3 +566,15 @@ crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
   publica. Nadie queda arriba de nadie por un número que no se ve.
 * **`data/resultados/` se versiona.** Es lo que permite `--sin-red`, la tabla
   general sin conexión y que no se vuelvan a consultar partidos ya cerrados.
+* **Solo hay una puerta para los picks**, `quiniela/carga.py`. La usan el
+  comando `importar` y la forma de GitHub; si se abre un segundo camino, las
+  revisiones terminan desalineándose.
+* **Quien carga se identifica por su número de cuenta de GitHub, no por su
+  usuario.** El usuario se puede cambiar y otro puede quedarse con el anterior.
+* **El texto de un hilo nunca va dentro de `${{ }}` en un comando.** Se lee
+  desde Python, del archivo del evento. Hay prueba para eso.
+* **Un reintento de publicación recalcula encima de lo publicado.** Con
+  `reset --soft` se deshacían en silencio los cambios de la otra corrida.
+* **La plantilla se escapa** (`select_autoescape(["html", "j2"])`). Sin el
+  `"j2"`, `index.html.j2` quedaba sin escapar y un nombre con código habría
+  entrado tal cual a la página. El lector, además, no acepta esos nombres.

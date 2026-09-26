@@ -9,6 +9,44 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.15.0
+
+* **El organizador carga la semana él mismo.** Hay una forma en GitHub, "Cargar
+  semana", donde adjunta el archivo tal como lo reparte —Excel o PDF, la semana
+  completa o una tanda— desde el teléfono o la computadora. En uno o dos
+  minutos le contesta en el mismo hilo: o quedó publicado y qué cambió, o qué
+  corregir, sin tocar nada. No necesita acceso al repo; solo pueden usarla las
+  cuentas de `data/cargadores.json`, reconocidas por su número de cuenta.
+
+* **Una sola puerta para los picks** (`quiniela/carga.py`), la misma para la
+  forma y para `importar`. Revisa que el archivo sea lo que dice ser (sin
+  contraseña, sin .xls viejo, sin zips tramposos, 10 MB como máximo), todo lo
+  del lector, de qué semana es, que no se salte ninguna, que cada partido exista
+  esa semana con local y visitante en su lugar, cómo encaja con lo que ya
+  estaba y que no cambie ni un pick de un partido que ya empezó. Avisa de
+  nombres nuevos, ausentes o parecidos a otros.
+
+  La semana se guarda siempre en la rejilla de siempre, escrita por el propio
+  programa y vuelta a leer para comprobarla, y en **un solo archivo**: si había
+  PDF, se quita. La tanda del domingo se junta sola con la del jueves.
+
+* **Tres huecos cerrados** que la carga habría vuelto frecuentes:
+
+  * **Los sellos no se subían.** Los workflows los calculaban en la nube y se
+    perdían al terminar; solo valían los sellados desde la Mac. Ahora se suben
+    con el sitio, y la carga además compara contra lo publicado.
+  * **Un reintento podía deshacer una carga.** Cuando dos corridas chocaban, la
+    segunda reintentaba con `reset --soft` y volvía a subir sus archivos viejos:
+    en un repo de prueba, una carga del organizador quedó revertida a los picks
+    anteriores. Ahora recalcula encima de lo publicado.
+  * **La página no escapaba los nombres.** La plantilla se llama
+    `index.html.j2` y el autoescape solo miraba `.html`, así que un nombre con
+    código habría entrado tal cual. Ahora se escapa todo (la página sale
+    idéntica byte por byte) y el lector rechaza nombres con signos raros,
+    caracteres invisibles o más de 40 caracteres.
+
+* Un partido capturado con local y visitante al revés ahora lo dice así.
+
 ## alfa v0.14.0
 
 * **La semana puede llegar en partes.** El organizador manda la hoja del jueves

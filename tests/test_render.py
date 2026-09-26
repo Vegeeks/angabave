@@ -423,3 +423,19 @@ def test_reordenar_no_desfasa_los_picks(tmp_path: Path):
             visitante, local = clave.split("@")
             publicado = local if semana["picks"][fila][col] == 1 else visitante
             assert publicado == verdad[quien][clave], f"{quien} desfasado en {clave}"
+
+
+def test_un_nombre_con_codigo_no_entra_crudo_a_la_pagina(armado, tmp_path: Path):
+    """El lector ya rechaza estos nombres; esta es la segunda barrera.
+
+    La plantilla se llama index.html.j2 y el autoescape de Jinja la dejaba
+    fuera. Si un nombre así llegara a los datos, la página tiene que pintarlo
+    como texto y no ejecutarlo.
+    """
+    semanas, general = armado
+    malicioso = '<img src=x onerror="alert(1)">'
+    general = general.copy()
+    general.loc[general.index[0], "participante"] = malicioso
+    html = render((semanas, general), tmp_path)
+    assert malicioso not in html
+    assert "&lt;img src=x onerror=&#34;alert(1)&#34;&gt;" in html

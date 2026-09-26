@@ -70,7 +70,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.14.0"
+VERSION = "v0.15.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -572,7 +572,9 @@ def _tipografia() -> str:
 def _entorno() -> Environment:
     return Environment(
         loader=FileSystemLoader(DIR_PLANTILLAS),
-        autoescape=select_autoescape(["html"]),
+        # La plantilla se llama index.html.j2: sin "j2" aquí, select_autoescape
+        # la dejaba sin escapar y un nombre con código habría entrado tal cual.
+        autoescape=select_autoescape(["html", "j2"]),
         undefined=StrictUndefined,
         trim_blocks=True,
         lstrip_blocks=True,

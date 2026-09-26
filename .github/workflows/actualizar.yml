@@ -51,47 +51,42 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements.txt
 
-      - name: Calcular tablas y regenerar docs/
-        # Sin "continue-on-error": si esto truena, el workflow se ve en rojo y
-        # no se publica una tabla vieja como si fuera buena.
-        run: |
-          if [ -n "${{ inputs.semana }}" ]; then
-            python cli.py actualizar --semana ${{ inputs.semana }}
-          else
-            python cli.py actualizar
-          fi
-
-      - name: Publicar cambios
+      - name: Calcular y publicar
+        # Sin "continue-on-error": si el cálculo truena, el workflow se ve en
+        # rojo y no se publica una tabla vieja como si fuera buena.
+        env:
+          SEMANA: ${{ inputs.semana }}
         run: |
           git config user.name "Angel Barrera"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          preparar() {
-            git add docs data/resultados
+          # Si otra corrida publica mientras esta calcula (el cron y una carga
+          # de picks, por ejemplo), se recalcula encima de lo que ella dejó.
+          # Nunca se reintenta con "reset --soft": eso volvía a subir los
+          # archivos viejos de esta corrida y deshacía en silencio lo que la
+          # otra hubiera cambiado, incluidos los picks.
+          for intento in 1 2 3; do
+            if [ -n "$SEMANA" ]; then
+              python cli.py actualizar --semana "$SEMANA"
+            else
+              python cli.py actualizar
+            fi
+
+            # Los sellos también: si no se suben, el de un partido que acaba de
+            # arrancar se pierde al terminar el job.
+            git add docs data/resultados data/sellos.json
             if git diff --staged --quiet; then
               echo "Sin cambios que publicar."
-              return 1
+              exit 0
             fi
             git commit -q -m "Actualiza tablas: $(date -u '+%Y-%m-%d %H:%M UTC')"
-            return 0
-          }
-
-          preparar || exit 0
-
-          # Dos corridas pueden terminar casi al mismo tiempo (el cron cada 15
-          # minutos y un push de picks, por ejemplo). Si otra se adelantó, se
-          # reintenta encima de lo que ya está publicado en vez de fallar:
-          # docs/ y data/resultados/ son archivos generados, así que lo recién
-          # calculado siempre manda sobre lo que hubiera allá.
-          for intento in 1 2 3; do
-            if git push; then
+            if git push -q; then
               echo "Publicado."
               exit 0
             fi
-            echo "Otra corrida se adelantó; reintento $intento."
+            echo "Otra corrida publicó primero; recalculo encima de lo publicado ($intento)."
             git fetch -q origin main
-            git reset -q --soft origin/main
-            preparar || exit 0
+            git reset -q --hard origin/main
           done
 
           echo "No pude publicar después de 3 intentos." >&2

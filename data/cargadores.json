@@ -1,0 +1,6 @@
+{
+  "_como_agregar": "Cuentas de GitHub que pueden usar la forma 'Cargar semana'. Se compara el id, que no cambia aunque la persona cambie su usuario. Para sacarlo: gh api users/USUARIO --jq .id",
+  "cuentas": [
+    {"usuario": "Vegeeks", "id": 51868211, "nombre": "Angel Barrera"}
+  ]
+}

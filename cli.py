@@ -12,18 +12,27 @@
 from __future__ import annotations
 
 import argparse
+import json
 import logging
-import re
-import shutil
 import sys
 from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pandas as pd
 
+from quiniela.buzon import ErrorBuzon, cargadores, descargar, leer_solicitud, reporte_rechazo
+from quiniela.carga import recibir, reporte_markdown, reporte_texto
 from quiniela.equipos import EquipoDesconocidoError
 from quiniela.espn import ErrorESPN, ahora_cdmx, obtener_partidos
-from quiniela.picks import ErrorPicks, PicksAlteradosError, leer_picks, numero_semana, verificar_sello
+from quiniela.picks import (
+    RUTA_SELLOS,
+    ErrorPicks,
+    PicksAlteradosError,
+    archivos_por_semana,
+    leer_picks,
+    numero_semana,
+    verificar_sello,
+)
 from quiniela.render_html import UMBRAL_SEMANA, SemanaRender, generar_html
 from quiniela.render_png import generar_iconos, generar_png
 from quiniela.render_html import _pesos
@@ -98,17 +107,15 @@ def semanas_disponibles() -> list[Path]:
 
     Si una semana está en los dos formatos gana el Excel, que es el original.
     """
-    if not DIR_PICKS.exists():
-        return []
-    rutas = [
-        p for p in DIR_PICKS.iterdir()
-        if p.suffix.lower() in EXTENSIONES and not p.name.startswith("~$")
-        and re.search(r"emana", p.name)
-    ]
-    por_semana: dict[int, Path] = {}
-    for ruta in sorted(rutas, key=lambda p: EXTENSIONES.index(p.suffix.lower())):
-        por_semana.setdefault(numero_semana(ruta), ruta)
-    return [por_semana[s] for s in sorted(por_semana)]
+    elegidos = []
+    for semana, rutas in archivos_por_semana(DIR_PICKS).items():
+        if len(rutas) > 1:
+            _log.warning(
+                "La semana %d tiene %d archivos (%s); uso %s.",
+                semana, len(rutas), ", ".join(p.name for p in rutas), rutas[0].name,
+            )
+        elegidos.append(rutas[0])
+    return elegidos
 
 
 def ultima_semana() -> int:
@@ -158,7 +165,7 @@ def _sellar(ruta: Path, semana: int, resultados) -> None:
         for partido in resultados
         if partido.finalizado or (partido.inicio is not None and partido.inicio <= ahora)
     }
-    verificar_sello(ruta, semana, arrancados)
+    verificar_sello(ruta, semana, arrancados, RUTA_SELLOS)
 
 
 def _cargar_semana(semana: int, anio: int, sin_red: bool):
@@ -351,38 +358,81 @@ def comando_escenarios(argumentos) -> int:
     return 0
 
 
-def comando_importar(argumentos) -> int:
-    """Guarda el archivo del organizador con el nombre que espera el proyecto.
+#: Lo que se contesta cuando falla algo de este lado y no del archivo.
+REPORTE_ERROR_INTERNO = (
+    "### ⚠️ No pude revisar el archivo\n\n"
+    "Algo falló de mi lado, no en tu archivo. No se tocó nada y Angel ya tiene el aviso.\n"
+)
 
-    Acepta el Excel o el PDF tal como llega ("Quiniela 3.pdf"), detecta de qué
-    semana es leyendo su contenido y lo deja en data/picks/ ya validado.
+
+def comando_importar(argumentos) -> int:
+    """Carga el archivo del organizador: lo revisa completo, lo guarda y lo sella.
+
+    Es la misma puerta que usa la forma "Cargar semana" de GitHub. Acepta el
+    Excel o el PDF tal como llega, de la semana completa o de una tanda; la
+    semana sale de la hoja. Devuelve 0 si quedó cargado o ya estaba igual, 1 si
+    se rechazó por algo del archivo, y 3 si algo falló de este lado.
     """
     origen = Path(argumentos.archivo).expanduser()
     if not origen.exists():
         raise ErrorPicks(f"No existe el archivo: {origen}")
 
-    partidos, picks = leer_picks(origen)
-    semana = argumentos.semana
-    if semana is None:
-        try:
-            semana = numero_semana(origen)
-        except ErrorPicks:
-            raise ErrorPicks(
-                f"No pude deducir la semana de {origen.name!r}. "
-                "Pásala con --semana."
-            ) from None
+    try:
+        resultado = recibir(
+            origen,
+            calendario=lambda numero: obtener_partidos(
+                argumentos.anio, numero, sin_red=argumentos.sin_red
+            ),
+            dir_picks=DIR_PICKS,
+            semana=argumentos.semana,
+            ruta_sellos=RUTA_SELLOS,
+            escribir=not argumentos.solo_revisar,
+        )
+    except Exception:
+        _log.exception("Falló la carga de %s por algo que no es del archivo.", origen.name)
+        if argumentos.reporte:
+            Path(argumentos.reporte).write_text(REPORTE_ERROR_INTERNO, encoding="utf-8")
+        return 3
 
-    destino = DIR_PICKS / f"Semana_{semana:02d}{origen.suffix.lower()}"
-    destino.parent.mkdir(parents=True, exist_ok=True)
-    if destino.exists() and not argumentos.forzar:
-        raise ErrorPicks(f"Ya existe {destino}. Usa --forzar para reemplazarlo.")
-    shutil.copy2(origen, destino)
+    if argumentos.reporte:
+        Path(argumentos.reporte).write_text(
+            reporte_markdown(resultado, forma=argumentos.forma or ""), encoding="utf-8"
+        )
+    if argumentos.resumen:
+        Path(argumentos.resumen).write_text(
+            json.dumps(
+                {"aceptado": resultado.aceptado, "accion": resultado.accion, "semana": resultado.semana}
+            ),
+            encoding="utf-8",
+        )
+    print(reporte_texto(resultado))
+    return 0 if resultado.aceptado else 1
 
-    _log.info(
-        "Guardé %s como %s: %d partidos, %d participantes.",
-        origen.name, destino.name, len(partidos), len(picks),
-    )
-    print(destino)
+
+def comando_buzon(argumentos) -> int:
+    """Atiende un hilo de la forma "Cargar semana": quién lo abrió y qué adjuntó.
+
+    Lo usa el workflow de carga. Si la cuenta está autorizada y hay un solo
+    archivo, lo baja y escribe su ruta en --salida; si no, escribe en --reporte
+    lo que hay que contestar. Mismos códigos que `importar`.
+    """
+    try:
+        evento = json.loads(Path(argumentos.evento).read_text(encoding="utf-8"))
+        solicitud = leer_solicitud(evento, cargadores())
+        archivo = descargar(solicitud, Path(argumentos.carpeta))
+    except ErrorBuzon as error:
+        _log.warning("%s", error)
+        Path(argumentos.reporte).write_text(
+            reporte_rechazo(error, forma=argumentos.forma or ""), encoding="utf-8"
+        )
+        return 1
+    except Exception:
+        _log.exception("Falló el buzón por algo que no es del hilo.")
+        Path(argumentos.reporte).write_text(REPORTE_ERROR_INTERNO, encoding="utf-8")
+        return 3
+
+    Path(argumentos.salida).write_text(str(archivo), encoding="utf-8")
+    _log.info("Hilo #%d de @%s: bajé %s.", solicitud.numero, solicitud.usuario, archivo.name)
     return 0
 
 
@@ -470,9 +520,28 @@ def construir_parser() -> argparse.ArgumentParser:
         "importar", help="guarda el archivo del organizador (Excel o PDF) en data/picks/"
     )
     importar.add_argument("archivo", help="ruta del archivo tal como llegó")
-    importar.add_argument("--semana", type=int, help="si no se puede deducir del nombre")
-    importar.add_argument("--forzar", action="store_true", help="reemplaza si ya existe")
+    importar.add_argument("--semana", type=int, help="solo si la hoja no dice 'Semana N'")
+    importar.add_argument(
+        "--solo-revisar", action="store_true", help="revisa todo pero no guarda nada"
+    )
+    importar.add_argument("--sin-red", action="store_true", help="usa solo el caché de ESPN")
+    importar.add_argument("--reporte", help="escribe ahí el reporte en Markdown")
+    importar.add_argument("--resumen", help="escribe ahí el resultado en JSON")
+    importar.add_argument("--forma", help="enlace para volver a subir, va en el reporte")
+    # Antes hacía falta para reemplazar una semana; ahora el reemplazo es seguro
+    # por sí solo. Se acepta para no romper instrucciones viejas.
+    importar.add_argument("--forzar", action="store_true", help=argparse.SUPPRESS)
     importar.set_defaults(funcion=comando_importar)
+
+    buzon = subcomandos.add_parser(
+        "buzon", help="atiende un hilo de la forma 'Cargar semana' (lo usa el workflow)"
+    )
+    buzon.add_argument("--evento", required=True, help="el JSON del evento de GitHub")
+    buzon.add_argument("--carpeta", required=True, help="dónde bajar el archivo")
+    buzon.add_argument("--reporte", required=True, help="dónde escribir la respuesta si se rechaza")
+    buzon.add_argument("--salida", required=True, help="dónde escribir la ruta del archivo bajado")
+    buzon.add_argument("--forma", help="enlace para volver a subir, va en el reporte")
+    buzon.set_defaults(funcion=comando_buzon)
 
     pendientes = subcomandos.add_parser(
         "pendientes", help="imprime cuántos partidos siguen abiertos"
