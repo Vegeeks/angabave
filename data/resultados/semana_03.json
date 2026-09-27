@@ -6,9 +6,9 @@
       "local": "Browns",
       "marcador_visitante": 18,
       "marcador_local": 21,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Browns",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
@@ -35,7 +35,7 @@
       "visitante": "Vikings",
       "local": "Buccaneers",
       "marcador_visitante": 10,
-      "marcador_local": 0,
+      "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -118,7 +118,7 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-09-27T20:25:00+00:00"
     },
     {
@@ -128,7 +128,7 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-09-27T20:25:00+00:00"
     },
     {
