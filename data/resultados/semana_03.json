@@ -28,7 +28,7 @@
       "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
@@ -55,16 +55,16 @@
       "visitante": "Titans",
       "local": "Giants",
       "marcador_visitante": 0,
-      "marcador_local": 6,
+      "marcador_local": 9,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
       "visitante": "Bengals",
       "local": "Steelers",
-      "marcador_visitante": 10,
+      "marcador_visitante": 16,
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
