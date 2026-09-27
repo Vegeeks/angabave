@@ -4,7 +4,7 @@
     {
       "visitante": "Cardinals",
       "local": "49ers",
-      "marcador_visitante": 6,
+      "marcador_visitante": 13,
       "marcador_local": 23,
       "ganador": null,
       "finalizado": false,
@@ -15,7 +15,7 @@
       "visitante": "Vikings",
       "local": "Buccaneers",
       "marcador_visitante": 17,
-      "marcador_local": 10,
+      "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
