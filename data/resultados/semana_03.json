@@ -46,9 +46,9 @@
       "local": "Dolphins",
       "marcador_visitante": 24,
       "marcador_local": 10,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Chiefs",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
@@ -65,7 +65,7 @@
       "visitante": "Bengals",
       "local": "Steelers",
       "marcador_visitante": 27,
-      "marcador_local": 27,
+      "marcador_local": 30,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
