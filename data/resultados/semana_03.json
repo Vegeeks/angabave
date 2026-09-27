@@ -34,7 +34,7 @@
     {
       "visitante": "Texans",
       "local": "Colts",
-      "marcador_visitante": 7,
+      "marcador_visitante": 10,
       "marcador_local": 16,
       "ganador": null,
       "finalizado": false,
@@ -54,7 +54,7 @@
     {
       "visitante": "Titans",
       "local": "Giants",
-      "marcador_visitante": 6,
+      "marcador_visitante": 7,
       "marcador_local": 12,
       "ganador": null,
       "finalizado": false,
@@ -84,7 +84,7 @@
     {
       "visitante": "Patriots",
       "local": "Jaguars",
-      "marcador_visitante": 3,
+      "marcador_visitante": 6,
       "marcador_local": 28,
       "ganador": null,
       "finalizado": false,
