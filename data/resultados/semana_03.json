@@ -8,7 +8,7 @@
       "marcador_local": 23,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-09-27T20:05:00+00:00"
     },
     {
@@ -35,7 +35,7 @@
       "visitante": "Raiders",
       "local": "Saints",
       "marcador_visitante": 16,
-      "marcador_local": 20,
+      "marcador_local": 27,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
