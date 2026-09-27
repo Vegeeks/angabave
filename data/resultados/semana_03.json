@@ -6,9 +6,9 @@
       "local": "49ers",
       "marcador_visitante": 30,
       "marcador_local": 36,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "49ers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T20:05:00+00:00"
     },
     {
@@ -34,7 +34,7 @@
     {
       "visitante": "Raiders",
       "local": "Saints",
-      "marcador_visitante": 28,
+      "marcador_visitante": 35,
       "marcador_local": 27,
       "ganador": null,
       "finalizado": false,
