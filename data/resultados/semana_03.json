@@ -6,16 +6,16 @@
       "local": "Bills",
       "marcador_visitante": 16,
       "marcador_local": 24,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Bills",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
       "visitante": "Panthers",
       "local": "Browns",
       "marcador_visitante": 18,
-      "marcador_local": 13,
+      "marcador_local": 21,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -36,9 +36,9 @@
       "local": "Steelers",
       "marcador_visitante": 27,
       "marcador_local": 30,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Steelers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
@@ -104,7 +104,7 @@
     {
       "visitante": "Vikings",
       "local": "Buccaneers",
-      "marcador_visitante": 0,
+      "marcador_visitante": 3,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
