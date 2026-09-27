@@ -64,7 +64,7 @@
     {
       "visitante": "Bengals",
       "local": "Steelers",
-      "marcador_visitante": 20,
+      "marcador_visitante": 26,
       "marcador_local": 24,
       "ganador": null,
       "finalizado": false,
@@ -88,7 +88,7 @@
       "marcador_local": 28,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
