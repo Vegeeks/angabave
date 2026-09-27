@@ -22,40 +22,10 @@
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
-      "visitante": "Jets",
-      "local": "Lions",
-      "marcador_visitante": 24,
-      "marcador_local": 31,
-      "ganador": "Lions",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-27T17:00:00+00:00"
-    },
-    {
       "visitante": "Texans",
       "local": "Colts",
       "marcador_visitante": 17,
-      "marcador_local": 16,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-09-27T17:00:00+00:00"
-    },
-    {
-      "visitante": "Chiefs",
-      "local": "Dolphins",
-      "marcador_visitante": 24,
-      "marcador_local": 10,
-      "ganador": "Chiefs",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-27T17:00:00+00:00"
-    },
-    {
-      "visitante": "Titans",
-      "local": "Giants",
-      "marcador_visitante": 7,
-      "marcador_local": 12,
+      "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -75,10 +45,40 @@
       "visitante": "Seahawks",
       "local": "Washington",
       "marcador_visitante": 24,
-      "marcador_local": 24,
+      "marcador_local": 27,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Jets",
+      "local": "Lions",
+      "marcador_visitante": 24,
+      "marcador_local": 31,
+      "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Chiefs",
+      "local": "Dolphins",
+      "marcador_visitante": 24,
+      "marcador_local": 10,
+      "ganador": "Chiefs",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Titans",
+      "local": "Giants",
+      "marcador_visitante": 7,
+      "marcador_local": 12,
+      "ganador": "Giants",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
@@ -86,9 +86,9 @@
       "local": "Jaguars",
       "marcador_visitante": 6,
       "marcador_local": 35,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Jaguars",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
