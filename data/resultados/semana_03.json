@@ -2,26 +2,6 @@
   "semana": 3,
   "partidos": [
     {
-      "visitante": "Panthers",
-      "local": "Browns",
-      "marcador_visitante": 18,
-      "marcador_local": 21,
-      "ganador": "Browns",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-27T17:00:00+00:00"
-    },
-    {
-      "visitante": "Seahawks",
-      "local": "Washington",
-      "marcador_visitante": 31,
-      "marcador_local": 33,
-      "ganador": "Washington",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-27T17:00:00+00:00"
-    },
-    {
       "visitante": "Cardinals",
       "local": "49ers",
       "marcador_visitante": 0,
@@ -42,11 +22,41 @@
       "inicio": "2026-09-27T20:05:00+00:00"
     },
     {
+      "visitante": "Ravens",
+      "local": "Cowboys",
+      "marcador_visitante": 0,
+      "marcador_local": 3,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-09-27T20:25:00+00:00"
+    },
+    {
+      "visitante": "Raiders",
+      "local": "Saints",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-09-27T20:25:00+00:00"
+    },
+    {
       "visitante": "Chargers",
       "local": "Bills",
       "marcador_visitante": 16,
       "marcador_local": 24,
       "ganador": "Bills",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
+      "visitante": "Panthers",
+      "local": "Browns",
+      "marcador_visitante": 18,
+      "marcador_local": 21,
+      "ganador": "Browns",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
@@ -102,6 +112,16 @@
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
+      "visitante": "Seahawks",
+      "local": "Washington",
+      "marcador_visitante": 31,
+      "marcador_local": 33,
+      "ganador": "Washington",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-27T17:00:00+00:00"
+    },
+    {
       "visitante": "Patriots",
       "local": "Jaguars",
       "marcador_visitante": 6,
@@ -110,26 +130,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
-    },
-    {
-      "visitante": "Ravens",
-      "local": "Cowboys",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-09-27T20:25:00+00:00"
-    },
-    {
-      "visitante": "Raiders",
-      "local": "Saints",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-09-27T20:25:00+00:00"
     },
     {
       "visitante": "Rams",
