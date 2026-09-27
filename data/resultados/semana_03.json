@@ -2,26 +2,6 @@
   "semana": 3,
   "partidos": [
     {
-      "visitante": "Ravens",
-      "local": "Cowboys",
-      "marcador_visitante": 34,
-      "marcador_local": 31,
-      "ganador": "Ravens",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-27T20:25:00+00:00"
-    },
-    {
-      "visitante": "Raiders",
-      "local": "Saints",
-      "marcador_visitante": 35,
-      "marcador_local": 27,
-      "ganador": "Raiders",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-27T20:25:00+00:00"
-    },
-    {
       "visitante": "Chargers",
       "local": "Bills",
       "marcador_visitante": 16,
@@ -130,6 +110,26 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-27T20:05:00+00:00"
+    },
+    {
+      "visitante": "Ravens",
+      "local": "Cowboys",
+      "marcador_visitante": 34,
+      "marcador_local": 31,
+      "ganador": "Ravens",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-27T20:25:00+00:00"
+    },
+    {
+      "visitante": "Raiders",
+      "local": "Saints",
+      "marcador_visitante": 35,
+      "marcador_local": 27,
+      "ganador": "Raiders",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-27T20:25:00+00:00"
     },
     {
       "visitante": "Rams",
