@@ -25,7 +25,7 @@
       "visitante": "Jets",
       "local": "Lions",
       "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -44,7 +44,7 @@
     {
       "visitante": "Chiefs",
       "local": "Dolphins",
-      "marcador_visitante": 7,
+      "marcador_visitante": 14,
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
@@ -58,7 +58,7 @@
       "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
