@@ -16,9 +16,9 @@
       "local": "Washington",
       "marcador_visitante": 31,
       "marcador_local": 33,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Washington",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
@@ -35,7 +35,7 @@
       "visitante": "Vikings",
       "local": "Buccaneers",
       "marcador_visitante": 10,
-      "marcador_local": 6,
+      "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
