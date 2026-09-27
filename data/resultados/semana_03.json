@@ -26,9 +26,9 @@
       "local": "Lions",
       "marcador_visitante": 24,
       "marcador_local": 31,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
