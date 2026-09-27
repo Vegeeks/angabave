@@ -44,7 +44,7 @@
     {
       "visitante": "Chiefs",
       "local": "Dolphins",
-      "marcador_visitante": 17,
+      "marcador_visitante": 24,
       "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
@@ -65,7 +65,7 @@
       "visitante": "Bengals",
       "local": "Steelers",
       "marcador_visitante": 27,
-      "marcador_local": 24,
+      "marcador_local": 27,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
