@@ -14,7 +14,7 @@
     {
       "visitante": "Panthers",
       "local": "Browns",
-      "marcador_visitante": 0,
+      "marcador_visitante": 3,
       "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
@@ -64,7 +64,7 @@
     {
       "visitante": "Bengals",
       "local": "Steelers",
-      "marcador_visitante": 16,
+      "marcador_visitante": 17,
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
@@ -88,7 +88,7 @@
       "marcador_local": 14,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
