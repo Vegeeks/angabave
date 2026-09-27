@@ -34,11 +34,11 @@
     {
       "visitante": "Raiders",
       "local": "Saints",
-      "marcador_visitante": 13,
+      "marcador_visitante": 16,
       "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-09-27T20:25:00+00:00"
     },
     {
