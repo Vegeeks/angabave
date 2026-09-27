@@ -2,16 +2,6 @@
   "semana": 3,
   "partidos": [
     {
-      "visitante": "Falcons",
-      "local": "Packers",
-      "marcador_visitante": 35,
-      "marcador_local": 14,
-      "ganador": "Falcons",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-09-25T00:15:00+00:00"
-    },
-    {
       "visitante": "Chargers",
       "local": "Bills",
       "marcador_visitante": 0,
@@ -150,6 +140,16 @@
       "finalizado": false,
       "estado": "Scheduled",
       "inicio": "2026-09-28T00:20:00+00:00"
+    },
+    {
+      "visitante": "Falcons",
+      "local": "Packers",
+      "marcador_visitante": 35,
+      "marcador_local": 14,
+      "ganador": "Falcons",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-09-25T00:15:00+00:00"
     },
     {
       "visitante": "Eagles",
