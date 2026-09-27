@@ -5,7 +5,7 @@
       "visitante": "Ravens",
       "local": "Cowboys",
       "marcador_visitante": 31,
-      "marcador_local": 28,
+      "marcador_local": 31,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -16,9 +16,9 @@
       "local": "Saints",
       "marcador_visitante": 35,
       "marcador_local": 27,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Raiders",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-27T20:25:00+00:00"
     },
     {
