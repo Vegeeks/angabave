@@ -4,7 +4,7 @@
     {
       "visitante": "Chargers",
       "local": "Bills",
-      "marcador_visitante": 7,
+      "marcador_visitante": 10,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
@@ -18,7 +18,7 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
@@ -48,7 +48,7 @@
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
@@ -65,7 +65,7 @@
       "visitante": "Bengals",
       "local": "Steelers",
       "marcador_visitante": 7,
-      "marcador_local": 7,
+      "marcador_local": 14,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
