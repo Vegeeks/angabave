@@ -45,7 +45,7 @@
       "visitante": "Chiefs",
       "local": "Dolphins",
       "marcador_visitante": 14,
-      "marcador_local": 7,
+      "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -75,10 +75,10 @@
       "visitante": "Seahawks",
       "local": "Washington",
       "marcador_visitante": 10,
-      "marcador_local": 14,
+      "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
@@ -88,7 +88,7 @@
       "marcador_local": 14,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-09-27T17:00:00+00:00"
     },
     {
