@@ -45,9 +45,10 @@
   },
   "3": {
     "archivo": "Semana_03.xlsx",
-    "sellado": "2026-09-27T17:01:11+00:00",
+    "sellado": "2026-09-27T20:06:38+00:00",
     "partidos": {
       "Bengals@Steelers": "d56db87b272999db3e1d7eff87e964da1a09db4c8c23ef7d5e63615dee5dbd67",
+      "Cardinals@49ers": "ab68f8b606d9202b6368cd7b56b552528350a7e6a876bb8cbcc0f8b6bc79ce1f",
       "Chargers@Bills": "94496f48223d7f26f99fc8acdd7c2e9a9ac8ff9bc662f13a208cb29f691a302f",
       "Chiefs@Dolphins": "68e03602c659804ef5670bb95020d898c96fd6d347d2947c87eab1354bb4efaf",
       "Falcons@Packers": "27b98c543d7bc129cd03da9eaae039eeb503c7746e22ee9c261ebe2a08339c12",
@@ -56,7 +57,8 @@
       "Patriots@Jaguars": "48198bd4c915d6966a64849bb4d3c0ccd392508883b4309ee0c5cb6b021c7cd5",
       "Seahawks@Washington": "b664878b4c0c34a27043d0ca2ca2828cc5ec9bab8e72de945a0a61d9bb2c9393",
       "Texans@Colts": "cc61ada1addb871443523aa084eb4c32156abf72cdc5b005c1f643bef0639d8f",
-      "Titans@Giants": "8c389c9c1f2c9f80a8291933916f247e40609291fb7185da2d06399ffb83c6fb"
+      "Titans@Giants": "8c389c9c1f2c9f80a8291933916f247e40609291fb7185da2d06399ffb83c6fb",
+      "Vikings@Buccaneers": "b5894c680476212cc7873f05d545874e8e3c4275993754a4b3d79332dc3741be"
     }
   }
 }
