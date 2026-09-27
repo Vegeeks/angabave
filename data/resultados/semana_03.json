@@ -5,10 +5,10 @@
       "visitante": "Cardinals",
       "local": "49ers",
       "marcador_visitante": 6,
-      "marcador_local": 14,
+      "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-09-27T20:05:00+00:00"
     },
     {
@@ -18,7 +18,7 @@
       "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-09-27T20:05:00+00:00"
     },
     {
