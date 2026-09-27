@@ -14,7 +14,7 @@
     {
       "visitante": "Panthers",
       "local": "Browns",
-      "marcador_visitante": 3,
+      "marcador_visitante": 6,
       "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
@@ -55,7 +55,7 @@
       "visitante": "Titans",
       "local": "Giants",
       "marcador_visitante": 0,
-      "marcador_local": 9,
+      "marcador_local": 12,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
