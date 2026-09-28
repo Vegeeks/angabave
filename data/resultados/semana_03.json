@@ -2,6 +2,16 @@
   "semana": 3,
   "partidos": [
     {
+      "visitante": "Rams",
+      "local": "Broncos",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-09-28T00:20:00+00:00"
+    },
+    {
       "visitante": "Chargers",
       "local": "Bills",
       "marcador_visitante": 16,
@@ -130,16 +140,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-09-27T20:25:00+00:00"
-    },
-    {
-      "visitante": "Rams",
-      "local": "Broncos",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-09-28T00:20:00+00:00"
     },
     {
       "visitante": "Falcons",
