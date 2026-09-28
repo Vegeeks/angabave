@@ -4,11 +4,11 @@
     {
       "visitante": "Rams",
       "local": "Broncos",
-      "marcador_visitante": 13,
+      "marcador_visitante": 16,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-09-28T00:20:00+00:00"
     },
     {
