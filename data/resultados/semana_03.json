@@ -6,9 +6,9 @@
       "local": "Broncos",
       "marcador_visitante": 26,
       "marcador_local": 30,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Broncos",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-28T00:20:00+00:00"
     },
     {
