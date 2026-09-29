@@ -4,11 +4,11 @@
     {
       "visitante": "Eagles",
       "local": "Bears",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
+      "marcador_visitante": 7,
+      "marcador_local": 27,
+      "ganador": "Bears",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-09-29T00:15:00+00:00"
     },
     {
