@@ -6,9 +6,9 @@
       "local": "Browns",
       "marcador_visitante": 24,
       "marcador_local": 27,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Browns",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-02T00:15:00+00:00"
     },
     {
