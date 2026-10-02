@@ -249,10 +249,15 @@ def _es_fila_de_equipos(fila: tuple, columnas: range) -> bool:
 
 
 def _localizar_columna_ignorada(filas: list[tuple]) -> int | None:
-    objetivo = clave_participante(COLUMNA_IGNORADA)
+    """La columna de totales del organizador, que no se lee.
+
+    En la hoja completa se titula "Aciertos Totales" y en la del jueves solo
+    "Aciertos", así que basta con que el título empiece así. Nunca es la columna
+    de nombres.
+    """
     for fila in filas[:_MAX_FILAS_ENCABEZADO]:
         for indice, celda in enumerate(fila):
-            if clave_participante(_texto(celda)) == objetivo:
+            if indice > 0 and clave_participante(_texto(celda)).startswith("aciertos"):
                 return indice
     return None
 

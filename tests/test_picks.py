@@ -232,3 +232,36 @@ def test_archivos_por_semana_prefiere_el_excel_y_ignora_temporales(tmp_path: Pat
     grupos = archivos_por_semana(tmp_path)
     assert list(grupos) == [1, 2]
     assert [p.name for p in grupos[2]] == ["Semana_02.xlsx", "Semana_02.pdf"]
+
+
+def test_la_hoja_del_jueves_titula_la_columna_de_totales_solo_aciertos(tmp_path: Path):
+    """Como llegó la semana 4: un partido, y "Aciertos" en una celda combinada C1:C2."""
+    libro = openpyxl.Workbook()
+    hoja = libro.active
+    hoja["B1"], hoja["C1"] = "Steelers", "Aciertos"
+    hoja.merge_cells("C1:C2")
+    hoja["A2"], hoja["B2"] = "Semana 4", "Browns"
+    filas = [("Ismael Reyna", "Browns", 28), ("Luis Santoyo", "Steelers", 28)]
+    for numero, (nombre, pick, total) in enumerate(filas, start=3):
+        hoja.cell(row=numero, column=1, value=nombre)
+        hoja.cell(row=numero, column=2, value=pick)
+        hoja.cell(row=numero, column=3, value=total)
+    ruta = tmp_path / "Quiniela 4 Jueves.xlsx"
+    libro.save(ruta)
+
+    leida = leer_hoja(ruta)
+    assert leida.semana == 4
+    assert [p.clave for p in leida.partidos] == ["Steelers@Browns"]
+    assert leida.picks == {"Ismael Reyna": ["Browns"], "Luis Santoyo": ["Steelers"]}
+
+
+@pytest.mark.parametrize("titulo", ["Aciertos Totales", "Aciertos", "ACIERTOS", "aciertos totales"])
+def test_cualquier_titulo_de_aciertos_es_la_columna_de_totales(tmp_path: Path, titulo: str):
+    ruta = crear_excel(tmp_path / "Semana_02.xlsx")
+    libro = openpyxl.load_workbook(ruta)
+    hoja = libro.active
+    columna = len(ENFRENTAMIENTOS_S2) + 2
+    hoja.cell(row=2, column=columna, value=titulo)
+    libro.save(ruta)
+    partidos, picks = leer_picks(ruta)
+    assert len(partidos) == 16 and all(len(e) == 16 for e in picks.values())

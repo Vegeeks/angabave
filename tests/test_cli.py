@@ -8,6 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import json
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -108,7 +109,12 @@ def test_sin_picks_el_mensaje_dice_donde_buscar(picks_en: Path):
 def carga_en(picks_en: Path, tmp_path: Path, monkeypatch):
     """Aísla también los sellos y el calendario: nada de red ni del sellos.json real."""
     monkeypatch.setattr(cli, "RUTA_SELLOS", tmp_path / "sellos.json")
-    monkeypatch.setattr(cli, "obtener_partidos", lambda anio, semana, sin_red=False: calendario_nfl())
+    # Partidos siempre en el futuro: el CLI usa la hora real, y con una fecha fija
+    # la prueba empezó a fallar en cuanto esa fecha quedó atrás.
+    futuro = datetime.now(timezone.utc) + timedelta(days=3)
+    monkeypatch.setattr(
+        cli, "obtener_partidos", lambda anio, semana, sin_red=False: calendario_nfl(inicio=futuro)
+    )
     return picks_en
 
 

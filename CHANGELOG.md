@@ -9,6 +9,18 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.17.3
+
+* **La hoja del jueves en Excel no entraba.** El organizador tituló la columna
+  de totales solo "Aciertos" (en la hoja completa es "Aciertos Totales") y el
+  lector buscaba el título exacto: tomaba esa columna por un partido y, como
+  "Aciertos" no es un equipo, decía que no encontraba los enfrentamientos.
+  Ahora cualquier título que empiece con "Aciertos" es la columna de totales.
+  Probado con la hoja real de la semana 4.
+* Una prueba del CLI dependía de la fecha: su calendario ponía los partidos el
+  27 de septiembre y empezó a fallar en cuanto esa fecha pasó. Ahora los pone
+  siempre en el futuro.
+
 ## alfa v0.17.2
 
 * **Prueba de conexión** (`red.html`, sin enlace en ningún menú): desde el
