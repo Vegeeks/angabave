@@ -1,165 +1,155 @@
 {
-  "semana": 4,
+  "semana": 5,
   "partidos": [
     {
-      "visitante": "Steelers",
-      "local": "Browns",
-      "marcador_visitante": 10,
-      "marcador_local": 21,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-10-02T00:15:00+00:00"
-    },
-    {
-      "visitante": "Colts",
-      "local": "Washington",
+      "visitante": "Buccaneers",
+      "local": "Cowboys",
       "marcador_visitante": 0,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
       "estado": "Scheduled",
-      "inicio": "2026-10-04T13:30:00+00:00"
+      "inicio": "2026-10-09T00:15:00+00:00"
     },
     {
-      "visitante": "Patriots",
-      "local": "Bills",
+      "visitante": "Eagles",
+      "local": "Jaguars",
       "marcador_visitante": 0,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
       "estado": "Scheduled",
-      "inicio": "2026-10-04T17:00:00+00:00"
+      "inicio": "2026-10-11T13:30:00+00:00"
     },
     {
-      "visitante": "Jets",
-      "local": "Bears",
+      "visitante": "Bears",
+      "local": "Packers",
       "marcador_visitante": 0,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
       "estado": "Scheduled",
-      "inicio": "2026-10-04T17:00:00+00:00"
+      "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
-      "visitante": "Jaguars",
-      "local": "Bengals",
+      "visitante": "Texans",
+      "local": "Titans",
       "marcador_visitante": 0,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
       "estado": "Scheduled",
-      "inicio": "2026-10-04T17:00:00+00:00"
+      "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
-      "visitante": "Cardinals",
-      "local": "Giants",
+      "visitante": "Bengals",
+      "local": "Dolphins",
       "marcador_visitante": 0,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
       "estado": "Scheduled",
-      "inicio": "2026-10-04T17:00:00+00:00"
+      "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
-      "visitante": "Rams",
-      "local": "Eagles",
+      "visitante": "Raiders",
+      "local": "Patriots",
       "marcador_visitante": 0,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
       "estado": "Scheduled",
-      "inicio": "2026-10-04T17:00:00+00:00"
+      "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
-      "visitante": "Packers",
-      "local": "Buccaneers",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-04T17:00:00+00:00"
-    },
-    {
-      "visitante": "Titans",
-      "local": "Ravens",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-04T17:00:00+00:00"
-    },
-    {
-      "visitante": "Cowboys",
-      "local": "Texans",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-04T17:00:00+00:00"
-    },
-    {
-      "visitante": "Dolphins",
-      "local": "Vikings",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-04T20:05:00+00:00"
-    },
-    {
-      "visitante": "Chiefs",
-      "local": "Raiders",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-04T20:25:00+00:00"
-    },
-    {
-      "visitante": "Broncos",
-      "local": "49ers",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-04T20:25:00+00:00"
-    },
-    {
-      "visitante": "Chargers",
-      "local": "Seahawks",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-04T20:25:00+00:00"
-    },
-    {
-      "visitante": "Lions",
-      "local": "Panthers",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-05T00:20:00+00:00"
-    },
-    {
-      "visitante": "Falcons",
+      "visitante": "Vikings",
       "local": "Saints",
       "marcador_visitante": 0,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
       "estado": "Scheduled",
-      "inicio": "2026-10-06T00:15:00+00:00"
+      "inicio": "2026-10-11T17:00:00+00:00"
+    },
+    {
+      "visitante": "Browns",
+      "local": "Jets",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-11T17:00:00+00:00"
+    },
+    {
+      "visitante": "Colts",
+      "local": "Steelers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-11T17:00:00+00:00"
+    },
+    {
+      "visitante": "Giants",
+      "local": "Washington",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-11T17:00:00+00:00"
+    },
+    {
+      "visitante": "Broncos",
+      "local": "Chargers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-11T20:05:00+00:00"
+    },
+    {
+      "visitante": "Lions",
+      "local": "Cardinals",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-11T20:25:00+00:00"
+    },
+    {
+      "visitante": "49ers",
+      "local": "Seahawks",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-11T20:25:00+00:00"
+    },
+    {
+      "visitante": "Ravens",
+      "local": "Falcons",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-12T00:20:00+00:00"
+    },
+    {
+      "visitante": "Bills",
+      "local": "Rams",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-13T00:15:00+00:00"
     }
   ]
 }
