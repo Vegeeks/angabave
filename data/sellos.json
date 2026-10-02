@@ -64,5 +64,12 @@
       "Titans@Giants": "8c389c9c1f2c9f80a8291933916f247e40609291fb7185da2d06399ffb83c6fb",
       "Vikings@Buccaneers": "b5894c680476212cc7873f05d545874e8e3c4275993754a4b3d79332dc3741be"
     }
+  },
+  "4": {
+    "archivo": "Semana_04.xlsx",
+    "sellado": "2026-10-02T02:22:15+00:00",
+    "partidos": {
+      "Steelers@Browns": "5735a72f9a88803687efaf74fcff94f3979115e0125af901a626f3245f117fd0"
+    }
   }
 }
