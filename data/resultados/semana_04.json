@@ -6,9 +6,9 @@
       "local": "Washington",
       "marcador_visitante": 30,
       "marcador_local": 13,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Colts",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-04T13:30:00+00:00"
     },
     {
