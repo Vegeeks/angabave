@@ -38,7 +38,7 @@
       "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
@@ -68,13 +68,13 @@
       "marcador_local": 24,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
       "visitante": "Cowboys",
       "local": "Texans",
-      "marcador_visitante": 12,
+      "marcador_visitante": 13,
       "marcador_local": 16,
       "ganador": null,
       "finalizado": false,
