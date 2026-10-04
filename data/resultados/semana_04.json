@@ -2,16 +2,6 @@
   "semana": 4,
   "partidos": [
     {
-      "visitante": "Steelers",
-      "local": "Browns",
-      "marcador_visitante": 24,
-      "marcador_local": 27,
-      "ganador": "Browns",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-02T00:15:00+00:00"
-    },
-    {
       "visitante": "Colts",
       "local": "Washington",
       "marcador_visitante": 0,
@@ -150,6 +140,16 @@
       "finalizado": false,
       "estado": "Scheduled",
       "inicio": "2026-10-05T00:20:00+00:00"
+    },
+    {
+      "visitante": "Steelers",
+      "local": "Browns",
+      "marcador_visitante": 24,
+      "marcador_local": 27,
+      "ganador": "Browns",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-02T00:15:00+00:00"
     },
     {
       "visitante": "Falcons",
