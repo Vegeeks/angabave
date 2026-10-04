@@ -34,11 +34,11 @@
     {
       "visitante": "Chargers",
       "local": "Seahawks",
-      "marcador_visitante": 3,
+      "marcador_visitante": 6,
       "marcador_local": 20,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T20:25:00+00:00"
     },
     {
