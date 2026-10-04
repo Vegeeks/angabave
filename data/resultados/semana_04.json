@@ -5,7 +5,7 @@
       "visitante": "Dolphins",
       "local": "Vikings",
       "marcador_visitante": 10,
-      "marcador_local": 12,
+      "marcador_local": 15,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -34,7 +34,7 @@
     {
       "visitante": "Chargers",
       "local": "Seahawks",
-      "marcador_visitante": 6,
+      "marcador_visitante": 12,
       "marcador_local": 27,
       "ganador": null,
       "finalizado": false,
