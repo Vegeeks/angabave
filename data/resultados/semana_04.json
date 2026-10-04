@@ -2,16 +2,6 @@
   "semana": 4,
   "partidos": [
     {
-      "visitante": "Colts",
-      "local": "Washington",
-      "marcador_visitante": 30,
-      "marcador_local": 13,
-      "ganador": "Colts",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-04T13:30:00+00:00"
-    },
-    {
       "visitante": "Patriots",
       "local": "Bills",
       "marcador_visitante": 0,
@@ -44,7 +34,7 @@
     {
       "visitante": "Cardinals",
       "local": "Giants",
-      "marcador_visitante": 0,
+      "marcador_visitante": 7,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
@@ -75,7 +65,7 @@
       "visitante": "Titans",
       "local": "Ravens",
       "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -90,6 +80,16 @@
       "finalizado": false,
       "estado": "In Progress",
       "inicio": "2026-10-04T17:00:00+00:00"
+    },
+    {
+      "visitante": "Colts",
+      "local": "Washington",
+      "marcador_visitante": 30,
+      "marcador_local": 13,
+      "ganador": "Colts",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-04T13:30:00+00:00"
     },
     {
       "visitante": "Dolphins",
