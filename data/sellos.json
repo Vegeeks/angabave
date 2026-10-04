@@ -67,8 +67,9 @@
   },
   "4": {
     "archivo": "Semana_04.xlsx",
-    "sellado": "2026-10-02T02:22:15+00:00",
+    "sellado": "2026-10-04T13:31:09+00:00",
     "partidos": {
+      "Colts@Washington": "f4af9d551e4c40cea6a42d2c89c5be4e0e5bbe66de2c96be2d047e820aa79ed6",
       "Steelers@Browns": "5735a72f9a88803687efaf74fcff94f3979115e0125af901a626f3245f117fd0"
     }
   }
