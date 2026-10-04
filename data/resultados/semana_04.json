@@ -2,16 +2,6 @@
   "semana": 4,
   "partidos": [
     {
-      "visitante": "Dolphins",
-      "local": "Vikings",
-      "marcador_visitante": 10,
-      "marcador_local": 15,
-      "ganador": "Vikings",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-04T20:05:00+00:00"
-    },
-    {
       "visitante": "Chiefs",
       "local": "Raiders",
       "marcador_visitante": 17,
@@ -130,6 +120,16 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-04T17:00:00+00:00"
+    },
+    {
+      "visitante": "Dolphins",
+      "local": "Vikings",
+      "marcador_visitante": 10,
+      "marcador_local": 15,
+      "ganador": "Vikings",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-04T20:05:00+00:00"
     },
     {
       "visitante": "Lions",
