@@ -6,9 +6,9 @@
       "local": "Raiders",
       "marcador_visitante": 30,
       "marcador_local": 27,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Chiefs",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-04T20:25:00+00:00"
     },
     {
@@ -16,9 +16,9 @@
       "local": "Seahawks",
       "marcador_visitante": 23,
       "marcador_local": 30,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Seahawks",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-04T20:25:00+00:00"
     },
     {
