@@ -15,10 +15,10 @@
       "visitante": "Chiefs",
       "local": "Raiders",
       "marcador_visitante": 10,
-      "marcador_local": 10,
+      "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T20:25:00+00:00"
     },
     {
