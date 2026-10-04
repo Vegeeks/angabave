@@ -2,11 +2,41 @@
   "semana": 4,
   "partidos": [
     {
+      "visitante": "Dolphins",
+      "local": "Vikings",
+      "marcador_visitante": 0,
+      "marcador_local": 3,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-10-04T20:05:00+00:00"
+    },
+    {
+      "visitante": "Colts",
+      "local": "Washington",
+      "marcador_visitante": 30,
+      "marcador_local": 13,
+      "ganador": "Colts",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-04T13:30:00+00:00"
+    },
+    {
       "visitante": "Patriots",
       "local": "Bills",
       "marcador_visitante": 29,
       "marcador_local": 26,
       "ganador": "Patriots",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-04T17:00:00+00:00"
+    },
+    {
+      "visitante": "Jets",
+      "local": "Bears",
+      "marcador_visitante": 12,
+      "marcador_local": 23,
+      "ganador": "Bears",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-04T17:00:00+00:00"
@@ -42,6 +72,16 @@
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
+      "visitante": "Packers",
+      "local": "Buccaneers",
+      "marcador_visitante": 17,
+      "marcador_local": 14,
+      "ganador": "Packers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-04T17:00:00+00:00"
+    },
+    {
       "visitante": "Titans",
       "local": "Ravens",
       "marcador_visitante": 18,
@@ -57,46 +97,6 @@
       "marcador_visitante": 34,
       "marcador_local": 30,
       "ganador": "Cowboys",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-04T17:00:00+00:00"
-    },
-    {
-      "visitante": "Dolphins",
-      "local": "Vikings",
-      "marcador_visitante": 0,
-      "marcador_local": 3,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-10-04T20:05:00+00:00"
-    },
-    {
-      "visitante": "Colts",
-      "local": "Washington",
-      "marcador_visitante": 30,
-      "marcador_local": 13,
-      "ganador": "Colts",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-04T13:30:00+00:00"
-    },
-    {
-      "visitante": "Jets",
-      "local": "Bears",
-      "marcador_visitante": 12,
-      "marcador_local": 23,
-      "ganador": "Bears",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-04T17:00:00+00:00"
-    },
-    {
-      "visitante": "Packers",
-      "local": "Buccaneers",
-      "marcador_visitante": 17,
-      "marcador_local": 14,
-      "ganador": "Packers",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-04T17:00:00+00:00"

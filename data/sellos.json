@@ -67,9 +67,12 @@
   },
   "4": {
     "archivo": "Semana_04.xlsx",
-    "sellado": "2026-10-04T20:06:31+00:00",
+    "sellado": "2026-10-04T20:25:01+00:00",
     "partidos": {
+      "Broncos@49ers": "624c93e2cb6b7f5cfa2c7148d76b6474f199662b9520f194a66cc1e51c095dda",
       "Cardinals@Giants": "861b595ca4d09853d3c508cd7cea636121b970f2b8027071c0b7bd4a81032c19",
+      "Chargers@Seahawks": "016c77ec2d24cb06ffeeb097df3554ddf5edf070abfd77cada94b640988d86e3",
+      "Chiefs@Raiders": "40cd4fd526d535fa6f73d9ad153b8e37ce59dff4a5e629e6a05d906721ca29a7",
       "Colts@Washington": "f4af9d551e4c40cea6a42d2c89c5be4e0e5bbe66de2c96be2d047e820aa79ed6",
       "Cowboys@Texans": "8905c01beed25d288c34189ab81a9b9a1e180478cc6424422a2d53314569b658",
       "Dolphins@Vikings": "a2a396141105843a292cf80d1e4323cdf952d4dba90afb91ec74c13707c4aa01",
