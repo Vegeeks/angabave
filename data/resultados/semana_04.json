@@ -38,14 +38,14 @@
       "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
       "visitante": "Rams",
       "local": "Eagles",
       "marcador_visitante": 10,
-      "marcador_local": 13,
+      "marcador_local": 20,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -65,10 +65,10 @@
       "visitante": "Titans",
       "local": "Ravens",
       "marcador_visitante": 7,
-      "marcador_local": 21,
+      "marcador_local": 24,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
