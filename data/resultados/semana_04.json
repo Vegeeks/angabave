@@ -12,16 +12,6 @@
       "inicio": "2026-10-04T20:25:00+00:00"
     },
     {
-      "visitante": "Broncos",
-      "local": "49ers",
-      "marcador_visitante": 14,
-      "marcador_local": 24,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-10-04T20:25:00+00:00"
-    },
-    {
       "visitante": "Chargers",
       "local": "Seahawks",
       "marcador_visitante": 23,
@@ -130,6 +120,16 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-04T20:05:00+00:00"
+    },
+    {
+      "visitante": "Broncos",
+      "local": "49ers",
+      "marcador_visitante": 14,
+      "marcador_local": 24,
+      "ganador": "49ers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-04T20:25:00+00:00"
     },
     {
       "visitante": "Lions",
