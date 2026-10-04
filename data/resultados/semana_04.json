@@ -46,9 +46,9 @@
       "local": "Ravens",
       "marcador_visitante": 18,
       "marcador_local": 24,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Ravens",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
