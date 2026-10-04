@@ -4,7 +4,7 @@
     {
       "visitante": "Chiefs",
       "local": "Raiders",
-      "marcador_visitante": 23,
+      "marcador_visitante": 30,
       "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
@@ -15,7 +15,7 @@
       "visitante": "Broncos",
       "local": "49ers",
       "marcador_visitante": 14,
-      "marcador_local": 17,
+      "marcador_local": 23,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
