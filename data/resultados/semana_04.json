@@ -16,9 +16,9 @@
       "local": "Bears",
       "marcador_visitante": 12,
       "marcador_local": 23,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Bears",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
