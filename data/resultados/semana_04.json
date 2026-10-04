@@ -16,9 +16,9 @@
       "local": "Bengals",
       "marcador_visitante": 22,
       "marcador_local": 17,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Jaguars",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
@@ -36,9 +36,9 @@
       "local": "Eagles",
       "marcador_visitante": 24,
       "marcador_local": 20,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Rams",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
