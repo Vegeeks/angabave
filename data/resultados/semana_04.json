@@ -64,7 +64,7 @@
     {
       "visitante": "Titans",
       "local": "Ravens",
-      "marcador_visitante": 16,
+      "marcador_visitante": 18,
       "marcador_local": 24,
       "ganador": null,
       "finalizado": false,
@@ -98,7 +98,7 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-10-04T20:05:00+00:00"
     },
     {
