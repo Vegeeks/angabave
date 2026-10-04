@@ -4,11 +4,11 @@
     {
       "visitante": "Colts",
       "local": "Washington",
-      "marcador_visitante": 7,
+      "marcador_visitante": 10,
       "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T13:30:00+00:00"
     },
     {
