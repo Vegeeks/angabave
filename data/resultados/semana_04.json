@@ -5,10 +5,10 @@
       "visitante": "Dolphins",
       "local": "Vikings",
       "marcador_visitante": 0,
-      "marcador_local": 6,
+      "marcador_local": 9,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T20:05:00+00:00"
     },
     {
@@ -35,7 +35,7 @@
       "visitante": "Chargers",
       "local": "Seahawks",
       "marcador_visitante": 3,
-      "marcador_local": 7,
+      "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
