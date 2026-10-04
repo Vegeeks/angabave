@@ -12,6 +12,36 @@
       "inicio": "2026-10-04T20:05:00+00:00"
     },
     {
+      "visitante": "Chiefs",
+      "local": "Raiders",
+      "marcador_visitante": 0,
+      "marcador_local": 7,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-10-04T20:25:00+00:00"
+    },
+    {
+      "visitante": "Broncos",
+      "local": "49ers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-10-04T20:25:00+00:00"
+    },
+    {
+      "visitante": "Chargers",
+      "local": "Seahawks",
+      "marcador_visitante": 3,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-10-04T20:25:00+00:00"
+    },
+    {
       "visitante": "Colts",
       "local": "Washington",
       "marcador_visitante": 30,
@@ -100,36 +130,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-04T17:00:00+00:00"
-    },
-    {
-      "visitante": "Chiefs",
-      "local": "Raiders",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-10-04T20:25:00+00:00"
-    },
-    {
-      "visitante": "Broncos",
-      "local": "49ers",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-10-04T20:25:00+00:00"
-    },
-    {
-      "visitante": "Chargers",
-      "local": "Seahawks",
-      "marcador_visitante": 3,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-10-04T20:25:00+00:00"
     },
     {
       "visitante": "Lions",
