@@ -35,7 +35,7 @@
       "visitante": "Cardinals",
       "local": "Giants",
       "marcador_visitante": 24,
-      "marcador_local": 27,
+      "marcador_local": 30,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -56,9 +56,9 @@
       "local": "Buccaneers",
       "marcador_visitante": 17,
       "marcador_local": 14,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Packers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
