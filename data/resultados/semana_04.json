@@ -12,16 +12,6 @@
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
-      "visitante": "Jets",
-      "local": "Bears",
-      "marcador_visitante": 12,
-      "marcador_local": 23,
-      "ganador": "Bears",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-04T17:00:00+00:00"
-    },
-    {
       "visitante": "Jaguars",
       "local": "Bengals",
       "marcador_visitante": 22,
@@ -52,16 +42,6 @@
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
-      "visitante": "Packers",
-      "local": "Buccaneers",
-      "marcador_visitante": 17,
-      "marcador_local": 14,
-      "ganador": "Packers",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-04T17:00:00+00:00"
-    },
-    {
       "visitante": "Titans",
       "local": "Ravens",
       "marcador_visitante": 18,
@@ -74,12 +54,22 @@
     {
       "visitante": "Cowboys",
       "local": "Texans",
-      "marcador_visitante": 27,
+      "marcador_visitante": 34,
       "marcador_local": 30,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
       "inicio": "2026-10-04T17:00:00+00:00"
+    },
+    {
+      "visitante": "Dolphins",
+      "local": "Vikings",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-10-04T20:05:00+00:00"
     },
     {
       "visitante": "Colts",
@@ -92,14 +82,24 @@
       "inicio": "2026-10-04T13:30:00+00:00"
     },
     {
-      "visitante": "Dolphins",
-      "local": "Vikings",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-10-04T20:05:00+00:00"
+      "visitante": "Jets",
+      "local": "Bears",
+      "marcador_visitante": 12,
+      "marcador_local": 23,
+      "ganador": "Bears",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-04T17:00:00+00:00"
+    },
+    {
+      "visitante": "Packers",
+      "local": "Buccaneers",
+      "marcador_visitante": 17,
+      "marcador_local": 14,
+      "ganador": "Packers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
       "visitante": "Chiefs",
