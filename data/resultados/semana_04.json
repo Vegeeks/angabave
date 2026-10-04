@@ -8,17 +8,17 @@
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
       "visitante": "Jets",
       "local": "Bears",
       "marcador_visitante": 3,
-      "marcador_local": 10,
+      "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
@@ -28,7 +28,7 @@
       "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
@@ -75,10 +75,10 @@
       "visitante": "Cowboys",
       "local": "Texans",
       "marcador_visitante": 6,
-      "marcador_local": 13,
+      "marcador_local": 16,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-04T17:00:00+00:00"
     },
     {
