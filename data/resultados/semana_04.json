@@ -4,11 +4,11 @@
     {
       "visitante": "Lions",
       "local": "Panthers",
-      "marcador_visitante": 13,
+      "marcador_visitante": 16,
       "marcador_local": 16,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-05T00:20:00+00:00"
     },
     {
