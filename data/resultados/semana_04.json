@@ -2,16 +2,6 @@
   "semana": 4,
   "partidos": [
     {
-      "visitante": "Falcons",
-      "local": "Saints",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-06T00:15:00+00:00"
-    },
-    {
       "visitante": "Steelers",
       "local": "Browns",
       "marcador_visitante": 24,
@@ -160,6 +150,16 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-05T00:20:00+00:00"
+    },
+    {
+      "visitante": "Falcons",
+      "local": "Saints",
+      "marcador_visitante": 45,
+      "marcador_local": 24,
+      "ganador": "Falcons",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-06T00:15:00+00:00"
     }
   ]
 }
