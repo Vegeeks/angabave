@@ -89,7 +89,9 @@
   },
   "5": {
     "archivo": "Semana_05.xlsx",
-    "sellado": "2026-10-08T23:24:39+00:00",
-    "partidos": {}
+    "sellado": "2026-10-09T00:16:12+00:00",
+    "partidos": {
+      "Buccaneers@Cowboys": "b84df7b8d412b108169ad4f6af9a09a9bc485d88509928c80ed1231986a82f65"
+    }
   }
 }
