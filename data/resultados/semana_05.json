@@ -2,16 +2,6 @@
   "semana": 5,
   "partidos": [
     {
-      "visitante": "Bengals",
-      "local": "Dolphins",
-      "marcador_visitante": 31,
-      "marcador_local": 24,
-      "ganador": "Bengals",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-11T17:00:00+00:00"
-    },
-    {
       "visitante": "Giants",
       "local": "Washington",
       "marcador_visitante": 27,
@@ -30,6 +20,26 @@
       "finalizado": false,
       "estado": "In Progress",
       "inicio": "2026-10-11T20:05:00+00:00"
+    },
+    {
+      "visitante": "Lions",
+      "local": "Cardinals",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-10-11T20:25:00+00:00"
+    },
+    {
+      "visitante": "49ers",
+      "local": "Seahawks",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-10-11T20:25:00+00:00"
     },
     {
       "visitante": "Eagles",
@@ -57,6 +67,16 @@
       "marcador_visitante": 26,
       "marcador_local": 3,
       "ganador": "Texans",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-11T17:00:00+00:00"
+    },
+    {
+      "visitante": "Bengals",
+      "local": "Dolphins",
+      "marcador_visitante": 31,
+      "marcador_local": 24,
+      "ganador": "Bengals",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-11T17:00:00+00:00"
@@ -100,26 +120,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-11T17:00:00+00:00"
-    },
-    {
-      "visitante": "Lions",
-      "local": "Cardinals",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-10-11T20:25:00+00:00"
-    },
-    {
-      "visitante": "49ers",
-      "local": "Seahawks",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-10-11T20:25:00+00:00"
     },
     {
       "visitante": "Ravens",
