@@ -89,10 +89,18 @@
   },
   "5": {
     "archivo": "Semana_05.xlsx",
-    "sellado": "2026-10-11T13:31:11+00:00",
+    "sellado": "2026-10-11T17:01:52+00:00",
     "partidos": {
+      "Bears@Packers": "9cdda949bd532fa5432fa32f9327da66b54d553d62db9a40737e5706f47b5d6e",
+      "Bengals@Dolphins": "7681e32b6d78082b87f0ec993c000defde22449640a4ee361e49b1950f444a63",
+      "Browns@Jets": "4b631103629eba4a7344d71394608f40e8d2a3423c86f332cf5efd3b4fd767d9",
       "Buccaneers@Cowboys": "b84df7b8d412b108169ad4f6af9a09a9bc485d88509928c80ed1231986a82f65",
-      "Eagles@Jaguars": "f63fc548df7af199cd446605083495fbbff94ba5be5e2719d6a9307a2f6c96eb"
+      "Colts@Steelers": "b284e0137eb896a8f5ceaf1676c09fb162150569bcc278f0d1b87639d63cf7f0",
+      "Eagles@Jaguars": "f63fc548df7af199cd446605083495fbbff94ba5be5e2719d6a9307a2f6c96eb",
+      "Giants@Washington": "079d7f30f9f1f5989a5c3d3c1f7647085613b39d4d1d3429056a72c390784487",
+      "Raiders@Patriots": "4371b7e83588d35dd1d1d65c1c76a488131cc7911949146db3c5ee13ae2815e6",
+      "Texans@Titans": "12b7e41102e2326c1c4eb9645da20f7e51c66aeb2fde4d4485d7861f4786e87d",
+      "Vikings@Saints": "0abfe2f663cee1cb6212ca9c406160b6d353ee2749de4e7b20491876eff09546"
     }
   }
 }
