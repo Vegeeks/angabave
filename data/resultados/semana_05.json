@@ -44,11 +44,11 @@
     {
       "visitante": "Vikings",
       "local": "Saints",
-      "marcador_visitante": 3,
+      "marcador_visitante": 6,
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
