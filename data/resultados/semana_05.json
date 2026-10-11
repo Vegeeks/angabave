@@ -24,7 +24,7 @@
     {
       "visitante": "Bengals",
       "local": "Dolphins",
-      "marcador_visitante": 7,
+      "marcador_visitante": 14,
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
@@ -64,7 +64,7 @@
     {
       "visitante": "Colts",
       "local": "Steelers",
-      "marcador_visitante": 6,
+      "marcador_visitante": 13,
       "marcador_local": 14,
       "ganador": null,
       "finalizado": false,
