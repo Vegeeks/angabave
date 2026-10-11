@@ -2,16 +2,6 @@
   "semana": 5,
   "partidos": [
     {
-      "visitante": "49ers",
-      "local": "Seahawks",
-      "marcador_visitante": 32,
-      "marcador_local": 29,
-      "ganador": "49ers",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-11T20:25:00+00:00"
-    },
-    {
       "visitante": "Eagles",
       "local": "Jaguars",
       "marcador_visitante": 17,
@@ -117,6 +107,16 @@
       "marcador_visitante": 45,
       "marcador_local": 21,
       "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-11T20:25:00+00:00"
+    },
+    {
+      "visitante": "49ers",
+      "local": "Seahawks",
+      "marcador_visitante": 32,
+      "marcador_local": 29,
+      "ganador": "49ers",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-11T20:25:00+00:00"
