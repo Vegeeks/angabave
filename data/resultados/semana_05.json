@@ -45,7 +45,7 @@
       "visitante": "Giants",
       "local": "Washington",
       "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -64,7 +64,7 @@
     {
       "visitante": "Bengals",
       "local": "Dolphins",
-      "marcador_visitante": 6,
+      "marcador_visitante": 7,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
