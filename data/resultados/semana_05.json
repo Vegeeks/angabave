@@ -8,7 +8,7 @@
       "marcador_local": 23,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
@@ -24,7 +24,7 @@
     {
       "visitante": "Bengals",
       "local": "Dolphins",
-      "marcador_visitante": 21,
+      "marcador_visitante": 28,
       "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
@@ -55,7 +55,7 @@
       "visitante": "Browns",
       "local": "Jets",
       "marcador_visitante": 6,
-      "marcador_local": 7,
+      "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -74,7 +74,7 @@
     {
       "visitante": "Giants",
       "local": "Washington",
-      "marcador_visitante": 6,
+      "marcador_visitante": 13,
       "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
