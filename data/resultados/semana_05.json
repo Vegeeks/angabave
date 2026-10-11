@@ -6,9 +6,9 @@
       "local": "Chargers",
       "marcador_visitante": 23,
       "marcador_local": 17,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Broncos",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-11T20:05:00+00:00"
     },
     {
