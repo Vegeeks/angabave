@@ -18,14 +18,14 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "End of Period",
       "inicio": "2026-10-11T20:05:00+00:00"
     },
     {
       "visitante": "Lions",
       "local": "Cardinals",
       "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
