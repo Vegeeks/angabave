@@ -18,7 +18,7 @@
       "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
@@ -35,7 +35,7 @@
       "visitante": "Raiders",
       "local": "Patriots",
       "marcador_visitante": 7,
-      "marcador_local": 14,
+      "marcador_local": 20,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -65,7 +65,7 @@
       "visitante": "Colts",
       "local": "Steelers",
       "marcador_visitante": 13,
-      "marcador_local": 14,
+      "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
