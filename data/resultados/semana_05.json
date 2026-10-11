@@ -24,7 +24,7 @@
     {
       "visitante": "Bengals",
       "local": "Dolphins",
-      "marcador_visitante": 14,
+      "marcador_visitante": 21,
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
@@ -38,7 +38,7 @@
       "marcador_local": 21,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
@@ -68,7 +68,7 @@
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
