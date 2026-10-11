@@ -5,7 +5,7 @@
       "visitante": "Broncos",
       "local": "Chargers",
       "marcador_visitante": 10,
-      "marcador_local": 3,
+      "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -24,7 +24,7 @@
     {
       "visitante": "49ers",
       "local": "Seahawks",
-      "marcador_visitante": 14,
+      "marcador_visitante": 21,
       "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
