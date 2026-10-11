@@ -58,13 +58,13 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
       "visitante": "Bengals",
       "local": "Dolphins",
-      "marcador_visitante": 0,
+      "marcador_visitante": 6,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
