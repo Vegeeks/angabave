@@ -6,9 +6,9 @@
       "local": "Cardinals",
       "marcador_visitante": 45,
       "marcador_local": 21,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-11T20:25:00+00:00"
     },
     {
