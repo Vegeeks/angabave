@@ -34,7 +34,7 @@
     {
       "visitante": "Raiders",
       "local": "Patriots",
-      "marcador_visitante": 7,
+      "marcador_visitante": 10,
       "marcador_local": 28,
       "ganador": null,
       "finalizado": false,
@@ -48,7 +48,7 @@
       "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
-      "estado": "End of Period",
+      "estado": "In Progress",
       "inicio": "2026-10-11T17:00:00+00:00"
     },
     {
