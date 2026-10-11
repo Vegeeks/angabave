@@ -6,9 +6,9 @@
       "local": "Jaguars",
       "marcador_visitante": 17,
       "marcador_local": 19,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Jaguars",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-11T13:30:00+00:00"
     },
     {
@@ -55,7 +55,7 @@
       "visitante": "Bears",
       "local": "Packers",
       "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
