@@ -2,16 +2,6 @@
   "semana": 5,
   "partidos": [
     {
-      "visitante": "Ravens",
-      "local": "Falcons",
-      "marcador_visitante": 30,
-      "marcador_local": 23,
-      "ganador": "Ravens",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-12T00:20:00+00:00"
-    },
-    {
       "visitante": "Eagles",
       "local": "Jaguars",
       "marcador_visitante": 17,
@@ -130,6 +120,16 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-11T20:25:00+00:00"
+    },
+    {
+      "visitante": "Ravens",
+      "local": "Falcons",
+      "marcador_visitante": 30,
+      "marcador_local": 23,
+      "ganador": "Ravens",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-12T00:20:00+00:00"
     },
     {
       "visitante": "Buccaneers",
