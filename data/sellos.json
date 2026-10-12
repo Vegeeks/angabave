@@ -89,7 +89,7 @@
   },
   "5": {
     "archivo": "Semana_05.xlsx",
-    "sellado": "2026-10-11T20:25:44+00:00",
+    "sellado": "2026-10-12T00:20:19+00:00",
     "partidos": {
       "49ers@Seahawks": "1acda74d9950c8a533433800d12ff5ac072b7944a612a59706c62baf52612155",
       "Bears@Packers": "9cdda949bd532fa5432fa32f9327da66b54d553d62db9a40737e5706f47b5d6e",
@@ -102,6 +102,7 @@
       "Giants@Washington": "079d7f30f9f1f5989a5c3d3c1f7647085613b39d4d1d3429056a72c390784487",
       "Lions@Cardinals": "2da02d16ae5822624303ce6934c146c1f8d32ddbb9c76b60b96969194d473ee8",
       "Raiders@Patriots": "4371b7e83588d35dd1d1d65c1c76a488131cc7911949146db3c5ee13ae2815e6",
+      "Ravens@Falcons": "ab7855c619251e0a7b00fdebb77edd4ab9fe578b5ee1d0f0c0fd558b2ed683ba",
       "Texans@Titans": "12b7e41102e2326c1c4eb9645da20f7e51c66aeb2fde4d4485d7861f4786e87d",
       "Vikings@Saints": "0abfe2f663cee1cb6212ca9c406160b6d353ee2749de4e7b20491876eff09546"
     }
