@@ -2,16 +2,6 @@
   "semana": 5,
   "partidos": [
     {
-      "visitante": "Bills",
-      "local": "Rams",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-13T00:15:00+00:00"
-    },
-    {
       "visitante": "Buccaneers",
       "local": "Cowboys",
       "marcador_visitante": 24,
@@ -150,6 +140,16 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-12T00:20:00+00:00"
+    },
+    {
+      "visitante": "Bills",
+      "local": "Rams",
+      "marcador_visitante": 37,
+      "marcador_local": 34,
+      "ganador": "Bills",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-13T00:15:00+00:00"
     }
   ]
 }

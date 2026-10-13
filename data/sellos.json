@@ -89,11 +89,12 @@
   },
   "5": {
     "archivo": "Semana_05.xlsx",
-    "sellado": "2026-10-12T00:20:19+00:00",
+    "sellado": "2026-10-13T05:01:21+00:00",
     "partidos": {
       "49ers@Seahawks": "1acda74d9950c8a533433800d12ff5ac072b7944a612a59706c62baf52612155",
       "Bears@Packers": "9cdda949bd532fa5432fa32f9327da66b54d553d62db9a40737e5706f47b5d6e",
       "Bengals@Dolphins": "7681e32b6d78082b87f0ec993c000defde22449640a4ee361e49b1950f444a63",
+      "Bills@Rams": "d8649659879241c9acd957d6884ca28a6532f1e1d300b7927f729042d2330a11",
       "Broncos@Chargers": "17b9accc91f1cef47e8e8926dc86d7db5fa9628eef57408e0071caabaff6ccb5",
       "Browns@Jets": "4b631103629eba4a7344d71394608f40e8d2a3423c86f332cf5efd3b4fd767d9",
       "Buccaneers@Cowboys": "b84df7b8d412b108169ad4f6af9a09a9bc485d88509928c80ed1231986a82f65",
