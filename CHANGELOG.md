@@ -9,6 +9,63 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.18.0
+
+**El portal se acomoda al momento de la semana y te sigue a ti.**
+
+* **Hoy**, la portada nueva, cambia según lo que esté pasando:
+  * Con partidos en vivo: los marcadores primero, con el cuarto y el reloj
+    ("Q2 · 5:32"). Tu pick va en verde o en rojo según cómo vas, y la
+    palomita o la tache solo aparecen con el final.
+  * El día de partido: los de hoy con su hora y tu pick, más una cuenta
+    regresiva al primero.
+  * En tiempo de picks: el generador completo arriba, con cuánto falta y
+    cuántos partidos cierran en cada fecha. Entre el martes y el jueves va
+    encima quién ganó la semana anterior.
+  * El domingo en la noche: cómo quedó el día ("Resultados de hoy"), tu semana
+    y quién va ganando. Los picks de la semana siguiente no le quitan el lugar
+    a la que se está jugando hasta que están por cerrar.
+  * Siempre, accesos directos a partidos, quién le fue a quién, escenarios y
+    las tablas.
+* **Tu barra**, arriba en todas las secciones: tus aciertos, tu porcentaje y tu
+  lugar en la semana y en la temporada, al minuto. En vivo dice cuántos de tus
+  partidos en juego vas ganando. Un toque abre tu ficha.
+* **Elegir tu nombre es de un toque**: la invitación abre directo la lista del
+  teléfono. Antes eran dos invitaciones encimadas y una tarjeta enorme.
+* **Navegación de app**: cinco secciones (Hoy, Semana, General, Jugadores y
+  Premios), abajo en el teléfono y arriba en computadora. Dentro de Semana, un
+  selector S1, S2… y una sola línea de estado en lugar de tres avisos.
+* **Logo nuevo**: una A dorada con un balón al centro. Sale de un solo lugar
+  (`quiniela/marca.py`) para el encabezado, el ícono de la pestaña, la imagen
+  de picks y los iconos de la app.
+* **En computadora**, Hoy va a dos columnas (lo que pasa a la izquierda, lo tuyo
+  a la derecha) y tu barra comparte fila con el menú.
+* En la general, **tu temporada** arriba: aciertos, porcentaje, lugar, tu mejor
+  semana y tu racha.
+
+Errores corregidos en la revisión:
+
+* En computadora la barra de secciones salía **invisible**: compartía nombre de
+  clase con el botón de volver arriba (fijo y transparente).
+* "EN VIVO" en rojo toda la semana aunque no se jugara nada, y "La tabla lleva
+  10 horas sin recalcularse" en días sin partidos.
+* ESPN manda "0" de marcador antes de la patada y salía un 0-0 en partidos que
+  no habían empezado.
+* En el teléfono, "ACIERTOS" salía como "CIERTOS": la columna del nombre se
+  encimaba a la siguiente.
+* La tarjeta de tu semana decía "0 por jugar" con 13 partidos sin repartir.
+* La fecha salía como "16 De Octubre", las horas mezclaban "02:05 p.m." con
+  "23:59", y había plurales del tipo "semana(s) jugada(s)".
+* En teléfonos angostos (320 px) se cortaban los nombres de los equipos en el
+  generador y en los partidos. Ahora manda el nombre: la etiqueta usa la sigla
+  y, abajo de 360 px, la sigla del generador se vuelve un punto de color.
+* Al refrescarse cada minuto con datos nuevos, la vista entera volvía a
+  animarse. Ahora se actualiza quieta, y las cuentas regresivas avanzan solas.
+
+Para revisar sin esperar al domingo: `herramientas/momentos.py` arma copias del
+portal en cinco momentos de la semana (con reloj y ESPN de mentira). Probado en
+Chrome a 320, 375 y 1024 px y en Safari de iPhone.
+
 ## alfa v0.17.3
 
 * **La hoja del jueves en Excel no entraba.** El organizador tituló la columna

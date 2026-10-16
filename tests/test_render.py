@@ -130,14 +130,16 @@ def test_la_semana_sin_picks_se_marca_como_pendiente(armado, tmp_path: Path):
     assert semana3["estado"] == "pendiente"
     assert semana3["jugadores"] == []
     assert len(semana3["partidos"]) == 2
-    assert "Actualizando la semana " in html
+    assert "Picks por cargar" in html            # así lo dice la línea de estado
 
 
 def test_las_semanas_jugadas_quedan_navegables(armado, tmp_path: Path):
+    """Las semanas se eligen dentro de "Semana", con su propio selector."""
     html = render(armado, tmp_path)
-    assert 'data-vista="2"' in html
-    assert 'data-vista="3"' in html
-    assert 'data-vista="general"' in html
+    assert 'data-vista="semana"' in html and 'data-vista="general"' in html
+    assert "function selectorDeSemanas" in html
+    assert [s["n"] for s in datos_embebidos(html)["semanas"]] == [2, 3]
+    assert '"#s" + vista' in html                  # y cada una tiene su dirección
 
 
 def test_los_estados_que_se_muestran_salen_en_espanol(armado, tmp_path: Path):
@@ -268,8 +270,8 @@ def test_la_semana_en_curso_queda_destacada(armado, tmp_path: Path):
     html = render(armado, tmp_path)
     datos = datos_embebidos(html)
     assert datos["activa"] == 2
-    # La pastilla de la semana activa lleva su marca.
-    assert 'data-vista="2"' in html and 'class="actual"' in html
+    # En el selector, la semana en curso lleva su marca.
+    assert 'classList.add("en-curso")' in html
 
 
 def test_la_tipografia_viaja_dentro_del_html(armado, tmp_path: Path):
@@ -293,8 +295,9 @@ def test_la_fuente_solo_se_usa_en_mayusculas_y_cifras(armado, tmp_path: Path):
 
 
 def test_la_invitacion_de_primera_visita_existe(armado, tmp_path: Path):
+    """Ya no es una tarjeta enorme: una línea en Hoy y un botón en la barra."""
     html = render(armado, tmp_path)
-    assert "Primera vez por aquí" in html
+    assert "¿Quién eres?" in html
     assert "angabave.invitado" in html       # se recuerda que ya la vio
 
 
@@ -541,3 +544,120 @@ def test_la_prueba_de_red_sale_con_el_portal(armado, tmp_path: Path):
     assert "<script src" not in pagina and "innerHTML" not in pagina
     for rastro in ("claude", "anthropic", "inteligencia artificial", "gpt", "automáticamente"):
         assert rastro not in pagina.lower()
+
+
+
+# --- la experiencia nueva ------------------------------------------------------------
+
+
+def test_hoy_es_la_portada(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert 'id="vista-hoy"' in html
+    assert ': "hoy";' in html                 # sin dirección ni sesión previa, abre en Hoy
+    assert "function pintarHoy" in html
+
+
+def test_las_dos_navegaciones_son_iguales(armado, tmp_path: Path):
+    """Arriba en computadora y abajo en el teléfono, con los mismos cinco botones."""
+    html = render(armado, tmp_path)
+    navs = re.findall(r'<nav class="[^"]*navegacion[^"]*" data-nav[^>]*>(.*?)</nav>', html, re.S)
+    assert len(navs) == 2
+    botones = [re.findall(r'data-vista="([a-z]+)"', n) for n in navs]
+    assert botones[0] == botones[1] == ["hoy", "semana", "general", "jugadores", "premios"]
+    # La de abajo va fuera del encabezado: su desenfoque la dejaría pegada a él.
+    assert html.index('class="navegacion al-pie"') > html.index("</header>")
+    # "arriba" ya es el botón de volver arriba (fijo y transparente hasta que
+    # bajas): una navegación con esa clase quedaba invisible en computadora.
+    for clases in re.findall(r'<nav class="([^"]*navegacion[^"]*)"', html):
+        assert "arriba" not in clases.split()
+
+
+def test_la_marca_es_la_misma_en_todas_partes(armado, tmp_path: Path):
+    from quiniela import marca
+
+    html = render(armado, tmp_path)
+    assert marca.ruta_a() in html                               # el SVG del encabezado
+    assert '<link rel="icon" href="data:image/svg+xml,' in html  # el ícono de la pestaña
+    assert datos_embebidos(html)["logo"]["rutas"] == marca.rutas()   # el canvas de la imagen
+    assert "escudoEnLienzo" not in html                          # el escudo viejo ya no está
+    carga = (tmp_path / "cargar.html").read_text(encoding="utf-8")
+    assert marca.ruta_a() in carga and 'rel="icon"' in carga
+
+
+def test_en_vivo_solo_cuando_se_esta_jugando(armado, tmp_path: Path):
+    """Una semana a medias un viernes está en curso, no en vivo."""
+    html = render(armado, tmp_path)
+    estado = html[html.index("function pintarEstado"):html.index("const COLORES")]
+    assert "juegosEnVivo(s)" in estado
+    assert 's.estado === "en_vivo") {\n      chip.classList.add("vivo")' not in estado
+
+
+def test_el_aviso_de_rezago_solo_si_algo_ya_arranco(armado, tmp_path: Path):
+    """Un viernes sin partidos, "10 horas sin recalcularse" era una falsa alarma."""
+    html = render(armado, tmp_path)
+    rezago = html[html.index("function avisoDeRezago"):]
+    rezago = rezago[:rezago.index("\n  }\n")]
+    assert "arrancoSinCerrar" in rezago and "if (!arrancoSinCerrar) return null;" in rezago
+
+
+def test_los_iconos_de_la_app_salen_de_la_marca(tmp_path: Path):
+    from quiniela.render_png import generar_iconos
+
+    rutas = generar_iconos(tmp_path)
+    assert [r.name for r in rutas] == ["icono-180.png", "icono-192.png", "icono-512.png"]
+    with Image.open(rutas[-1]) as icono:
+        assert icono.size == (512, 512)
+        # Al centro, sobre la A, hay oro; en la esquina, la loseta oscura.
+        r, g, b = icono.convert("RGB").getpixel((256, 180))
+        assert r > 200 and g > 150 and r - b > 80
+        assert sum(icono.convert("RGB").getpixel((10, 10))) < 120
+
+
+def _funcion(html: str, nombre: str) -> str:
+    """El cuerpo de una función del script de la página, hasta su llave de cierre."""
+    cuerpo = html[html.index("function " + nombre):]
+    return cuerpo[:cuerpo.index("\n  }\n")]
+
+
+def test_antes_de_la_patada_no_hay_cero_a_cero(armado, tmp_path: Path):
+    """ESPN manda "0" de marcador antes del partido: no se pinta como un 0-0."""
+    html = render(armado, tmp_path)
+    vivo = _funcion(html, "parsearVivo")
+    assert 'tipo.state === "pre"' in vivo and "v.m = null; l.m = null;" in vivo
+    assert "enJuego: !tipo.completed && !antes" in vivo
+    # En juego se ve el cuarto y el reloj, no un "En curso" genérico.
+    assert '"Q" + reloj.period' in vivo
+
+
+def test_los_picks_de_la_semana_que_sigue_no_tapan_la_que_se_juega(armado, tmp_path: Path):
+    """El domingo en la noche importa cómo vas, no los picks que cierran el miércoles."""
+    html = render(armado, tmp_path)
+    hoy = _funcion(html, "pintarHoy")
+    assert "picks.s === s" in hoy and "36 * 3600e3" in hoy
+    assert ': apuran ? "picks"' in hoy
+
+
+def test_el_martes_se_ve_quien_gano_la_semana(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    hoy = _funcion(html, "pintarHoy")
+    assert "semanaRecienCerrada()" in hoy
+    assert 'picks: [["previo", "picks"]' in hoy
+    # Y la barra muestra la última semana con tabla mientras la nueva no se reparte.
+    assert "D.semanas.slice().reverse()" in _funcion(html, "numerosDe")
+
+
+def test_elegir_nombre_es_de_un_toque(armado, tmp_path: Path):
+    """La barra trae la lista encima: el teléfono abre su selector nativo al primer toque."""
+    html = render(armado, tmp_path)
+    barra = _funcion(html, "pintarMiBarra")
+    assert 'listaDeNombres("¿Quién eres?")' in barra
+    assert ".mi-barra-invita select{position:absolute; inset:0" in html
+    assert "quien-eres" not in html                  # la tarjeta duplicada ya no está
+
+
+def test_las_clases_nuevas_no_chocan_con_el_podio(armado, tmp_path: Path):
+    """.lugar es del podio (borde, barra lateral): el lugar en la barra lo heredaba."""
+    html = render(armado, tmp_path)
+    script = html[html.index('id="datos"'):]
+    assert not re.search(r'crear\("[a-z]+", "lugar"', script)
+    assert not re.search(r'cifra\([^;]*, "lugar"\)', script)

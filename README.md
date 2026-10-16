@@ -413,6 +413,16 @@ abrirlo. Se regenera completo en cada corrida.
 
 Qué trae:
 
+* **Hoy**, la portada, se acomoda al momento de la semana. Con partidos en vivo
+  pone los marcadores primero, con el cuarto y el reloj; el día de partido, los
+  de hoy con su hora y una cuenta regresiva; en tiempo de picks, el generador
+  arriba (y, entre el martes y el jueves, quién ganó la semana anterior); el
+  domingo en la noche, los resultados del día y quién va ganando. Los picks de
+  la semana siguiente no desplazan a la que se está jugando hasta 36 horas antes
+  de cerrar. Lleva accesos directos a lo que más se consulta.
+* **Tu barra**: quien elige su nombre ve arriba, en todas las secciones, sus
+  aciertos, su porcentaje y su lugar en la semana y en la temporada, al minuto.
+  En vivo dice cuántos de sus partidos en juego va ganando.
 * **Podio** con los tres primeros escalones y el premio de cada uno. Agrupa a
   los empatados, así que aguanta igual "31 empatados en primero" que un líder
   solitario en diciembre. No aparece hasta que se cierren `UMBRAL_PODIO`
@@ -430,10 +440,13 @@ Qué trae:
   de tu equipo se adelanta mientras no termine.
 * **Los empatados se despliegan**: donde dice "N empatados" se ve la lista con
   un toque.
-* **Navegación por semanas**: General, Premios y una pestaña por cada semana.
-  El portal abre en la semana en curso, que además va marcada en el menú.
+* **Navegación de app**: Hoy, Semana, General, Jugadores y Premios, abajo en
+  el teléfono y arriba en computadora. En Semana, un selector S1, S2… que abre
+  en la semana en curso y una sola línea de estado. En computadora, Hoy va a dos
+  columnas.
 * **Marcador en vivo**: el navegador consulta ESPN cada 60 segundos, solo con
-  la pestaña al frente. Esa capa nunca cierra un partido ni cambia el conteo
+  la pestaña al frente, y muestra el cuarto y el reloj. Antes de la patada no
+  pinta marcador (ESPN manda "0"). Esa capa nunca cierra un partido ni cambia el conteo
   oficial —eso lo decide CI— así que un error de la API no puede producir una
   tabla equivocada; si falla, se ve lo último publicado.
 * **Jugadores**: buscador entre los 34 y un duelo para comparar a dos. La
@@ -452,7 +465,11 @@ Qué trae:
 * **Tipografía propia** incrustada (Oswald recortada, 8 KB) para marcadores,
   cifras y rótulos. Ver `quiniela/tipografia/LEEME.md`.
 * **El marcador avisa cuando cambia** en vivo, y las cifras cuentan al entrar.
-* **Invitación de primera visita** para que cada quien se identifique una vez.
+* **Elegir tu nombre es de un toque**: la invitación abre directo la lista del
+  teléfono. Se puede cerrar y elegir después desde el botón del encabezado.
+* **Logo propio**: una A dorada con un balón. Su geometría vive en
+  `quiniela/marca.py` y de ahí salen el encabezado, el ícono de la pestaña, la
+  imagen de picks y los iconos de la app.
 * **Modo jugador**: en el encabezado eliges tu nombre y el sitio se vuelve
   tuyo. Cada partido de la semana se pinta según tu pick —verde si vas
   ganando, rojo si vas perdiendo, gris si no empieza— con un resumen de
@@ -534,6 +551,19 @@ como si fuera buena.
 Y abrir <http://localhost:8765>. Abrir el archivo con doble clic también
 funciona; el servidor solo evita que el navegador cachee la versión anterior.
 
+**Hoy** cambia según el momento de la semana. Para revisarlo sin esperar al
+domingo, `herramientas/momentos.py` arma copias del portal con reloj y ESPN de
+mentira, a partir de la última semana cerrada: domingo temprano, en vivo,
+domingo en la noche, martes después del cierre y fin de temporada.
+
+```bash
+.venv/bin/python herramientas/momentos.py
+python3 -m http.server 8766 --directory /tmp/angabave-momentos
+```
+
+Las tablas no se recalculan: sirven para ver el acomodo, no las cuentas. La
+herramienta se niega a escribir dentro de `docs/`.
+
 ## Publicar
 
 ```bash
@@ -585,7 +615,9 @@ quiniela/
   scoring.py       tablas, escenarios, panorama, premios
   render_html.py   la página, los temas, el contraste y el orden de la NFL
   render_png.py    imagen para WhatsApp e iconos de app
-  plantillas/      index.html.j2 (el portal) y cargar.html.j2 (la página del enlace)
+  marca.py         el logo: una sola geometría para SVG, favicon, canvas e iconos
+  plantillas/      index.html.j2 (el portal), cargar.html.j2 (la página del
+                   enlace) y red.html.j2 (la prueba de conexión)
   tipografia/      Oswald recortada (8 KB) + su licencia OFL
 data/
   picks/           Semana_01.xlsx, Semana_02.xlsx… (una por semana)
@@ -610,7 +642,8 @@ docs/              lo que se publica en GitHub Pages
     cargar-semana.yml  la forma
 supabase/functions/angabave-carga/   la función que recibe los archivos del enlace
 herramientas/llaves.py               crea, lista y anula enlaces de carga
-tests/             284 pruebas de Python y 13 de la función; ninguna toca la red
+herramientas/momentos.py             el portal en otros momentos de la semana
+tests/             327 pruebas de Python y 13 de la función; ninguna toca la red
 cli.py
 crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 ```

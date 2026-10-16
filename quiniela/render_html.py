@@ -23,6 +23,7 @@ from urllib.parse import urlsplit
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 
+from . import marca
 from .carga import TAMANO_MAXIMO
 from .enlace import URL_FUNCION
 from .equipos import ABREVIATURAS_ESPN
@@ -75,7 +76,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.17.3"
+VERSION = "v0.18.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -618,6 +619,8 @@ def generar_pagina_de_carga(ruta_salida: Path, url_funcion: str = URL_FUNCION) -
         etapa=ETAPA,
         version=VERSION,
         tipografia=_tipografia(),
+        marca_svg=marca.svg("carga"),
+        favicon=marca.favicon(),
         origen_funcion=f"{partes.scheme}://{partes.netloc}",
         config={"funcion": url_funcion, "portal": "./", "maximo": TAMANO_MAXIMO},
     )
@@ -641,6 +644,7 @@ def generar_prueba_de_red(ruta_salida: Path, url_funcion: str = URL_FUNCION) -> 
         version=VERSION,
         url_funcion=url_funcion,
         url_espn=URL_SCOREBOARD,
+        favicon=marca.favicon(),
         origen_funcion=f"{partes.scheme}://{partes.netloc}",
         origen_espn=f"{espn.scheme}://{espn.netloc}",
     )
@@ -763,6 +767,7 @@ def generar_html(
         # En ISO para que el navegador pueda medir cuánto lleva sin refrescarse.
         "generado": momento.isoformat(),
         "rezago": MINUTOS_REZAGO,
+        "logo": marca.para_canvas(),
         "participantes": participantes,
         "colores": paleta_equipos(),
         "siglas": _siglas(),
@@ -791,6 +796,8 @@ def generar_html(
 
     podio = _armar_podio(general, participantes, reparto) if podio_listo else []
     contexto = {
+        "marca_svg": marca.svg("cabeza"),
+        "favicon": marca.favicon(),
         "tipografia": _tipografia(),
         "marca": MARCA,
         "etapa": ETAPA,
