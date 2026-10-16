@@ -9,6 +9,39 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.20.0
+
+**Menos secciones, cada cosa en su lugar.**
+
+* **Picks tiene su propia sección** en la barra de abajo: Hoy · Picks · Semana ·
+  General · Premios. Es la única puerta para armar tus picks y se acomoda sola
+  a la semana en curso:
+  * Arriba, lo que está abierto, con su cuenta regresiva y la fecha de cierre.
+  * Abajo, **lo que el organizador registró a tu nombre**, para revisar que
+    quedó bien.
+  * Un globito en el botón dice cuántos partidos te faltan.
+  * Sin picks abiertos, lo dice y enseña los registrados.
+* **Hoy, más corto**: de 6 a 8 secciones se pasó a 2 a 4 tarjetas, según el
+  momento.
+  * Los partidos del día van en una sola tarjeta (en vivo, más tarde,
+    terminados).
+  * Luego tu semana y quién va ganando.
+  * El generador de picks se fue a su sección. Se quitaron la tabla general
+    repetida y la fila de accesos directos: ya están en la barra y en los
+    enlaces de cada tarjeta.
+* **Semana enfoca la que se está jugando**: tocar "Semana" en la barra siempre
+  lleva a la actual. Para ver otras hay flechas ‹ › y, al tocar el título, una
+  hoja con todas las semanas: cómo quedó cada una, cuántos llevas tú en cada una
+  y un 🏆 en las que ganaste. La fila de S1 a S18 crecía sin fin; ya no está.
+* La semana muestra su avance con una barra (partidos cerrados) y una sola
+  línea de estado.
+* **Jugadores vive dentro de General**: se entra con "Fichas y duelo ›" o
+  tocando un nombre de la tabla, y se regresa con "‹ Tabla general". La barra
+  sigue marcando General.
+* En el teléfono ya no está el botón flotante de volver arriba: se encimaba con
+  "Generar imagen" y con las cifras de la orilla. Para subir, se toca otra vez
+  la sección en la barra.
+
 ## alfa v0.19.0
 
 **El portal ahora es un campo de noche, con vidrio esmerilado encima.**

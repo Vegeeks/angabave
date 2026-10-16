@@ -60,7 +60,7 @@ en toda la semana: durante los partidos el sitio se recalcula cada dos minutos.
 aparte, porque esa tanda cierra el miércoles y la del domingo el sábado. Esa
 hoja se importa igual —un solo partido y la rejilla centrada, el lector la
 reconoce— y la semana se publica a medias: el encabezado dice "1 de 16", no se
-corona ganador, y el generador de picks sigue abajo con los partidos que faltan.
+corona ganador, y la sección Picks sigue ofreciendo los partidos que faltan.
 Lo demás se carga igual, cuando llegue y en las partes que sea. La hoja
 completa reemplaza la semana. Una hoja parcial **suma**: agrega los partidos
 que falten, corrige los que repite si no han empezado y conserva los que no
@@ -413,13 +413,15 @@ abrirlo. Se regenera completo en cada corrida.
 
 Qué trae:
 
-* **Hoy**, la portada, se acomoda al momento de la semana. Con partidos en vivo
-  pone los marcadores primero, con el cuarto y el reloj; el día de partido, los
-  de hoy con su hora y una cuenta regresiva; en tiempo de picks, el generador
-  arriba (y, entre el martes y el jueves, quién ganó la semana anterior); el
-  domingo en la noche, los resultados del día y quién va ganando. Los picks de
-  la semana siguiente no desplazan a la que se está jugando hasta 36 horas antes
-  de cerrar. Lleva accesos directos a lo que más se consulta.
+* **Hoy**, la portada, se acomoda al momento de la semana con 2 a 4 tarjetas,
+  nunca más:
+  * Con partidos, los del día en una sola tarjeta (en vivo con el cuarto y el
+    reloj, más tarde, terminados).
+  * En tiempo de picks, una invitación a la sección Picks con su cuenta
+    regresiva. Entre el martes y el jueves, quién ganó la semana anterior.
+  * El domingo en la noche, los resultados del día y quién va ganando.
+  * Los picks de la semana siguiente no desplazan a la que se está jugando
+    hasta 36 horas antes de cerrar.
 * **Tu barra**: quien elige su nombre ve arriba, en todas las secciones, sus
   aciertos, su porcentaje y su lugar en la semana y en la temporada, al minuto.
   En vivo dice cuántos de sus partidos en juego va ganando.
@@ -440,10 +442,17 @@ Qué trae:
   de tu equipo se adelanta mientras no termine.
 * **Los empatados se despliegan**: donde dice "N empatados" se ve la lista con
   un toque.
-* **Navegación de app**: Hoy, Semana, General, Jugadores y Premios, abajo en
-  el teléfono y arriba en computadora. En Semana, un selector S1, S2… que abre
-  en la semana en curso y una sola línea de estado. En computadora, Hoy va a dos
-  columnas.
+* **Navegación de app**: Hoy, Picks, Semana, General y Premios, abajo en el
+  teléfono y arriba en computadora.
+  * Semana siempre abre en la que se está jugando; las demás se eligen con
+    flechas o en una hoja con todas, que dice cómo quedó cada una y cuántos
+    llevas tú.
+  * Jugadores (fichas y duelo) cuelga de General.
+  * En computadora, Hoy va a dos columnas.
+* **Picks** es la única puerta para armar los tuyos. Se acomoda a la semana en
+  curso: lo abierto con su cuenta regresiva arriba, y abajo lo que el
+  organizador registró a tu nombre. El botón lleva un globito con cuántos te
+  faltan.
 * **Marcador en vivo**: el navegador consulta ESPN cada 60 segundos, solo con
   la pestaña al frente, y muestra el cuarto y el reloj. Antes de la patada no
   pinta marcador (ESPN manda "0"). Esa capa nunca cierra un partido ni cambia el conteo
@@ -497,9 +506,8 @@ Qué trae:
   que están en la misma situación y dice en una línea qué les hace falta:
   "Necesita que gane Giants", "Ya aseguraron el primer lugar, compartido". Tu
   fila te habla de tú.
-* Cuando todavía no se sube el Excel de una semana, el sitio la publica con
-  sus partidos programados y, sobre todo, con el **generador de picks**: cada
-  quien elige los suyos, el sitio arma una imagen membretada y la comparte o la
+* Mientras haya partidos sin repartir, la sección **Picks** tiene el
+  **generador de picks**: cada quien elige los suyos, el sitio arma una imagen membretada y la comparte o la
   descarga para mandarla a `quinielanfl@hotmail.com`. Cada tanda muestra hasta
   cuándo se reciben —las 23:59 del día anterior a su primer partido— y lo
   elegido se guarda en el navegador mientras tanto. El sitio no sube ni
@@ -654,7 +662,7 @@ docs/              lo que se publica en GitHub Pages
 supabase/functions/angabave-carga/   la función que recibe los archivos del enlace
 herramientas/llaves.py               crea, lista y anula enlaces de carga
 herramientas/momentos.py             el portal en otros momentos de la semana
-tests/             395 pruebas de Python y 13 de la función; ninguna toca la red
+tests/             398 pruebas de Python y 13 de la función; ninguna toca la red
 cli.py
 crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 ```

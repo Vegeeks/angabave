@@ -563,7 +563,7 @@ def test_las_dos_navegaciones_son_iguales(armado, tmp_path: Path):
     navs = re.findall(r'<nav class="[^"]*navegacion[^"]*" data-nav[^>]*>(.*?)</nav>', html, re.S)
     assert len(navs) == 2
     botones = [re.findall(r'data-vista="([a-z]+)"', n) for n in navs]
-    assert botones[0] == botones[1] == ["hoy", "semana", "general", "jugadores", "premios"]
+    assert botones[0] == botones[1] == ["hoy", "picks", "semana", "general", "premios"]
     # La de abajo va fuera del encabezado: su desenfoque la dejaría pegada a él.
     assert html.index('class="navegacion al-pie"') > html.index("</header>")
     # "arriba" ya es el botón de volver arriba (fijo y transparente hasta que
@@ -661,3 +661,35 @@ def test_las_clases_nuevas_no_chocan_con_el_podio(armado, tmp_path: Path):
     script = html[html.index('id="datos"'):]
     assert not re.search(r'crear\("[a-z]+", "lugar"', script)
     assert not re.search(r'cifra\([^;]*, "lugar"\)', script)
+
+
+def test_picks_tiene_su_seccion_y_es_la_unica_puerta(armado, tmp_path: Path):
+    """Armar picks se hace en un solo lugar: la sección Picks de la barra."""
+    html = render(armado, tmp_path)
+    assert 'id="vista-picks"' in html and "function pintarPicks" in html
+    assert re.search(r'data-vista="picks"[^>]*>.*?<b class="globo" hidden></b>', html)
+    script = html[html.index('id="datos"'):]
+    llamadas = re.findall(r"moduloPicks\(", script)
+    assert len(llamadas) == 2                                   # la definición y una sola llamada
+    assert "moduloPicks(abiertos.s" in _funcion(html, "pintarPicks")
+
+
+def test_hoy_no_pasa_de_cuatro_tarjetas(armado, tmp_path: Path):
+    """Con demasiadas secciones la gente se pierde: cada momento lleva pocas."""
+    html = render(armado, tmp_path)
+    plan = _funcion(html, "pintarHoy")
+    fases = re.findall(r'(\w+): \[\[([^\]]*)\], \[([^\]]*)\]\]', plan)
+    assert {f[0] for f in fases} == {"vivo", "hoy", "picks", "cerrada", "semana"}
+    for fase, principal, lateral in fases:
+        assert len(re.findall(r'"\w+"', principal + lateral)) <= 4, fase
+
+
+def test_la_semana_se_cambia_con_flechas_y_una_hoja(armado, tmp_path: Path):
+    """La fila de S1 a S18 crecía sin fin: ahora flechas y todas en una hoja aparte."""
+    html = render(armado, tmp_path)
+    selector = _funcion(html, "selectorDeSemanas")
+    assert '"‹"' in selector and '"›"' in selector and "abrirSemanas(actual" in selector
+    hoja = _funcion(html, "abrirSemanas")
+    assert 'setAttribute("aria-modal", "true")' in hoja and 'e.key === "Escape"' in hoja
+    # Y "Semana" en la barra siempre lleva a la que se está jugando.
+    assert "semanaElegida = D.activa" in html

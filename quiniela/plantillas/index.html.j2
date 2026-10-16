@@ -751,12 +751,6 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 .saludo.fase-picks h1{background:linear-gradient(96deg,#fff3c9,#f7c948 60%,#e5a92a);
   -webkit-background-clip:text; background-clip:text; color:transparent}
 
-.atajos{display:flex; gap:.4rem; overflow-x:auto; scrollbar-width:none;
-  margin:0 calc(-1 * clamp(.7rem,3.4vw,1.5rem)) 1rem; padding:0 clamp(.7rem,3.4vw,1.5rem)}
-.atajos::-webkit-scrollbar{display:none}
-.atajo{flex:0 0 auto; padding:.5rem .85rem; border-radius:999px; font-size:.8rem; font-weight:700; white-space:nowrap;
-  background:rgba(255,255,255,.045); border:1px solid var(--linea2); transition:border-color .2s, background .2s}
-.atajo:hover,.atajo:focus-visible{border-color:var(--oro); background:rgba(247,201,72,.08)}
 
 .tarjeta{position:relative; margin-bottom:.85rem; padding:1rem; border-radius:18px;
   background:linear-gradient(180deg,var(--panel),rgba(16,23,36,.7)); border:1px solid var(--linea);
@@ -841,17 +835,99 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 .lista-mini li.yo .quien{color:var(--oro2)}
 
 /* ═══════ dentro de "Semana" ═══════ */
-.selector-semanas{display:flex; gap:.35rem; overflow-x:auto; scrollbar-width:none; scroll-behavior:smooth;
-  margin:0 calc(-1 * clamp(.7rem,3.4vw,1.5rem)) .7rem; padding:.1rem clamp(.7rem,3.4vw,1.5rem) .2rem}
-.selector-semanas::-webkit-scrollbar{display:none}
-.selector-semanas button{flex:0 0 auto; min-width:46px; padding:.45rem .66rem; border-radius:12px;
-  font-family:var(--rotulo); font-weight:700; font-size:.84rem; color:var(--tenue);
-  background:rgba(255,255,255,.035); border:1px solid var(--linea)}
-.selector-semanas button.en-curso{border-color:rgba(255,71,87,.45)}
-.selector-semanas button.por-cargar{border-style:dashed}
-.selector-semanas button[aria-current="true"]{color:#171203; background:linear-gradient(180deg,#ffe193,#f7c948); border-color:transparent;
-  box-shadow:0 6px 18px rgba(247,201,72,.22)}
-.linea-estado{margin:-.3rem 0 .9rem; font-size:.85rem; line-height:1.4; color:var(--tenue)}
+
+
+/* ═══════ menos es más ═══════ */
+.saludo{padding:.5rem 0 1.15rem}
+.tarjeta{margin-bottom:1rem}
+.hoy-rejilla{gap:0 1.1rem}
+.subgrupo{font-family:var(--rotulo); font-weight:700; font-size:.66rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--tenue2); margin:.9rem .1rem .1rem}
+.tarjeta .cab + .subgrupo{margin-top:0}
+.partidos-hoy.envivo .subgrupo:first-of-type{color:var(--vivo)}
+/* En el teléfono, volver arriba es tocar otra vez la sección: el botón flotante
+   se encimaba con "Generar imagen" y con las cifras de la orilla. */
+@media (max-width:899px){ .arriba{display:none} }
+
+/* ═══════ semana: la enfocada, flechas y selector aparte ═══════ */
+.cabeza-semana{margin:.5rem 0 1.1rem; text-align:center}
+.cambia-semana{display:flex; align-items:center; justify-content:space-between; gap:.5rem}
+.flecha-semana{width:46px; height:46px; flex:0 0 auto; border-radius:15px; display:grid; place-items:center;
+  font-size:1.7rem; line-height:1; padding-bottom:3px; color:var(--txt);
+  background-color:var(--vidrio); background-image:var(--grano),var(--brillo); border:1px solid var(--borde-vidrio);
+  transition:transform .15s, opacity .2s}
+.flecha-semana:disabled{opacity:.22; cursor:default}
+.flecha-semana:not(:disabled):active{transform:scale(.9)}
+.semana-elegida{display:inline-flex; align-items:center; gap:.5rem; padding:.25rem .7rem; border-radius:14px; min-width:0}
+.semana-elegida .num{font-family:var(--rotulo); font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+  font-size:clamp(1.8rem,8.6vw,2.5rem); line-height:1; white-space:nowrap}
+.semana-elegida .abre{font-size:.8rem; color:var(--oro); transition:transform .25s var(--rebote)}
+.semana-elegida:hover .abre,.semana-elegida:focus-visible .abre{transform:translateY(3px)}
+.estado-fila{display:flex; align-items:center; justify-content:center; gap:.7rem; flex-wrap:wrap; margin-top:.55rem}
+.volver-actual{font-size:.8rem; font-weight:800; color:var(--oro2)}
+.boton-principal.volver-actual{margin-top:1rem; color:#171203}
+.detalle-semana{margin-top:.9rem}
+.avance-semana{height:5px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; margin:0 auto .5rem; max-width:420px}
+.avance-semana i{display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,var(--verde),#a6f3c9);
+  transition:width .7s var(--salida)}
+.linea-estado{margin:0; font-size:.82rem; line-height:1.4; color:var(--tenue)}
+.aviso-picks{display:flex; align-items:center; gap:.8rem; width:100%; margin:0 0 1rem; padding:.85rem 1rem; border-radius:16px;
+  text-align:left; border:1px solid rgba(247,201,72,.35);
+  background-color:var(--vidrio); background-image:var(--grano),linear-gradient(90deg,rgba(247,201,72,.12),rgba(247,201,72,0) 70%)}
+.aviso-picks .txt{flex:1 1 auto; font-size:.88rem; line-height:1.35; color:var(--txt)}
+.aviso-picks .ir{flex:0 0 auto; font-weight:800; font-size:.86rem; color:var(--oro)}
+.aviso-picks:active{transform:scale(.985)}
+
+/* La hoja con todas las semanas: abajo en el teléfono, al centro en computadora. */
+.con-hoja,.con-hoja body{overflow:hidden}
+.hoja-fondo{position:fixed; inset:0; z-index:200; display:flex; align-items:flex-end; justify-content:center;
+  background:rgba(2,6,4,.55); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); animation:fundido .25s ease both}
+.hoja{width:min(100%,560px); max-height:min(82vh,680px); overflow:auto; overscroll-behavior:contain;
+  padding:.6rem 1rem calc(1.2rem + env(safe-area-inset-bottom)); border-radius:24px 24px 0 0;
+  background-color:var(--cristal); background-image:var(--grano); border:1px solid var(--borde-vidrio); border-bottom:0;
+  -webkit-backdrop-filter:blur(26px) saturate(160%); backdrop-filter:blur(26px) saturate(160%);
+  box-shadow:0 -24px 60px rgba(0,0,0,.5); animation:subir .42s var(--salida) both}
+.hoja .agarradera{width:42px; height:5px; border-radius:3px; background:rgba(255,255,255,.22); margin:0 auto .9rem}
+.hoja h3{margin:0 0 .9rem; text-align:center; font-family:var(--rotulo); font-size:.8rem; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--tenue)}
+.rejilla-semanas{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.5rem}
+.celda-semana{position:relative; display:flex; flex-direction:column; align-items:center; gap:.12rem; padding:.65rem .2rem .6rem;
+  border-radius:15px; background-color:var(--vidrio); background-image:var(--grano),var(--brillo);
+  border:1px solid var(--borde-vidrio); transition:transform .15s, border-color .2s}
+.celda-semana:active{transform:scale(.95)}
+.celda-semana b{font-family:var(--rotulo); font-weight:700; font-size:1.6rem; line-height:1}
+.celda-semana small{font-size:.6rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--tenue2)}
+.celda-semana .mio{font-size:.7rem; font-weight:800; color:var(--tenue)}
+.celda-semana .mio.gano{color:var(--oro)}
+.celda-semana.pendiente{border-style:dashed}
+.celda-semana.cerrada small{color:var(--tenue)}
+.celda-semana.vivo small{color:var(--vivo)}
+.celda-semana.en-curso::after{content:""; position:absolute; top:7px; right:8px; width:7px; height:7px; border-radius:50%;
+  background:var(--oro); box-shadow:0 0 0 3px rgba(247,201,72,.18)}
+.celda-semana.elegida{border-color:var(--oro); box-shadow:inset 0 0 0 1px var(--oro); background-color:rgba(247,201,72,.1)}
+@keyframes fundido{from{opacity:0} to{opacity:1}}
+@keyframes subir{from{transform:translateY(100%)} to{transform:none}}
+@keyframes acercar{from{opacity:0; transform:translateY(16px) scale(.97)} to{opacity:1; transform:none}}
+@media (min-width:700px){
+  .hoja-fondo{align-items:center}
+  .hoja{border-radius:24px; border-bottom:1px solid var(--borde-vidrio); animation:acercar .32s var(--salida) both}
+}
+@media (max-width:340px){ .rejilla-semanas{grid-template-columns:repeat(3,minmax(0,1fr))} }
+
+/* ═══════ la sección Picks ═══════ */
+.navegacion .globo{position:absolute; top:2px; left:calc(50% + 6px); min-width:18px; height:18px; padding:0 5px;
+  border-radius:9px; display:grid; place-items:center; font-style:normal; font-size:.62rem; font-weight:900; line-height:1;
+  color:#171203; background:linear-gradient(180deg,#ffe193,#f7c948); box-shadow:0 0 0 2px var(--bg)}
+.navegacion .globo[hidden]{display:none}
+.navegacion.en-cabeza .globo{position:static; margin-left:2px}
+.registrados .nota{margin:.1rem 0 .8rem}
+.tus-picks.completa .una-tanda .tanda .cab{display:none}
+.tus-picks.completa .una-tanda .tanda{margin-top:.2rem}
+
+/* Jugadores cuelga de la general. */
+.regreso{display:inline-flex; align-items:center; gap:.3rem; margin:.7rem 0 .2rem; padding:.35rem .1rem;
+  font-weight:800; font-size:.88rem; color:var(--oro2)}
+.enlace-titulo{margin-left:auto; font-size:.8rem; font-weight:800; color:var(--oro2)}
 
 /* ═══════ vidrio esmerilado ═══════
    Las superficies son vidrio translúcido con grano: detrás se adivina el campo,
@@ -862,7 +938,7 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
    se nota, porque el vidrio ya tapa el campo. */
 .tarjeta,.marco,.generador,.perfil,.lugar,.bolsa-card,.campeon,.mi-barra-yo,.tabs-int,
 .juego,.split,.fila-gan,.ficha,.candidato,.boleta .linea,.duelo .cara,.dif .row,.rasgo,.aviso,
-.atajo,.selector-semanas button,.opcion,.filtro-tabla input,select.ancho,input.ancho{
+.opcion,.filtro-tabla input,select.ancho,input.ancho{
   background-color:var(--vidrio); background-image:var(--grano),var(--brillo);
   border-color:var(--borde-vidrio)}
 .tarjeta,.generador,.perfil,.campeon,.bolsa-card,.lugar,.mi-semana{
@@ -907,9 +983,6 @@ tbody tr:hover td,table.fija tbody tr:hover td:nth-child(-n+2){background-color:
 .titulo{margin:1.7rem .1rem .75rem}
 .titulo h2{font-family:var(--rotulo); font-size:1rem; font-weight:700; letter-spacing:.13em; color:var(--txt)}
 .titulo h2::before{width:4px; height:.9rem; background:var(--oro); vertical-align:-2px; margin-right:.55rem}
-.titulo-semana{margin-top:.9rem; gap:.65rem}
-.titulo-semana h2{font-size:clamp(1.7rem,8vw,2.3rem); letter-spacing:.05em; line-height:1}
-.titulo-semana h2::before{display:none}
 .estado-semana{display:inline-flex; align-items:center; gap:.35rem; font-family:var(--rotulo); font-weight:700;
   font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; padding:.26rem .6rem; border-radius:999px;
   color:var(--tenue); background:var(--vidrio); border:1px solid var(--borde-vidrio)}
@@ -925,18 +998,13 @@ tbody tr:hover td,table.fija tbody tr:hover td:nth-child(-n+2){background-color:
 .cifras .cifra b{font-family:var(--rotulo); font-weight:700; font-size:2rem; letter-spacing:.01em}
 .cifra b small.o,.mi-barra .rango small.o{font-family:var(--cuerpo); font-size:.5em; font-weight:800; margin-left:.04em; vertical-align:.75em}
 .mi-barra .linea b{font-family:var(--rotulo); font-weight:700; font-size:1.18rem; letter-spacing:.02em}
-.atajos{gap:.45rem}
-.atajo{min-height:38px; padding:.42rem .85rem; font-size:.79rem; color:var(--tenue); box-shadow:none;
-  transition:color .2s, border-color .2s, background-color .2s, transform .15s}
-.atajo:hover,.atajo:focus-visible{color:var(--txt)}
-.atajo:active{transform:scale(.96)}
 .acciones-gen .boton:not(.suave){color:#171203; background:linear-gradient(180deg,#ffe193,#f7c948);
   box-shadow:0 8px 20px rgba(247,201,72,.18)}
 
 /* ═══════ movimiento ═══════ */
 .hoy-rejilla .tarjeta{animation:entrar .52s var(--salida) both; animation-delay:calc(var(--n,0) * 70ms)}
 .sin-animar .tarjeta,.sin-animar .hoy-rejilla .tarjeta{animation:none}
-.juego-fila,.boton-principal,.ficha,.opcion,.selector-semanas button,.mi-barra-yo{transition:transform .15s ease, background-color .2s, border-color .2s}
+.juego-fila,.boton-principal,.ficha,.opcion,.mi-barra-yo{transition:transform .15s ease, background-color .2s, border-color .2s}
 .juego-fila:active,.ficha:active,.mi-barra-yo:active{transform:scale(.985)}
 .opcion[aria-pressed="true"]{animation:elegir .36s var(--rebote)}
 @keyframes elegir{0%{transform:scale(1)} 45%{transform:scale(1.05)} 100%{transform:scale(1)}}
@@ -1000,9 +1068,9 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
 <body>
 {% macro botones_nav() -%}
 <button type="button" data-vista="hoy" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3.2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle class="lleno" cx="12" cy="15.2" r="1.7"/></svg><span>Hoy</span></button>
+<button type="button" data-vista="picks" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="17" rx="3"/><path d="M8.3 9.2l1.9 1.9 3.6-3.6M8.5 15.5h7"/></svg><span>Picks</span><b class="globo" hidden></b></button>
 <button type="button" data-vista="semana" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3.2"/><path d="M3.5 12h17M12 4v16"/><circle cx="12" cy="12" r="2.6"/></svg><span>Semana</span></button>
 <button type="button" data-vista="general" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5h17M5 20.5v-6.5h4.5v6.5M9.5 20.5V8h5v12.5M14.5 20.5v-9h4.5v9"/></svg><span>General</span></button>
-<button type="button" data-vista="jugadores" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.6" r="3.3"/><path d="M3.3 19.6c.7-3.4 2.9-5.3 5.7-5.3s5 1.9 5.7 5.3"/><circle cx="17.2" cy="9.6" r="2.5"/><path d="M16 14.6c2.6-.3 4.4 1.3 4.8 4.4"/></svg><span>Jugadores</span></button>
 <button type="button" data-vista="premios" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5.2a4 4 0 0 1-8 0zM8 6.2H5.4a2.7 2.7 0 0 0 3 4.2M16 6.2h2.6a2.7 2.7 0 0 1-3 4.2M12 13.2v3.6M8.6 20.3h6.8M10 16.8h4v3.5h-4z"/></svg><span>Premios</span></button>
 {%- endmacro %}
 {% set espera_rescate = 8000 %}{% include "_rescate.html.j2" %}
@@ -1036,6 +1104,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
 
 <main>
   <section class="vista oculto env" id="vista-hoy"></section>
+  <section class="vista oculto env" id="vista-picks"></section>
   <!-- La general se escribe en el HTML: se ve aunque el navegador no ejecute nada. -->
   <section class="vista anima env" id="vista-general">
     {% if podio_listo %}
@@ -1072,7 +1141,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     {% endif %}
 
     <div class="titulo">
-      <h2>Tabla general</h2><span class="nota">{{ general|length }} participantes</span>
+      <h2>Tabla general</h2><button type="button" class="enlace-titulo" id="a-jugadores">Fichas y duelo ›</button>
     </div>
     <div class="marco rueda">
       <table class="fija">
@@ -1124,6 +1193,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   const D = JSON.parse(document.getElementById("datos").textContent);
   const vistas = {
     hoy: document.getElementById("vista-hoy"),
+    picks: document.getElementById("vista-picks"),
     general: document.getElementById("vista-general"),
     premios: document.getElementById("vista-premios"),
     jugadores: document.getElementById("vista-jugadores"),
@@ -2102,19 +2172,16 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     caja.appendChild(crear("div", "rot", "Tus picks · semana " + s.n));
     caja.appendChild(crear("h3", null, "Arma tu quiniela y mándala"));
     const explica = crear("p", "pie-gen");
-    explica.textContent = (parcial ? "Son los partidos que el organizador todavía no reparte. " : "") +
-      "Elige los que quieras —no tienen que ser todos— y genera la imagen para mandarla. " +
-      "Aquí no se registra nada: cuenta lo que le mandes al organizador.";
+    explica.textContent = (parcial ? "Son los que el organizador todavía no reparte. " : "") +
+      "Elige los que quieras y manda la imagen al organizador: aquí no se registra nada.";
     caja.appendChild(explica);
 
-    const quien = crear("div", "quien-soy");
-    if (jugador !== null) {
-      quien.appendChild(document.createTextNode("Van a nombre de "));
-      quien.appendChild(crear("b", null, nombre(jugador)));
-    } else {
-      quien.appendChild(document.createTextNode("Elige tu nombre arriba para que la imagen lo lleve."));
+    // A nombre de quién va la imagen ya lo dice la barra de arriba; solo se
+    // pide el nombre si falta.
+    if (jugador === null) {
+      caja.appendChild(crear("div", "quien-soy", "Elige tu nombre arriba para que la imagen lo lleve."));
     }
-    caja.appendChild(quien);
+    if ((tandas || []).length === 1) caja.classList.add("una-tanda");
 
     const porClave = new Map((lista || []).map((p) => [p.v + "@" + p.l, p]));
     const ahora = Date.now();
@@ -2174,10 +2241,10 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     caja.appendChild(acciones);
 
     const nota = crear("p", "aviso-gen");
-    nota.innerHTML = "Se descarga o se abre el menú de compartir, según tu teléfono. " +
+    nota.innerHTML = "Al generarla se abre compartir o se descarga. " +
       'Mándala a <a href="mailto:' + D.correo + '?subject=' +
       encodeURIComponent("Picks semana " + s.n + (jugador !== null ? " · " + nombre(jugador) : "")) +
-      '">' + D.correo + "</a> con la imagen adjunta.";
+      '">' + D.correo + "</a>.";
     caja.appendChild(nota);
 
     function refrescar() {
@@ -2191,6 +2258,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       // Con al menos uno, la barra de abajo se queda a la vista mientras bajas.
       caja.classList.toggle("con-picks", n > 0);
       avance.style.width = (porClave.size ? (100 * n) / porClave.size : 0) + "%";
+      pintarGloboPicks();
     }
     limpiar.addEventListener("click", () => {
       elegidos.clear();
@@ -2337,6 +2405,10 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   function pintarJugadores() {
     const raiz = vistas.jugadores;
     raiz.textContent = "";
+    const regreso = crear("button", "regreso", "‹ Tabla general");
+    regreso.type = "button";
+    regreso.addEventListener("click", () => navegar("general"));
+    raiz.appendChild(regreso);
 
     if (perfilAbierto !== null) raiz.appendChild(perfil(perfilAbierto));
 
@@ -2841,7 +2913,6 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     const fase = vivos.length ? "vivo" : hoy.length ? "hoy" : apuran ? "picks" : cerrada ? "cerrada" : "semana";
 
     raiz.appendChild(saludo(fase, s, vivos, hoy, picks, terminados.length));
-    raiz.appendChild(atajos(s));
     const rejilla = crear("div", "hoy-rejilla");
     const principal = crear("div", "hoy-principal");
     const lateral = crear("div", "hoy-lateral");
@@ -2851,24 +2922,23 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
 
     const previa = semanaRecienCerrada();
     const tarjetas = {
-      vivo: () => tarjetaPartidos("En vivo ahora", vivos, s, true),
-      hoy: () => (hoy.length ? tarjetaPartidos(vivos.length ? "Más tarde" : "Hoy juegan", hoy, s, false) : null),
-      terminados: () => (terminados.length ? tarjetaPartidos("Resultados de hoy", terminados, s, false) : null),
+      partidos: () => tarjetaPartidos(s, vivos, hoy, terminados),
       // Con la semana nueva sin repartir, "tu semana" es la que acaba de cerrar.
       tuSemana: () => tarjetaTuSemana(s && s.estado !== "pendiente" ? s : previa),
       resultado: () => (s && (cerrada || s.proyectable) ? campeon(s) : null),
       previo: () => (previa && previa !== s ? campeon(previa) : null),
-      picks: () => (picks ? tarjetaPicks(picks, fase === "picks") : null),
+      picks: () => (picks ? tarjetaPicks(picks) : null),
       proximo: () => tarjetaProximo(),
-      general: () => tarjetaGeneral(),
     };
-    // [columna principal, columna lateral]. En el teléfono van una tras otra.
+    // Pocas tarjetas y en orden de importancia: lo que pasa ahora, lo tuyo y
+    // quién va ganando. Lo demás vive en su sección de la barra de abajo.
+    // [columna principal, columna lateral]; en el teléfono van una tras otra.
     const plan = {
-      vivo: [["vivo", "hoy", "terminados"], ["tuSemana", "resultado", "picks", "general"]],
-      hoy: [["hoy", "terminados", "picks"], ["tuSemana", "resultado", "previo", "general"]],
-      picks: [["previo", "picks"], ["tuSemana", "resultado", "terminados", "general"]],
-      cerrada: [["resultado"], ["tuSemana", "proximo", "general"]],
-      semana: [["tuSemana", "terminados", "proximo"], ["resultado", "picks", "previo", "general"]],
+      vivo: [["partidos"], ["tuSemana", "resultado"]],
+      hoy: [["partidos", "picks"], ["tuSemana"]],
+      picks: [["previo", "picks"], ["tuSemana"]],
+      cerrada: [["resultado"], ["tuSemana", "proximo"]],
+      semana: [["tuSemana", "partidos"], ["resultado", "proximo"]],
     }[fase];
     let orden = 0;
     plan.forEach((claves, columna) => claves.forEach((clave) => {
@@ -2968,27 +3038,6 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     return caja;
   }
 
-  /* Accesos directos a lo que más se consulta desde aquí. */
-  function atajos(s) {
-    const caja = crear("nav", "atajos");
-    caja.setAttribute("aria-label", "Accesos directos");
-    const boton = (texto, accion) => {
-      const b = crear("button", "atajo", texto);
-      b.type = "button";
-      b.addEventListener("click", accion);
-      caja.appendChild(b);
-    };
-    const aSemana = (tab) => () => { pestana = tab; pestanaElegida = true; navegar(s.n); };
-    if (s) {
-      boton("Partidos", aSemana("partidos"));
-      boton("Quién le fue a quién", aSemana("picks"));
-      if (Object.keys(s.panorama || {}).length) boton("Escenarios", aSemana("escenarios"));
-      boton("Tabla de la semana", aSemana("tabla"));
-    }
-    boton("Tabla general", () => navegar("general"));
-    boton("Premios", () => navegar("premios"));
-    return caja;
-  }
 
   /* Cuántos le fueron a cada lado en un partido ya cargado. */
   function consenso(s, col) {
@@ -3004,65 +3053,81 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     return i;
   }
 
-  function tarjetaPartidos(titulo, juegos, s, enVivo) {
-    const caja = crear("section", "tarjeta partidos-hoy" + (enVivo ? " envivo" : ""));
+  /* Los partidos de hoy en una sola tarjeta: en vivo, más tarde y terminados. */
+  function tarjetaPartidos(s, vivos, porJugar, terminados) {
+    const grupos = [["En vivo", vivos], ["Más tarde", porJugar], ["Terminados", terminados]]
+      .filter(([, juegos]) => juegos.length);
+    if (!grupos.length) return null;
+    const caja = crear("section", "tarjeta partidos-hoy" + (vivos.length ? " envivo" : ""));
     const cab = crear("div", "cab");
-    if (enVivo) cab.appendChild(crear("span", "punto"));
-    cab.appendChild(crear("h3", null, titulo));
+    if (vivos.length) cab.appendChild(crear("span", "punto"));
+    cab.appendChild(crear("h3", null, grupos.length > 1 ? "Partidos de hoy"
+      : vivos.length ? "En vivo ahora" : porJugar.length ? "Hoy juegan" : "Resultados de hoy"));
+    if (s) {
+      const todos = crear("button", "enlace", "Toda la semana ›");
+      todos.type = "button";
+      todos.addEventListener("click", () => { pestana = "partidos"; pestanaElegida = true; navegar(s.n); });
+      cab.appendChild(todos);
+    }
     caja.appendChild(cab);
-    juegos.slice().sort((a, b) => a.t - b.t).forEach((p) => {
-      const col = s ? s.partidos.findIndex((q) => q.v === p.v && q.l === p.l) : -1;
-      const fila = crear("button", "juego-fila" + (p.vivo ? " vivo" : ""));
-      fila.type = "button";
-      const lados = crear("div", "lados");
-      const empezo = p.vivo || p.cerrado || p.porConfirmar;
-      [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, eq, m]) => {
-        const l = crear("div", "eq-fila" + (empezo && p.g === lado ? " adelante" : ""));
-        l.appendChild(sigla(eq));
-        l.appendChild(crear("span", "eq", eq));
-        if (empezo && m !== null && m !== undefined) l.appendChild(crear("b", "mrc", String(m)));
-        lados.appendChild(l);
-      });
-      fila.appendChild(lados);
-      const meta = crear("div", "meta");
-      meta.appendChild(crear("span", "cuando", p.vivo ? (p.e || "En juego")
-        : p.cerrado || p.porConfirmar ? (p.e || "Final") : hora(p.t)));
-      if (col >= 0) {
-        const mio = miPick(s, col);
-        if (mio) {
-          // En juego el color dice cómo vas; la palomita o la tache, solo con el final.
-          const final = p.cerrado || p.porConfirmar;
-          const estado = !p.g ? "neutro" : p.g === mio.lado ? "bien" : "mal";
-          const marca = !final ? "" : estado === "bien" ? " ✓" : estado === "mal" ? " ✗" : "";
-          // En pantallas angostas va la sigla: el nombre completo ya está en la fila.
-          const pill = crear("span", "mio " + estado + (p.vivo ? " provisional" : ""), "Tu pick: ");
-          pill.appendChild(crear("span", "largo", mio.equipo));
-          pill.appendChild(crear("span", "corto", D.siglas[mio.equipo] || mio.equipo.slice(0, 3).toUpperCase()));
-          if (marca) pill.appendChild(document.createTextNode(marca));
-          if (p.vivo && p.g) pill.title = estado === "bien" ? "Va ganando" : "Va perdiendo";
-          meta.appendChild(pill);
-        }
-        const c = consenso(s, col), total = c.v + c.l;
-        if (total) {
-          const mayor = c.l >= c.v ? p.l : p.v;
-          const linea = crear("span", "consenso", pct(Math.max(c.v, c.l), total) + "% con ");
-          linea.appendChild(crear("span", "largo", mayor));
-          linea.appendChild(crear("span", "corto", D.siglas[mayor] || mayor.slice(0, 3).toUpperCase()));
-          meta.appendChild(linea);
-        }
-      } else {
-        meta.appendChild(crear("span", "consenso", "picks por repartir"));
-      }
-      fila.appendChild(meta);
-      fila.addEventListener("click", () => {
-        if (!s) return;
-        pestana = "partidos";
-        pestanaElegida = true;
-        navegar(s.n);
-      });
-      caja.appendChild(fila);
+    grupos.forEach(([titulo, juegos]) => {
+      if (grupos.length > 1) caja.appendChild(crear("div", "subgrupo", titulo));
+      juegos.slice().sort((a, b) => a.t - b.t).forEach((p) => caja.appendChild(filaJuego(s, p)));
     });
     return caja;
+  }
+
+  function filaJuego(s, p) {
+    const col = s ? s.partidos.findIndex((q) => q.v === p.v && q.l === p.l) : -1;
+    const fila = crear("button", "juego-fila" + (p.vivo ? " vivo" : ""));
+    fila.type = "button";
+    const lados = crear("div", "lados");
+    const empezo = p.vivo || p.cerrado || p.porConfirmar;
+    [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, eq, m]) => {
+      const l = crear("div", "eq-fila" + (empezo && p.g === lado ? " adelante" : ""));
+      l.appendChild(sigla(eq));
+      l.appendChild(crear("span", "eq", eq));
+      if (empezo && m !== null && m !== undefined) l.appendChild(crear("b", "mrc", String(m)));
+      lados.appendChild(l);
+    });
+    fila.appendChild(lados);
+    const meta = crear("div", "meta");
+    meta.appendChild(crear("span", "cuando", p.vivo ? (p.e || "En juego")
+      : p.cerrado || p.porConfirmar ? (p.e || "Final") : hora(p.t)));
+    if (col >= 0) {
+      const mio = miPick(s, col);
+      if (mio) {
+        // En juego el color dice cómo vas; la palomita o la tache, solo con el final.
+        const final = p.cerrado || p.porConfirmar;
+        const estado = !p.g ? "neutro" : p.g === mio.lado ? "bien" : "mal";
+        const marca = !final ? "" : estado === "bien" ? " ✓" : estado === "mal" ? " ✗" : "";
+        // En pantallas angostas va la sigla: el nombre completo ya está en la fila.
+        const pill = crear("span", "mio " + estado + (p.vivo ? " provisional" : ""), "Tu pick: ");
+        pill.appendChild(crear("span", "largo", mio.equipo));
+        pill.appendChild(crear("span", "corto", D.siglas[mio.equipo] || mio.equipo.slice(0, 3).toUpperCase()));
+        if (marca) pill.appendChild(document.createTextNode(marca));
+        if (p.vivo && p.g) pill.title = estado === "bien" ? "Va ganando" : "Va perdiendo";
+        meta.appendChild(pill);
+      }
+      const c = consenso(s, col), total = c.v + c.l;
+      if (total) {
+        const mayor = c.l >= c.v ? p.l : p.v;
+        const linea = crear("span", "consenso", pct(Math.max(c.v, c.l), total) + "% con ");
+        linea.appendChild(crear("span", "largo", mayor));
+        linea.appendChild(crear("span", "corto", D.siglas[mayor] || mayor.slice(0, 3).toUpperCase()));
+        meta.appendChild(linea);
+      }
+    } else {
+      meta.appendChild(crear("span", "consenso", "picks por repartir"));
+    }
+    fila.appendChild(meta);
+    fila.addEventListener("click", () => {
+      if (!s) return;
+      pestana = "partidos";
+      pestanaElegida = true;
+      navegar(s.n);
+    });
+    return fila;
   }
 
   function tarjetaTuSemana(s) {
@@ -3072,9 +3137,9 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     const caja = crear("section", "tarjeta tu-semana");
     const cab = crear("div", "cab");
     cab.appendChild(crear("h3", null, "Tu semana " + semana.n));
-    const ver = crear("button", "enlace", "Tus picks ›");
+    const ver = crear("button", "enlace", "Ver tabla ›");
     ver.type = "button";
-    ver.addEventListener("click", () => { pestana = "picks"; pestanaElegida = true; navegar(s.n); });
+    ver.addEventListener("click", () => { pestana = "tabla"; pestanaElegida = true; navegar(s.n); });
     cab.appendChild(ver);
     caja.appendChild(cab);
 
@@ -3128,29 +3193,30 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     return caja;
   }
 
-  function tarjetaPicks(picks, completa) {
-    const caja = crear("section", "tarjeta tus-picks" + (completa ? " completa" : ""));
+  function tarjetaPicks(picks) {
+    const caja = crear("section", "tarjeta tus-picks");
     const cab = crear("div", "cab");
     cab.appendChild(crear("h3", null, "Tus picks · semana " + picks.s.n));
     cab.appendChild(cuentaRegresiva("cuenta-regresiva", "cierran en ", Date.parse(picks.cierre.cierre)));
     caja.appendChild(cab);
-    if (completa) {
-      caja.appendChild(moduloPicks(picks.s, picks.lista, picks.tandas, picks.parcial));
-    } else {
-      const cuantos = porElegir(picks);
-      caja.appendChild(crear("p", "nota", cuantos + (cuantos === 1 ? " partido" : " partidos") + " por elegir. " + textoCierres(picks)));
-      const b = crear("button", "boton-principal", "Armar mis picks");
-      b.type = "button";
-      b.addEventListener("click", () => {
-        pestanaElegida = false;
-        navegar(picks.s.n, () => requestAnimationFrame(() => {
-          const gen = vistas.semana.querySelector(".generador");
-          if (gen) gen.scrollIntoView({ behavior: suave ? "auto" : "smooth", block: "start" });
-        }));
-      });
-      caja.appendChild(b);
-    }
+    const cuantos = porElegir(picks), llevas = borradorDe(picks);
+    // La fecha exacta ya va en el titular de Hoy y aquí la cuenta regresiva.
+    caja.appendChild(crear("p", "nota", llevas
+      ? "Llevas " + llevas + " de " + cuantos + "."
+      : cuantos + (cuantos === 1 ? " partido por elegir." : " partidos por elegir.")));
+    const b = crear("button", "boton-principal", llevas ? "Seguir con mis picks" : "Armar mis picks");
+    b.type = "button";
+    b.addEventListener("click", () => navegar("picks"));
+    caja.appendChild(b);
     return caja;
+  }
+
+  /* Cuántos picks de lo que sigue abierto lleva el borrador de este teléfono. */
+  function borradorDe(picks) {
+    let guardado = {};
+    try { guardado = JSON.parse(leer(LLAVE_BORRADOR(picks.s.n)) || "{}"); } catch (e) { guardado = {}; }
+    const abiertos = new Set(tandasAbiertas(picks).flatMap((tanda) => tanda.claves));
+    return Object.keys(guardado).filter((clave) => abiertos.has(clave)).length;
   }
 
   function tarjetaProximo() {
@@ -3179,32 +3245,6 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     return caja;
   }
 
-  function tarjetaGeneral() {
-    if (!D.general.length) return null;
-    const caja = crear("section", "tarjeta mini-general");
-    const cab = crear("div", "cab");
-    cab.appendChild(crear("h3", null, "Tabla general"));
-    const ver = crear("button", "enlace", "Completa ›");
-    ver.type = "button";
-    ver.addEventListener("click", () => navegar("general"));
-    cab.appendChild(ver);
-    caja.appendChild(cab);
-    const filas = D.general.slice(0, 5);
-    const mia = jugador !== null ? D.general.find((f) => f.p === jugador) : null;
-    if (mia && !filas.includes(mia)) filas.push(mia);
-    const lista = crear("ol", "lista-mini");
-    filas.forEach((f, i) => {
-      const li = crear("li", f.p === jugador ? "yo" : "");
-      if (i === 5) li.classList.add("separada");
-      li.appendChild(crear("span", "pos", String(f.pos)));
-      li.appendChild(crear("span", "quien", nombre(f.p)));
-      if (f.mov) li.appendChild(crear("span", "mov " + (f.mov > 0 ? "sube" : "baja"), (f.mov > 0 ? "▲" : "▼") + Math.abs(f.mov)));
-      li.appendChild(crear("b", "pts", String(f.total)));
-      lista.appendChild(li);
-    });
-    caja.appendChild(lista);
-    return caja;
-  }
 
   /* En la general: tu temporada arriba, si ya dijiste quién eres. */
   function tarjetaTemporada() {
@@ -3247,32 +3287,163 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     return caja;
   }
 
+  /* ═══ picks: la única puerta para armar los tuyos ═══
+     Se acomoda a la semana en curso: lo que está abierto, con su cuenta
+     regresiva, y lo que el organizador ya registró a tu nombre para que
+     revises que quedó bien. */
+  function pintarPicks() {
+    const raiz = vistas.picks;
+    raiz.textContent = "";
+    const abiertos = picksAbiertos();
+    const conPicks = [porSemana.get(D.activa)].concat(D.semanas.slice().reverse())
+      .find((x) => x && x.jugadores && x.jugadores.length);
+    const s = abiertos ? abiertos.s : (porSemana.get(D.activa) || conPicks);
+
+    const cabeza = crear("div", "saludo fase-picks");
+    cabeza.appendChild(crear("div", "fecha", s ? "Semana " + s.n : "Temporada " + D.anio));
+    cabeza.appendChild(crear("h1", null, abiertos ? "Tus picks" : "Picks cerrados"));
+    const detalle = crear("p");
+    if (abiertos) {
+      const n = porElegir(abiertos);
+      detalle.textContent = n + (n === 1 ? " partido" : " partidos") + " por elegir. " + textoCierres(abiertos);
+    } else {
+      detalle.textContent = "Por ahora no hay partidos abiertos. Los siguientes se abren en cuanto salga el calendario de la próxima semana.";
+    }
+    cabeza.appendChild(detalle);
+    raiz.appendChild(cabeza);
+
+    if (abiertos) {
+      const tarjeta = crear("section", "tarjeta tus-picks completa");
+      const cab = crear("div", "cab");
+      cab.appendChild(crear("h3", null, "Arma tu quiniela"));
+      cab.appendChild(cuentaRegresiva("cuenta-regresiva", "cierran en ", Date.parse(abiertos.cierre.cierre)));
+      tarjeta.appendChild(cab);
+      tarjeta.appendChild(moduloPicks(abiertos.s, abiertos.lista, abiertos.tandas, abiertos.parcial));
+      raiz.appendChild(tarjeta);
+    }
+
+    if (conPicks) {
+      const tarjeta = crear("section", "tarjeta registrados");
+      const cab = crear("div", "cab");
+      cab.appendChild(crear("h3", null, "Registrados · semana " + conPicks.n));
+      const todos = crear("button", "enlace", "Los de todos ›");
+      todos.type = "button";
+      todos.addEventListener("click", () => { pestana = "picks"; pestanaElegida = true; navegar(conPicks.n); });
+      cab.appendChild(todos);
+      tarjeta.appendChild(cab);
+      if (jugador === null) {
+        tarjeta.appendChild(crear("p", "nota", "Elige tu nombre arriba y aquí ves lo que el organizador registró a tu nombre."));
+      } else if (conPicks.jugadores.indexOf(jugador) < 0) {
+        tarjeta.appendChild(crear("p", "nota", "El organizador todavía no registra picks a tu nombre en la semana " + conPicks.n + "."));
+      } else {
+        tarjeta.appendChild(crear("p", "nota", "Lo que el organizador cargó a tu nombre. Si algo no coincide con lo que mandaste, avísale."));
+        tarjeta.appendChild(boleta(conPicks, jugador));
+      }
+      raiz.appendChild(tarjeta);
+    }
+  }
+
+  /* El globito de la sección Picks: cuántos te faltan de lo que sigue abierto. */
+  function pintarGloboPicks() {
+    const abiertos = picksAbiertos();
+    const faltan = abiertos ? Math.max(0, porElegir(abiertos) - borradorDe(abiertos)) : 0;
+    document.querySelectorAll('[data-vista="picks"] .globo').forEach((g) => {
+      g.textContent = faltan > 99 ? "99+" : String(faltan);
+      g.hidden = !faltan;
+    });
+  }
+
   /* ═══ dentro de "Semana" ═══ */
   function selectorDeSemanas(actual) {
-    const caja = crear("nav", "selector-semanas");
-    caja.setAttribute("aria-label", "Elegir semana");
-    D.semanas.forEach((s) => {
-      const b = crear("button", null, "S" + s.n);
+    const caja = crear("div", "cambia-semana");
+    const i = D.semanas.findIndex((x) => x.n === actual);
+    const flecha = (destino, texto) => {
+      const b = crear("button", "flecha-semana", texto);
       b.type = "button";
-      b.setAttribute("aria-current", String(s.n === actual));
-      if (s.n === D.activa) b.classList.add("en-curso");
-      if (s.estado === "pendiente") b.classList.add("por-cargar");
-      b.addEventListener("click", () => { pestanaElegida = false; navegar(s.n); });
-      caja.appendChild(b);
-    });
-    requestAnimationFrame(() => {
-      const elegido = caja.querySelector('[aria-current="true"]');
-      if (elegido) caja.scrollLeft = elegido.offsetLeft - caja.clientWidth / 2 + elegido.clientWidth / 2;
-    });
+      if (!destino) { b.disabled = true; b.setAttribute("aria-label", "No hay más semanas"); return b; }
+      b.setAttribute("aria-label", "Semana " + destino.n);
+      b.addEventListener("click", () => { pestanaElegida = false; navegar(destino.n); });
+      return b;
+    };
+    caja.appendChild(flecha(D.semanas[i - 1], "‹"));
+    const centro = crear("button", "semana-elegida");
+    centro.type = "button";
+    centro.setAttribute("aria-haspopup", "dialog");
+    centro.setAttribute("aria-label", "Semana " + actual + ". Elegir otra semana");
+    centro.appendChild(crear("span", "num", "Semana " + actual));
+    centro.appendChild(crear("span", "abre", "▾"));
+    centro.addEventListener("click", () => abrirSemanas(actual, centro));
+    caja.appendChild(centro);
+    caja.appendChild(flecha(D.semanas[i + 1], "›"));
     return caja;
+  }
+
+  /* Todas las semanas en una hoja aparte: la fila de S1 a S18 ocupaba media
+     pantalla. Cada una dice cómo quedó y cuántos llevas tú. */
+  function abrirSemanas(actual, origen) {
+    const fondo = crear("div", "hoja-fondo");
+    const hoja = crear("div", "hoja");
+    hoja.setAttribute("role", "dialog");
+    hoja.setAttribute("aria-modal", "true");
+    hoja.setAttribute("aria-label", "Elegir semana");
+    hoja.appendChild(crear("div", "agarradera"));
+    hoja.appendChild(crear("h3", null, "Semanas"));
+    const rejilla = crear("div", "rejilla-semanas");
+    const g = jugador !== null ? D.general.find((f) => f.p === jugador) : null;
+    const cerrar = () => {
+      document.documentElement.classList.remove("con-hoja");
+      document.removeEventListener("keydown", tecla);
+      fondo.remove();
+      if (origen && origen.isConnected) origen.focus();
+    };
+    const tecla = (e) => { if (e.key === "Escape") cerrar(); };
+    D.semanas.forEach((s) => {
+      const vivos = juegosEnVivo(s).length;
+      const b = crear("button", "celda-semana " + s.estado + (vivos ? " vivo" : ""));
+      b.type = "button";
+      if (s.n === actual) b.classList.add("elegida");
+      if (s.n === D.activa) b.classList.add("en-curso");
+      b.appendChild(crear("b", null, String(s.n)));
+      b.appendChild(crear("small", null, vivos ? "En vivo" : { pendiente: "Por cargar", en_vivo: "En curso", cerrada: "Cerrada" }[s.estado] || ""));
+      const mios = g && g.sem ? g.sem[String(s.n)] : undefined;
+      if (mios !== undefined && s.estado !== "pendiente") {
+        const gano = s.oficial && (s.ganadores || []).includes(jugador);
+        b.appendChild(crear("span", "mio" + (gano ? " gano" : ""), (gano ? "🏆 " : "") + mios + (mios === 1 ? " tuyo" : " tuyos")));
+      }
+      b.setAttribute("aria-current", String(s.n === actual));
+      b.addEventListener("click", () => { cerrar(); pestanaElegida = false; navegar(s.n); });
+      rejilla.appendChild(b);
+    });
+    hoja.appendChild(rejilla);
+    if (actual !== D.activa && porSemana.has(D.activa)) {
+      const volver = crear("button", "boton-principal volver-actual", "Ir a la semana en curso (" + D.activa + ")");
+      volver.type = "button";
+      volver.addEventListener("click", () => { cerrar(); pestanaElegida = false; navegar(D.activa); });
+      hoja.appendChild(volver);
+    }
+    fondo.appendChild(hoja);
+    fondo.addEventListener("click", (e) => { if (e.target === fondo) cerrar(); });
+    document.addEventListener("keydown", tecla);
+    document.documentElement.classList.add("con-hoja");
+    document.body.appendChild(fondo);
+    const elegida = hoja.querySelector('[aria-current="true"]');
+    if (elegida) elegida.focus();
   }
 
   /* Una sola línea con todo lo que antes eran tres tarjetas de avisos. */
   function lineaDeEstado(s) {
-    const caja = crear("p", "linea-estado");
+    const caja = crear("div", "detalle-semana");
+    if (s.estado !== "pendiente") {
+      const barra = crear("div", "avance-semana");
+      barra.setAttribute("aria-hidden", "true");
+      const lleno = crear("i");
+      lleno.style.width = (s.total ? (100 * s.cerrados) / s.total : 0) + "%";
+      barra.appendChild(lleno);
+      caja.appendChild(barra);
+    }
     const partes = [];
     if (s.estado === "pendiente") {
-      const tanda = (s.tandas || []).find((t) => Date.parse(t.cierre) > Date.now()) || (s.tandas || [])[0];
+      const tanda = (s.tandas || []).find((x) => Date.parse(x.cierre) > Date.now()) || (s.tandas || [])[0];
       partes.push("Picks por cargar");
       if (tanda) partes.push("cierran el " + tanda.cierre_texto);
     } else {
@@ -3280,12 +3451,25 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       const faltan = (s.por_entregar || []).length;
       if (faltan) {
         const tanda = (s.tandas_por_entregar || [])[0];
-        partes.push(faltan + " por repartir" + (tanda ? " (cierran el " + tanda.cierre_texto + ")" : ""));
+        partes.push(faltan + " por repartir" + (tanda ? " hasta el " + tanda.cierre_texto : ""));
       }
       if (s.estado !== "cerrada" && !s.proyectable) partes.push("ganador a partir de " + s.umbral + " cerrados");
     }
-    caja.textContent = partes.join(" · ");
+    caja.appendChild(crear("p", "linea-estado", partes.join(" · ")));
     return caja;
+  }
+
+  /* En Semana ya no va el generador: una sola puerta para los picks. */
+  function avisoPicks(s, cuantos) {
+    const abiertos = picksAbiertos();
+    if (!abiertos || abiertos.s !== s) return null;
+    const b = crear("button", "aviso-picks");
+    b.type = "button";
+    b.appendChild(crear("span", "txt", cuantos + (cuantos === 1 ? " partido" : " partidos") +
+      " por elegir. Cierran el " + abiertos.cierre.cierre_texto + "."));
+    b.appendChild(crear("span", "ir", "Armar mis picks ›"));
+    b.addEventListener("click", () => navegar("picks"));
+    return b;
   }
 
   /* ═══ vista de una semana ═══ */
@@ -3297,23 +3481,30 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     raiz.textContent = "";
     if (!s) return;
 
-    raiz.appendChild(selectorDeSemanas(n));
-
-    const titulo = crear("div", "titulo titulo-semana");
-    titulo.appendChild(crear("h2", null, "Semana " + s.n));
+    const cabeza = crear("div", "cabeza-semana");
+    cabeza.appendChild(selectorDeSemanas(n));
     const vivos = juegosEnVivo(s).length;
+    const fila = crear("div", "estado-fila");
     const estado = crear("span", "estado-semana " + (vivos ? "vivo" : s.estado),
       vivos ? "En vivo" : { pendiente: "Por cargar", en_vivo: "En curso", cerrada: "Cerrada" }[s.estado] || "");
     if (vivos && ultimaConsulta) estado.title = "Última consulta " + ultimaConsulta.toLocaleTimeString("es-MX");
-    titulo.appendChild(estado);
-    raiz.appendChild(titulo);
-    raiz.appendChild(lineaDeEstado(s));
+    fila.appendChild(estado);
+    if (n !== D.activa && porSemana.has(D.activa)) {
+      const volver = crear("button", "volver-actual", "Ir a la semana " + D.activa + " ›");
+      volver.type = "button";
+      volver.addEventListener("click", () => { pestanaElegida = false; navegar(D.activa); });
+      fila.appendChild(volver);
+    }
+    cabeza.appendChild(fila);
+    cabeza.appendChild(lineaDeEstado(s));
+    raiz.appendChild(cabeza);
 
     const franja = avisoDeRezago(s);
     if (franja) raiz.appendChild(franja);
 
     if (s.estado === "pendiente") {
-      raiz.appendChild(moduloPicks(s, s.partidos, s.tandas, false));
+      const aviso_ = avisoPicks(s, s.partidos.length);
+      if (aviso_) raiz.appendChild(aviso_);
       raiz.appendChild(panelPartidos(s));
       return;
     }
@@ -3355,12 +3546,12 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     else if (pestana === "picks") raiz.appendChild(panelReparto(s));
     else raiz.appendChild(panelEscenarios(s));
 
-    /* El organizador reparte por tandas: la hoja del jueves llega días antes
-       que la del resto. Mientras falten partidos por repartir, el generador
-       sigue abajo, después de la tabla, que es lo que se viene a ver. */
+    /* El organizador reparte por tandas: mientras falten partidos por repartir,
+       abajo de la tabla queda el acceso a la sección Picks. */
     const faltan = (s.por_entregar || []);
     if (faltan.length) {
-      raiz.appendChild(moduloPicks(s, faltan, s.tandas_por_entregar, true));
+      const aviso_ = avisoPicks(s, faltan.length);
+      if (aviso_) raiz.appendChild(aviso_);
     }
   }
 
@@ -3464,7 +3655,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   /* Cambiar de sección desliza la vista hacia donde vas: a la derecha si la
      sección está más adelante en la barra (o la semana es posterior), a la
      izquierda si está antes. Sin soporte del navegador, entra como siempre. */
-  const ORDEN_VISTAS = ["hoy", "semana", "general", "jugadores", "premios"];
+  const ORDEN_VISTAS = ["hoy", "picks", "semana", "general", "jugadores", "premios"];
   function rumboHacia(destino) {
     const de = typeof vistaActual === "number" ? "semana" : vistaActual;
     const a = destino === "semana" || typeof destino === "number" ? "semana" : destino;
@@ -3509,6 +3700,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     Object.entries(vistas).forEach(([k, nodo]) => nodo.classList.toggle("oculto", k !== cual));
     if (cual === "semana") pintarSemana(vista);
     else if (cual === "hoy") pintarHoy();
+    else if (cual === "picks") pintarPicks();
     else if (cual === "premios") pintarPremios();
     else if (cual === "jugadores") pintarJugadores();
     else marcarFilasPropias();
@@ -3522,9 +3714,12 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       nodo.classList.add("anima");
     }
 
+    // Jugadores vive dentro de General: la barra marca General.
+    const enBarra = cual === "jugadores" ? "general" : cual;
     navs.forEach((n) => n.querySelectorAll("button").forEach((b) =>
-      b.setAttribute("aria-selected", String(b.dataset.vista === cual))));
+      b.setAttribute("aria-selected", String(b.dataset.vista === enBarra))));
     moverIndicadores();
+    pintarGloboPicks();
     pintarEstado(cual === "semana" ? vista : D.activa);
 
     const destino = cual === "semana" ? "#s" + vista : "#" + cual;
@@ -3597,7 +3792,11 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   navs.forEach((n) => n.addEventListener("click", (e) => {
     const b = e.target.closest("button");
     if (!b) return;
-    if (b.dataset.vista === "semana") { pestanaElegida = false; }
+    // "Semana" en la barra siempre lleva a la que se está jugando.
+    if (b.dataset.vista === "semana") {
+      pestanaElegida = false;
+      if (porSemana.has(D.activa)) semanaElegida = D.activa;
+    }
     navegar(b.dataset.vista);
   }));
   // El logo siempre lleva a Hoy.
@@ -3605,6 +3804,9 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     e.preventDefault();
     navegar("hoy");
   });
+  // Las fichas y el duelo ya no tienen botón abajo: se entra desde la general.
+  const aJugadores = document.getElementById("a-jugadores");
+  if (aJugadores) aJugadores.addEventListener("click", () => { perfilAbierto = null; navegar("jugadores"); });
 
   montarSoy();
   montarEquipo();
@@ -3613,11 +3815,11 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   const hash = location.hash;
   const m = hash.match(/^#s(\d+)$/);
   const guardado = sitioGuardado();
-  const valida = (v) => v === "hoy" || v === "general" || v === "premios" || v === "jugadores" ||
+  const valida = (v) => v === "hoy" || v === "picks" || v === "general" || v === "premios" || v === "jugadores" ||
     porSemana.has(Number(v));
 
   const inicio = m && porSemana.has(Number(m[1])) ? Number(m[1])
-    : ["#hoy", "#premios", "#jugadores", "#general"].includes(hash) ? hash.slice(1)
+    : ["#hoy", "#picks", "#premios", "#jugadores", "#general"].includes(hash) ? hash.slice(1)
     : guardado && valida(guardado.vista) ? guardado.vista
     : "hoy";
 
