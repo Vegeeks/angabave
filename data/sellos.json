@@ -110,7 +110,9 @@
   },
   "6": {
     "archivo": "Semana_06.xlsx",
-    "sellado": "2026-10-15T23:25:13+00:00",
-    "partidos": {}
+    "sellado": "2026-10-16T00:16:13+00:00",
+    "partidos": {
+      "Seahawks@Broncos": "8acc9a92ed4712b0cfcb9104753f0c9116c66e3e3901ca65b24ded11f1f82d4f"
+    }
   }
 }
