@@ -9,6 +9,14 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.20.1
+
+* **Hoy dice cuando no hay partidos.** Un día sin juegos aparece "Hoy no hay
+  partidos ni eventos" y cuál es el próximo partido. Si ese día cierran picks,
+  dice "Hoy no hay partidos" y a qué hora cierran.
+* El botón de **Picks ya no lleva el globito** con cuántos faltan: no hacía
+  falta.
+
 ## alfa v0.20.0
 
 **Menos secciones, cada cosa en su lugar.**

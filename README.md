@@ -422,6 +422,8 @@ Qué trae:
   * El domingo en la noche, los resultados del día y quién va ganando.
   * Los picks de la semana siguiente no desplazan a la que se está jugando
     hasta 36 horas antes de cerrar.
+  * Un día sin partidos dice "Hoy no hay partidos ni eventos" (o, si ese día
+    cierran picks, a qué hora) y cuál es el próximo.
 * **Tu barra**: quien elige su nombre ve arriba, en todas las secciones, sus
   aciertos, su porcentaje y su lugar en la semana y en la temporada, al minuto.
   En vivo dice cuántos de sus partidos en juego va ganando.
@@ -451,8 +453,7 @@ Qué trae:
   * En computadora, Hoy va a dos columnas.
 * **Picks** es la única puerta para armar los tuyos. Se acomoda a la semana en
   curso: lo abierto con su cuenta regresiva arriba, y abajo lo que el
-  organizador registró a tu nombre. El botón lleva un globito con cuántos te
-  faltan.
+  organizador registró a tu nombre.
 * **Marcador en vivo**: el navegador consulta ESPN cada 60 segundos, solo con
   la pestaña al frente, y muestra el cuarto y el reloj. Antes de la patada no
   pinta marcador (ESPN manda "0"). Esa capa nunca cierra un partido ni cambia el conteo
@@ -662,7 +663,7 @@ docs/              lo que se publica en GitHub Pages
 supabase/functions/angabave-carga/   la función que recibe los archivos del enlace
 herramientas/llaves.py               crea, lista y anula enlaces de carga
 herramientas/momentos.py             el portal en otros momentos de la semana
-tests/             398 pruebas de Python y 13 de la función; ninguna toca la red
+tests/             399 pruebas de Python y 13 de la función; ninguna toca la red
 cli.py
 crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 ```

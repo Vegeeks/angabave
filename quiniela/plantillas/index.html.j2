@@ -878,6 +878,15 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 .aviso-picks .ir{flex:0 0 auto; font-weight:800; font-size:.86rem; color:var(--oro)}
 .aviso-picks:active{transform:scale(.985)}
 
+.dia-libre{display:flex; align-items:center; gap:.85rem; margin:0 0 1rem; padding:.85rem 1rem; border-radius:16px;
+  background-color:var(--vidrio); background-image:var(--grano),var(--brillo); border:1px solid var(--borde-vidrio);
+  animation:entrar .4s var(--salida) both}
+.dia-libre svg{width:28px; height:28px; flex:0 0 auto; fill:none; stroke:var(--tenue); stroke-width:1.7;
+  stroke-linecap:round; stroke-linejoin:round}
+.dia-libre .txt{display:flex; flex-direction:column; gap:.15rem; min-width:0}
+.dia-libre b{font-size:.98rem}
+.dia-libre span{font-size:.85rem; line-height:1.35; color:var(--tenue)}
+
 /* La hoja con todas las semanas: abajo en el teléfono, al centro en computadora. */
 .con-hoja,.con-hoja body{overflow:hidden}
 .hoja-fondo{position:fixed; inset:0; z-index:200; display:flex; align-items:flex-end; justify-content:center;
@@ -915,11 +924,6 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 @media (max-width:340px){ .rejilla-semanas{grid-template-columns:repeat(3,minmax(0,1fr))} }
 
 /* ═══════ la sección Picks ═══════ */
-.navegacion .globo{position:absolute; top:2px; left:calc(50% + 6px); min-width:18px; height:18px; padding:0 5px;
-  border-radius:9px; display:grid; place-items:center; font-style:normal; font-size:.62rem; font-weight:900; line-height:1;
-  color:#171203; background:linear-gradient(180deg,#ffe193,#f7c948); box-shadow:0 0 0 2px var(--bg)}
-.navegacion .globo[hidden]{display:none}
-.navegacion.en-cabeza .globo{position:static; margin-left:2px}
 .registrados .nota{margin:.1rem 0 .8rem}
 .tus-picks.completa .una-tanda .tanda .cab{display:none}
 .tus-picks.completa .una-tanda .tanda{margin-top:.2rem}
@@ -1068,7 +1072,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
 <body>
 {% macro botones_nav() -%}
 <button type="button" data-vista="hoy" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3.2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle class="lleno" cx="12" cy="15.2" r="1.7"/></svg><span>Hoy</span></button>
-<button type="button" data-vista="picks" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="17" rx="3"/><path d="M8.3 9.2l1.9 1.9 3.6-3.6M8.5 15.5h7"/></svg><span>Picks</span><b class="globo" hidden></b></button>
+<button type="button" data-vista="picks" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="3.5" width="15" height="17" rx="3"/><path d="M8.3 9.2l1.9 1.9 3.6-3.6M8.5 15.5h7"/></svg><span>Picks</span></button>
 <button type="button" data-vista="semana" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3.2"/><path d="M3.5 12h17M12 4v16"/><circle cx="12" cy="12" r="2.6"/></svg><span>Semana</span></button>
 <button type="button" data-vista="general" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5h17M5 20.5v-6.5h4.5v6.5M9.5 20.5V8h5v12.5M14.5 20.5v-9h4.5v9"/></svg><span>General</span></button>
 <button type="button" data-vista="premios" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5.2a4 4 0 0 1-8 0zM8 6.2H5.4a2.7 2.7 0 0 0 3 4.2M16 6.2h2.6a2.7 2.7 0 0 1-3 4.2M12 13.2v3.6M8.6 20.3h6.8M10 16.8h4v3.5h-4z"/></svg><span>Premios</span></button>
@@ -2258,7 +2262,6 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       // Con al menos uno, la barra de abajo se queda a la vista mientras bajas.
       caja.classList.toggle("con-picks", n > 0);
       avance.style.width = (porClave.size ? (100 * n) / porClave.size : 0) + "%";
-      pintarGloboPicks();
     }
     limpiar.addEventListener("click", () => {
       elegidos.clear();
@@ -2913,6 +2916,8 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     const fase = vivos.length ? "vivo" : hoy.length ? "hoy" : apuran ? "picks" : cerrada ? "cerrada" : "semana";
 
     raiz.appendChild(saludo(fase, s, vivos, hoy, picks, terminados.length));
+    const sinPartidos = !vivos.length && !hoy.length && !terminados.length;
+    if (sinPartidos) raiz.appendChild(diaSinPartidos(picks));
     const rejilla = crear("div", "hoy-rejilla");
     const principal = crear("div", "hoy-principal");
     const lateral = crear("div", "hoy-lateral");
@@ -2928,7 +2933,8 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       resultado: () => (s && (cerrada || s.proyectable) ? campeon(s) : null),
       previo: () => (previa && previa !== s ? campeon(previa) : null),
       picks: () => (picks ? tarjetaPicks(picks) : null),
-      proximo: () => tarjetaProximo(),
+      // El aviso de día sin partidos ya dice cuál es el próximo.
+      proximo: () => (sinPartidos ? null : tarjetaProximo()),
     };
     // Pocas tarjetas y en orden de importancia: lo que pasa ahora, lo tuyo y
     // quién va ganando. Lo demás vive en su sección de la barra de abajo.
@@ -2949,6 +2955,31 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     }));
     if (!principal.firstChild) principal.remove();
     if (!principal.isConnected || !lateral.firstChild) rejilla.classList.add("sola");
+  }
+
+  /* Un día sin partidos se dice claro: si ese día cierran los picks, eso es lo
+     único que pasa; si no, no hay nada. Y cuál es el próximo partido. */
+  const DIAS_SEMANA = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  function cuandoEs(t) {
+    const fecha = new Date(t * 1000);
+    if (mismoDia(fecha, Date.now() + 864e5)) return "mañana a las " + hora(t);
+    return "el " + DIAS_SEMANA[fecha.getDay()] + " " + fecha.getDate() + " a las " + hora(t);
+  }
+  function diaSinPartidos(picks) {
+    const caja = crear("div", "dia-libre");
+    caja.insertAdjacentHTML("beforeend",
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3.2"/>' +
+      '<path d="M3.5 10h17M8 3v4M16 3v4M9.5 14.5l5 3M14.5 14.5l-5 3"/></svg>');
+    const txt = crear("div", "txt");
+    const cierraHoy = picks ? tandasAbiertas(picks).find((x) => mismoDia(Date.parse(x.cierre), Date.now())) : null;
+    txt.appendChild(crear("b", null, cierraHoy ? "Hoy no hay partidos" : "Hoy no hay partidos ni eventos"));
+    const partes = [];
+    if (cierraHoy) partes.push("Hoy a las " + hora(Date.parse(cierraHoy.cierre) / 1000) + " cierran los picks.");
+    const prox = proximoPartido();
+    if (prox) partes.push("El próximo: " + prox.p.v + " @ " + prox.p.l + ", " + cuandoEs(prox.p.t) + ".");
+    if (partes.length) txt.appendChild(crear("span", null, partes.join(" ")));
+    caja.appendChild(txt);
+    return caja;
   }
 
   /* La última semana cerrada sigue siendo noticia hasta el jueves. */
@@ -3343,15 +3374,6 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     }
   }
 
-  /* El globito de la sección Picks: cuántos te faltan de lo que sigue abierto. */
-  function pintarGloboPicks() {
-    const abiertos = picksAbiertos();
-    const faltan = abiertos ? Math.max(0, porElegir(abiertos) - borradorDe(abiertos)) : 0;
-    document.querySelectorAll('[data-vista="picks"] .globo').forEach((g) => {
-      g.textContent = faltan > 99 ? "99+" : String(faltan);
-      g.hidden = !faltan;
-    });
-  }
 
   /* ═══ dentro de "Semana" ═══ */
   function selectorDeSemanas(actual) {
@@ -3719,7 +3741,6 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     navs.forEach((n) => n.querySelectorAll("button").forEach((b) =>
       b.setAttribute("aria-selected", String(b.dataset.vista === enBarra))));
     moverIndicadores();
-    pintarGloboPicks();
     pintarEstado(cual === "semana" ? vista : D.activa);
 
     const destino = cual === "semana" ? "#s" + vista : "#" + cual;

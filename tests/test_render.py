@@ -667,7 +667,7 @@ def test_picks_tiene_su_seccion_y_es_la_unica_puerta(armado, tmp_path: Path):
     """Armar picks se hace en un solo lugar: la sección Picks de la barra."""
     html = render(armado, tmp_path)
     assert 'id="vista-picks"' in html and "function pintarPicks" in html
-    assert re.search(r'data-vista="picks"[^>]*>.*?<b class="globo" hidden></b>', html)
+    assert 'data-vista="picks"' in html and 'class="globo"' not in html   # sin contador: no hacía falta
     script = html[html.index('id="datos"'):]
     llamadas = re.findall(r"moduloPicks\(", script)
     assert len(llamadas) == 2                                   # la definición y una sola llamada
@@ -693,3 +693,13 @@ def test_la_semana_se_cambia_con_flechas_y_una_hoja(armado, tmp_path: Path):
     assert 'setAttribute("aria-modal", "true")' in hoja and 'e.key === "Escape"' in hoja
     # Y "Semana" en la barra siempre lleva a la que se está jugando.
     assert "semanaElegida = D.activa" in html
+
+
+def test_hoy_dice_cuando_no_hay_partidos(armado, tmp_path: Path):
+    """Un día sin partidos se dice claro, y si ese día cierran picks, también."""
+    html = render(armado, tmp_path)
+    hoy = _funcion(html, "pintarHoy")
+    assert "!vivos.length && !hoy.length && !terminados.length" in hoy
+    assert "diaSinPartidos(picks)" in hoy
+    aviso = _funcion(html, "diaSinPartidos")
+    assert '"Hoy no hay partidos ni eventos"' in aviso and "cierran los picks" in aviso
