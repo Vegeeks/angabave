@@ -9,6 +9,53 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.19.0
+
+**El portal ahora es un campo de noche, con vidrio esmerilado encima.**
+
+* **Fondo de campo**: verde de cancha casi negro, el corte del pasto cada cinco
+  yardas, las líneas de cal, las marcas de cada yarda, los números (10, 20… 50)
+  a los lados y las luces del estadio arriba. Todo tenue: es ambiente, no
+  información. Se mueve a un tercio de la velocidad de la página, como el
+  fondo de una toma de televisión.
+* **Vidrio esmerilado** ("mate raspadito"): tarjetas, encabezado y barra de
+  abajo son translúcidos y llevan un grano fino, como un cancel de regadera;
+  detrás se adivina el campo, borroso. Las tablas son del mismo vidrio pero
+  opaco, para leer filas largas sin distracciones.
+* **Colores de futbol americano**: verde esmeralda de cancha, cal blanca y el
+  dorado del trofeo como color de lo elegido (sección, semana, botón principal).
+* **Jerarquía más clara**: los titulares de Hoy y de cada semana van grandes,
+  en la tipografía de los marcadores ("TIEMPO DE PICKS", "SEMANA 6" con su
+  estado al lado: en curso, cerrada, por cargar, en vivo). Las cifras de tu
+  semana y tu temporada, en grande; los accesos directos, discretos.
+* **Movimiento**:
+  * Cambiar de sección desliza la vista hacia donde vas (adelante o atrás en
+    la barra, o a una semana posterior o anterior).
+  * Una pastilla dorada se desliza en el menú a la sección elegida.
+  * Las tarjetas de Hoy entran una tras otra.
+  * Elegir un pick lo hace "brincar" y le pone una palomita del color del
+    equipo en la esquina.
+  * Si una de tus cifras cambia en vivo, brinca.
+  * Con movimiento reducido en el teléfono, todo eso se apaga.
+* **El botón de generar la imagen te sigue**: en cuanto eliges un pick, una
+  barra con "3 de 13", una línea de avance, Borrar y Generar imagen se queda a
+  la vista mientras bajas por los partidos.
+* La imagen de picks, la página del enlace y la prueba de conexión usan la
+  misma paleta del campo.
+
+**Legible en los 65 temas, verificado:** el del campo y los de los 32 equipos,
+de casa y de visita. Cada texto se mide contra lo más claro que le puede quedar
+detrás —el campo bajo las luces, el vidrio encima, los paneles y tu fila
+resaltada— y se aclara hasta cumplir (7:1 el texto principal, 4.5:1 el
+secundario). Hay una prueba por tema. Eso destapó dos problemas que ya
+existían:
+
+* En **34 temas el rojo de "en vivo"** y en **24 el rojo de los fallos** no
+  llegaban al mínimo. Ahora se aclaran solos en esos temas.
+* En los **7 temas de visita blanca o plateada** (Cardinals, Falcons, Bengals,
+  Browns, Colts, Raiders y Jets) el tinte aclaraba tanto el fondo que ni el
+  texto blanco llegaba a 7:1. Ahora el tinte se baja lo justo para que se lea.
+
 ## alfa v0.18.0
 
 **El portal se acomoda al momento de la semana y te sigue a ti.**

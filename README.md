@@ -453,11 +453,22 @@ Qué trae:
   ficha de cada quien cruza los picks de todos: promedio, a cuántos está del
   líder, porcentaje de acierto, su equipo consentido con su récord y cuántas
   veces fue contra la mayoría de la quiniela (y cuántas le salió).
+* **Un campo de noche**: el fondo es una cancha vista desde arriba —corte del
+  pasto, líneas de cal, marcas de cada yarda, los números a los lados y las
+  luces del estadio—, tenue, y se mueve a un tercio de la velocidad de la
+  página. Encima, las superficies son **vidrio esmerilado**: translúcidas, con
+  grano y el campo borroso detrás. Las tablas son del mismo vidrio, opaco. El
+  grano es un SVG en línea (`GRANO_SVG`): no se pide ningún archivo.
 * **Modo equipo**: eliges tu equipo y el portal entero se viste de sus colores
-  —fondo, superficies, bordes y resplandor— con los de casa o los de visita
-  según dónde juegue esa semana, y su partido encabeza la lista. Los 64 temas
-  se generan mezclando el color del equipo con la base oscura y cada uno pasa
-  una verificación de contraste antes de salir.
+  —fondo, campo, superficies, bordes y luces— con los de casa o los de visita
+  según dónde juegue esa semana, y su partido encabeza la lista.
+* **Legible en los 65 temas** (el del campo y 64 de equipo), por construcción:
+  cada texto se mide contra lo más claro que le puede quedar detrás —el campo
+  bajo las luces, el vidrio encima, los paneles y la fila resaltada— y se
+  aclara hasta cumplir 7:1 el principal, 4.5:1 el secundario y 3:1 el tenue y
+  los colores de acierto, fallo, en vivo y oro. Con los colores de visita muy
+  claros, el tinte se baja hasta que todo cumple. `tests/test_temas.py` lo
+  revisa tema por tema.
 * **Se queda donde estabas**: al recargar vuelve a la misma vista, pestaña y
   altura de la página.
 * **Se guarda como app**: al agregarlo a la pantalla de inicio en iPhone o
@@ -643,7 +654,7 @@ docs/              lo que se publica en GitHub Pages
 supabase/functions/angabave-carga/   la función que recibe los archivos del enlace
 herramientas/llaves.py               crea, lista y anula enlaces de carga
 herramientas/momentos.py             el portal en otros momentos de la semana
-tests/             327 pruebas de Python y 13 de la función; ninguna toca la red
+tests/             395 pruebas de Python y 13 de la función; ninguna toca la red
 cli.py
 crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 ```
@@ -666,6 +677,7 @@ crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 | Cada cuánto se recarga la página entera | `SEGUNDOS_RECARGA` (600 s) | `render_html.py` |
 | Cuándo se avisa que la tabla va vieja | `MINUTOS_REZAGO` (25 min) | `render_html.py` |
 | Colores y contraste de los temas | `COLORES_EQUIPO`, `FUERZA_TEMA`, `CONTRASTE_MINIMO` | `render_html.py` |
+| El campo, el vidrio y las luces | `BASE_CAMPO`, `OPACIDAD_VIDRIO`, `OPACIDAD_CRISTAL`, `LUZ_ESTADIO`, `GRANO_SVG` | `render_html.py` |
 | Timeout y reintentos de ESPN | `TIEMPO_ESPERA`, `MAX_REINTENTOS`, `ESPERA_BASE` | `espn.py` |
 
 ## Decisiones que conviene no deshacer

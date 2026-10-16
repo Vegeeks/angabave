@@ -18,7 +18,7 @@ from decimal import Decimal
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
@@ -76,7 +76,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.18.0"
+VERSION = "v0.19.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -183,13 +183,24 @@ def paleta_equipos() -> dict[str, dict[str, str]]:
     return salida
 
 
-# --- temas por equipo --------------------------------------------------------
+# --- temas -------------------------------------------------------------------
 #
-# Elegir equipo no cambia solo un acento: tiñe el fondo, las superficies y los
-# bordes. Todo se deriva del color del equipo mezclándolo con la base oscura, y
-# después se verifica que el texto siga siendo legible encima.
+# El portal es un campo de noche: pasto casi negro con líneas de cal y luces de
+# estadio arriba, y encima superficies de vidrio esmerilado (translúcidas y con
+# grano). Elegir equipo tiñe fondo, superficies y bordes con su color.
+#
+# Nada de eso se deja al ojo: cada texto se mide contra lo más claro que puede
+# quedar detrás —el panel opaco, el vidrio sobre la parte más iluminada del
+# campo y el campo mismo— y se aclara hasta que cumpla.
 
-#: Base neutra del portal, sobre la que se mezcla el color del equipo.
+#: El portal sin equipo: pasto de noche.
+BASE_CAMPO: dict[str, str] = {
+    "bg": "#041009", "bg2": "#0A1C11",
+    "panel": "#102117", "panel2": "#162A1F", "panel3": "#1D3527",
+    "linea": "#1D3728", "linea2": "#2B4A39",
+}
+
+#: Base neutra sobre la que se mezcla el color de un equipo.
 BASE_TEMA: dict[str, str] = {
     "bg": "#06090F", "bg2": "#0B1018",
     "panel": "#101724", "panel2": "#161F2E", "panel3": "#1D2838",
@@ -203,8 +214,27 @@ FUERZA_TEMA: dict[str, float] = {
     "panel3": 0.32, "linea": 0.40, "linea2": 0.48,
 }
 
-#: Textos que tienen que seguir leyéndose sobre el panel teñido.
+#: Los textos y el contraste mínimo de cada uno (WCAG: 7 es AAA, 4.5 es AA y 3
+#: alcanza para texto grande o en negritas).
 _TEXTOS = {"txt": ("#EEF4FB", 7.0), "tenue": ("#8D9BB0", 4.5), "tenue2": ("#5C6A7E", 3.0)}
+#: Los mismos, con un dejo verde para el campo.
+_TEXTOS_CAMPO = {"txt": ("#EEF5F0", 7.0), "tenue": ("#93A69A", 4.5), "tenue2": ("#62776B", 3.0)}
+
+#: Colores con significado (acierto, fallo, en vivo y el oro de los premios). No
+#: se tiñen, pero se miden en cada tema y se aclaran ahí donde no lleguen.
+SEMANTICOS: dict[str, str] = {"verde": "#3DDC84", "rojo": "#FF6058", "vivo": "#FF4757", "oro": "#F7C948"}
+CONTRASTE_SEMANTICO = 3.0
+
+#: Cuánto tapa el vidrio de las tarjetas (1 sería opaco).
+OPACIDAD_VIDRIO = 0.72
+#: El encabezado y la barra de abajo tapan más: por detrás pasa contenido.
+OPACIDAD_CRISTAL = 0.84
+#: Las luces del estadio en su punto más fuerte: color y opacidad.
+LUZ_ESTADIO = ("#EAFBF0", 0.10)
+#: Con equipo, las luces son de su color.
+LUZ_EQUIPO = 0.16
+#: Lo que aclaran, juntas, las franjas del pasto y las líneas de cal.
+CAL_CAMPO = 0.03
 
 
 def mezclar(fondo: str, tinte: str, fuerza: float) -> str:
@@ -216,43 +246,125 @@ def mezclar(fondo: str, tinte: str, fuerza: float) -> str:
 
 
 def _rgba(color: str, alfa: float) -> str:
-    rojo, verde, azul = (round(v * 255) for v in _a_rgb(color))
-    return f"rgba({rojo},{verde},{azul},{alfa})"
+    """El color con transparencia, en hexadecimal de ocho cifras (#RRGGBBAA).
+
+    Pesa la mitad que rgba(): van 128 temas dentro de la página.
+    """
+    return "#%s%02X" % (color.lstrip("#").upper(), round(alfa * 255))
+
+
+def fondos_de_prueba(tema: dict[str, str], luz: str, alfa: float) -> list[str]:
+    """Lo más claro que puede quedar detrás de un texto en este tema.
+
+    El campo bajo las luces (con su franja y su cal), el vidrio encima de ese
+    campo, los paneles opacos y la fila resaltada de quien eligió su nombre.
+    """
+    campo = mezclar(mezclar(tema["--bg"], luz, alfa), "#FFFFFF", CAL_CAMPO)
+    vidrio = mezclar(campo, tema["--panel"], OPACIDAD_VIDRIO)
+    fondos = [campo, vidrio, tema["--panel"], tema["--panel2"], tema["--vidrio-solido"]]
+    if "--fila-yo" in tema:
+        fondos.append(tema["--fila-yo"])
+    return fondos
+
+
+def _hasta_que_se_lea(color: str, fondos: list[str], minimo: float) -> str:
+    """Aclara el color lo justo para que cumpla contra todos los fondos."""
+    seguro = color
+    for _ in range(60):
+        if all(contraste(seguro, fondo) >= minimo for fondo in fondos):
+            return seguro
+        seguro = _aclarar(seguro)
+    return seguro
+
+
+def _acabado(tema: dict[str, str], luz: str, alfa: float, textos: dict) -> dict[str, str]:
+    """Vidrio, luces y textos verificados para un tema que ya trae sus superficies."""
+    fondo, panel = tema["--bg"], tema["--panel"]
+    tema["--vidrio"] = _rgba(panel, OPACIDAD_VIDRIO)
+    tema["--cristal"] = _rgba(fondo, OPACIDAD_CRISTAL)
+    # Donde no puede haber transparencia (las celdas pegadas de una tabla que se
+    # desliza por debajo), el color al que equivale el vidrio sobre el fondo.
+    tema["--vidrio-solido"] = mezclar(fondo, panel, OPACIDAD_VIDRIO)
+    tema["--resplandor"] = _rgba(luz, alfa)
+
+    acento = _hasta_que_se_lea(tema["--acento"], fondos_de_prueba(tema, luz, alfa), CONTRASTE_MINIMO)
+    tema["--fila-yo"] = mezclar(tema["--vidrio-solido"], acento, 0.16)
+    fondos = fondos_de_prueba(tema, luz, alfa)
+    tema["--acento"] = _hasta_que_se_lea(acento, fondos, CONTRASTE_MINIMO)
+    for nombre, (color, minimo) in textos.items():
+        tema["--" + nombre] = _hasta_que_se_lea(color, fondos, minimo)
+    for nombre, color in SEMANTICOS.items():
+        seguro = _hasta_que_se_lea(color, fondos, CONTRASTE_SEMANTICO)
+        if seguro != color:
+            tema["--" + nombre] = seguro
+    return tema
+
+
+def tema_campo() -> dict[str, str]:
+    """El portal de siempre, sin equipo: un campo de noche, ya verificado."""
+    tema = {"--" + nombre: color for nombre, color in BASE_CAMPO.items()}
+    tema["--acento"] = "#5B95FF"
+    return _acabado(tema, *LUZ_ESTADIO, _TEXTOS_CAMPO)
+
+
+def se_lee(tema: dict[str, str], luz: str, alfa: float) -> bool:
+    """¿Cumple cada texto del tema contra todo lo que le puede quedar detrás?"""
+    fondos = fondos_de_prueba(tema, luz, alfa)
+    minimos = {"--" + nombre: minimo for nombre, (_, minimo) in _TEXTOS.items()}
+    minimos["--acento"] = CONTRASTE_MINIMO
+    if any(contraste(tema[v], f) < m for v, m in minimos.items() for f in fondos):
+        return False
+    return all(
+        contraste(tema.get("--" + nombre, color), f) >= CONTRASTE_SEMANTICO
+        for nombre, color in SEMANTICOS.items() for f in fondos
+    )
 
 
 def tema_equipo(acento: str) -> dict[str, str]:
     """Paleta completa a partir del color del equipo, ya verificada.
 
-    Devuelve las variables CSS tal cual las aplica el navegador.
+    Devuelve las variables CSS tal cual las aplica el navegador. Con los colores
+    muy claros (la visita blanca o plateada de varios equipos) teñir a la fuerza
+    de siempre aclara tanto el fondo que ni el blanco alcanza a leerse: ahí el
+    tinte se baja de diez en diez por ciento hasta que todo cumple.
     """
-    tema = {
-        "--" + nombre: mezclar(base, acento, FUERZA_TEMA[nombre])
-        for nombre, base in BASE_TEMA.items()
-    }
-    # Resplandor del fondo, en el color del equipo.
-    tema["--resplandor"] = _rgba(acento, 0.45)
-    tema["--resplandor2"] = _rgba(acento, 0.24)
+    for paso in range(10):
+        escala = 1 - paso * 0.1
+        tema = {
+            "--" + nombre: mezclar(base, acento, FUERZA_TEMA[nombre] * escala)
+            for nombre, base in BASE_TEMA.items()
+        }
+        # Al teñir, el panel queda más claro que la base neutra, así que el acento
+        # se mide contra ESE panel y no contra el original.
+        tema["--acento"] = legible_sobre_oscuro(acento, tema["--panel"])
 
-    # Al teñir, el panel queda más claro que la base neutra, así que el acento
-    # se vuelve a verificar contra ESE panel y no contra el original.
-    panel = tema["--panel"]
-    tema["--acento"] = legible_sobre_oscuro(acento, panel)
-
-    # Las pastillas activas se visten del equipo, con su texto legible encima.
-    tema["--pastilla"] = (
-        f"linear-gradient(180deg,{tema['--acento']},{mezclar(tema['--acento'], '#000000', 0.22)})"
-    )
-    tema["--pastilla-txt"] = texto_encima(tema["--acento"])
-
-    # Los textos se aclaran si el panel teñido les quitó contraste.
-    for nombre, (color, minimo) in _TEXTOS.items():
-        seguro = color
-        for _ in range(30):
-            if contraste(seguro, panel) >= minimo:
-                break
-            seguro = _aclarar(seguro)
-        tema["--" + nombre] = seguro
+        # Las pastillas activas se visten del equipo, con su texto legible encima.
+        tema["--pastilla"] = (
+            f"linear-gradient(180deg,{tema['--acento']},{mezclar(tema['--acento'], '#000000', 0.22)})"
+        )
+        tema["--pastilla-txt"] = texto_encima(tema["--acento"])
+        tema = _acabado(tema, acento, LUZ_EQUIPO * escala, _TEXTOS)
+        if se_lee(tema, acento, LUZ_EQUIPO * escala):
+            return tema
     return tema
+
+
+#: El grano del vidrio esmerilado: ruido fino, blanco y escaso, que se repite en
+#: mosaico. Es una imagen SVG en línea: no se pide ningún archivo.
+GRANO_SVG = (
+    "<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'>"
+    "<filter id='g' x='0' y='0'>"
+    "<feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/>"
+    "<feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.25 -.32'/>"
+    "</filter>"
+    "<rect width='100%' height='100%' filter='url(#g)' opacity='.12'/>"
+    "</svg>"
+)
+
+
+def grano() -> str:
+    """El grano como dirección data:, codificado entero para que no parezca un enlace."""
+    return "data:image/svg+xml," + quote(GRANO_SVG, safe="")
 
 
 def temas_equipos() -> dict[str, dict[str, dict[str, str]]]:
@@ -663,8 +775,8 @@ def generar_manifiesto(ruta_salida: Path, marca: str = MARCA) -> Path:
         "scope": ".",
         "display": "standalone",
         "orientation": "portrait",
-        "background_color": "#06090f",
-        "theme_color": "#06090f",
+        "background_color": BASE_CAMPO["bg"].lower(),
+        "theme_color": BASE_CAMPO["bg"].lower(),
         "lang": "es-MX",
         "icons": [
             {"src": "icono-192.png", "sizes": "192x192", "type": "image/png"},
@@ -768,6 +880,8 @@ def generar_html(
         "generado": momento.isoformat(),
         "rezago": MINUTOS_REZAGO,
         "logo": marca.para_canvas(),
+        # El fondo del tema sin equipo, para la barra del navegador.
+        "fondo": BASE_CAMPO["bg"].lower(),
         "participantes": participantes,
         "colores": paleta_equipos(),
         "siglas": _siglas(),
@@ -797,6 +911,8 @@ def generar_html(
     podio = _armar_podio(general, participantes, reparto) if podio_listo else []
     contexto = {
         "marca_svg": marca.svg("cabeza"),
+        "tema_campo": tema_campo(),
+        "grano": grano(),
         "favicon": marca.favicon(),
         "tipografia": _tipografia(),
         "marca": MARCA,

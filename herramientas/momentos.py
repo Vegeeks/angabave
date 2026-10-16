@@ -159,6 +159,10 @@ def main(argv: list[str] | None = None) -> int:
     domingo = domingo_de(cerradas[-1])
     lunes, martes = domingo + timedelta(days=1), domingo + timedelta(days=2)
     salida.mkdir(parents=True, exist_ok=True)
+    # El aviso de versión de la página lo pide; sin él, la consola se llena de 404.
+    for archivo in ("version.json", "manifest.webmanifest"):
+        if (args.sitio / archivo).exists():
+            (salida / archivo).write_bytes((args.sitio / archivo).read_bytes())
     print(f"Semana {n} (domingo {domingo:%d/%m}) → {salida}")
 
     def base(hasta: int) -> dict:
