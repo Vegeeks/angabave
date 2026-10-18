@@ -8,14 +8,14 @@
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-10-18T17:00:00+00:00"
     },
     {
       "visitante": "Ravens",
       "local": "Browns",
       "marcador_visitante": 10,
-      "marcador_local": 0,
+      "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
