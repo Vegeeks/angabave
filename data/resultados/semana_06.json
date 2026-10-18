@@ -16,9 +16,9 @@
       "local": "Raiders",
       "marcador_visitante": 33,
       "marcador_local": 30,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Bills",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-18T20:25:00+00:00"
     },
     {
