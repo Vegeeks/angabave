@@ -2,26 +2,6 @@
   "semana": 6,
   "partidos": [
     {
-      "visitante": "Chargers",
-      "local": "Chiefs",
-      "marcador_visitante": 6,
-      "marcador_local": 22,
-      "ganador": "Chiefs",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-18T20:25:00+00:00"
-    },
-    {
-      "visitante": "Bills",
-      "local": "Raiders",
-      "marcador_visitante": 33,
-      "marcador_local": 30,
-      "ganador": "Bills",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-18T20:25:00+00:00"
-    },
-    {
       "visitante": "Texans",
       "local": "Jaguars",
       "marcador_visitante": 34,
@@ -110,6 +90,26 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-18T20:05:00+00:00"
+    },
+    {
+      "visitante": "Chargers",
+      "local": "Chiefs",
+      "marcador_visitante": 6,
+      "marcador_local": 22,
+      "ganador": "Chiefs",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-18T20:25:00+00:00"
+    },
+    {
+      "visitante": "Bills",
+      "local": "Raiders",
+      "marcador_visitante": 33,
+      "marcador_local": 30,
+      "ganador": "Bills",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-18T20:25:00+00:00"
     },
     {
       "visitante": "Cowboys",
