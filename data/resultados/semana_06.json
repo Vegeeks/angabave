@@ -6,9 +6,9 @@
       "local": "Buccaneers",
       "marcador_visitante": 26,
       "marcador_local": 19,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Steelers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-18T17:00:00+00:00"
     },
     {
@@ -35,7 +35,7 @@
       "visitante": "Bills",
       "local": "Raiders",
       "marcador_visitante": 3,
-      "marcador_local": 0,
+      "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
