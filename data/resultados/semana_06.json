@@ -2,16 +2,6 @@
   "semana": 6,
   "partidos": [
     {
-      "visitante": "Steelers",
-      "local": "Buccaneers",
-      "marcador_visitante": 26,
-      "marcador_local": 19,
-      "ganador": "Steelers",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-18T17:00:00+00:00"
-    },
-    {
       "visitante": "Cardinals",
       "local": "Rams",
       "marcador_visitante": 6,
@@ -34,7 +24,7 @@
     {
       "visitante": "Bills",
       "local": "Raiders",
-      "marcador_visitante": 3,
+      "marcador_visitante": 6,
       "marcador_local": 7,
       "ganador": null,
       "finalizado": false,
@@ -107,6 +97,16 @@
       "marcador_visitante": 25,
       "marcador_local": 14,
       "ganador": "Panthers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-18T17:00:00+00:00"
+    },
+    {
+      "visitante": "Steelers",
+      "local": "Buccaneers",
+      "marcador_visitante": 26,
+      "marcador_local": 19,
+      "ganador": "Steelers",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-18T17:00:00+00:00"
