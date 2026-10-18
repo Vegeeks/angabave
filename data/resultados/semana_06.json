@@ -5,7 +5,7 @@
       "visitante": "Bears",
       "local": "Falcons",
       "marcador_visitante": 31,
-      "marcador_local": 15,
+      "marcador_local": 23,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -64,7 +64,7 @@
     {
       "visitante": "Steelers",
       "local": "Buccaneers",
-      "marcador_visitante": 13,
+      "marcador_visitante": 16,
       "marcador_local": 16,
       "ganador": null,
       "finalizado": false,
