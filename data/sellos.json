@@ -110,10 +110,12 @@
   },
   "6": {
     "archivo": "Semana_06.xlsx",
-    "sellado": "2026-10-18T20:06:31+00:00",
+    "sellado": "2026-10-18T20:25:33+00:00",
     "partidos": {
       "Bears@Falcons": "ca4b6cb9bd0ed6b0574f382d2de9f7edd39296496e3fa5fde993f5f22ef70661",
+      "Bills@Raiders": "00db8d7a548ee6c81e77ae9fadd897ce555950dc9c571f1679743755582f0c24",
       "Cardinals@Rams": "261beac45ae71453af5b131d3b75c0227f0ae602637acbbc74cb914f27b5a0d4",
+      "Chargers@Chiefs": "582899f0a9381286db91ff9612516a1fe8bfba2e71c5e1676ebddfc9f07f8005",
       "Jets@Patriots": "d6c54f7f71b2b887f7cd53fa271b30c8ec7573d71786dba54e7b1cb03b44fc5e",
       "Panthers@Eagles": "b1a9d3409f62fca7027e6835dc3971c6a151d517fafd6d2797da43266fa27960",
       "Ravens@Browns": "be08c041641d16bb2b8053aa1b873f6f5b63aa35471f0897a28a490fd5af78ac",
