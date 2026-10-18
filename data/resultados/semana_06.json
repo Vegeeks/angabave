@@ -6,9 +6,9 @@
       "local": "Falcons",
       "marcador_visitante": 31,
       "marcador_local": 23,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Bears",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-18T17:00:00+00:00"
     },
     {
