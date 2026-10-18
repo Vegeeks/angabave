@@ -8,14 +8,14 @@
       "marcador_local": 9,
       "ganador": null,
       "finalizado": false,
-      "estado": "Halftime",
+      "estado": "In Progress",
       "inicio": "2026-10-18T20:05:00+00:00"
     },
     {
       "visitante": "Chargers",
       "local": "Chiefs",
       "marcador_visitante": 3,
-      "marcador_local": 9,
+      "marcador_local": 16,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
