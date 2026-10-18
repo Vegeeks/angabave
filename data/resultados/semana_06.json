@@ -15,10 +15,10 @@
       "visitante": "Ravens",
       "local": "Browns",
       "marcador_visitante": 10,
-      "marcador_local": 10,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "marcador_local": 13,
+      "ganador": "Browns",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-18T17:00:00+00:00"
     },
     {
