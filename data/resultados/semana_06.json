@@ -38,13 +38,13 @@
       "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-18T17:00:00+00:00"
     },
     {
       "visitante": "Saints",
       "local": "Giants",
-      "marcador_visitante": 9,
+      "marcador_visitante": 10,
       "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
