@@ -2,16 +2,6 @@
   "semana": 6,
   "partidos": [
     {
-      "visitante": "Texans",
-      "local": "Jaguars",
-      "marcador_visitante": 34,
-      "marcador_local": 31,
-      "ganador": "Texans",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-18T13:30:00+00:00"
-    },
-    {
       "visitante": "Bears",
       "local": "Falcons",
       "marcador_visitante": 0,
@@ -64,7 +54,7 @@
     {
       "visitante": "Panthers",
       "local": "Eagles",
-      "marcador_visitante": 0,
+      "marcador_visitante": 3,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
@@ -80,6 +70,16 @@
       "finalizado": false,
       "estado": "In Progress",
       "inicio": "2026-10-18T17:00:00+00:00"
+    },
+    {
+      "visitante": "Texans",
+      "local": "Jaguars",
+      "marcador_visitante": 34,
+      "marcador_local": 31,
+      "ganador": "Texans",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-18T13:30:00+00:00"
     },
     {
       "visitante": "Cardinals",
