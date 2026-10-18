@@ -110,9 +110,10 @@
   },
   "6": {
     "archivo": "Semana_06.xlsx",
-    "sellado": "2026-10-16T00:16:13+00:00",
+    "sellado": "2026-10-18T13:31:24+00:00",
     "partidos": {
-      "Seahawks@Broncos": "8acc9a92ed4712b0cfcb9104753f0c9116c66e3e3901ca65b24ded11f1f82d4f"
+      "Seahawks@Broncos": "8acc9a92ed4712b0cfcb9104753f0c9116c66e3e3901ca65b24ded11f1f82d4f",
+      "Texans@Jaguars": "dfe165af8ad92838ee4c5f6a0863faf30166c36be9f0f9ba066741c09b375b35"
     }
   }
 }
