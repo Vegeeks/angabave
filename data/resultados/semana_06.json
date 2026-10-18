@@ -24,7 +24,7 @@
     {
       "visitante": "Steelers",
       "local": "Buccaneers",
-      "marcador_visitante": 25,
+      "marcador_visitante": 26,
       "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
@@ -54,7 +54,7 @@
     {
       "visitante": "Bills",
       "local": "Raiders",
-      "marcador_visitante": 0,
+      "marcador_visitante": 3,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
