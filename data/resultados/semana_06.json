@@ -25,7 +25,7 @@
       "visitante": "Titans",
       "local": "Colts",
       "marcador_visitante": 20,
-      "marcador_local": 13,
+      "marcador_local": 20,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -64,7 +64,7 @@
     {
       "visitante": "Steelers",
       "local": "Buccaneers",
-      "marcador_visitante": 10,
+      "marcador_visitante": 13,
       "marcador_local": 16,
       "ganador": null,
       "finalizado": false,
