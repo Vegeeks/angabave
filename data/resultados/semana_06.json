@@ -24,7 +24,7 @@
     {
       "visitante": "Steelers",
       "local": "Buccaneers",
-      "marcador_visitante": 19,
+      "marcador_visitante": 25,
       "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
@@ -45,7 +45,7 @@
       "visitante": "Chargers",
       "local": "Chiefs",
       "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
