@@ -25,10 +25,10 @@
       "visitante": "Bills",
       "local": "Raiders",
       "marcador_visitante": 13,
-      "marcador_local": 10,
+      "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-18T20:25:00+00:00"
     },
     {
