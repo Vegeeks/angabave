@@ -2,6 +2,26 @@
   "semana": 6,
   "partidos": [
     {
+      "visitante": "Washington",
+      "local": "49ers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-20T00:15:00+00:00"
+    },
+    {
+      "visitante": "Seahawks",
+      "local": "Broncos",
+      "marcador_visitante": 14,
+      "marcador_local": 17,
+      "ganador": "Broncos",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-16T00:15:00+00:00"
+    },
+    {
       "visitante": "Texans",
       "local": "Jaguars",
       "marcador_visitante": 34,
@@ -120,26 +140,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-19T00:20:00+00:00"
-    },
-    {
-      "visitante": "Seahawks",
-      "local": "Broncos",
-      "marcador_visitante": 14,
-      "marcador_local": 17,
-      "ganador": "Broncos",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-16T00:15:00+00:00"
-    },
-    {
-      "visitante": "Washington",
-      "local": "49ers",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-20T00:15:00+00:00"
     }
   ]
 }
