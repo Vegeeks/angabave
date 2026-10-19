@@ -2,16 +2,6 @@
   "semana": 6,
   "partidos": [
     {
-      "visitante": "Cowboys",
-      "local": "Packers",
-      "marcador_visitante": 13,
-      "marcador_local": 23,
-      "ganador": "Packers",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-19T00:20:00+00:00"
-    },
-    {
       "visitante": "Texans",
       "local": "Jaguars",
       "marcador_visitante": 34,
@@ -120,6 +110,16 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-18T20:25:00+00:00"
+    },
+    {
+      "visitante": "Cowboys",
+      "local": "Packers",
+      "marcador_visitante": 13,
+      "marcador_local": 23,
+      "ganador": "Packers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-19T00:20:00+00:00"
     },
     {
       "visitante": "Seahawks",
