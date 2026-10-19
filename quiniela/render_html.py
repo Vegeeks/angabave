@@ -32,6 +32,7 @@ from .scoring import (
     ACUMULADO_SEMANAL,
     ACUMULADO_TOTAL,
     PREMIO_SEMANAL,
+    REPARTO_FINAL,
     SEMANAS_TEMPORADA,
     ganadores,
     premio_semanal,
@@ -76,7 +77,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.20.1"
+VERSION = "v0.21.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -646,11 +647,19 @@ def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
     return bloque
 
 
+#: Medalla de cada lugar con premio. Del 4º en adelante no hay medalla: un
+#: escalón del podio puede quedar en 7º si hay empates arriba, y ese no cobra.
+MEDALLAS = {1: "oro", 2: "plata", 3: "bronce"}
+
+
 def _armar_podio(general: list[dict], participantes: list[str], reparto: list[dict]) -> list[dict]:
-    """Los tres primeros lugares, agrupando a los empatados.
+    """Los tres primeros escalones de puntos, agrupando a los empatados.
 
     Al arrancar la temporada medio mundo va empatado, así que el podio se arma
-    por posición y no por persona: un escalón puede llevar a veinte.
+    por posición y no por persona: un escalón puede llevar a veinte. El color
+    sale del lugar y no del escalón: con cinco empatados en 2º, el escalón que
+    sigue es el 7º y no lleva bronce. `reparto` es el de hoy: cuánto se llevaría
+    cada quien si la temporada terminara ahora.
     """
     escalones: list[dict] = []
     for fila in general:
@@ -667,8 +676,77 @@ def _armar_podio(general: list[dict], participantes: list[str], reparto: list[di
         escalon["cuantos"] = len(escalon["nombres"])
         # Con muchos empatados se cuenta, no se enlista.
         escalon["enlistar"] = escalon["cuantos"] <= MAXIMO_NOMBRES_PODIO
-        escalon["premio"] = premios.get(escalon["nombres"][0]) if escalon["cuantos"] == 1 else None
+        escalon["medalla"] = MEDALLAS.get(escalon["pos"], "sin-medalla")
+        # Lo que se llevaría cada integrante del escalón (los empatados cobran igual).
+        escalon["premio"] = premios.get(escalon["nombres"][0])
     return escalones
+
+
+def _porciento(fraccion) -> str:
+    """70%, 6%, 33.3%: sin decimales si es redondo."""
+    valor = Decimal(fraccion) * 100
+    if valor == valor.to_integral_value():
+        return f"{valor:.0f}%"
+    return f"{valor:.1f}%"
+
+
+def _grupos_del_reparto(reparto: list[dict]) -> list[dict]:
+    """El reparto agrupado por lugar: quiénes empatan y cuánto toca a cada uno."""
+    grupos: list[dict] = []
+    for fila in reparto:
+        if not grupos or grupos[-1]["pos"] != fila["pos"]:
+            grupos.append({"pos": fila["pos"], "p": [], "aciertos": fila["aciertos"],
+                           "porcentaje": fila["porcentaje"], "premio": fila["premio"]})
+        grupos[-1]["p"].append(fila["p"])
+    return grupos
+
+
+def _ejemplo_reparto(grupos: list[int]) -> list[tuple[int, int, str]]:
+    """(lugar, cuántos, premio de cada uno) si los primeros lugares se agrupan así.
+
+    Sale de `reparto_final` con una tabla inventada, para que los ejemplos de la
+    dinámica nunca se desfasen de la regla que de verdad se aplica.
+    """
+    filas, lugar = [], 1
+    for cuantos in grupos:
+        filas += [{"participante": f"{lugar}-{i}", "posicion": lugar, "acumulado": 100 - lugar}
+                  for i in range(cuantos)]
+        lugar += cuantos
+    salida: list[tuple[int, int, str]] = []
+    for fila in reparto_final(pd.DataFrame(filas)):
+        if not salida or salida[-1][0] != fila["posicion"]:
+            salida.append((fila["posicion"], 0, _pesos(fila["premio"])))
+        lugar_, cuantos_, premio = salida[-1]
+        salida[-1] = (lugar_, cuantos_ + 1, premio)
+    return salida
+
+
+def dinamica() -> dict[str, list[str]]:
+    """Cómo se gana, en palabras y con los montos de verdad."""
+    montos = [_pesos(ACUMULADO_TOTAL * pct) for pct in REPARTO_FINAL]
+    solo_y_cinco = _ejemplo_reparto([1, 5])
+    tres_arriba = _ejemplo_reparto([3])
+    dos_arriba = _ejemplo_reparto([2, 1])
+    return {
+        "semana": [
+            f"Gana quien tenga más aciertos y se lleva {_pesos(PREMIO_SEMANAL)}. Si empatan, se divide entre ellos.",
+            "Si un partido termina empatado, nadie acierta.",
+        ],
+        "temporada": [
+            f"Cada semana se apartan {_pesos(ACUMULADO_SEMANAL)} para la bolsa final: "
+            f"{_pesos(ACUMULADO_TOTAL)} al terminar las {SEMANAS_TEMPORADA} semanas.",
+            f"Se buscan 3 ganadores, los 3 primeros lugares de la tabla general: el 1º se lleva "
+            f"{montos[0]}, el 2º {montos[1]} y el 3º {montos[2]}. Del 4º lugar en adelante no hay premio.",
+        ],
+        "empates": [
+            "Los premios de los lugares que ocupan los empatados se juntan y se dividen parejo entre ellos.",
+            f"Si el 1º va solo, es campeón y se lleva {solo_y_cinco[0][2]}. Si atrás hay 5 empatados en 2º, "
+            f"se juntan el 2º y el 3º y cada uno de los 5 se lleva {solo_y_cinco[1][2]}.",
+            f"Si 3 empatan en 1º, se juntan los tres premios y cada uno se lleva {tres_arriba[0][2]}.",
+            f"Si 2 empatan en 1º, se juntan el 1º y el 2º ({dos_arriba[0][2]} cada uno) y quien sigue "
+            f"es 3º con {dos_arriba[1][2]}.",
+        ],
+    }
 
 
 def _pesos(cantidad) -> str:
@@ -843,17 +921,20 @@ def generar_html(
         len(jugadas) >= SEMANAS_TEMPORADA
         and all(semana.estado == "cerrada" for semana in jugadas)
     )
-    reparto = [
+    # Cómo quedaría la bolsa final si la temporada terminara hoy. Al cerrar las
+    # 18 semanas, ese mismo cálculo es el reparto oficial.
+    reparto_hoy = [
         {
             "pos": fila["posicion"],
             "p": indice_global[fila["participante"]],
             "nombre": fila["participante"],
             "aciertos": fila["aciertos"],
-            "porcentaje": f"{fila['porcentaje']:.0%}",
+            "porcentaje": _porciento(fila["porcentaje"]),
             "premio": _pesos(fila["premio"]),
         }
         for fila in reparto_final(tabla_acumulada)
-    ] if temporada_cerrada else []
+    ]
+    reparto = reparto_hoy if temporada_cerrada else []
 
     premios = {
         "semanal": _pesos(PREMIO_SEMANAL),
@@ -864,12 +945,13 @@ def generar_html(
         "apartado": _pesos(ACUMULADO_SEMANAL * len(jugadas)),
         "reparto": reparto,
         "temporada_cerrada": temporada_cerrada,
-        # Las reglas del reparto: se muestran siempre, los nombres no.
+        # Los grupos que hoy se llevarían algo de la bolsa final, con su parte.
+        "hoy": _grupos_del_reparto(reparto_hoy),
         "reglas": [
-            {"lugar": "1º", "porcentaje": "70%", "monto": _pesos(ACUMULADO_TOTAL * Decimal("0.70"))},
-            {"lugar": "2º", "porcentaje": "20%", "monto": _pesos(ACUMULADO_TOTAL * Decimal("0.20"))},
-            {"lugar": "3º", "porcentaje": "10%", "monto": _pesos(ACUMULADO_TOTAL * Decimal("0.10"))},
+            {"lugar": f"{i}º", "porcentaje": _porciento(pct), "monto": _pesos(ACUMULADO_TOTAL * pct)}
+            for i, pct in enumerate(REPARTO_FINAL, start=1)
         ],
+        "dinamica": dinamica(),
     }
 
     datos = {
@@ -908,7 +990,7 @@ def generar_html(
         } if hay_juego else None,
     }
 
-    podio = _armar_podio(general, participantes, reparto) if podio_listo else []
+    podio = _armar_podio(general, participantes, reparto_hoy) if podio_listo else []
     contexto = {
         "marca_svg": marca.svg("cabeza"),
         "tema_campo": tema_campo(),

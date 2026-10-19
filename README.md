@@ -134,12 +134,16 @@ las 18 semanas, repartida entre los tres primeros de la general.
 **Empates.** Si varias personas comparten un lugar, se suman los porcentajes de
 los lugares que ocupan entre todas y se divide en partes iguales. Dos en primer
 lugar se reparten el 70 % más el 20 % (45 % cada una) y quien sigue queda
-tercero con su 10 %. El premio semanal se divide igual entre los ganadores de
-esa semana.
+tercero con su 10 %. Con un primero solo y cinco empatados en segundo, el 2º y
+el 3º se juntan y se dividen entre los cinco. Del 4º lugar en adelante no hay
+premio. El premio semanal se divide igual entre los ganadores de esa semana.
 
-Mientras la temporada sigue abierta, el sitio muestra las reglas del reparto
-(los porcentajes y los montos) pero **no nombra a nadie**: los nombres del
-reparto final aparecen hasta que cierran las 18 semanas.
+El sitio lo explica en Premios ("Cómo se gana", con ejemplos y montos que salen
+de la misma función del reparto) y muestra **la rebanada del pastel**: quién se
+llevaría algo si la temporada terminara hoy, marcado como provisional. El
+reparto oficial queda hasta que cierran las 18 semanas. En el podio, la medalla
+sale del lugar (oro 1º, plata 2º, bronce 3º) y no del escalón: un escalón en 7º
+por empates arriba no lleva medalla.
 
 Los montos viven en `quiniela/scoring.py` (`PREMIO_SEMANAL`,
 `ACUMULADO_SEMANAL`, `SEMANAS_TEMPORADA`, `REPARTO_FINAL`).
@@ -318,7 +322,7 @@ El sitio calla lo que todavía no significa nada:
 |---|---|---|
 | Podio de la general | 16 partidos cerrados en la temporada | `UMBRAL_PODIO` |
 | Ganador de la semana | 8 partidos cerrados de esa semana | `UMBRAL_SEMANA` |
-| Nombres del reparto final | Cierran las 18 semanas | `SEMANAS_TEMPORADA` |
+| Reparto final oficial | Cierran las 18 semanas (antes, "si terminara hoy") | `SEMANAS_TEMPORADA` |
 
 Y cuando hay muchos empatados no enlista a todos: dice cuántos son. Los
 nombres sí se escriben cuando el resultado ya es oficial y hay dinero de por
@@ -432,8 +436,9 @@ Qué trae:
   solitario en diciembre. No aparece hasta que se cierren `UMBRAL_PODIO`
   partidos (16 por defecto): con tres juegos todos van empatados y un podio ahí
   no dice nada.
-* **Premios**: la bolsa, el reparto final como va hoy y el ganador de cada
-  semana con su monto.
+* **Premios**: la bolsa, cómo se gana (cada semana, al final y con empates,
+  con ejemplos), la rebanada del pastel si la temporada terminara hoy (con tu
+  parte o cuánto te falta) y el ganador de cada semana con su monto.
 * **Ganador de la semana** arriba de cada semana, con trofeo y confeti cuando
   la semana ya cerró. Mientras sigue abierta dice quién va ganando y cuánto
   hay en juego.
@@ -663,7 +668,7 @@ docs/              lo que se publica en GitHub Pages
 supabase/functions/angabave-carga/   la función que recibe los archivos del enlace
 herramientas/llaves.py               crea, lista y anula enlaces de carga
 herramientas/momentos.py             el portal en otros momentos de la semana
-tests/             399 pruebas de Python y 13 de la función; ninguna toca la red
+tests/             403 pruebas de Python y 13 de la función; ninguna toca la red
 cli.py
 crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 ```

@@ -887,6 +887,34 @@ footer .sello-marca{font-weight:900; letter-spacing:.16em; color:var(--oro); fon
 .dia-libre b{font-size:.98rem}
 .dia-libre span{font-size:.85rem; line-height:1.35; color:var(--tenue)}
 
+/* El podio solo pinta medalla a los lugares con premio (1º, 2º y 3º). */
+.lugar.sin-medalla .medalla{background:rgba(255,255,255,.07); color:var(--tenue); box-shadow:inset 0 0 0 1px var(--borde-vidrio)}
+.lugar.sin-medalla .puntos{color:var(--tenue)}
+.lugar .sin-premio{margin-top:.25rem; font-size:.74rem; font-weight:700; color:var(--tenue2)}
+.nota-podio{margin:.75rem .1rem 0; font-size:.82rem; line-height:1.45; color:var(--tenue)}
+.nota-podio .enlace-titulo{margin-left:.2rem}
+/* Cómo se gana. */
+#dinamica{scroll-margin-top:calc(var(--alto-encabezado) + 14px)}
+.dinamica h3.sub{font-family:var(--rotulo); font-size:.74rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--oro); margin:1rem 0 .45rem}
+.dinamica h3.sub:first-child{margin-top:0}
+.dinamica ul{margin:0; padding-left:1.1rem; display:grid; gap:.4rem}
+.dinamica li{font-size:.9rem; line-height:1.45; color:var(--txt)}
+.dinamica li::marker{color:var(--tenue2)}
+.lugares-premio{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.45rem; margin:.8rem 0 .2rem}
+.lugar-premio{display:flex; flex-direction:column; align-items:center; gap:.05rem; padding:.6rem .3rem; border-radius:14px;
+  background:rgba(255,255,255,.04); border:1px solid var(--borde-vidrio)}
+.lugar-premio .n{font-family:var(--rotulo); font-weight:700; font-size:1.2rem}
+.lugar-premio .pct{font-size:.72rem; color:var(--tenue)}
+.lugar-premio b{font-family:var(--rotulo); font-weight:700; font-size:1rem}
+.lugar-premio.oro .n,.lugar-premio.oro b{color:var(--oro)}
+.lugar-premio.plata .n,.lugar-premio.plata b{color:var(--plata)}
+.lugar-premio.bronce .n,.lugar-premio.bronce b{color:var(--bronce)}
+.fila-gan.tuya{border-color:rgba(91,149,255,.5); background-color:rgba(91,149,255,.08)}
+.rebanada{margin:.75rem .1rem 0; padding:.7rem .85rem; border-radius:14px; font-size:.88rem; font-weight:700; line-height:1.4;
+  color:var(--oro2); background:rgba(247,201,72,.08); border:1px solid rgba(247,201,72,.25)}
+.tarjeta .rebanada{margin:.8rem 0 0}
+
 /* La hoja con todas las semanas: abajo en el teléfono, al centro en computadora. */
 .con-hoja,.con-hoja body{overflow:hidden}
 .hoja-fondo{position:fixed; inset:0; z-index:200; display:flex; align-items:flex-end; justify-content:center;
@@ -1117,7 +1145,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     </div>
     <div class="podio">
       {% for escalon in podio %}
-      <article class="lugar {% if loop.index0 == 0 %}oro{% elif loop.index0 == 1 %}plata{% else %}bronce{% endif %}" style="--i:{{ loop.index0 }}">
+      <article class="lugar {{ escalon.medalla }}" style="--i:{{ loop.index0 }}">
         <div class="medalla">{{ escalon.pos }}</div>
         <div class="cuerpo">
           {% if escalon.enlistar %}
@@ -1126,7 +1154,8 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
           <div class="empatados">{{ escalon.cuantos }} empatados</div>
           {% endif %}
           <div class="detalle">{{ escalon.pos }}º lugar</div>
-          {% if escalon.premio %}<div class="bolsa">{{ escalon.premio }}</div>{% endif %}
+          {% if escalon.premio %}<div class="bolsa">{% if not premios.temporada_cerrada %}Hoy: {% endif %}{{ escalon.premio }}{% if escalon.cuantos > 1 %} c/u{% endif %}</div>
+          {% elif escalon.pos > 3 %}<div class="sin-premio">Sin premio{% if not premios.temporada_cerrada %} por ahora{% endif %}</div>{% endif %}
         </div>
         <div class="cifra">
           <div class="puntos">{{ escalon.total }}</div>
@@ -1135,6 +1164,10 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       </article>
       {% endfor %}
     </div>
+    <p class="nota-podio">Solo ganan los 3 primeros lugares de la general. Con empates, los premios de los
+      lugares que ocupan se juntan y se dividen parejo{% if not premios.temporada_cerrada %}; los montos son si
+      la temporada terminara hoy{% endif %}.
+      <button type="button" class="enlace-titulo" id="a-dinamica">Cómo se reparte ›</button></p>
     {% else %}
     <div class="titulo"><h2>Podio</h2><span class="nota">aún no</span></div>
     <div class="aviso">
@@ -1184,7 +1217,8 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
 <footer>
   <div class="env">
     <p class="sello-marca">{{ marca }} · {{ etapa }} {{ version }}</p>
-    <p>Gana la semana quien tenga más aciertos. Si un partido termina empatado, nadie acierta.</p>
+    <p>Gana la semana quien tenga más aciertos. Si un partido termina empatado, nadie acierta. La bolsa final
+      se reparte entre los 3 primeros lugares de la general.</p>
     <p>Actualizado {{ actualizado }} · horario de Ciudad de México</p>
     <p class="firma">Desarrollado por {{ desarrollador }}</p>
   </div>
@@ -2317,46 +2351,41 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     });
     raiz.appendChild(bolsas);
 
+    // La dinámica, en claro: quién gana qué y qué pasa con los empates.
     const t2 = crear("div", "titulo");
-    t2.appendChild(crear("h2", null, "Reparto final"));
-    t2.appendChild(crear("span", "nota", "al cerrar la temporada"));
+    t2.id = "dinamica";
+    t2.appendChild(crear("h2", null, "Cómo se gana"));
     raiz.appendChild(t2);
-
-    const reglas = crear("div", "ganadores");
+    const reglas = crear("section", "tarjeta dinamica");
+    const bloque = (titulo, lineas) => {
+      reglas.appendChild(crear("h3", "sub", titulo));
+      const lista = crear("ul");
+      lineas.forEach((linea) => lista.appendChild(crear("li", null, linea)));
+      reglas.appendChild(lista);
+    };
+    bloque("Cada semana", P.dinamica.semana);
+    bloque("Al final de la temporada", P.dinamica.temporada);
+    const lugares = crear("div", "lugares-premio");
     P.reglas.forEach((r, i) => {
-      const fila = crear("div", "fila-gan");
-      fila.style.setProperty("--i", i);
-      fila.appendChild(crear("span", "sN", r.lugar));
-      const quien = crear("div", "quien", r.porcentaje + " de la bolsa final");
-      quien.appendChild(crear("small", null, P.temporada_cerrada ? "" : "se define al terminar la temporada"));
-      fila.appendChild(quien);
-      fila.appendChild(crear("span", "monto", r.monto));
-      reglas.appendChild(fila);
+      const fila = crear("div", "lugar-premio " + ["oro", "plata", "bronce"][i]);
+      fila.appendChild(crear("span", "n", r.lugar));
+      fila.appendChild(crear("span", "pct", r.porcentaje));
+      fila.appendChild(crear("b", null, r.monto));
+      lugares.appendChild(fila);
     });
+    reglas.appendChild(lugares);
+    bloque("Si hay empates", P.dinamica.empates);
     raiz.appendChild(reglas);
 
-    if (!P.reparto.length) {
-      const nota = crear("p", "mini");
-      nota.style.cssText = "margin:.7rem .1rem 0; line-height:1.6";
-      nota.textContent = "La bolsa final se entrega hasta que terminen las " + P.semanas_temporada +
-        " semanas. Van " + P.semanas_jugadas + ". Cuando varios empatan se suman los porcentajes " +
-        "de los lugares que ocupan y se divide en partes iguales.";
-      raiz.appendChild(nota);
-    } else {
-      const caja = crear("div", "ganadores");
-      caja.style.marginTop = ".7rem";
-      P.reparto.forEach((r, i) => {
-        const fila = crear("div", "fila-gan");
-        fila.style.setProperty("--i", i);
-        fila.appendChild(crear("span", "sN", r.pos + "º"));
-        const quien = crear("div", "quien", r.nombre);
-        quien.appendChild(crear("small", null, r.aciertos + " aciertos · " + r.porcentaje + " de la bolsa"));
-        fila.appendChild(quien);
-        fila.appendChild(crear("span", "monto", r.premio));
-        caja.appendChild(fila);
-      });
-      raiz.appendChild(caja);
-    }
+    // Quién se llevaría algo hoy: "la rebanada del pastel". Al cerrar, el oficial.
+    const tReparto = crear("div", "titulo");
+    tReparto.appendChild(crear("h2", null, P.temporada_cerrada ? "Reparto final" : "La rebanada del pastel"));
+    tReparto.appendChild(crear("span", "nota", P.temporada_cerrada ? "oficial"
+      : "si la temporada terminara hoy · van " + P.semanas_jugadas + " de " + P.semanas_temporada));
+    raiz.appendChild(tReparto);
+    if (P.hoy.length) raiz.appendChild(listaDelReparto(P.hoy));
+    const mia = tuRebanada();
+    if (mia) raiz.appendChild(crear("p", "rebanada", mia));
 
     const t3 = crear("div", "titulo");
     t3.appendChild(crear("h2", null, "Ganadores por semana"));
@@ -2392,6 +2421,40 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       lista.appendChild(fila);
     });
     raiz.appendChild(lista);
+  }
+
+  /* Los que hoy se llevarían algo de la bolsa final, agrupados por lugar. */
+  function listaDelReparto(grupos) {
+    const caja = crear("div", "ganadores");
+    grupos.forEach((g, i) => {
+      const varios = g.p.length > 1;
+      const fila = crear("div", "fila-gan" + (jugador !== null && g.p.includes(jugador) ? " tuya" : ""));
+      fila.style.setProperty("--i", i);
+      fila.appendChild(crear("span", "sN", g.pos + "º"));
+      const quien = crear("div", "quien");
+      quien.appendChild(nombrar(g.p.map(nombre), true));
+      quien.appendChild(crear("small", null, g.aciertos + " aciertos · " +
+        (varios ? g.p.length + " empatados, " + g.porcentaje + " cada uno" : g.porcentaje + " de la bolsa")));
+      fila.appendChild(quien);
+      fila.appendChild(crear("span", "monto", g.premio + (varios ? " c/u" : "")));
+      caja.appendChild(fila);
+    });
+    return caja;
+  }
+
+  /* Tu parte si la temporada terminara hoy, o cuántos aciertos te faltan. */
+  function tuRebanada() {
+    if (jugador === null || D.premios.temporada_cerrada || !D.premios.hoy.length) return null;
+    const mio = D.premios.hoy.find((g) => g.p.includes(jugador));
+    if (mio) {
+      return "Tu rebanada: " + mio.premio + " si todo acabara hoy" +
+        (mio.p.length > 1 ? " (empatas con " + (mio.p.length - 1) + (mio.p.length === 2 ? " persona)." : " personas).") : ".");
+    }
+    const g = D.general.find((f) => f.p === jugador);
+    if (!g) return null;
+    const faltan = Math.min(...D.premios.hoy.map((x) => x.aciertos)) - g.total;
+    return "Hoy no te toca rebanada: estás a " + faltan + (faltan === 1 ? " acierto" : " aciertos") +
+      " de la zona de premio, y la temporada es joven.";
   }
 
   /* ═══ jugadores: buscador, ficha y duelo ═══ */
@@ -3315,6 +3378,8 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     else if (racha.mejor >= 3) partes.push("tu mejor racha: " + racha.mejor + " seguidos");
     if (g.mov) partes.push(g.mov > 0 ? "subiste " + g.mov + (g.mov === 1 ? " lugar" : " lugares") : "bajaste " + Math.abs(g.mov) + (g.mov === -1 ? " lugar" : " lugares"));
     if (partes.length) { extra.textContent = partes.join(" · ") + "."; caja.appendChild(extra); }
+    const rebanada = tuRebanada();
+    if (rebanada) caja.appendChild(crear("p", "rebanada", rebanada));
     return caja;
   }
 
@@ -3825,6 +3890,11 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     e.preventDefault();
     navegar("hoy");
   });
+  const aDinamica = document.getElementById("a-dinamica");
+  if (aDinamica) aDinamica.addEventListener("click", () => navegar("premios", () => requestAnimationFrame(() => {
+    const ancla = document.getElementById("dinamica");
+    if (ancla) ancla.scrollIntoView({ behavior: suave ? "auto" : "smooth", block: "start" });
+  })));
   // Las fichas y el duelo ya no tienen botón abajo: se entra desde la general.
   const aJugadores = document.getElementById("a-jugadores");
   if (aJugadores) aJugadores.addEventListener("click", () => { perfilAbierto = null; navegar("jugadores"); });

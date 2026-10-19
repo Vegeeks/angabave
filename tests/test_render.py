@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -703,3 +705,57 @@ def test_hoy_dice_cuando_no_hay_partidos(armado, tmp_path: Path):
     assert "diaSinPartidos(picks)" in hoy
     aviso = _funcion(html, "diaSinPartidos")
     assert '"Hoy no hay partidos ni eventos"' in aviso and "cierran los picks" in aviso
+
+
+def test_el_podio_pinta_medalla_por_lugar_y_no_por_escalon():
+    """Con 5 empatados en 2º, el escalón que sigue es el 7º: ni bronce ni premio."""
+    from quiniela.render_html import _armar_podio
+
+    nombres = [f"J{i}" for i in range(7)]
+    general = ([{"p": 0, "pos": 1, "total": 52}]
+               + [{"p": i, "pos": 2, "total": 51} for i in range(1, 6)]
+               + [{"p": 6, "pos": 7, "total": 50}])
+    reparto = ([{"nombre": "J0", "premio": "$17,640"}]
+               + [{"nombre": f"J{i}", "premio": "$1,512"} for i in range(1, 6)])
+    escalones = _armar_podio(general, nombres, reparto)
+    assert [e["medalla"] for e in escalones] == ["oro", "plata", "sin-medalla"]
+    assert [e["premio"] for e in escalones] == ["$17,640", "$1,512", None]
+    # Con dos empatados en 1º, el que sigue es 3º: bronce, no plata.
+    dos_arriba = [{"p": 0, "pos": 1, "total": 52}, {"p": 1, "pos": 1, "total": 52}, {"p": 2, "pos": 3, "total": 50}]
+    assert [e["medalla"] for e in _armar_podio(dos_arriba, nombres, [])] == ["oro", "bronce"]
+
+
+def test_la_dinamica_explica_los_empates_con_montos_de_verdad():
+    from quiniela.render_html import dinamica
+
+    texto = " ".join(sum(dinamica().values(), []))
+    for monto in ("$5,200", "$17,640", "$5,040", "$2,520", "$1,512", "$8,400", "$11,340"):
+        assert monto in texto
+    assert "Del 4º lugar en adelante no hay premio" in texto
+
+
+def test_la_rebanada_de_hoy_viaja_agrupada_por_lugar(armado, tmp_path: Path):
+    """Quién se llevaría algo si la temporada terminara hoy, sin esperar a la semana 18."""
+    html = render(armado, tmp_path)
+    premios = datos_embebidos(html)["premios"]
+    assert premios["reparto"] == []                       # el oficial, hasta cerrar la temporada
+    assert premios["hoy"] and {"pos", "p", "aciertos", "porcentaje", "premio"} <= set(premios["hoy"][0])
+    assert all(g["pos"] <= 3 for g in premios["hoy"])
+    assert "function tuRebanada" in html
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="hace falta node para revisar la sintaxis")
+def test_los_scripts_de_la_pagina_no_tienen_errores_de_sintaxis(armado, tmp_path: Path):
+    """Un error de sintaxis tumba el script entero: la página queda a medias y sin aviso.
+
+    Pasó en la v0.20.2 en preparación (una variable declarada dos veces) y solo se vio
+    en el navegador.
+    """
+    html = render(armado, tmp_path)
+    scripts = re.findall(r"<script(?![^>]*application/json)[^>]*>(.*?)</script>", html, re.S)
+    assert scripts
+    for i, codigo in enumerate(scripts):
+        archivo = tmp_path / f"script{i}.js"
+        archivo.write_text(codigo, encoding="utf-8")
+        revision = subprocess.run(["node", "--check", str(archivo)], capture_output=True, text=True)
+        assert revision.returncode == 0, revision.stderr

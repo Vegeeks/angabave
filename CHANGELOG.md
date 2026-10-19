@@ -9,6 +9,37 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.21.0
+
+**El reparto, claro: quién gana qué y qué pasa con los empates.**
+
+* **El podio pinta la medalla según el lugar, no según el escalón.** Antes los
+  tres escalones de puntos salían siempre en oro, plata y bronce. Con empates
+  arriba, eso mentía:
+  * Con dos empatados en 1.º, el escalón que sigue es el 3.º y salía en plata.
+  * Con cinco empatados en 2.º, el siguiente era el 7.º y salía en bronce,
+    aunque del 4.º lugar en adelante no hay premio.
+
+  Ahora el 1.º va en oro, el 2.º en plata y el 3.º en bronce. Del 4.º en
+  adelante no lleva medalla y dice "Sin premio por ahora".
+* **Cada escalón dice cuánto se llevaría hoy** cada uno de sus integrantes:
+  "Hoy: $11,340 c/u". Abajo, una nota explica que solo ganan los 3 primeros
+  lugares y que con empates los premios se juntan, con un enlace a "Cómo se
+  reparte".
+* **Premios explica la dinámica completa** ("Cómo se gana"):
+  * Cada semana: quién se lleva el premio y qué pasa si empatan.
+  * Al final de la temporada: los 3 lugares con sus montos.
+  * Si hay empates: cómo se juntan y se dividen los premios, con ejemplos y
+    montos de verdad. Los ejemplos salen de la misma función que hace el
+    reparto, así que no se pueden desfasar.
+* **La rebanada del pastel**: quién se llevaría algo de la bolsa final si la
+  temporada terminara hoy, agrupado por lugar. Quien eligió su nombre ve su
+  parte o cuántos aciertos le faltan para entrar ("estás a 1 acierto de la
+  zona de premio"), también en su tarjeta de temporada en General.
+* Nueva prueba: los scripts de la página pasan por una revisión de sintaxis. Un
+  error así tumbaba el script entero sin aviso; uno se coló en la preparación
+  de esta versión y solo se vio en el navegador.
+
 ## alfa v0.20.1
 
 * **Hoy dice cuando no hay partidos.** Un día sin juegos aparece "Hoy no hay
