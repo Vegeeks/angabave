@@ -4,11 +4,11 @@
     {
       "visitante": "Washington",
       "local": "49ers",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_visitante": 17,
+      "marcador_local": 23,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-10-20T00:15:00+00:00"
     },
     {

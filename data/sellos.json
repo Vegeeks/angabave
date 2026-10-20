@@ -110,7 +110,7 @@
   },
   "6": {
     "archivo": "Semana_06.xlsx",
-    "sellado": "2026-10-19T00:21:16+00:00",
+    "sellado": "2026-10-20T03:01:12+00:00",
     "partidos": {
       "Bears@Falcons": "ca4b6cb9bd0ed6b0574f382d2de9f7edd39296496e3fa5fde993f5f22ef70661",
       "Bills@Raiders": "00db8d7a548ee6c81e77ae9fadd897ce555950dc9c571f1679743755582f0c24",
@@ -124,7 +124,8 @@
       "Seahawks@Broncos": "8acc9a92ed4712b0cfcb9104753f0c9116c66e3e3901ca65b24ded11f1f82d4f",
       "Steelers@Buccaneers": "240e0dbf3eb950698edb55e22ea27ff0b848dfabec7eacd581f4b4fa67eab2e7",
       "Texans@Jaguars": "dfe165af8ad92838ee4c5f6a0863faf30166c36be9f0f9ba066741c09b375b35",
-      "Titans@Colts": "ae817eb1486da9750e8aaeacbd90af06855d40be07069a903fa9d08fba34336a"
+      "Titans@Colts": "ae817eb1486da9750e8aaeacbd90af06855d40be07069a903fa9d08fba34336a",
+      "Washington@49ers": "ab68f8b606d9202b6368cd7b56b552528350a7e6a876bb8cbcc0f8b6bc79ce1f"
     }
   }
 }
