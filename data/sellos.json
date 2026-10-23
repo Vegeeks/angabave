@@ -127,5 +127,12 @@
       "Titans@Colts": "ae817eb1486da9750e8aaeacbd90af06855d40be07069a903fa9d08fba34336a",
       "Washington@49ers": "ab68f8b606d9202b6368cd7b56b552528350a7e6a876bb8cbcc0f8b6bc79ce1f"
     }
+  },
+  "7": {
+    "archivo": "Semana_07.xlsx",
+    "sellado": "2026-10-23T00:15:00+00:00",
+    "partidos": {
+      "Patriots@Bears": "1f6328269d79de4138317e45328117bfccd854c6f4203923d28fe582057ca292"
+    }
   }
 }
