@@ -25,7 +25,7 @@
       "visitante": "Giants",
       "local": "Texans",
       "marcador_visitante": 21,
-      "marcador_local": 14,
+      "marcador_local": 21,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -88,7 +88,7 @@
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
-      "estado": "Scheduled",
+      "estado": "In Progress",
       "inicio": "2026-10-25T20:05:00+00:00"
     },
     {
