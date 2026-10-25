@@ -18,13 +18,13 @@
       "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-25T20:25:00+00:00"
     },
     {
       "visitante": "Rams",
       "local": "Raiders",
-      "marcador_visitante": 21,
+      "marcador_visitante": 28,
       "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
