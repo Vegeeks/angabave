@@ -130,9 +130,10 @@
   },
   "7": {
     "archivo": "Semana_07.xlsx",
-    "sellado": "2026-10-23T00:15:00+00:00",
+    "sellado": "2026-10-25T13:31:27+00:00",
     "partidos": {
-      "Patriots@Bears": "1f6328269d79de4138317e45328117bfccd854c6f4203923d28fe582057ca292"
+      "Patriots@Bears": "1f6328269d79de4138317e45328117bfccd854c6f4203923d28fe582057ca292",
+      "Steelers@Saints": "c23c3cae447e23907f973575f138f9f20468b99b8fbf3b4abaf99574304f088b"
     }
   }
 }
