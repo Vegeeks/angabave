@@ -5,10 +5,10 @@
       "visitante": "49ers",
       "local": "Falcons",
       "marcador_visitante": 14,
-      "marcador_local": 9,
+      "marcador_local": 12,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-25T17:00:00+00:00"
     },
     {
@@ -24,11 +24,11 @@
     {
       "visitante": "Colts",
       "local": "Vikings",
-      "marcador_visitante": 7,
+      "marcador_visitante": 10,
       "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "Halftime",
       "inicio": "2026-10-25T17:00:00+00:00"
     },
     {
@@ -44,7 +44,7 @@
     {
       "visitante": "Buccaneers",
       "local": "Panthers",
-      "marcador_visitante": 26,
+      "marcador_visitante": 32,
       "marcador_local": 6,
       "ganador": null,
       "finalizado": false,
