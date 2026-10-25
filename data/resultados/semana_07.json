@@ -4,11 +4,11 @@
     {
       "visitante": "Broncos",
       "local": "Cardinals",
-      "marcador_visitante": 26,
+      "marcador_visitante": 27,
       "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "End of Period",
       "inicio": "2026-10-25T20:05:00+00:00"
     },
     {
