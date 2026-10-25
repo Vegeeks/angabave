@@ -14,11 +14,11 @@
     {
       "visitante": "Browns",
       "local": "Titans",
-      "marcador_visitante": 24,
+      "marcador_visitante": 27,
       "marcador_local": 24,
       "ganador": null,
       "finalizado": false,
-      "estado": "In Progress",
+      "estado": "End of Period",
       "inicio": "2026-10-25T17:00:00+00:00"
     },
     {
