@@ -2,23 +2,13 @@
   "semana": 7,
   "partidos": [
     {
-      "visitante": "Broncos",
-      "local": "Cardinals",
-      "marcador_visitante": 30,
-      "marcador_local": 16,
-      "ganador": "Broncos",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-25T20:05:00+00:00"
-    },
-    {
       "visitante": "Packers",
       "local": "Lions",
       "marcador_visitante": 17,
-      "marcador_local": 17,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "marcador_local": 20,
+      "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-25T20:25:00+00:00"
     },
     {
@@ -110,6 +100,16 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-25T17:00:00+00:00"
+    },
+    {
+      "visitante": "Broncos",
+      "local": "Cardinals",
+      "marcador_visitante": 30,
+      "marcador_local": 16,
+      "ganador": "Broncos",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-25T20:05:00+00:00"
     },
     {
       "visitante": "Chiefs",
