@@ -16,9 +16,9 @@
       "local": "Raiders",
       "marcador_visitante": 35,
       "marcador_local": 21,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Rams",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-25T20:25:00+00:00"
     },
     {
