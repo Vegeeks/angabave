@@ -36,9 +36,9 @@
       "local": "Jets",
       "marcador_visitante": 28,
       "marcador_local": 25,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Dolphins",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-25T17:00:00+00:00"
     },
     {
