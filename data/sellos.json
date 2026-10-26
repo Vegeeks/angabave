@@ -130,13 +130,14 @@
   },
   "7": {
     "archivo": "Semana_07.xlsx",
-    "sellado": "2026-10-25T20:25:37+00:00",
+    "sellado": "2026-10-26T00:20:11+00:00",
     "partidos": {
       "49ers@Falcons": "e549a5675bae1d5bb011fdd7fa01022639fc62852290468187405d248bbf3bad",
       "Bengals@Ravens": "f25584b942b740e85d74b8d37732fd65cc8c7e30badabc3fa48fcf9e0622dc2b",
       "Broncos@Cardinals": "efff4f548bd2a4edfcd60ba2a63b5b13c12cddd0f27be5fdb9527db2662afdfc",
       "Browns@Titans": "a18ca5a8afb445007789c13198c57a654805353fce3dce5f02229bdecf6b309f",
       "Buccaneers@Panthers": "3c8d2af2329e79650fd05a0527b97e158127addb4b5b80dfe74cc9dc514c7075",
+      "Chiefs@Seahawks": "c101a2d52f6f546865120f9b7c9c0cd861394bd60cf8c1627f28399c45b4d4a3",
       "Colts@Vikings": "57a15564e7be4525ab55e54ea7bed6657df987434aa67924359db2afc6f2c3bd",
       "Dolphins@Jets": "3c31b95555c07014ec51db453be182f733e2ea35e8c67b39b3ac8c160fb4506f",
       "Giants@Texans": "b88320267639da33a9bd2ad0c6f411bef89c4ce03c62755ad72b8f4ef5db4796",
