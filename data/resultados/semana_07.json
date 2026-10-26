@@ -2,6 +2,26 @@
   "semana": 7,
   "partidos": [
     {
+      "visitante": "Cowboys",
+      "local": "Eagles",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-10-27T00:15:00+00:00"
+    },
+    {
+      "visitante": "Patriots",
+      "local": "Bears",
+      "marcador_visitante": 24,
+      "marcador_local": 30,
+      "ganador": "Bears",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-23T00:15:00+00:00"
+    },
+    {
       "visitante": "Steelers",
       "local": "Saints",
       "marcador_visitante": 16,
@@ -120,26 +140,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-10-26T00:20:00+00:00"
-    },
-    {
-      "visitante": "Patriots",
-      "local": "Bears",
-      "marcador_visitante": 24,
-      "marcador_local": 30,
-      "ganador": "Bears",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-10-23T00:15:00+00:00"
-    },
-    {
-      "visitante": "Cowboys",
-      "local": "Eagles",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-10-27T00:15:00+00:00"
     }
   ]
 }
