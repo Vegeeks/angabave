@@ -4,11 +4,11 @@
     {
       "visitante": "Cowboys",
       "local": "Eagles",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
+      "marcador_visitante": 38,
+      "marcador_local": 21,
+      "ganador": "Cowboys",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-10-27T00:15:00+00:00"
     },
     {
