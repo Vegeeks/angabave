@@ -150,7 +150,9 @@
   },
   "8": {
     "archivo": "Semana_08.xlsx",
-    "sellado": "2026-10-29T23:49:38+00:00",
-    "partidos": {}
+    "sellado": "2026-10-30T00:16:27+00:00",
+    "partidos": {
+      "Panthers@Packers": "2b3e30d671201734ecf704da9589d51926630d676a78dafbecda55f925910945"
+    }
   }
 }
