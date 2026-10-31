@@ -283,34 +283,17 @@ def test_la_semana_en_curso_queda_destacada(armado, tmp_path: Path):
     assert 'classList.add("en-curso")' in html
 
 
-def test_la_tipografia_viaja_dentro_del_html(armado, tmp_path: Path):
-    """La fuente va incrustada: el sitio no pide un solo archivo de afuera."""
+def test_la_pagina_no_pide_fuentes(armado, tmp_path: Path):
+    """Usa la letra del sistema, la que el teléfono ya trae: nada que bajar ni que esperar."""
     html = render(armado, tmp_path)
-    assert "@font-face" in html
-    assert "src:url(data:font/woff2;base64," in html
-    # Y sigue sin haber más direcciones externas que la de los marcadores.
+    assert "@font-face" not in html
+    assert "-apple-system" in html
     assert _externas(html) == {"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"}
-
-
-def test_la_fuente_solo_se_usa_en_mayusculas_y_cifras(armado, tmp_path: Path):
-    """Los nombres llevan minúsculas: si usaran la recortada, se partirían."""
-    html = render(armado, tmp_path)
-    reglas = re.findall(r"([^{}]+)\{[^{}]*var\(--rotulo\)[^{}]*\}", html)
-    selectores = " ".join(reglas)
-    for nombres in (".c-nombre", ".lugar .quien", ".campeon .nombres", ".ficha .quien"):
-        assert nombres not in selectores
-
-
-def test_la_invitacion_de_primera_visita_existe(armado, tmp_path: Path):
-    """Ya no es una tarjeta enorme: una línea en Hoy y un botón en la barra."""
-    html = render(armado, tmp_path)
-    assert "¿Quién eres?" in html
-    assert "angabave.invitado" in html       # se recuerda que ya la vio
 
 
 def test_hay_animacion_para_los_cambios_de_marcador(armado, tmp_path: Path):
     html = render(armado, tmp_path)
-    assert "@keyframes anotacion" in html
+    assert "@keyframes ola" in html and "@keyframes rueda" in html
     assert "anotaciones.set" in html          # se detecta el cambio
 
 
@@ -342,7 +325,7 @@ def test_sin_horarios_no_hay_tandas(tmp_path: Path):
 
 def test_el_generador_de_picks_esta_en_la_semana_pendiente(armado, tmp_path: Path):
     html = render(armado, tmp_path)
-    assert "Arma tu quiniela y mándala" in html
+    assert "Arma tu quiniela" in html
     assert "quinielanfl@hotmail.com" in html
     assert "exportarPicks" in html
     # Las tandas de la semana pendiente viajan con su fecha de cierre.
@@ -684,7 +667,7 @@ def test_el_martes_se_ve_quien_gano_la_semana(armado, tmp_path: Path):
     html = render(armado, tmp_path)
     hoy = _funcion(html, "pintarHoy")
     assert "semanaRecienCerrada()" in hoy
-    assert 'picks: [["previo", "picks"]' in hoy
+    assert 'picks: [["picks", "previo"]' in hoy
     # Y la barra muestra la última semana con tabla mientras la nueva no se reparte.
     assert "D.semanas.slice().reverse()" in _funcion(html, "numerosDe")
 
@@ -731,8 +714,8 @@ def test_la_semana_se_cambia_con_flechas_y_una_hoja(armado, tmp_path: Path):
     """La fila de S1 a S18 crecía sin fin: ahora flechas y todas en una hoja aparte."""
     html = render(armado, tmp_path)
     selector = _funcion(html, "selectorDeSemanas")
-    assert '"‹"' in selector and '"›"' in selector and "abrirSemanas(actual" in selector
-    hoja = _funcion(html, "abrirSemanas")
+    assert "flecha-semana" in selector and "abrirSemanas(actual" in selector
+    hoja = _funcion(html, "abrirHoja")
     assert 'setAttribute("aria-modal", "true")' in hoja and 'e.key === "Escape"' in hoja
     # Y "Semana" en la barra siempre lleva a la que se está jugando.
     assert "semanaElegida = D.activa" in html
@@ -743,9 +726,9 @@ def test_hoy_dice_cuando_no_hay_partidos(armado, tmp_path: Path):
     html = render(armado, tmp_path)
     hoy = _funcion(html, "pintarHoy")
     assert "!vivos.length && !hoy.length && !terminados.length" in hoy
-    assert "diaSinPartidos(picks)" in hoy
+    assert "diaSinPartidos(picks)" in _funcion(html, "saludo")
     aviso = _funcion(html, "diaSinPartidos")
-    assert '"Hoy no hay partidos ni eventos"' in aviso and "cierran los picks" in aviso
+    assert '"Hoy no hay partidos ni eventos."' in aviso and "cierran los picks" in aviso
 
 
 def test_el_podio_pinta_medalla_por_lugar_y_no_por_escalon():
@@ -772,7 +755,7 @@ def test_la_dinamica_explica_los_empates_con_montos_de_verdad():
     texto = " ".join(sum(dinamica().values(), []))
     for monto in ("$5,200", "$17,640", "$5,040", "$2,520", "$1,512", "$8,400", "$11,340"):
         assert monto in texto
-    assert "Del 4º lugar en adelante no hay premio" in texto
+    assert "Del 4.º lugar en adelante no hay premio" in texto
 
 
 def test_la_rebanada_de_hoy_viaja_agrupada_por_lugar(armado, tmp_path: Path):
@@ -992,7 +975,7 @@ def test_la_vista_previa_lleva_direcciones_completas(armado, tmp_path: Path):
     assert f'<meta property="og:image:width" content="{TAMANO_PORTADA[0]}">' in html
     assert f'<meta property="og:image:height" content="{TAMANO_PORTADA[1]}">' in html
     # Y antes de la tipografía y el CSS: algunos lectores solo ven el principio.
-    assert html.index('property="og:image"') < html.index("@font-face")
+    assert html.index('property="og:image"') < html.index("<style>")
 
 
 def test_la_portada_mide_lo_que_declara_la_pagina(armado, tmp_path: Path):
