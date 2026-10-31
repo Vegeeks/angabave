@@ -9,6 +9,20 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.23.0
+
+**Rediseño completo: moderno, plano y con la línea amarilla de primera y diez como sello.**
+
+* Sin grano, relieves ni degradados. Letra del sistema, seis tamaños y 12 px como mínimo.
+* Campo en perspectiva de fondo, barra de abajo flotante y encabezado que se pliega al bajar.
+* El botón Atrás ya no te saca del portal. Cambiar de pestaña te lleva al inicio de la lista.
+* Solo se anima lo que cambia. Los marcadores ruedan y el confeti sale una vez por semana.
+* Semana › Partidos muestra todos los partidos con su hora, y Picks también trae las horas.
+* General con la tabla casi al inicio, "Mi fila" y la semana más reciente primero.
+* Premios: primero la bolsa y tu parte; las reglas, al final en desplegables.
+* La ficha incluye el duelo. Se quitó la lista repetida de participantes.
+* Borrar picks se puede deshacer. Nuevo: "Desde tu última visita" y "Si todo queda así".
+
 ## alfa v0.22.0
 
 **Listo para Thanksgiving y Navidad, publica solo lo que cambia y una imagen que da gusto mandar.**

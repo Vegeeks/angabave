@@ -47,11 +47,11 @@ VERDE = SEMANTICOS["verde"]
 ROJO = SEMANTICOS["rojo"]
 ORO = SEMANTICOS["oro"]
 TINTA = "#0A1020"
-#: La medalla de cada lugar con premio, de arriba a abajo, como en el podio del portal.
+#: La medalla de cada lugar con premio: plana, como en el podio del portal.
 COLOR_MEDALLA = {
-    "oro": ("#FFE193", "#E0A92B"),
-    "plata": ("#DFE7F2", "#93A3B8"),
-    "bronce": ("#E9BB92", "#B5773F"),
+    "oro": ("#FFD60A", "#FFD60A"),
+    "plata": ("#C9D2DB", "#C9D2DB"),
+    "bronce": ("#D8935C", "#D8935C"),
 }
 
 # Las primeras que existan; en el runner de Linux caen a la fuente de Pillow.

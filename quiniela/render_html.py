@@ -19,7 +19,7 @@ from decimal import Decimal
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
-from urllib.parse import quote, urlsplit
+from urllib.parse import urlsplit
 
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
@@ -62,8 +62,8 @@ _log = logging.getLogger(__name__)
 
 RAIZ = Path(__file__).resolve().parents[1]
 DIR_PLANTILLAS = Path(__file__).resolve().parent / "plantillas"
-#: Fuente de titulares y números, recortada a mayúsculas y dígitos. Se incrusta
-#: en el HTML para no pedirle un archivo a nadie. Licencia en tipografia/OFL.txt.
+#: Fuente de titulares y números, recortada a mayúsculas y dígitos, para la página
+#: de carga y las imágenes. Licencia en tipografia/OFL.txt.
 RUTA_TIPOGRAFIA = Path(__file__).resolve().parent / "tipografia" / "oswald-recortada.woff2"
 RUTA_SALIDA = RAIZ / "docs" / "index.html"
 
@@ -80,7 +80,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.22.0"
+VERSION = "v0.23.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -197,46 +197,47 @@ def paleta_equipos() -> dict[str, dict[str, str]]:
 # quedar detrás —el panel opaco, el vidrio sobre la parte más iluminada del
 # campo y el campo mismo— y se aclara hasta que cumpla.
 
-#: El portal sin equipo: pasto de noche.
+#: El portal sin equipo: casi negro, con un dejo del pasto de noche. Superficies
+#: planas: la profundidad la dan la luz del campo y las líneas, no sombras ni relieves.
 BASE_CAMPO: dict[str, str] = {
-    "bg": "#041009", "bg2": "#0A1C11",
-    "panel": "#102117", "panel2": "#162A1F", "panel3": "#1D3527",
-    "linea": "#1D3728", "linea2": "#2B4A39",
+    "bg": "#060A08", "bg2": "#0A100D",
+    "panel": "#101613", "panel2": "#171E1A", "panel3": "#202823",
+    "linea": "#1E2622", "linea2": "#2E3833",
 }
 
 #: Base neutra sobre la que se mezcla el color de un equipo.
 BASE_TEMA: dict[str, str] = {
-    "bg": "#06090F", "bg2": "#0B1018",
-    "panel": "#101724", "panel2": "#161F2E", "panel3": "#1D2838",
-    "linea": "#1F2938", "linea2": "#2B3849",
+    "bg": "#08090B", "bg2": "#0C0E11",
+    "panel": "#121417", "panel2": "#191C20", "panel3": "#22262B",
+    "linea": "#212429", "linea2": "#31353B",
 }
 
-#: Cuánto color del equipo lleva cada superficie. Poco en el fondo, más en los
-#: bordes: así se nota el tema sin que el texto pierda contraste.
+#: Cuánto color del equipo lleva cada superficie. Apenas un dejo: el equipo se
+#: nota en el acento y en la luz del campo, sin que el texto pierda contraste.
 FUERZA_TEMA: dict[str, float] = {
-    "bg": 0.20, "bg2": 0.24, "panel": 0.22, "panel2": 0.27,
-    "panel3": 0.32, "linea": 0.40, "linea2": 0.48,
+    "bg": 0.05, "bg2": 0.07, "panel": 0.07, "panel2": 0.09,
+    "panel3": 0.12, "linea": 0.16, "linea2": 0.24,
 }
 
-#: Los textos y el contraste mínimo de cada uno (WCAG: 7 es AAA, 4.5 es AA y 3
-#: alcanza para texto grande o en negritas).
-_TEXTOS = {"txt": ("#EEF4FB", 7.0), "tenue": ("#8D9BB0", 4.5), "tenue2": ("#5C6A7E", 3.0)}
+#: Los textos y el contraste mínimo de cada uno (WCAG: 7 es AAA y 4.5 es AA). Hasta
+#: el más tenue cumple 4.5: el texto chico también lo lee gente de cuarenta.
+_TEXTOS = {"txt": ("#F2F4F7", 7.0), "tenue": ("#A6ADB7", 6.0), "tenue2": ("#808994", 4.5)}
 #: Los mismos, con un dejo verde para el campo.
-_TEXTOS_CAMPO = {"txt": ("#EEF5F0", 7.0), "tenue": ("#93A69A", 4.5), "tenue2": ("#62776B", 3.0)}
+_TEXTOS_CAMPO = {"txt": ("#F3F6F4", 7.0), "tenue": ("#A7B1AB", 6.0), "tenue2": ("#818C86", 4.5)}
 
 #: Colores con significado (acierto, fallo, en vivo y el oro de los premios). No
 #: se tiñen, pero se miden en cada tema y se aclaran ahí donde no lleguen.
-SEMANTICOS: dict[str, str] = {"verde": "#3DDC84", "rojo": "#FF6058", "vivo": "#FF4757", "oro": "#F7C948"}
-CONTRASTE_SEMANTICO = 3.0
+SEMANTICOS: dict[str, str] = {"verde": "#34D680", "rojo": "#FF6B61", "vivo": "#FF453A", "oro": "#FFD60A"}
+CONTRASTE_SEMANTICO = 4.5
 
-#: Cuánto tapa el vidrio de las tarjetas (1 sería opaco).
-OPACIDAD_VIDRIO = 0.72
-#: El encabezado y la barra de abajo tapan más: por detrás pasa contenido.
-OPACIDAD_CRISTAL = 0.84
-#: Las luces del estadio en su punto más fuerte: color y opacidad.
-LUZ_ESTADIO = ("#EAFBF0", 0.10)
-#: Con equipo, las luces son de su color.
-LUZ_EQUIPO = 0.16
+#: El amarillo de la línea de primera y diez: el acento del portal sin equipo.
+ACENTO_CAMPO = "#FFD60A"
+#: Cuánto tapan el encabezado y la barra de abajo (1 sería opaco).
+OPACIDAD_CRISTAL = 0.78
+#: La luz del estadio en su punto más fuerte: color y opacidad.
+LUZ_ESTADIO = ("#3DDC97", 0.16)
+#: Con equipo, la luz es de su color.
+LUZ_EQUIPO = 0.20
 #: Lo que aclaran, juntas, las franjas del pasto y las líneas de cal.
 CAL_CAMPO = 0.03
 
@@ -260,12 +261,12 @@ def _rgba(color: str, alfa: float) -> str:
 def fondos_de_prueba(tema: dict[str, str], luz: str, alfa: float) -> list[str]:
     """Lo más claro que puede quedar detrás de un texto en este tema.
 
-    El campo bajo las luces (con su franja y su cal), el vidrio encima de ese
-    campo, los paneles opacos y la fila resaltada de quien eligió su nombre.
+    El campo bajo la luz (con su franja y su cal), el cristal encima de ese campo,
+    las superficies y la fila resaltada de quien eligió su nombre.
     """
     campo = mezclar(mezclar(tema["--bg"], luz, alfa), "#FFFFFF", CAL_CAMPO)
-    vidrio = mezclar(campo, tema["--panel"], OPACIDAD_VIDRIO)
-    fondos = [campo, vidrio, tema["--panel"], tema["--panel2"], tema["--vidrio-solido"]]
+    cristal = mezclar(campo, tema["--bg"], OPACIDAD_CRISTAL)
+    fondos = [campo, cristal, tema["--panel"], tema["--panel2"], tema["--panel3"]]
     if "--fila-yo" in tema:
         fondos.append(tema["--fila-yo"])
     return fondos
@@ -282,17 +283,12 @@ def _hasta_que_se_lea(color: str, fondos: list[str], minimo: float) -> str:
 
 
 def _acabado(tema: dict[str, str], luz: str, alfa: float, textos: dict) -> dict[str, str]:
-    """Vidrio, luces y textos verificados para un tema que ya trae sus superficies."""
-    fondo, panel = tema["--bg"], tema["--panel"]
-    tema["--vidrio"] = _rgba(panel, OPACIDAD_VIDRIO)
-    tema["--cristal"] = _rgba(fondo, OPACIDAD_CRISTAL)
-    # Donde no puede haber transparencia (las celdas pegadas de una tabla que se
-    # desliza por debajo), el color al que equivale el vidrio sobre el fondo.
-    tema["--vidrio-solido"] = mezclar(fondo, panel, OPACIDAD_VIDRIO)
+    """Cristal, luz y textos verificados para un tema que ya trae sus superficies."""
+    tema["--cristal"] = _rgba(tema["--bg"], OPACIDAD_CRISTAL)
     tema["--resplandor"] = _rgba(luz, alfa)
 
     acento = _hasta_que_se_lea(tema["--acento"], fondos_de_prueba(tema, luz, alfa), CONTRASTE_MINIMO)
-    tema["--fila-yo"] = mezclar(tema["--vidrio-solido"], acento, 0.16)
+    tema["--fila-yo"] = mezclar(tema["--panel"], acento, 0.12)
     fondos = fondos_de_prueba(tema, luz, alfa)
     tema["--acento"] = _hasta_que_se_lea(acento, fondos, CONTRASTE_MINIMO)
     for nombre, (color, minimo) in textos.items():
@@ -305,9 +301,9 @@ def _acabado(tema: dict[str, str], luz: str, alfa: float, textos: dict) -> dict[
 
 
 def tema_campo() -> dict[str, str]:
-    """El portal de siempre, sin equipo: un campo de noche, ya verificado."""
+    """El portal sin equipo: negro, luz de estadio y la línea amarilla, ya verificado."""
     tema = {"--" + nombre: color for nombre, color in BASE_CAMPO.items()}
-    tema["--acento"] = "#5B95FF"
+    tema["--acento"] = ACENTO_CAMPO
     return _acabado(tema, *LUZ_ESTADIO, _TEXTOS_CAMPO)
 
 
@@ -342,33 +338,13 @@ def tema_equipo(acento: str) -> dict[str, str]:
         # se mide contra ESE panel y no contra el original.
         tema["--acento"] = legible_sobre_oscuro(acento, tema["--panel"])
 
-        # Las pastillas activas se visten del equipo, con su texto legible encima.
-        tema["--pastilla"] = (
-            f"linear-gradient(180deg,{tema['--acento']},{mezclar(tema['--acento'], '#000000', 0.22)})"
-        )
+        # El botón principal se viste del equipo, con su texto legible encima.
+        tema["--pastilla"] = tema["--acento"]
         tema["--pastilla-txt"] = texto_encima(tema["--acento"])
         tema = _acabado(tema, acento, LUZ_EQUIPO * escala, _TEXTOS)
         if se_lee(tema, acento, LUZ_EQUIPO * escala):
             return tema
     return tema
-
-
-#: El grano del vidrio esmerilado: ruido fino, blanco y escaso, que se repite en
-#: mosaico. Es una imagen SVG en línea: no se pide ningún archivo.
-GRANO_SVG = (
-    "<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'>"
-    "<filter id='g' x='0' y='0'>"
-    "<feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/>"
-    "<feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1.25 -.32'/>"
-    "</filter>"
-    "<rect width='100%' height='100%' filter='url(#g)' opacity='.12'/>"
-    "</svg>"
-)
-
-
-def grano() -> str:
-    """El grano como dirección data:, codificado entero para que no parezca un enlace."""
-    return "data:image/svg+xml," + quote(GRANO_SVG, safe="")
 
 
 def temas_equipos() -> dict[str, dict[str, dict[str, str]]]:
@@ -767,16 +743,16 @@ def dinamica() -> dict[str, list[str]]:
         "temporada": [
             f"Cada semana se apartan {_pesos(ACUMULADO_SEMANAL)} para la bolsa final: "
             f"{_pesos(ACUMULADO_TOTAL)} al terminar las {SEMANAS_TEMPORADA} semanas.",
-            f"Se buscan 3 ganadores, los 3 primeros lugares de la tabla general: el 1º se lleva "
-            f"{montos[0]}, el 2º {montos[1]} y el 3º {montos[2]}. Del 4º lugar en adelante no hay premio.",
+            f"Se buscan 3 ganadores, los 3 primeros lugares de la tabla general: el 1.º se lleva "
+            f"{montos[0]}, el 2.º {montos[1]} y el 3.º {montos[2]}. Del 4.º lugar en adelante no hay premio.",
         ],
         "empates": [
             "Los premios de los lugares que ocupan los empatados se juntan y se dividen parejo entre ellos.",
-            f"Si el 1º va solo, es campeón y se lleva {solo_y_cinco[0][2]}. Si atrás hay 5 empatados en 2º, "
-            f"se juntan el 2º y el 3º y cada uno de los 5 se lleva {solo_y_cinco[1][2]}.",
-            f"Si 3 empatan en 1º, se juntan los tres premios y cada uno se lleva {tres_arriba[0][2]}.",
-            f"Si 2 empatan en 1º, se juntan el 1º y el 2º ({dos_arriba[0][2]} cada uno) y quien sigue "
-            f"es 3º con {dos_arriba[1][2]}.",
+            f"Si el 1.º va solo, es campeón y se lleva {solo_y_cinco[0][2]}. Si atrás hay 5 empatados en 2.º, "
+            f"se juntan el 2.º y el 3.º y cada uno de los 5 se lleva {solo_y_cinco[1][2]}.",
+            f"Si 3 empatan en 1.º, se juntan los tres premios y cada uno se lleva {tres_arriba[0][2]}.",
+            f"Si 2 empatan en 1.º, se juntan el 1.º y el 2.º ({dos_arriba[0][2]} cada uno) y quien sigue "
+            f"es 3.º con {dos_arriba[1][2]}.",
         ],
     }
 
@@ -1046,7 +1022,7 @@ def generar_html(
         # Los grupos que hoy se llevarían algo de la bolsa final, con su parte.
         "hoy": _grupos_del_reparto(reparto_hoy),
         "reglas": [
-            {"lugar": f"{i}º", "porcentaje": _porciento(pct), "monto": _pesos(ACUMULADO_TOTAL * pct)}
+            {"lugar": f"{i}.º", "porcentaje": _porciento(pct), "monto": _pesos(ACUMULADO_TOTAL * pct)}
             for i, pct in enumerate(REPARTO_FINAL, start=1)
         ],
         "dinamica": dinamica(),
@@ -1106,11 +1082,9 @@ def generar_html(
 
     podio = _armar_podio(general, participantes, reparto_hoy) if podio_listo else []
     contexto = {
-        "marca_svg": marca.svg("cabeza"),
+        "marca_svg": marca.svg("cabeza", loseta=False),
         "tema_campo": tema_campo(),
-        "grano": grano(),
         "favicon": marca.favicon(),
-        "tipografia": _tipografia(),
         "marca": MARCA,
         "etapa": ETAPA,
         "version": VERSION,

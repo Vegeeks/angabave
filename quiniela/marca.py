@@ -34,10 +34,11 @@ COSTURAS = (
 GROSOR_CONTORNO = 2.4
 GROSOR_COSTURA = 1.55
 
-#: Oro de arriba a abajo (el de en medio va al 55 %), loseta en diagonal y tinta.
-ORO = ("#ffe9a8", "#f7c948", "#c98a12")
-LOSETA = ("#1b2639", "#070b12")
-TINTA = "#0b1220"
+#: Los colores: planos a propósito, sin brillos ni relieve. El amarillo es el de la
+#: línea de primera y diez. Oro de arriba a abajo, loseta en diagonal y tinta.
+ORO = ("#ffd60a", "#ffd60a", "#ffd60a")
+LOSETA = ("#0c120f", "#0c120f")
+TINTA = "#0c120f"
 
 
 def _n(valor: float) -> str:
