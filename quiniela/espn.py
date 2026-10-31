@@ -27,7 +27,16 @@ def a_cdmx(momento: datetime | None) -> datetime | None:
 def ahora_cdmx() -> datetime:
     return datetime.now(ZONA_CDMX)
 
-__all__ = ["Partido", "ZONA_CDMX", "a_cdmx", "ahora_cdmx"]
+__all__ = ["ESTADOS_DE_AVISO", "Partido", "ZONA_CDMX", "a_cdmx", "ahora_cdmx"]
+
+#: Un partido abierto en estos estados ya no se juega como estaba previsto: eso
+#: sí es noticia. Los demás (por jugar, en curso, medio tiempo) cambian solos y
+#: el navegador los pide a ESPN por su cuenta.
+ESTADOS_DE_AVISO = frozenset({"Postponed", "Delayed", "Canceled", "Suspended"})
+
+#: Un partido dura menos que esto. Si sigue abierto después, está pospuesto o
+#: atorado: ya no se sigue minuto a minuto, solo se revisa de vez en cuando.
+MAXIMO_ABIERTO = timedelta(hours=12)
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,6 +58,9 @@ class Partido:
     estado: str = "sin datos"
     #: Momento de inicio en UTC. None cuando el partido viene del Excel.
     inicio: datetime | None = None
+    #: False mientras la NFL no fija la hora. ESPN trae entonces las 00:00 del
+    #: este del día probable, que es relleno: no se muestra ni se calcula con él.
+    hora_definida: bool = True
 
     @property
     def clave(self) -> str:
@@ -77,6 +89,21 @@ class Partido:
         if self.marcador_local > self.marcador_visitante:
             return self.local
         return None
+
+    @property
+    def sin_hora(self) -> bool:
+        """Sigue programado y la NFL todavía no le pone hora."""
+        return not self.hora_definida and self.estado == "Scheduled"
+
+    def arranco(self, ahora: datetime) -> bool:
+        """Ya se jugó o ya empezó. Una hora de relleno no cuenta como arranque."""
+        if self.finalizado:
+            return True
+        return self.inicio is not None and not self.sin_hora and self.inicio <= ahora
+
+    def en_curso(self, ahora: datetime) -> bool:
+        """Arrancó, no ha cerrado y todavía es razonable que se esté jugando."""
+        return not self.finalizado and self.arranco(ahora) and ahora - self.inicio < MAXIMO_ABIERTO
 
     def con_ganador(self, ganador: str | None, estado: str) -> "Partido":
         """Copia con el ganador forzado y marcado como cerrado (overrides)."""
@@ -235,6 +262,7 @@ def _parsear_evento(evento: dict, indice: int) -> Partido:
         finalizado=finalizado,
         estado=estado,
         inicio=_fecha(evento, contexto),
+        hora_definida=competencia.get("timeValid") is not False,
     )
 
 
@@ -303,6 +331,7 @@ def cargar_cache(semana: int, dir_cache: Path = DIR_RESULTADOS) -> list[Partido]
                 finalizado=bool(registro.get("finalizado", False)),
                 estado=registro.get("estado", "desconocido"),
                 inicio=datetime.fromisoformat(inicio) if inicio else None,
+                hora_definida=registro.get("hora_definida", True),
             )
         )
     return partidos
@@ -328,6 +357,7 @@ def guardar_cache(semana: int, partidos: list[Partido], dir_cache: Path = DIR_RE
                 "finalizado": partido.finalizado,
                 "estado": partido.estado,
                 "inicio": partido.inicio.isoformat() if partido.inicio else None,
+                "hora_definida": partido.hora_definida,
             }
             for partido in partidos
         ],
@@ -355,6 +385,24 @@ def _mezclar(cacheados: list[Partido], frescos: list[Partido]) -> list[Partido]:
         )
         mezclados.append(sobrante)
     return mezclados
+
+
+def _lo_que_dura(partidos: list[Partido]) -> dict[str, tuple]:
+    """Lo que vale guardar de cada partido: sin el marcador de los que siguen abiertos.
+
+    Ese marcador cambia con cada jugada y el navegador ya lo pide a ESPN. Si
+    contara, cada anotación sería un commit y una publicación más.
+    """
+    return {
+        partido.clave: (
+            (True, partido.marcador_visitante, partido.marcador_local, partido.ganador,
+             partido.estado, partido.inicio)
+            if partido.finalizado
+            else (False, partido.inicio, partido.hora_definida,
+                  partido.estado if partido.estado in ESTADOS_DE_AVISO else None)
+        )
+        for partido in partidos
+    }
 
 
 def aplicar_overrides(
@@ -442,7 +490,8 @@ def obtener_partidos(
 
     frescos = parsear_scoreboard(_consultar_api(anio, semana))
     partidos = _mezclar(cacheados, frescos)
-    guardar_cache(semana, partidos, dir_cache)
+    if _lo_que_dura(partidos) != _lo_que_dura(cacheados):
+        guardar_cache(semana, partidos, dir_cache)
     cerrados = sum(1 for p in partidos if p.finalizado)
     _log.info("Semana %d: %d de %d partidos cerrados.", semana, cerrados, len(partidos))
     return aplicar_overrides(partidos, semana, ruta_overrides)

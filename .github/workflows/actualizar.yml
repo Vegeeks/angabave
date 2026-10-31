@@ -1,8 +1,10 @@
 name: Actualizar quiniela
 
-# Cada 5 minutos, que es el mínimo que permite GitHub. Aun así el programador
-# de GitHub se retrasa cuando hay carga, así que el sitio no depende de esto
-# para el marcador en vivo: el navegador consulta ESPN por su cuenta.
+# El respaldo del directo en los días de siempre. Cada 5 minutos, que es el mínimo
+# que permite GitHub. Aun así el programador de GitHub se retrasa o se salta
+# corridas, así que el sitio no depende de esto: el directo se despierta todos
+# los días y el navegador consulta el marcador en vivo por su cuenta. Si no hay
+# nada nuevo, esta corrida no publica nada.
 #
 # Ciudad de México está fija en UTC-6 todo el año (México eliminó el horario de
 # verano en 2022), así que el ajuste es sumar 6 horas a la hora local:

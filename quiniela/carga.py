@@ -259,11 +259,7 @@ def _recibir(
         ) from error
     emparejar_resultados(hoja.partidos, resultados)
     reales = {partido.clave: partido for partido in resultados}
-    arrancados = {
-        partido.clave
-        for partido in resultados
-        if partido.finalizado or (partido.inicio is not None and partido.inicio <= ahora)
-    }
+    arrancados = {partido.clave for partido in resultados if partido.arranco(ahora)}
 
     rutas_de_la_semana = guardadas.get(numero, [])
     actual = _leer_guardada(rutas_de_la_semana[0], numero) if rutas_de_la_semana else None

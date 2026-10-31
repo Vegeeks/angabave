@@ -37,8 +37,8 @@ from quiniela.picks import (
     numero_semana,
     verificar_sello,
 )
-from quiniela.render_html import UMBRAL_SEMANA, SemanaRender, generar_html
-from quiniela.render_png import generar_iconos, generar_png
+from quiniela.render_html import UMBRAL_SEMANA, SemanaRender, firma_publicada, generar_html
+from quiniela.render_png import generar_iconos, generar_png, generar_portada
 from quiniela.render_html import _pesos
 from quiniela.scoring import (
     ErrorCalendario,
@@ -54,6 +54,7 @@ from quiniela.scoring import (
 
 RAIZ = Path(__file__).resolve().parent
 DIR_PICKS = RAIZ / "data" / "picks"
+DIR_SITIO = RAIZ / "docs"
 
 _log = logging.getLogger("quiniela")
 
@@ -164,11 +165,7 @@ def _sellar(ruta: Path, semana: int, resultados) -> None:
     entregar y el organizador manda esa hoja aparte.
     """
     ahora = datetime.now(timezone.utc)
-    arrancados = {
-        partido.clave
-        for partido in resultados
-        if partido.finalizado or (partido.inicio is not None and partido.inicio <= ahora)
-    }
+    arrancados = {partido.clave for partido in resultados if partido.arranco(ahora)}
     verificar_sello(ruta, semana, arrancados, RUTA_SELLOS)
 
 
@@ -181,28 +178,19 @@ def _cargar_semana(semana: int, anio: int, sin_red: bool):
     return partidos, picks, alineados
 
 
-def _resultados_de(anio: int, semana: int, *, activa: bool, sin_red: bool):
-    """La semana activa se refresca; las anteriores salen del caché."""
-    if activa and not sin_red:
-        return obtener_partidos(anio, semana, sin_red=False)
-    try:
-        return obtener_partidos(anio, semana, sin_red=True)
-    except ErrorESPN:
-        if sin_red:
-            raise
-        _log.info("No hay caché de la semana %d todavía: la consulto una vez.", semana)
-        return obtener_partidos(anio, semana, sin_red=False)
+def construir_semanas(anio: int, sin_red: bool) -> list[SemanaRender]:
+    """Arma todas las semanas con picks, para que el sitio sea navegable.
 
-
-def construir_semanas(anio: int, semana_activa: int, sin_red: bool) -> list[SemanaRender]:
-    """Arma todas las semanas con picks, para que el sitio sea navegable."""
+    Se consulta cualquier semana con un partido abierto, no solo la última: si
+    la hoja de la semana siguiente llegaba antes de que cerrara el lunes, ese
+    partido se quedaba abierto para siempre. Una semana ya cerrada no toca la
+    red: `obtener_partidos` la saca del caché.
+    """
     construidas: list[SemanaRender] = []
     for ruta in semanas_disponibles():
         numero = numero_semana(ruta)
         partidos, picks = leer_picks(ruta)
-        resultados = _resultados_de(
-            anio, numero, activa=(numero == semana_activa), sin_red=sin_red
-        )
+        resultados = obtener_partidos(anio, numero, sin_red=sin_red)
         alineados = emparejar_resultados(partidos, resultados)
         _sellar(ruta, numero, alineados)
         tabla = tabla_semana(partidos, picks, alineados)
@@ -231,7 +219,7 @@ def semana_por_cargar(anio: int, numero: int, sin_red: bool) -> SemanaRender | N
     "actualizando la semana N" en lugar de quedarse en la anterior.
     """
     try:
-        partidos = _resultados_de(anio, numero, activa=True, sin_red=sin_red)
+        partidos = obtener_partidos(anio, numero, sin_red=sin_red)
     except ErrorESPN as error:
         _log.info("Sin partidos para la semana %d todavía (%s).", numero, error)
         return None
@@ -239,9 +227,36 @@ def semana_por_cargar(anio: int, numero: int, sin_red: bool) -> SemanaRender | N
     return SemanaRender(numero, partidos)
 
 
+def _ganador_para_imagen(semanas: list[SemanaRender], activa: SemanaRender) -> dict:
+    """Quién va en la franja de la imagen: es el dato que la gente comparte.
+
+    La semana en curso si ya hay partidos suficientes para hablar de su ganador;
+    si no, la última que cerró. Vacío si todavía no hay ninguna de las dos.
+    """
+    if activa.tabla is not None and activa.cerrados >= UMBRAL_SEMANA:
+        primeros = ganadores_de(activa.tabla)
+        cerrada = activa.estado == "cerrada"
+        return {
+            "semana_ganadores": activa.numero,
+            "ganadores": primeros,
+            "premio": _pesos(premio_semanal(len(primeros)) if cerrada else PREMIO_SEMANAL),
+            "oficial": cerrada,
+        }
+    ultima = next((s for s in reversed(semanas) if s.estado == "cerrada" and s.tabla is not None), None)
+    if ultima is None:
+        return {}
+    primeros = ganadores_de(ultima.tabla)
+    return {
+        "semana_ganadores": ultima.numero,
+        "ganadores": primeros,
+        "premio": _pesos(premio_semanal(len(primeros))),
+        "oficial": True,
+    }
+
+
 def comando_actualizar(argumentos) -> int:
     semana = argumentos.semana or ultima_semana()
-    semanas = construir_semanas(argumentos.anio, semana, argumentos.sin_red)
+    semanas = construir_semanas(argumentos.anio, argumentos.sin_red)
     activa = next(s for s in semanas if s.numero == semana)
 
     proxima = semana_por_cargar(argumentos.anio, max(s.numero for s in semanas) + 1, argumentos.sin_red)
@@ -257,33 +272,30 @@ def comando_actualizar(argumentos) -> int:
         previas = dict(zip(anterior["participante"], anterior["posicion"]))
     momento = ahora_cdmx()
 
+    publicada = firma_publicada(DIR_SITIO)
     html = generar_html(
         anio=argumentos.anio,
         semanas=semanas,
         tabla_acumulada=general,
         posiciones_previas=previas,
+        ruta_salida=DIR_SITIO / "index.html",
         momento=momento,
     )
-    generar_iconos()
-    # La franja del PNG solo aparece cuando ya hay algo que decir.
-    primeros: list[str] = []
-    monto = None
-    if activa.tabla is not None and activa.cerrados >= UMBRAL_SEMANA:
-        primeros = ganadores_de(activa.tabla)
-        monto = _pesos(
-            premio_semanal(len(primeros)) if activa.estado == "cerrada" else PREMIO_SEMANAL
-        )
-    png = generar_png(
-        tabla_acumulada=general,
-        semana=semana,
-        anio=argumentos.anio,
-        cerrados=activa.cerrados,
-        total_partidos=len(activa.partidos),
-        momento=momento,
-        ganadores=primeros,
-        premio=monto,
-        oficial=activa.estado == "cerrada",
-    )
+    generar_iconos(DIR_SITIO)
+
+    # Las imágenes llevan la hora y pesan: solo se redibujan si hay novedad, o
+    # cada vuelta del directo sumaba 170 KB al repositorio.
+    png, portada = DIR_SITIO / "tabla.png", DIR_SITIO / "portada.png"
+    if firma_publicada(DIR_SITIO) != publicada or not png.exists() or not portada.exists():
+        partidos_semana = {
+            "tabla_acumulada": general,
+            "semana": semana,
+            "anio": argumentos.anio,
+            "cerrados": activa.cerrados,
+            "total_partidos": activa.total,
+        }
+        generar_png(**partidos_semana, ruta_salida=png, momento=momento, **_ganador_para_imagen(semanas, activa))
+        generar_portada(**partidos_semana, ruta_salida=portada)
 
     lider = general.iloc[0]
     _log.info(
@@ -476,20 +488,13 @@ def comando_enlace(argumentos) -> int:
         return 3
 
 
-def comando_pendientes(argumentos) -> int:
-    """Cuántos partidos siguen abiertos. Lo usa el workflow para saber si parar."""
-    semana = argumentos.semana or ultima_semana()
-    partidos, _, resultados = _cargar_semana(semana, argumentos.anio, sin_red=True)
-    abiertos = sum(1 for partido in resultados if not partido.finalizado)
-    print(abiertos)
-    return 0
-
-
 def comando_proximo(argumentos) -> int:
     """Segundos hasta el próximo partido por empezar.
 
-    Imprime 0 si alguno ya arrancó y sigue abierto, y -1 si no queda ninguno.
-    Con eso el workflow sabe si ponerse a trabajar, esperar o irse a dormir.
+    Imprime 0 si alguno se está jugando y -1 si no queda ninguno por seguir. Con
+    eso el workflow sabe si ponerse a trabajar, esperar o irse a dormir. No
+    cuentan los que todavía no tienen hora, ni los que arrancaron hace tanto que
+    deben estar pospuestos: por esos no vale tener un proceso esperando.
     """
     rutas = semanas_disponibles()
     if not rutas:
@@ -505,12 +510,13 @@ def comando_proximo(argumentos) -> int:
         except ErrorESPN:
             continue
         for partido in resultados:
-            if partido.finalizado:
+            if partido.finalizado or partido.sin_hora:
                 continue
-            if partido.inicio is None or partido.inicio <= ahora:
-                print(0)  # ya empezó (o no sabemos cuándo): hay que mirarlo
+            if partido.inicio is None or partido.en_curso(ahora):
+                print(0)  # se está jugando (o no sabemos cuándo): hay que mirarlo
                 return 0
-            faltantes.append((partido.inicio - ahora).total_seconds())
+            if not partido.arranco(ahora):
+                faltantes.append((partido.inicio - ahora).total_seconds())
 
     print(int(min(faltantes)) if faltantes else -1)
     return 0
@@ -598,12 +604,6 @@ def construir_parser() -> argparse.ArgumentParser:
     contestar_.add_argument("--resumen", help="el JSON que escribe importar --resumen")
     contestar_.add_argument("--nota", help="reemplaza el texto del error que se muestra")
     enlace.set_defaults(funcion=comando_enlace)
-
-    pendientes = subcomandos.add_parser(
-        "pendientes", help="imprime cuántos partidos siguen abiertos"
-    )
-    pendientes.add_argument("--semana", type=int)
-    pendientes.set_defaults(funcion=comando_pendientes)
 
     proximo = subcomandos.add_parser(
         "proximo", help="segundos hasta el próximo partido (0 si ya empezó, -1 si no hay)"

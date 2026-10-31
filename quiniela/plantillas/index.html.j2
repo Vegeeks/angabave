@@ -13,9 +13,16 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="{{ marca }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ marca }}">
+<meta property="og:url" content="{{ sitio }}">
 <meta property="og:title" content="{{ marca }} · Quiniela NFL {{ anio }}">
 <meta property="og:description" content="Tabla general, ganadores por semana y marcador en vivo.">
-<meta property="og:image" content="tabla.png">
+<meta property="og:image" content="{{ sitio }}portada.png?v={{ firma }}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="{{ tamano_portada[0] }}">
+<meta property="og:image:height" content="{{ tamano_portada[1] }}">
+<meta name="twitter:card" content="summary_large_image">
 <title>{{ marca }} · Quiniela NFL {{ anio }}</title>
 <style>
 {% if tipografia %}
@@ -1252,12 +1259,16 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   // Si la pestaña la eligió la persona, se respeta; si no, la decide el momento.
   let pestanaElegida = false;
 
-  /* Dónde se quedó el usuario, para volver ahí al recargar. */
+  /* Dónde se quedó el usuario, para volver ahí al recargar. Si la recarga la
+     hizo la página, además se le devuelve todo lo demás: no la pidió él. */
   const SITIO = "angabave.sitio";
+  let recargaAutomatica = false;
   function recordarSitio() {
     try {
       sessionStorage.setItem(SITIO, JSON.stringify({
-        vista: vistaActual, pestana, scroll: Math.round(window.scrollY),
+        vista: vistaActual, pestana, scroll: Math.round(window.scrollY), auto: recargaAutomatica,
+        elegida: pestanaElegida, perfil: perfilAbierto === null ? null : D.participantes[perfilAbierto],
+        controles: leerControles(),
       }));
     } catch (e) { /* sin memoria: se abre donde toque por omisión */ }
   }
@@ -1265,6 +1276,41 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     try { return JSON.parse(sessionStorage.getItem(SITIO) || "null"); }
     catch (e) { return null; }
   }
+
+  /* Lo que la persona dejó a medias en la vista: búsquedas, a quién eligió en
+     una lista y los desplegables abiertos. Sobrevive a que la vista se redibuje
+     y a una recarga. Las listas se recuerdan por el texto, no por el valor: el
+     valor es la posición en la tabla, y esa cambia cuando cierra un partido. */
+  function controlesDeLaVista() {
+    const raiz = vistas[typeof vistaActual === "number" ? "semana" : vistaActual] || vistas.hoy;
+    return Array.from(raiz.querySelectorAll("input,select,details"));
+  }
+  function leerControles() {
+    return controlesDeLaVista().map((c) => c.tagName === "DETAILS" ? c.open
+      : c.tagName === "SELECT" ? (c.selectedOptions[0] || {}).text || "" : c.value);
+  }
+  function reponerControles(valores) {
+    const controles = controlesDeLaVista();
+    if (!Array.isArray(valores) || valores.length !== controles.length) return;
+    controles.forEach((c, i) => {
+      if (c.tagName === "DETAILS") { c.open = valores[i] === true; return; }
+      if (c.tagName === "SELECT") {
+        const opcion = Array.from(c.options).find((o) => o.text === valores[i]);
+        if (!opcion || opcion.selected) return;
+        c.value = opcion.value;
+        c.dispatchEvent(new Event("change"));
+      } else if (typeof valores[i] === "string" && c.value !== valores[i]) {
+        c.value = valores[i];
+        c.dispatchEvent(new Event("input"));
+      }
+    });
+  }
+
+  /* Un toque, una tecla o un deslizamiento reciente: la persona está ahí. */
+  let ultimoToque = 0;
+  ["pointerdown", "keydown", "wheel", "touchmove", "scroll"].forEach((tipo) =>
+    document.addEventListener(tipo, () => { ultimoToque = Date.now(); }, { passive: true }));
+  const escribiendo = () => /^(INPUT|TEXTAREA)$/.test((document.activeElement || {}).tagName || "");
 
   const crear = (tag, clase, texto) => {
     const n = document.createElement(tag);
@@ -1422,6 +1468,8 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   const anotaciones = new Map();   // clave -> cuándo cambió el marcador
   const SEGUNDOS_ANOTACION = 9;
   let fallosVivo = 0, ultimaConsulta = null;
+  // La última vez que se supo que el cálculo oficial sigue corriendo.
+  let latido = Date.parse(String(D.generado || "").replace(/(\.\d{3})\d+/, "$1")) || 0, latidoVisto = false;
 
   /* Una cifra que sube contando se nota; una que aparece ya puesta, no. */
   function contarHasta(nodo, destino, ms) {
@@ -1465,7 +1513,8 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       let g = null;
       if (v.m !== null && l.m !== null && v.m !== l.m) g = v.m > l.m ? "v" : "l";
       const crudo = tipo.description || tipo.name || "";
-      let e = D.vivo.estados[crudo] || crudo;
+      // Antes de la patada no hay nada que decir: se queda el horario publicado.
+      let e = crudo === "Scheduled" ? null : (D.vivo.estados[crudo] || crudo);
       // En juego, mejor el cuarto y el reloj que un "En curso" genérico.
       if (tipo.state === "in" && crudo === "In Progress" && Number(reloj.period) > 0) {
         e = (reloj.period > 4 ? "TE" : "Q" + reloj.period) + (reloj.displayClock ? " · " + reloj.displayClock : "");
@@ -1493,6 +1542,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       if (!r.ok) throw new Error(r.status);
       const frescos = parsearVivo(await r.json());
       if (!frescos) throw new Error("formato inesperado");
+      const antes = JSON.stringify(todosLosJuegos(s));
       frescos.forEach((valor, clave) => {
         const previo = marcadores.get(clave);
         if (previo && (previo.mv !== valor.mv || previo.ml !== valor.ml)) {
@@ -1505,7 +1555,8 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       });
       fallosVivo = 0;
       ultimaConsulta = new Date();
-      repintar();
+      // Redibujar sin que nada cambie borraba lo que la persona tenía a medias.
+      if (repintePendiente || JSON.stringify(todosLosJuegos(s)) !== antes) repintarSinEstorbar();
     } catch (e) {
       fallosVivo++;   // a la tercera se deja de insistir y manda lo publicado por CI
     } finally {
@@ -1651,7 +1702,9 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       "<th>Aciertos</th><th>Fallos</th></tr></thead>";
     const cuerpo = crear("tbody");
     const vivos = vivosPorParticipante(s);
-    s.tabla.forEach((fila, i) => {
+    // Dentro de un empate, primero quien va ganando más partidos en este momento.
+    const filas = s.tabla.slice().sort((a, b) => a.pos - b.pos || (vivos.get(b.p) || 0) - (vivos.get(a.p) || 0));
+    filas.forEach((fila, i) => {
       const tr = crear("tr", "p" + fila.pos + (fila.p === jugador ? " yo" : "") + " clic");
       tr.style.setProperty("--i", Math.min(i, 12));
       tr.appendChild(crear("td", "c-pos", String(fila.pos)));
@@ -1698,7 +1751,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     const resto = juegos.filter((juego) => !mios.includes(juego));
     const porJugar = resto
       .filter(({ p }) => !p.cerrado)
-      .sort((a, b) => (a.p.t || 0) - (b.p.t || 0) || a.i - b.i);
+      .sort((a, b) => (a.p.t || Infinity) - (b.p.t || Infinity) || a.i - b.i);
     const jugados = resto
       .filter(({ p }) => p.cerrado)
       .sort((a, b) => (b.p.t || 0) - (a.p.t || 0) || b.i - a.i);
@@ -1988,15 +2041,19 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   /* Solo avisa si de verdad puede haber algo atrasado: un partido que ya
      arrancó y que el sitio todavía no cierra. Un viernes sin partidos la tabla
      no tiene por qué recalcularse, y avisar "10 horas sin recalcularse" era
-     una falsa alarma que asustaba a todos. */
+     una falsa alarma que asustaba a todos. Se cuenta desde el último latido o
+     desde que arrancó el partido, lo más reciente: sin novedades el sitio ya no
+     se publica, y antes del partido nadie tenía por qué recalcular. Doce horas
+     después de la patada ya no se está jugando: estará pospuesto. */
   function avisoDeRezago(s) {
-    if (!s || s.cerrados >= s.total || !D.generado) return null;
+    if (!s || s.cerrados >= s.total || !latidoVisto) return null;
     const ahora = Date.now();
-    const arrancoSinCerrar = s.partidos.concat(s.por_entregar || [])
-      .some((p) => !p.cerrado && p.t && p.t * 1000 <= ahora);
-    if (!arrancoSinCerrar) return null;
-    const minutos = Math.floor((Date.now() - new Date(D.generado).getTime()) / 60000);
-    if (!Number.isFinite(minutos) || minutos < (D.rezago || 25)) return null;
+    const arrancados = s.partidos.concat(s.por_entregar || [])
+      .filter((p) => !p.cerrado && p.t && p.t * 1000 <= ahora && ahora - p.t * 1000 < 12 * 3600e3);
+    if (!arrancados.length) return null;
+    const desde = Math.max(latido, Math.min(...arrancados.map((p) => p.t * 1000)));
+    const minutos = Math.floor((ahora - desde) / 60000);
+    if (!Number.isFinite(minutos) || minutos < (D.rezago || 35)) return null;
 
     const caja = crear("div", "rezago");
     caja.appendChild(crear("span", "icono", "⚠"));
@@ -3087,7 +3144,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       if (resta > 0) n.textContent = n.dataset.antes + falta(resta);
       else if (!vencidas.has(hasta)) { vencidas.add(hasta); cambio = true; }
     });
-    if (cambio) repintar();
+    if (cambio) repintarSinEstorbar();
   }, 20000);
 
   function saludo(fase, s, vivos, hoy, picks, yaJugados) {
@@ -3775,6 +3832,20 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     window.scrollTo({ top: alto });
   }
 
+  /* El repintado que pide el reloj o el marcador, no la persona: espera si está
+     escribiendo o acaba de tocar algo, y le devuelve lo que tenía a medias. */
+  let repintePendiente = false;
+  function repintarSinEstorbar() {
+    if (escribiendo() || Date.now() - ultimoToque < 8000) { repintePendiente = true; return; }
+    repintePendiente = false;
+    const controles = leerControles();
+    repintar();
+    reponerControles(controles);
+  }
+  document.addEventListener("focusout", () => setTimeout(() => {
+    if (repintePendiente) repintarSinEstorbar();
+  }, 0));
+
   function ir(vista, empujar, quieto) {
     if (vista === "semana") vista = semanaElegida;
     if (typeof vista === "number" || /^\d+$/.test(String(vista))) {
@@ -3915,11 +3986,17 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     : "hoy";
 
   if (guardado && guardado.pestana) pestana = guardado.pestana;
+  const automatica = !!(guardado && guardado.auto);
+  if (automatica && guardado.elegida) pestanaElegida = true;
+  if (automatica && guardado.perfil && D.participantes.includes(guardado.perfil)) {
+    perfilAbierto = D.participantes.indexOf(guardado.perfil);
+  }
   ir(inicio, false);
 
   // Y a la altura donde se quedó, para que una recarga no te mande al inicio.
-  if (guardado && guardado.scroll > 0 && String(guardado.vista) === String(inicio)) {
-    requestAnimationFrame(() => window.scrollTo({ top: guardado.scroll }));
+  if (guardado && String(guardado.vista) === String(inicio)) {
+    if (automatica) reponerControles(guardado.controles);
+    if (guardado.scroll > 0) requestAnimationFrame(() => window.scrollTo({ top: guardado.scroll }));
   }
 
   if (D.vivo) {
@@ -3929,8 +4006,10 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   }
   /* ═══ que nadie se quede con una copia vieja ═══
      Pages cachea el HTML diez minutos y esa cabecera no se puede cambiar. Así
-     que se consulta un archivo de cien bytes; si el sitio se regeneró, se
-     recarga.
+     que se consulta un archivo de cien bytes y se recarga solo si su firma es
+     otra: cerró un partido, llegó una hoja, se movió un horario. Una hora nueva
+     con la misma firma es un latido: dice que el cálculo sigue vivo, nada más.
+     Y si la persona está en medio de algo, se espera a la siguiente revisión.
 
      Con candados, porque el CDN de GitHub ignora el ?v= (medido: una dirección
      con un ?v= nunca pedido sale del caché). Recargar en seguida puede traer la
@@ -3958,16 +4037,25 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   function recargarFresco(version) {
     const ahora = Date.now(), previa = leerRecarga();
     if (previa.cuando && ahora - previa.cuando < TRES_MIN) return;
-    if (version && previa.version === version && ahora - previa.cuando < ONCE_MIN) return;
+    if (previa.version === version && ahora - previa.cuando < ONCE_MIN) return;
     try {
-      sessionStorage.setItem(LLAVE_RECARGA, JSON.stringify({ cuando: ahora, version: version || "" }));
+      sessionStorage.setItem(LLAVE_RECARGA, JSON.stringify({ cuando: ahora, version }));
     } catch (e) {
       // Sin dónde anotar la recarga no hay candado: mejor no recargar solo.
-      if (version) return;
+      return;
     }
+    recargaAutomatica = true;
+    recordarSitio();
     const url = new URL(location.href);
     url.searchParams.set("v", String(ahora));
     location.replace(url.toString());
+  }
+
+  /* El aviso de "lleva tanto sin recalcularse" entra o sale según el último latido. */
+  function revisarRezago() {
+    if (typeof vistaActual !== "number") return;
+    const hay = !!vistas.semana.querySelector(".rezago");
+    if (hay !== !!avisoDeRezago(porSemana.get(vistaActual))) repintarSinEstorbar();
   }
 
   async function revisarVersion() {
@@ -3977,16 +4065,19 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       if (!r.ok) return;
       const sello = await r.json();
       const publicada = marca(sello.generado), esta = marca(D.generado);
-      if (!(publicada > esta)) return;   // igual, más vieja o ilegible: nada que hacer
-      recargarFresco(sello.generado);
+      if (publicada > latido) latido = publicada;
+      latidoVisto = true;
+      revisarRezago();
+      if (!sello.firma || sello.firma === D.firma) return;   // nada oficial cambió
+      if (!(publicada > esta)) return;   // el CDN trajo uno más viejo o ilegible
+      if (escribiendo() || document.querySelector(".hoja-fondo") || Date.now() - ultimoToque < 30000) return;
+      recargarFresco(sello.firma);
     } catch (e) { /* sin red o archivo viejo: se sigue con lo que hay */ }
   }
 
   setInterval(revisarVersion, 90000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) revisarVersion(); });
   revisarVersion();
-
-  if (D.recarga > 0) setTimeout(() => recargarFresco(), D.recarga * 1000);
 
   // Arrancó bien: la red de seguridad ya no hace falta.
   window.angabaveListo = true;

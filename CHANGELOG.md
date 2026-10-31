@@ -9,6 +9,66 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## alfa v0.22.0
+
+**Listo para Thanksgiving y Navidad, publica solo lo que cambia y una imagen que da gusto mandar.**
+
+* **Ningún partido se queda sin seguimiento, caiga el día que caiga.** El directo
+  solo arrancaba jueves, domingo y lunes, y en la temporada hay 9 partidos ya
+  programados en miércoles, viernes, sábado y Thanksgiving en la mañana, más los
+  que falten por definir. Con el partido del viernes 27 de noviembre, la tabla
+  se habría quedado sin mover hasta el domingo.
+  * Ahora se despierta cada seis horas, todos los días, fuera de la hora en punto
+    (GitHub avisa que es cuando más retrasa corridas). Si no hay partido en 12
+    horas se detiene; es un minuto de trabajo.
+  * Entre partidos duerme en vez de recalcular cada dos minutos.
+  * Al arrancar le pregunta a ESPN si cambió algo, así que un horario nuevo llega
+    al sitio aunque no sea día de juego.
+  * Un partido pospuesto o atorado ya no mantiene al directo corriendo: después de
+    12 horas sin cerrar se revisa solo cuando se despierta.
+* **Corregido: un partido podía quedarse abierto para siempre.** Solo se consultaba
+  la última semana con picks. Si la hoja de la semana siguiente llegaba antes de
+  que cerrara el lunes, ese partido ya no volvía a consultarse. Ahora se consulta
+  cualquier semana con algo abierto.
+* **"Hora por definir" en vez de "sábado 23:00".** 24 partidos de las semanas 16,
+  17 y 18 todavía no tienen hora, y ESPN trae un relleno que el portal tomaba por
+  bueno. Ya no se muestra ni se usa:
+  * El partido dice "Hora por definir" y va al final de la semana.
+  * Entra en la tanda de su día. En la semana 16 cierran 4 el miércoles 23 de
+    diciembre y 12 el sábado 26; antes eran 8 y 8.
+  * Si ninguno de la tanda tiene hora, su cierre sale "(por confirmar)".
+  * Una hora de relleno no sella picks ni bloquea la carga de ese partido.
+* **Se publica solo si hay algo que contar.** Un jueves hubo 95 publicaciones y 82
+  no traían nada nuevo: cambiaba solo la hora, con 170 KB de imagen cada una, y
+  llegamos a 28 por hora contra el límite de 10 que sugiere GitHub. Ahora una
+  firma decide: un partido cerrado, una hoja, un horario o una versión nueva sí se
+  publican; un marcador en curso no, porque ese ya lo pide cada navegador a ESPN.
+  Mientras se juega, cada 20 minutos se reescribe solo `version.json`, para que la
+  página sepa que el cálculo sigue vivo.
+* **La página ya no estorba.**
+  * Quitada la recarga forzada cada 10 minutos, que corría todo el año. Ahora se
+    recarga solo si hay novedad, y no mientras escribes, tienes una hoja abierta o
+    acabas de tocar algo.
+  * Corregido: cada minuto se redibujaba la vista aunque ningún marcador hubiera
+    cambiado, y se borraban la búsqueda y a quién tenías elegido en "Quién le fue a
+    quién". Ahora solo se redibuja si algo cambió y te devuelve lo que tenías a
+    medias.
+  * Si la recarga la hizo la página, vuelves a la misma vista, pestaña, búsqueda y
+    persona elegida.
+  * El aviso de "la tabla lleva tanto sin recalcularse" se cuenta desde el último
+    latido o desde la patada, y pasa de 25 a 35 minutos para no dar falsas alarmas.
+* **Imagen de la tabla nueva**, con el campo de noche, el vidrio y la marca del
+  portal.
+  * Corregido el texto: decía "1 de 1 partidos cerrados" con 14 en la jornada,
+    porque solo contaba los ya repartidos. Ahora dice "1 de 14 partidos".
+  * La medalla sale del lugar: oro, plata y bronce solo para 1.º, 2.º y 3.º, igual
+    que el podio del portal.
+  * Una franja con el ganador: el de la semana en curso cuando ya hay partidos
+    suficientes y, si no, el de la última semana cerrada, con su premio.
+* **Vista previa al compartir el enlace.** La imagen se declaraba sin dirección
+  completa, que es lo que necesitan los chats. Ahora lleva dirección completa y una
+  portada propia de 1200 × 630 con la marca, la semana y quién va en primero.
+
 ## alfa v0.21.0
 
 **El reparto, claro: quién gana qué y qué pasa con los empates.**

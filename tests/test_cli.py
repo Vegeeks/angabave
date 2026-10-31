@@ -13,10 +13,13 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 import cli
+from quiniela import espn
 from quiniela.buzon import ErrorBuzon
+from quiniela.espn import Partido
 from quiniela.picks import ErrorPicks, leer_hoja
+from quiniela.scoring import tabla_general
 
-from .conftest import PICKS_S2, calendario_nfl, crear_excel, crear_pdf
+from .conftest import ENFRENTAMIENTOS_S2, PICKS_S2, calendario_nfl, crear_excel, crear_pdf
 
 
 @pytest.fixture
@@ -35,13 +38,13 @@ def test_todos_los_subcomandos_existen():
     )
     assert set(subcomandos) == {
         "actualizar", "tabla", "general", "escenarios", "validar",
-        "importar", "buzon", "enlace", "pendientes", "proximo",
+        "importar", "buzon", "enlace", "proximo",
     }
 
 
 def test_cada_subcomando_tiene_funcion():
     parser = cli.construir_parser()
-    for comando in ("actualizar", "tabla", "general", "validar", "pendientes", "proximo"):
+    for comando in ("actualizar", "tabla", "general", "validar", "proximo"):
         opciones = parser.parse_args([comando])
         assert callable(opciones.funcion)
 
@@ -236,3 +239,196 @@ def test_imprimir_tabla_no_publica_el_proyectado(capsys):
 def test_un_error_de_picks_devuelve_codigo_1(picks_en: Path):
     codigo = cli.main(["tabla", "--semana", "9"])
     assert codigo == 1
+
+
+# --- proximo: de esto depende que el directo se despierte o se duerma ---------
+
+
+def _proximo(capsys) -> int:
+    cli.comando_proximo(cli.construir_parser().parse_args(["proximo"]))
+    return int(capsys.readouterr().out.strip())
+
+
+def _con_partidos(monkeypatch, picks_en: Path, partidos: list[Partido]) -> None:
+    crear_excel(picks_en / "Semana_02.xlsx")
+    monkeypatch.setattr(cli, "obtener_partidos", lambda anio, semana, sin_red=False: partidos)
+
+
+def test_proximo_cuenta_los_segundos_al_siguiente(picks_en: Path, monkeypatch, capsys):
+    ahora = datetime.now(timezone.utc)
+    _con_partidos(monkeypatch, picks_en, [
+        Partido("Lions", "Bills", estado="Scheduled", inicio=ahora + timedelta(hours=9)),
+        Partido("Saints", "Ravens", estado="Scheduled", inicio=ahora + timedelta(hours=3)),
+    ])
+    assert 3 * 3600 - 60 < _proximo(capsys) <= 3 * 3600
+
+
+def test_proximo_es_cero_con_un_partido_en_curso(picks_en: Path, monkeypatch, capsys):
+    ahora = datetime.now(timezone.utc)
+    _con_partidos(monkeypatch, picks_en, [
+        Partido("Lions", "Bills", estado="In Progress", inicio=ahora - timedelta(hours=1)),
+        Partido("Saints", "Ravens", estado="Scheduled", inicio=ahora + timedelta(hours=3)),
+    ])
+    assert _proximo(capsys) == 0
+
+
+def test_proximo_ignora_una_hora_que_es_relleno(picks_en: Path, monkeypatch, capsys):
+    """Con la hora por definir no hay a qué despertarse, aunque el relleno ya haya pasado."""
+    ahora = datetime.now(timezone.utc)
+    _con_partidos(monkeypatch, picks_en, [
+        Partido("Lions", "Bills", estado="Scheduled", inicio=ahora - timedelta(hours=1), hora_definida=False),
+        Partido("Saints", "Ravens", estado="Scheduled", inicio=ahora + timedelta(hours=2), hora_definida=False),
+    ])
+    assert _proximo(capsys) == -1
+
+
+def test_proximo_no_se_queda_pegado_a_un_partido_pospuesto(picks_en: Path, monkeypatch, capsys):
+    """Abierto y con su hora muy atrás: si contara, el directo correría para siempre."""
+    ahora = datetime.now(timezone.utc)
+    _con_partidos(monkeypatch, picks_en, [
+        Partido("Lions", "Bills", estado="Postponed", inicio=ahora - timedelta(days=2)),
+    ])
+    assert _proximo(capsys) == -1
+
+
+def test_proximo_sin_nada_abierto_es_menos_uno(picks_en: Path, monkeypatch, capsys):
+    _con_partidos(monkeypatch, picks_en, [Partido("Lions", "Bills", 1, 2, "Bills", True, "Final")])
+    assert _proximo(capsys) == -1
+
+
+# --- actualizar: publica solo si hay algo que contar ---------------------------
+
+
+@pytest.fixture
+def sitio(picks_en: Path, tmp_path: Path, monkeypatch):
+    """El CLI completo, con ESPN de mentira y sin tocar docs/ ni los datos reales."""
+    crear_excel(picks_en / "Semana_02.xlsx")
+    dir_sitio = tmp_path / "docs"
+    monkeypatch.setattr(cli, "DIR_SITIO", dir_sitio)
+    monkeypatch.setattr(cli, "RUTA_SELLOS", tmp_path / "sellos.json")
+
+    # ESPN es lo único de mentira: el caché lo maneja el código de verdad.
+    dir_cache = tmp_path / "resultados"
+    futuro = datetime.now(timezone.utc) + timedelta(days=2)
+    estado = {"partidos": [
+        Partido(v, l, 0, 0, None, False, "Scheduled", futuro) for v, l in ENFRENTAMIENTOS_S2
+    ]}
+    monkeypatch.setattr(espn, "_consultar_api", lambda anio, semana: {"semana": semana})
+
+    def parsear(carga):
+        if carga["semana"] != 2:
+            raise cli.ErrorESPN("sin partidos todavía")
+        return estado["partidos"]
+
+    monkeypatch.setattr(espn, "parsear_scoreboard", parsear)
+    monkeypatch.setattr(cli, "obtener_partidos", lambda anio, semana, sin_red=False: espn.obtener_partidos(
+        anio, semana, sin_red=sin_red, dir_cache=dir_cache, ruta_overrides=tmp_path / "no.json"))
+    monkeypatch.setattr(cli, "tabla_general", lambda rutas: tabla_general(
+        rutas, dir_cache=dir_cache, ruta_overrides=tmp_path / "no.json"))
+    return dir_sitio, estado
+
+
+def _actualizar() -> int:
+    return cli.comando_actualizar(cli.construir_parser().parse_args(["actualizar"]))
+
+
+def _huellas(carpeta: Path) -> dict[str, bytes]:
+    return {r.name: r.read_bytes() for r in carpeta.iterdir()}
+
+
+def test_sin_novedad_no_cambia_ni_un_archivo(sitio):
+    dir_sitio, _ = sitio
+    assert _actualizar() == 0
+    antes = _huellas(dir_sitio)
+    assert {"index.html", "tabla.png", "portada.png", "version.json"} <= set(antes)
+    assert _actualizar() == 0
+    assert _huellas(dir_sitio) == antes
+
+
+def test_un_partido_cerrado_si_se_publica_con_todo_e_imagenes(sitio):
+    dir_sitio, estado = sitio
+    _actualizar()
+    antes = _huellas(dir_sitio)
+    primero = estado["partidos"][0]
+    estado["partidos"] = [Partido(primero.visitante, primero.local, 10, 20, primero.local, True, "Final", primero.inicio),
+                          *estado["partidos"][1:]]
+    _actualizar()
+    despues = _huellas(dir_sitio)
+    for archivo in ("index.html", "tabla.png", "portada.png", "version.json"):
+        assert despues[archivo] != antes[archivo], archivo
+
+
+def test_los_marcadores_de_un_partido_abierto_no_publican_nada(sitio):
+    dir_sitio, estado = sitio
+    _actualizar()
+    antes = _huellas(dir_sitio)
+    primero = estado["partidos"][0]
+    # Se mueve el marcador, pero el partido todavía es del futuro: no toca latido.
+    estado["partidos"] = [Partido(primero.visitante, primero.local, 7, 3, None, False, "In Progress", primero.inicio),
+                          *estado["partidos"][1:]]
+    _actualizar()
+    assert _huellas(dir_sitio) == antes
+
+
+def test_la_imagen_cuenta_toda_la_semana_y_no_solo_lo_repartido(picks_en: Path, tmp_path: Path, monkeypatch):
+    """Con la hoja del jueves decía "1 de 1 partidos" con 14 en la jornada."""
+    crear_excel(picks_en / "Semana_02.xlsx", enfrentamientos=ENFRENTAMIENTOS_S2[:1],
+                picks={nombre: elegidos[:1] for nombre, elegidos in PICKS_S2.items()})
+    monkeypatch.setattr(cli, "DIR_SITIO", tmp_path / "docs")
+    monkeypatch.setattr(cli, "RUTA_SELLOS", tmp_path / "sellos.json")
+    futuro = datetime.now(timezone.utc) + timedelta(days=2)
+    jornada = [Partido(v, l, 0, 0, None, False, "Scheduled", futuro) for v, l in ENFRENTAMIENTOS_S2]
+    jornada[0] = Partido(jornada[0].visitante, jornada[0].local, 3, 7, jornada[0].local, True, "Final", futuro)
+
+    def obtener(anio, semana, sin_red=False):
+        if semana != 2:
+            raise cli.ErrorESPN("sin partidos todavía")
+        return jornada
+
+    from quiniela.espn import guardar_cache
+    guardar_cache(2, jornada, tmp_path / "resultados")
+    monkeypatch.setattr(cli, "obtener_partidos", obtener)
+    monkeypatch.setattr(cli, "tabla_general", lambda rutas: tabla_general(
+        rutas, dir_cache=tmp_path / "resultados", ruta_overrides=tmp_path / "no.json"))
+
+    vistos = {}
+    monkeypatch.setattr(cli, "generar_png", lambda **k: vistos.update(k))
+    monkeypatch.setattr(cli, "generar_portada", lambda **k: None)
+    assert _actualizar() == 0
+    assert (vistos["cerrados"], vistos["total_partidos"]) == (1, 16)
+
+
+def test_una_semana_vieja_con_un_partido_abierto_tambien_se_consulta(picks_en: Path, monkeypatch, tmp_path: Path):
+    """Si la hoja siguiente llegaba antes de cerrar el lunes, ese partido no cerraba nunca."""
+    crear_excel(picks_en / "Semana_02.xlsx", semana=2)
+    crear_excel(picks_en / "Semana_03.xlsx", semana=3)
+    monkeypatch.setattr(cli, "RUTA_SELLOS", tmp_path / "sellos.json")
+    pedidas = []
+
+    def obtener(anio, semana, sin_red=False):
+        pedidas.append((semana, sin_red))
+        return [Partido(v, l, 1, 2, l, True, "Final") for v, l in ENFRENTAMIENTOS_S2]
+
+    monkeypatch.setattr(cli, "obtener_partidos", obtener)
+    cli.construir_semanas(2026, False)
+    # obtener_partidos es quien decide no tocar la red si ya está todo cerrado.
+    assert pedidas == [(2, False), (3, False)]
+
+
+def test_la_franja_de_la_imagen_es_de_la_ultima_semana_cerrada(picks_en: Path, tmp_path: Path, monkeypatch):
+    import pandas as pd
+
+    from quiniela.render_html import SemanaRender
+
+    tabla = pd.DataFrame([
+        {"posicion": 1, "participante": "Ana", "firme": 12, "errores": 4},
+        {"posicion": 2, "participante": "Beto", "firme": 10, "errores": 6},
+    ])
+    cerrada = SemanaRender(7, [Partido("Lions", "Bills", 1, 2, "Bills", True, "Final")], {"Ana": ["Bills"]}, tabla)
+    en_curso = SemanaRender(8, [Partido("Saints", "Ravens", 1, 2, "Ravens", True, "Final"),
+                                Partido("Jets", "Bears", estado="Scheduled")], {"Ana": ["Ravens", "Jets"]}, tabla)
+    franja = cli._ganador_para_imagen([cerrada, en_curso], en_curso)
+    assert franja["semana_ganadores"] == 7 and franja["ganadores"] == ["Ana"]
+    assert franja["oficial"] is True and franja["premio"] == "$5,200"
+    # Sin ninguna cerrada todavía no hay nada que presumir.
+    assert cli._ganador_para_imagen([en_curso], en_curso) == {}

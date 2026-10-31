@@ -1,23 +1,25 @@
 name: Directo
 
-# El cron de GitHub no es de fiar: tardó horas en activarse en este repo y de
-# ~40 corridas solo 3 fueron programadas. Así que este workflow no depende de
-# que dispare seguido, sino de arrancar y encadenarse:
+# El cron de GitHub no es de fiar: tardó horas en activarse en este repo, llega
+# de 2 a 5 horas tarde y a veces se salta corridas. Y la NFL también juega miércoles,
+# viernes y sábados. Así que este workflow se despierta todos los días, sin
+# importar el calendario, y él mismo decide:
 #
-#   1. Pregunta cuándo es el próximo partido.
-#   2. Si falta mucho pero cabe en este eslabón, duerme hasta unos minutos
-#      antes y se pone a recalcular cada dos minutos.
-#   3. Si no cabe (un job dura como máximo 6 horas), duerme lo que puede y
-#      lanza el siguiente eslabón antes de morir.
-#   4. Cuando cierra el último partido, o si el próximo está a más de 12 horas,
-#      se detiene. No se queda encendido toda la semana.
+#   1. Le pregunta a ESPN si cambió algo (un horario que se definió, un partido
+#      que se movió) y luego cuándo es el próximo partido.
+#   2. Si está a más de 12 horas, o no queda ninguno, se detiene. Es un minuto
+#      de trabajo: no se queda encendido toda la semana.
+#   3. Si está cerca, duerme hasta unos minutos antes y se pone a recalcular
+#      cada dos minutos, solo mientras haya un partido en curso.
+#   4. Si no cabe (un job dura como máximo 6 horas), duerme lo que puede y lanza
+#      el siguiente eslabón antes de morir.
 #
-# CDMX está fija en UTC-6, así que la hora local + 6 da la UTC.
+# Cada seis horas con un retraso de hasta cinco, siempre cae al menos una corrida
+# en las 12 horas antes de cualquier partido. El minuto 17 es a propósito: GitHub
+# avisa que la hora en punto es cuando más se retrasa o descarta.
 on:
   schedule:
-    - cron: "0 17 * * 0"   # domingo 11:00 CDMX
-    - cron: "0 0 * * 5"    # jueves  18:00 CDMX (viernes en UTC)
-    - cron: "0 0 * * 2"    # lunes   18:00 CDMX (martes en UTC)
+    - cron: "17 0,6,12,18 * * *"   # 18:17, 00:17, 06:17 y 12:17 en CDMX
   workflow_dispatch:
     inputs:
       minutos:
@@ -52,7 +54,8 @@ jobs:
       CADA: ${{ inputs.cada || '120' }}
       ESLABON: ${{ inputs.eslabon || '1' }}
       MAX_ESLABONES: "6"
-      # Si el próximo partido está más lejos que esto, no vale la pena seguir.
+      # Si el próximo partido está más lejos que esto, no vale la pena seguir:
+      # la siguiente corrida programada lo alcanza a tiempo.
       VENTANA: "43200"   # 12 horas
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -95,48 +98,51 @@ jobs:
           LIMITE=$(( $(date -u +%s) + MINUTOS * 60 ))
           echo "Eslabón $ESLABON de máximo $MAX_ESLABONES."
 
-          PROXIMO=$(python cli.py proximo 2>/dev/null || echo -1)
-          echo "Próximo partido en $PROXIMO segundos."
-
-          if [ "$PROXIMO" -lt 0 ]; then
-            echo "No hay partidos pendientes: nada que seguir."
-            exit 0
-          fi
-
-          if [ "$PROXIMO" -gt "$VENTANA" ]; then
-            echo "El próximo partido está a más de $(( VENTANA / 3600 )) horas. Me detengo."
-            exit 0
-          fi
-
-          if [ "$PROXIMO" -gt 0 ]; then
-            # Despertar cinco minutos antes del saque inicial.
-            ESPERA=$(( PROXIMO - 300 ))
-            [ "$ESPERA" -lt 0 ] && ESPERA=0
-            MARGEN=$(( LIMITE - $(date -u +%s) - 120 ))
-            if [ "$ESPERA" -ge "$MARGEN" ]; then
-              echo "No alcanzo el partido en este eslabón: duermo $(( MARGEN / 60 )) min y encadeno."
-              [ "$MARGEN" -gt 0 ] && sleep "$MARGEN"
-              echo "encadenar=si" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            echo "Duermo $(( ESPERA / 60 )) min hasta el arranque."
-            sleep "$ESPERA"
+          # Si esta corrida se quedó en cola, su copia ya es vieja. Y si ESPN no
+          # contesta ahorita no se publica nada: el próximo partido se calcula
+          # con el último calendario guardado.
+          sincronizar
+          if python cli.py actualizar; then
+            publicar || true
+          else
+            echo "No pude consultar ESPN en este arranque; sigo con lo que hay."
           fi
 
           VUELTA=0
           while [ "$(date -u +%s)" -lt "$LIMITE" ]; do
+            PROXIMO=$(python cli.py proximo 2>/dev/null || echo -1)
+            echo "Próximo partido en $PROXIMO segundos."
+
+            if [ "$PROXIMO" -lt 0 ]; then
+              echo "No queda ningún partido por seguir."
+              exit 0
+            fi
+
+            if [ "$PROXIMO" -gt "$VENTANA" ]; then
+              echo "El próximo partido está a más de $(( VENTANA / 3600 )) horas. Me detengo."
+              exit 0
+            fi
+
+            # Sin partido en curso no hay nada que recalcular: se despierta
+            # cinco minutos antes del saque inicial.
+            ESPERA=$(( PROXIMO - 300 ))
+            if [ "$ESPERA" -gt 0 ]; then
+              MARGEN=$(( LIMITE - $(date -u +%s) - 120 ))
+              if [ "$ESPERA" -ge "$MARGEN" ]; then
+                echo "No alcanzo el partido en este eslabón: duermo $(( MARGEN / 60 )) min y encadeno."
+                [ "$MARGEN" -gt 0 ] && sleep "$MARGEN"
+                echo "encadenar=si" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              echo "Duermo $(( ESPERA / 60 )) min hasta el arranque."
+              sleep "$ESPERA"
+            fi
+
             VUELTA=$(( VUELTA + 1 ))
             echo "── vuelta $VUELTA · $(date -u '+%H:%M:%S UTC') ──"
             sincronizar
             python cli.py actualizar
             publicar || true
-
-            ABIERTOS=$(python cli.py pendientes 2>/dev/null || echo 1)
-            echo "Partidos abiertos: $ABIERTOS"
-            if [ "$ABIERTOS" = "0" ]; then
-              echo "Todo cerrado: se acabó la jornada."
-              exit 0
-            fi
             sleep "$CADA"
           done
 

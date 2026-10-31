@@ -30,13 +30,12 @@ python cli.py escenarios --participante "Angel D Luffy"
 python cli.py validar --semana 2               # solo revisa el archivo, no calcula
 python cli.py importar ~/Downloads/"Quiniela 3.pdf"   # lo revisa todo y lo guarda
 python cli.py importar archivo.xlsx --solo-revisar    # revisa todo sin guardar nada
-python cli.py pendientes --semana 2            # cuántos partidos siguen abiertos
 python cli.py proximo                          # segundos al próximo partido
 ```
 
-Si omites `--semana`, se usa la última semana con archivo de picks. `pendientes`
-y `proximo` existen para el workflow **Directo**, que los consulta para saber si
-ponerse a trabajar, esperar o detenerse.
+Si omites `--semana`, se usa la última semana con archivo de picks. `proximo`
+existe para el workflow **Directo**, que lo consulta para saber si ponerse a
+trabajar, esperar o detenerse.
 
 ### Flujo semanal
 
@@ -485,7 +484,8 @@ Qué trae:
   claros, el tinte se baja hasta que todo cumple. `tests/test_temas.py` lo
   revisa tema por tema.
 * **Se queda donde estabas**: al recargar vuelve a la misma vista, pestaña y
-  altura de la página.
+  altura de la página. Si la recarga la hizo la página, además te devuelve tu
+  búsqueda, a quién elegiste en una lista y lo que tenías desplegado.
 * **Se guarda como app**: al agregarlo a la pantalla de inicio en iPhone o
   Android usa el logo propio y abre a pantalla completa.
 * **Tipografía propia** incrustada (Oswald recortada, 8 KB) para marcadores,
@@ -522,43 +522,60 @@ Qué trae:
 Todo es responsivo y está pensado primero para el teléfono; se probó desde 320
 px. Las animaciones se apagan solas si el dispositivo pide movimiento reducido.
 
-**No se queda con copias viejas.** Pages cachea el HTML diez minutos y esa
-cabecera no se puede cambiar. Por eso se publica `docs/version.json`: la página
-lo consulta sin caché y se recarga sola en cuanto el sitio se regenera.
+**No se queda con copias viejas, y no recarga por gusto.** Pages cachea el HTML
+diez minutos y esa cabecera no se puede cambiar. Por eso se publica
+`docs/version.json`: la página lo consulta cada 90 segundos y se recarga solo si
+cambió su **firma**, es decir, si hay algo nuevo de verdad: cerró un partido,
+llegó una hoja, se movió un horario o salió una versión. Si la persona está
+escribiendo, tiene una hoja abierta o acaba de tocar algo, se espera a la
+siguiente revisión.
 
-**Se actualiza solo.** El workflow regenera el sitio cada 15 minutos durante
-las ventanas de juego, y la página abierta en un teléfono se recarga sola cada
-5 minutos mientras haya partidos en curso.
+**Se publica solo lo que cambia.** El marcador de un partido en curso lo pide
+cada navegador a ESPN, así que no cuenta como novedad. Mientras se juega y no
+hay nada nuevo, cada 20 minutos se reescribe solo `version.json`: es el latido
+que le dice a la página que el cálculo sigue vivo.
 
-`docs/tabla.png` es la general como imagen de 1080 px de ancho. Con más de 18
-participantes se parte en dos columnas para que quede casi cuadrada y se lea en
-la vista previa de WhatsApp sin abrirla.
+**Los partidos sin hora se dicen así.** Mientras la NFL no fija la hora, ESPN
+trae las 00:00 del este del día probable, que en CDMX parece sábado a las 23:00.
+Ese relleno no se muestra ni se usa para nada: el partido dice "Hora por
+definir", va al final de la semana y entra en la tanda de su día. Si ninguno de
+la tanda tiene hora, su cierre sale "(por confirmar)".
+
+`docs/tabla.png` es la general como imagen de 1080 px de ancho, con el campo y
+el vidrio del portal, la medalla solo para los tres primeros lugares y una franja
+con el ganador. Con más de 18 participantes se parte en dos columnas para que
+quede casi cuadrada y se lea en WhatsApp sin abrirla. `docs/portada.png` (1200 ×
+630) es lo que se ve al compartir el enlace; lleva lo importante al centro porque
+hay chats que la recortan en cuadrado.
 
 Las horas se muestran en horario de Ciudad de México, que está fijo en UTC-6
 todo el año desde que México eliminó el horario de verano en 2022.
 
 ## Automatización
 
-Hay dos workflows, porque el cron de GitHub no es de fiar: en repos nuevos
-tarda en activarse y GitHub avisa que retrasa o descarta corridas programadas
-cuando hay carga.
+Hay dos workflows, porque el cron de GitHub no es de fiar: llega de 2 a 5 horas
+tarde y GitHub avisa que descarta corridas programadas cuando hay carga.
 
-**`directo.yml`** es el que trabaja durante los partidos. Necesita arrancar una
-sola vez por ventana (jueves, domingo y lunes) y de ahí se queda corriendo
-hasta 5 horas, recalculando cada 2 minutos y parando cuando cierra el último
-partido. Cada vuelta arranca de lo que está publicado, así que si subes un
-Excel nuevo o se corrige algo a media tarde, entra sin reiniciar el directo.
-Para arrancarlo a mano:
+**`directo.yml`** es el que trabaja durante los partidos. Se despierta cada seis
+horas, todos los días, porque la NFL también juega miércoles, viernes y sábados.
+Primero le pregunta a ESPN si cambió algo. Si el próximo partido está a más de
+12 horas se detiene, y eso es un minuto de trabajo. Si está cerca, duerme hasta
+cinco minutos antes y recalcula cada 2 minutos mientras haya un partido en curso;
+entre partidos vuelve a dormir. Un job dura 6 horas como máximo, así que al
+acabarse el tiempo lanza el siguiente eslabón. Cada vuelta arranca de lo que está
+publicado, así que si subes un Excel nuevo o se corrige algo a media tarde, entra
+sin reiniciar el directo. Para arrancarlo a mano:
 
 ```bash
 gh workflow run directo.yml --repo <cuenta>/<repo> -f minutos=300 -f cada=120
 ```
 
-**`actualizar.yml`** es el respaldo: corre cada 5 minutos en las mismas
-ventanas, cuando subes un Excel nuevo y cuando lo disparas a mano.
+**`actualizar.yml`** es el respaldo: corre cada 5 minutos en las ventanas de
+jueves, domingo y lunes, cuando subes un Excel nuevo y cuando lo disparas a mano.
 
 Cada corrida recalcula y hace commit de `docs/`, `data/resultados/` y
-`data/sellos.json` si algo cambió. Si otra corrida publicó mientras tanto, se
+`data/sellos.json` solo si algo cambió: sin novedad, ningún archivo se toca y no
+hay commit ni publicación. Si otra corrida publicó mientras tanto, se
 pone encima de lo publicado y **recalcula** antes de volver a intentar: nunca
 reintenta con `reset --soft`, que volvía a subir los archivos viejos de esa
 corrida y deshacía en silencio lo que la otra hubiera cambiado, incluidos los
@@ -600,7 +617,8 @@ publicación. Acepta dos argumentos: `./crear_repo.sh nombre-del-repo private`.
 
 El sitio queda en `https://<tu-cuenta>.github.io/<nombre-del-repo>/`. Ese es el
 enlace que se comparte al grupo. La imagen para WhatsApp queda en
-`.../tabla.png`.
+`.../tabla.png`. Si cambias de dirección, actualiza `SITIO` en `quiniela/carga.py`:
+de ahí sale la vista previa del enlace.
 
 > En macOS, si `git` responde *"You have not agreed to the Xcode license"*,
 > corre una sola vez:
@@ -639,7 +657,7 @@ quiniela/
   enlace.py        el lado del workflow de la carga por enlace
   scoring.py       tablas, escenarios, panorama, premios
   render_html.py   la página, los temas, el contraste y el orden de la NFL
-  render_png.py    imagen para WhatsApp e iconos de app
+  render_png.py    imágenes para WhatsApp e iconos de app
   marca.py         el logo: una sola geometría para SVG, favicon, canvas e iconos
   plantillas/      index.html.j2 (el portal), cargar.html.j2 (la página del
                    enlace) y red.html.j2 (la prueba de conexión)
@@ -655,20 +673,21 @@ docs/              lo que se publica en GitHub Pages
   index.html       el portal entero, en un solo archivo
   cargar.html      la página del enlace de carga
   tabla.png        imagen para WhatsApp
-  version.json     sello de versión contra el caché de Pages
+  portada.png      vista previa al compartir el enlace
+  version.json     sello de versión contra el caché de Pages, con la firma y el latido
   icono-*.png      iconos para guardar el sitio como app
   manifest.webmanifest
 .github/
   workflows/
     actualizar.yml cron cada 5 min en ventanas + push de picks + manual
-    directo.yml    bucle que sigue la jornada y se encadena solo
+    directo.yml    se despierta a diario, sigue la jornada y se encadena solo
     cargar.yml     revisa y publica lo que llega por el enlace o por la forma
   ISSUE_TEMPLATE/
     cargar-semana.yml  la forma
 supabase/functions/angabave-carga/   la función que recibe los archivos del enlace
 herramientas/llaves.py               crea, lista y anula enlaces de carga
 herramientas/momentos.py             el portal en otros momentos de la semana
-tests/             403 pruebas de Python y 13 de la función; ninguna toca la red
+tests/             459 pruebas de Python y 13 de la función; ninguna toca la red
 cli.py
 crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 ```
@@ -688,8 +707,10 @@ crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
 | Cuándo se proyecta el ganador semanal | `UMBRAL_SEMANA` (8 de esa semana) | `render_html.py` |
 | Cuántos empatados se enlistan | `MAXIMO_NOMBRES`, `MAXIMO_NOMBRES_PODIO` | `render_html.py` |
 | Cada cuánto consulta marcadores el navegador | `SEGUNDOS_VIVO` (60 s) | `render_html.py` |
-| Cada cuánto se recarga la página entera | `SEGUNDOS_RECARGA` (600 s) | `render_html.py` |
-| Cuándo se avisa que la tabla va vieja | `MINUTOS_REZAGO` (25 min) | `render_html.py` |
+| Cada cuánto se avisa que el cálculo sigue vivo | `MINUTOS_LATIDO` (20 min) | `render_html.py` |
+| Cuándo se avisa que la tabla va vieja | `MINUTOS_REZAGO` (35 min) | `render_html.py` |
+| Hasta cuándo se sigue un partido abierto | `MAXIMO_ABIERTO` (12 h) | `espn.py` |
+| Qué partidos se siguen por adelantado | `VENTANA` (12 h) | `directo.yml` |
 | Colores y contraste de los temas | `COLORES_EQUIPO`, `FUERZA_TEMA`, `CONTRASTE_MINIMO` | `render_html.py` |
 | El campo, el vidrio y las luces | `BASE_CAMPO`, `OPACIDAD_VIDRIO`, `OPACIDAD_CRISTAL`, `LUZ_ESTADIO`, `GRANO_SVG` | `render_html.py` |
 | Timeout y reintentos de ESPN | `TIEMPO_ESPERA`, `MAX_REINTENTOS`, `ESPERA_BASE` | `espn.py` |
@@ -700,6 +721,11 @@ crear_repo.sh      crea el repo en GitHub, sube y enciende Pages
   un solo lugar (`_orden_nfl`). Reordenarlos obliga a reordenar los picks de
   cada quien con ellos; si se despegan, el conteo queda mal y **no se ve**. Hay
   una prueba que lo verifica pick por pick.
+* **Nada se publica si no hay novedad.** Lo decide la firma de `render_html.py`:
+  cubre los datos oficiales y el código que los dibuja, y deja fuera la hora y los
+  marcadores en curso. Con cada vuelta publicando, un jueves salieron 95 commits
+  con 82 vacíos, 170 KB de imagen cada uno, y a cada teléfono se le recargaba la
+  página. Si un dato nuevo tiene que verse, tiene que entrar en la firma.
 * **El navegador nunca cierra un partido ni toca el conteo oficial.** La capa en
   vivo solo refresca marcadores de partidos que CI tiene abiertos. Así, un error
   de la API jamás puede producir una tabla equivocada.

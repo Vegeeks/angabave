@@ -79,13 +79,20 @@ def test_la_pagina_no_carga_codigo_de_afuera(armado, tmp_path: Path):
     assert not re.search(r'<link[^>]+rel="stylesheet"', html, re.I)
 
 
+def _externas(html: str) -> set[str]:
+    """Las direcciones que la página pide al abrirse. Las de la vista previa las lee
+    el chat donde se comparte el enlace; el navegador no pide nada a ninguna."""
+    sin_vista_previa = re.sub(r'<meta property="og:[^>]*>', "", html)
+    externas = set(re.findall(r"https?://[^\s\"'<>]+", sin_vista_previa))
+    # El espacio de nombres de SVG es un identificador, no una petición de red.
+    externas.discard("http://www.w3.org/2000/svg")
+    return externas
+
+
 def test_la_unica_direccion_externa_es_la_de_los_marcadores(armado, tmp_path: Path):
     """El resto de los enlaces son archivos propios (iconos, manifiesto)."""
     html = render(armado, tmp_path)
-    externas = set(re.findall(r"https?://[^\s\"'<>]+", html))
-    # El espacio de nombres de SVG es un identificador, no una petición de red.
-    externas.discard("http://www.w3.org/2000/svg")
-    assert externas == {"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"}
+    assert _externas(html) == {"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"}
     for propio in ('href="manifest.webmanifest"', 'href="icono-180.png"'):
         assert propio in html
 
@@ -282,9 +289,7 @@ def test_la_tipografia_viaja_dentro_del_html(armado, tmp_path: Path):
     assert "@font-face" in html
     assert "src:url(data:font/woff2;base64," in html
     # Y sigue sin haber más direcciones externas que la de los marcadores.
-    externas = set(re.findall(r"https?://[^\s\"'<>]+", html))
-    externas.discard("http://www.w3.org/2000/svg")
-    assert externas == {"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"}
+    assert _externas(html) == {"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"}
 
 
 def test_la_fuente_solo_se_usa_en_mayusculas_y_cifras(armado, tmp_path: Path):
@@ -367,6 +372,7 @@ def test_se_publica_un_sello_de_version(armado, tmp_path: Path):
     sello = _json.loads((tmp_path / "version.json").read_text(encoding="utf-8"))
     assert sello["generado"] == MOMENTO.isoformat()
     assert sello["version"].startswith("v")
+    assert sello["firma"] == datos_embebidos((tmp_path / "index.html").read_text(encoding="utf-8"))["firma"]
 
 
 def test_la_pagina_vigila_su_propia_version(armado, tmp_path: Path):
@@ -524,6 +530,37 @@ def test_el_portal_no_se_recarga_en_bucle():
     assert "previa.version === version && ahora - previa.cuando < ONCE_MIN" in plantilla
 
 
+def test_el_portal_solo_se_recarga_si_cambio_la_firma(armado, tmp_path: Path):
+    """Antes se recargaba cada diez minutos, todo el año, con o sin novedades."""
+    html = render(armado, tmp_path)
+    assert "recarga" not in datos_embebidos(html)
+    assert "D.recarga" not in html
+    revisar = _funcion(html, "revisarVersion")
+    assert "sello.firma === D.firma" in revisar
+    # La hora nueva sin firma nueva es un latido: se anota y nada más.
+    assert revisar.index("latido = publicada") < revisar.index("sello.firma === D.firma")
+    # Y no se le recarga a quien está en medio de algo.
+    assert revisar.index('.hoja-fondo') < revisar.index("recargarFresco(")
+    assert "escribiendo()" in revisar and "ultimoToque" in revisar
+
+
+def test_redibujar_le_devuelve_a_la_persona_lo_que_tenia_a_medias(armado, tmp_path: Path):
+    """El marcador redibujaba la vista cada minuto y borraba búsquedas y elecciones."""
+    html = render(armado, tmp_path)
+    consultar = _funcion(html, "consultarVivo")
+    assert "repintar()" not in consultar and "repintarSinEstorbar()" in consultar
+    assert "JSON.stringify(todosLosJuegos(s)) !== antes" in consultar
+    sin_estorbar = _funcion(html, "repintarSinEstorbar")
+    assert sin_estorbar.index("leerControles()") < sin_estorbar.index("repintar()") < sin_estorbar.index("reponerControles(")
+    # Las listas se recuerdan por el nombre: su valor es la posición en la tabla.
+    assert "selectedOptions" in _funcion(html, "leerControles")
+    assert "o.text === valores[i]" in _funcion(html, "reponerControles")
+    assert "controles: leerControles()" in _funcion(html, "recordarSitio")
+    # Solo si la recarga la hizo la página: quien recarga a mano quiere empezar de cero.
+    assert "if (automatica) reponerControles(guardado.controles);" in html
+    assert "recargaAutomatica = true;" in _funcion(html, "recargarFresco")
+
+
 def test_compatibilidad_con_safari_viejo():
     raiz = Path(__file__).resolve().parents[1] / "quiniela" / "plantillas"
     portal = (raiz / "index.html.j2").read_text(encoding="utf-8")
@@ -599,7 +636,11 @@ def test_el_aviso_de_rezago_solo_si_algo_ya_arranco(armado, tmp_path: Path):
     html = render(armado, tmp_path)
     rezago = html[html.index("function avisoDeRezago"):]
     rezago = rezago[:rezago.index("\n  }\n")]
-    assert "arrancoSinCerrar" in rezago and "if (!arrancoSinCerrar) return null;" in rezago
+    assert "if (!arrancados.length) return null;" in rezago
+    # Sin novedades el sitio ya no se publica: se cuenta desde el último latido o
+    # desde la patada, no desde la última publicación de hace tres días.
+    assert "Math.max(latido, Math.min(" in rezago
+    assert "!latidoVisto" in rezago   # sin saber el último latido no se alarma a nadie
 
 
 def test_los_iconos_de_la_app_salen_de_la_marca(tmp_path: Path):
@@ -759,3 +800,261 @@ def test_los_scripts_de_la_pagina_no_tienen_errores_de_sintaxis(armado, tmp_path
         archivo.write_text(codigo, encoding="utf-8")
         revision = subprocess.run(["node", "--check", str(archivo)], capture_output=True, text=True)
         assert revision.returncode == 0, revision.stderr
+
+
+# --- publicar solo si hay algo que contar ---------------------------------------
+
+
+def _generar(armado, ruta: Path, momento: datetime = MOMENTO) -> dict:
+    semanas, general = armado
+    generar_html(anio=2026, semanas=semanas, tabla_acumulada=general,
+                 ruta_salida=ruta / "index.html", momento=momento)
+    return json.loads((ruta / "version.json").read_text(encoding="utf-8"))
+
+
+def _con_partidos(armado, cambio) -> tuple:
+    """El mismo armado con los partidos de la primera semana retocados."""
+    semanas, general = armado
+    primera = semanas[0]
+    return ([SemanaRender(primera.numero, cambio(list(primera.partidos)), primera.picks, primera.tabla,
+                          primera.panorama, primera.faltantes), *semanas[1:]], general)
+
+
+def test_la_firma_no_cambia_con_el_orden_de_los_empatados(armado, tmp_path: Path):
+    """Dentro de un empate las filas siguen a quien va ganando: eso no es noticia."""
+    from quiniela.render_html import _firma
+
+    semana = {"partidos": [], "por_entregar": [], "tabla": [{"p": 0, "pos": 1, "f": 3, "e": 0}, {"p": 1, "pos": 1, "f": 3, "e": 0}]}
+    volteada = {**semana, "tabla": semana["tabla"][::-1]}
+    assert _firma({"semanas": [semana]}) == _firma({"semanas": [volteada]})
+    otra = {**semana, "tabla": [{"p": 0, "pos": 1, "f": 4, "e": 0}, {"p": 1, "pos": 2, "f": 3, "e": 0}]}
+    assert _firma({"semanas": [semana]}) != _firma({"semanas": [otra]})
+
+
+def test_la_firma_no_cambia_con_la_hora_ni_con_los_marcadores_en_curso(armado, tmp_path: Path):
+    (tmp_path / "a").mkdir(), (tmp_path / "b").mkdir()
+    base = _generar(armado, tmp_path / "a")
+
+    def se_mueve_el_marcador(partidos):
+        p = partidos[1]
+        partidos[1] = Partido(p.visitante, p.local, 21, 28, None, False, "Halftime", p.inicio)
+        p = partidos[2]
+        partidos[2] = Partido(p.visitante, p.local, 3, 0, None, False, "In Progress", p.inicio)  # arrancó
+        return partidos
+
+    otra = _generar(_con_partidos(armado, se_mueve_el_marcador), tmp_path / "b", MOMENTO + timedelta(hours=3))
+    assert otra["firma"] == base["firma"]
+
+
+@pytest.mark.parametrize("cambio", [
+    lambda p: Partido(p.visitante, p.local, 21, 28, p.local, True, "Final", p.inicio),
+    lambda p: Partido(p.visitante, p.local, 0, 0, None, False, "Postponed", p.inicio),
+    lambda p: Partido(p.visitante, p.local, 0, 0, None, False, "Scheduled", datetime(2026, 9, 21, 17, tzinfo=timezone.utc)),
+    lambda p: Partido(p.visitante, p.local, 0, 0, None, False, "Scheduled", datetime(2026, 9, 21, 5, tzinfo=timezone.utc), hora_definida=False),
+], ids=["cerro", "pospuesto", "se-movio", "hora-por-definir"])
+def test_la_firma_si_cambia_con_lo_que_dura(armado, tmp_path: Path, cambio):
+    (tmp_path / "a").mkdir(), (tmp_path / "b").mkdir()
+    base = _generar(armado, tmp_path / "a")
+
+    def retoca(partidos):
+        partidos[2] = cambio(partidos[2])
+        return partidos
+
+    assert _generar(_con_partidos(armado, retoca), tmp_path / "b")["firma"] != base["firma"]
+
+
+def test_sin_novedad_la_pagina_se_queda_como_esta(armado, tmp_path: Path):
+    primera = _generar(armado, tmp_path)
+    html = (tmp_path / "index.html").read_bytes()
+    segunda = _generar(armado, tmp_path, MOMENTO + timedelta(hours=2))
+    assert segunda == primera                      # ni la hora: no hay partido en curso
+    assert (tmp_path / "index.html").read_bytes() == html
+
+
+def _en_curso(armado, arranque: datetime):
+    def retoca(partidos):
+        p = partidos[1]
+        partidos[1] = Partido(p.visitante, p.local, 7, 3, None, False, "In Progress", arranque)
+        return partidos
+    return _con_partidos(armado, retoca)
+
+
+def test_con_un_partido_en_curso_hay_latido_y_solo_toca_el_sello(armado, tmp_path: Path):
+    armado_vivo = _en_curso(armado, MOMENTO - timedelta(minutes=10))
+    primera = _generar(armado_vivo, tmp_path)
+    html = (tmp_path / "index.html").read_bytes()
+
+    # A los diez minutos todavía no toca.
+    assert _generar(armado_vivo, tmp_path, MOMENTO + timedelta(minutes=10)) == primera
+    # A los veinte sí, y el sello es lo único que cambia: la página no se recarga por eso.
+    latido = MOMENTO + timedelta(minutes=20)
+    segunda = _generar(armado_vivo, tmp_path, latido)
+    assert segunda["generado"] == latido.isoformat() and segunda["firma"] == primera["firma"]
+    assert (tmp_path / "index.html").read_bytes() == html
+
+
+def test_un_partido_pospuesto_no_da_latidos_para_siempre(armado, tmp_path: Path):
+    armado_viejo = _en_curso(armado, MOMENTO - timedelta(hours=30))
+    primera = _generar(armado_viejo, tmp_path)
+    assert _generar(armado_viejo, tmp_path, MOMENTO + timedelta(hours=1)) == primera
+
+
+def test_un_sello_viejo_sin_firma_obliga_a_publicar(armado, tmp_path: Path):
+    _generar(armado, tmp_path)
+    (tmp_path / "version.json").write_text('{"generado": "2026-09-20T10:00:00-06:00", "version": "v0.21.0"}\n', encoding="utf-8")
+    (tmp_path / "index.html").write_text("vieja", encoding="utf-8")
+    sello = _generar(armado, tmp_path, MOMENTO + timedelta(minutes=1))
+    assert sello["firma"] and (tmp_path / "index.html").read_text(encoding="utf-8") != "vieja"
+
+
+# --- la hora por definir ----------------------------------------------------------
+
+# Lo que trae ESPN de la semana 16 de 2026: las 05:00 UTC del domingo, sábado 23:00 en CDMX.
+_RELLENO = datetime(2026, 12, 27, 5, tzinfo=timezone.utc)
+
+
+def _por_definir(visitante: str = "Buccaneers", local: str = "Falcons") -> Partido:
+    return Partido(visitante, local, 0, 0, None, False, "Scheduled", _RELLENO, hora_definida=False)
+
+
+def test_un_partido_sin_hora_no_publica_el_relleno():
+    from quiniela.render_html import _describir
+
+    d = _describir(_por_definir())
+    assert (d["e"], d["grupo"], d["t"]) == ("Hora por definir", "Hora por definir", 0)
+    assert "23:00" not in json.dumps(d)
+
+
+def test_las_tandas_de_navidad_con_partidos_sin_hora():
+    """Los domingos por definir son del domingo, no del "sábado 23:00" que parecían."""
+    from quiniela.render_html import _tandas
+
+    def juego(visitante, local, *cuando):
+        return Partido(visitante, local, 0, 0, None, False, "Scheduled", datetime(*cuando, tzinfo=timezone.utc))
+
+    tandas = _tandas([
+        juego("Texans", "Eagles", 2026, 12, 25, 1, 15),      # jueves 24, 19:15 CDMX
+        juego("Packers", "Bears", 2026, 12, 25, 18, 0),      # viernes 25
+        _por_definir(),
+        _por_definir("Bengals", "Colts"),
+        juego("Chargers", "Dolphins", 2026, 12, 27, 18, 0),  # domingo 27
+        juego("Giants", "Lions", 2026, 12, 29, 1, 15),       # lunes 28
+    ])
+    assert [t["claves"] for t in tandas] == [
+        ["Texans@Eagles", "Packers@Bears"],
+        # Los que no tienen hora, al final de su tanda.
+        ["Chargers@Dolphins", "Giants@Lions", "Buccaneers@Falcons", "Bengals@Colts"],
+    ]
+    assert tandas[0]["cierre_texto"] == "miércoles 23 de dic a las 23:59"
+    # El domingo manda: no el relleno, que habría cerrado el viernes.
+    assert tandas[1]["cierre_texto"] == "sábado 26 de dic a las 23:59"
+    assert tandas[1]["cierre"] == "2026-12-26T23:59:00-06:00"
+
+
+def test_si_ningun_partido_tiene_hora_el_cierre_es_por_confirmar():
+    """La semana 18 sale completa por definir hasta casi el final."""
+    from quiniela.render_html import _tandas
+
+    relleno = datetime(2027, 1, 10, 5, tzinfo=timezone.utc)
+    tandas = _tandas([
+        Partido("Jets", "Bills", 0, 0, None, False, "Scheduled", relleno, hora_definida=False),
+        Partido("Browns", "Bengals", 0, 0, None, False, "Scheduled", relleno, hora_definida=False),
+    ])
+    assert len(tandas) == 1
+    assert tandas[0]["cierre_texto"] == "sábado 9 de ene a las 23:59 (por confirmar)"
+
+
+def test_los_partidos_sin_hora_van_al_final_de_la_semana():
+    from quiniela.render_html import _orden_nfl
+
+    domingo = datetime(2026, 12, 27, 18, tzinfo=timezone.utc)
+    partidos = [_por_definir(), Partido("Chargers", "Dolphins", estado="Scheduled", inicio=domingo)]
+    assert _orden_nfl(partidos) == [1, 0]
+
+
+def test_el_navegador_tampoco_ordena_ni_pisa_lo_que_no_tiene_hora(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert "(a.p.t || Infinity) - (b.p.t || Infinity)" in _funcion(html, "panelPartidos")
+    assert 'crudo === "Scheduled" ? null' in _funcion(html, "parsearVivo")
+
+
+# --- la vista previa y las imágenes -----------------------------------------------
+
+
+def test_la_vista_previa_lleva_direcciones_completas(armado, tmp_path: Path):
+    """Sin dirección completa WhatsApp no encuentra la imagen."""
+    from quiniela.render_html import TAMANO_PORTADA
+
+    html = render(armado, tmp_path)
+    sello = json.loads((tmp_path / "version.json").read_text(encoding="utf-8"))
+    assert '<meta property="og:url" content="https://vegeeks.github.io/angabave/">' in html
+    assert f'<meta property="og:image" content="https://vegeeks.github.io/angabave/portada.png?v={sello["firma"]}">' in html
+    assert f'<meta property="og:image:width" content="{TAMANO_PORTADA[0]}">' in html
+    assert f'<meta property="og:image:height" content="{TAMANO_PORTADA[1]}">' in html
+    # Y antes de la tipografía y el CSS: algunos lectores solo ven el principio.
+    assert html.index('property="og:image"') < html.index("@font-face")
+
+
+def test_la_portada_mide_lo_que_declara_la_pagina(armado, tmp_path: Path):
+    from quiniela.render_html import TAMANO_PORTADA
+    from quiniela.render_png import generar_portada
+
+    _, general = armado
+    ruta = generar_portada(tabla_acumulada=general, semana=2, anio=2026, cerrados=1, total_partidos=16,
+                           ruta_salida=tmp_path / "portada.png")
+    with Image.open(ruta) as imagen:
+        assert imagen.size == TAMANO_PORTADA
+    assert ruta.stat().st_size < 300 * 1024   # WhatsApp no muestra las muy pesadas
+
+
+def test_lo_que_dicen_las_imagenes_de_la_semana():
+    from quiniela.render_png import estado_de_semana, titulo_ganadores
+
+    assert estado_de_semana(8, 1, 14) == "1 DE 14 PARTIDOS"
+    assert estado_de_semana(8, 14, 14) == "CERRADA"
+    assert titulo_ganadores(7, 1, True) == "GANADOR DE LA SEMANA 7"
+    assert titulo_ganadores(7, 2, True) == "GANADORES DE LA SEMANA 7"
+    assert titulo_ganadores(8, 3, False) == "VA GANANDO LA SEMANA 8"
+
+
+def test_quien_va_arriba_en_la_portada():
+    import pandas as pd
+
+    from quiniela.render_png import linea_de_lideres
+
+    def tabla(*filas):
+        return pd.DataFrame([{"posicion": p, "participante": n, "acumulado": a} for p, n, a in filas])
+
+    assert linea_de_lideres(tabla((1, "Ana", 69), (2, "Beto", 68))) == "Ana · 69 aciertos"
+    assert linea_de_lideres(tabla((1, "Ana", 69), (1, "Beto", 69))) == "Ana y Beto · 69 aciertos"
+    assert linea_de_lideres(tabla((1, "Ana", 69), (1, "Beto", 69), (1, "Caro", 69))) == "3 empatados en primero con 69"
+
+
+def test_la_imagen_solo_lleva_medalla_en_los_tres_primeros_lugares(tmp_path: Path):
+    """Del 4º en adelante no hay premio, y un 6º no puede salir en bronce."""
+    import pandas as pd
+
+    from quiniela.render_png import COLOR_MEDALLA, ROJO, _campo, _fila
+
+    def lienzo_con(posicion: int):
+        lienzo = _campo(500, 60)
+        _fila(lienzo, (0, 0, 500, 54), {"posicion": posicion, "participante": "Ana", "acumulado": 60, "errores": 4}, False)
+        return lienzo
+
+    # La franja de la orilla izquierda es del color de la medalla, y solo existe si hay medalla.
+    for posicion, cual in ((1, "oro"), (2, "plata"), (3, "bronce")):
+        assert lienzo_con(posicion).getpixel((1, 27))[:3] == tuple(int(COLOR_MEDALLA[cual][1][i:i + 2], 16) for i in (1, 3, 5))
+    for posicion in (4, 6, 11):
+        rojo, verde, azul = lienzo_con(posicion).getpixel((1, 27))[:3]
+        assert max(rojo, verde, azul) < 60, posicion   # se queda el pasto oscuro
+
+
+def test_la_franja_acomoda_a_los_empatados(tmp_path: Path):
+    from quiniela.render_png import _fuente, _renglones
+
+    fuente = _fuente("negrita", 25)
+    nombres = ["Luis Toledano", "Tristan Mejia"]
+    assert _renglones(nombres, fuente, 900) == ["Luis Toledano · Tristan Mejia"]
+    assert _renglones(nombres, fuente, 240) == ["Luis Toledano", "Tristan Mejia"]
+    # Si ni en dos renglones caben, se cuentan.
+    assert _renglones(nombres * 10, fuente, 300) is None

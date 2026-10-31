@@ -12,11 +12,12 @@ aunque el navegador no ejecute nada; las vistas por semana se arman al vuelo.
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import logging
 from decimal import Decimal
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from urllib.parse import quote, urlsplit
 
@@ -24,10 +25,10 @@ import pandas as pd
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 
 from . import marca
-from .carga import TAMANO_MAXIMO
+from .carga import SITIO, TAMANO_MAXIMO
 from .enlace import URL_FUNCION
 from .equipos import ABREVIATURAS_ESPN
-from .espn import URL_SCOREBOARD, Partido, a_cdmx, ahora_cdmx
+from .espn import ESTADOS_DE_AVISO, URL_SCOREBOARD, ZONA_CDMX, Partido, a_cdmx, ahora_cdmx
 from .scoring import (
     ACUMULADO_SEMANAL,
     ACUMULADO_TOTAL,
@@ -44,6 +45,8 @@ __all__ = [
     "ETAPA",
     "MARCA",
     "RUTA_SALIDA",
+    "TAMANO_PORTADA",
+    "firma_publicada",
     "generar_manifiesto",
     "generar_pagina_de_carga",
     "generar_prueba_de_red",
@@ -77,7 +80,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.21.0"
+VERSION = "v0.22.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -401,9 +404,8 @@ MAXIMO_NOMBRES = 3
 #: En el podio caben más: es el lugar donde la gente viene a buscar su nombre.
 MAXIMO_NOMBRES_PODIO = 6
 
-#: Cada cuántos segundos se recarga la página entera mientras haya juego.
-#: Es la red de seguridad: quien manda los números oficiales es CI.
-SEGUNDOS_RECARGA = 600
+#: La imagen de la vista previa al compartir el enlace.
+TAMANO_PORTADA = (1200, 630)
 
 #: Cada cuántos segundos el navegador pide marcadores a ESPN por su cuenta.
 SEGUNDOS_VIVO = 60
@@ -415,9 +417,15 @@ CORREO_ORGANIZADOR = "quinielanfl@hotmail.com"
 #: cada tanda: la del jueves cierra el miércoles, la del domingo el sábado.
 HORA_CIERRE = 23, 59
 
+#: Con un partido en curso y sin novedades, cada cuánto se avisa que el cálculo
+#: sigue vivo. Solo se reescribe version.json, y la página no se recarga por eso.
+MINUTOS_LATIDO = 20
+
 #: A partir de cuántos minutos sin recalcular se avisa que la tabla va vieja.
-#: Con partidos abiertos, quedarse callado es el peor modo de falla.
-MINUTOS_REZAGO = 25
+#: Con partidos abiertos, quedarse callado es el peor modo de falla. Deja lugar
+#: para que un latido llegue tarde: 20 de latido, unos 3 de publicar y hasta 10
+#: del caché de Pages.
+MINUTOS_REZAGO = 35
 
 #: ESPN describe el estado en inglés; aquí se traduce lo que puede aparecer.
 ESTADOS = {
@@ -476,6 +484,10 @@ class SemanaRender:
         return "en_vivo"
 
 
+#: Lo que dice un partido mientras la NFL no le pone hora.
+SIN_HORA = "Hora por definir"
+
+
 def _fecha_larga(momento: datetime) -> str:
     return f"{momento.day} {_MESES[momento.month - 1]} {momento.year}, {momento.strftime('%H:%M')}"
 
@@ -488,6 +500,8 @@ def _describir(partido: Partido) -> dict:
     """Un partido, listo para la plantilla."""
     if partido.finalizado:
         estado = "Empate" if partido.empatado else ESTADOS.get(partido.estado, "Final")
+    elif partido.sin_hora:
+        estado = SIN_HORA
     elif partido.estado == "Scheduled" and partido.inicio is not None:
         estado = _fecha_corta(a_cdmx(partido.inicio))
     else:
@@ -501,14 +515,16 @@ def _describir(partido: Partido) -> dict:
         gana = None
 
     en_juego = not partido.finalizado and partido.estado != "Scheduled"
-    local = a_cdmx(partido.inicio)
+    # Mientras la NFL no fija la hora, la que trae ESPN es relleno: no se publica.
+    inicio = None if partido.sin_hora else partido.inicio
+    local = a_cdmx(inicio)
     return {
         # Etiqueta del horario: así los partidos se agrupan como se vive la
         # jornada, por bloques, en vez de en una lista plana de dieciséis.
         "grupo": f"{_DIAS_LARGOS[local.weekday()]} {local.day} · {local.strftime('%H:%M')}"
-        if local else "Por programar",
+        if local else SIN_HORA,
         # Marca de tiempo para ordenar los bloques cronológicamente.
-        "t": int(partido.inicio.timestamp()) if partido.inicio else 0,
+        "t": int(inicio.timestamp()) if inicio else 0,
         "v": partido.visitante,
         "l": partido.local,
         "mv": partido.marcador_visitante if (partido.finalizado or en_juego) else None,
@@ -520,40 +536,55 @@ def _describir(partido: Partido) -> dict:
     }
 
 
+def _dia_de(partido: Partido) -> date:
+    """El día en que se juega, en CDMX.
+
+    Sin hora definida, ESPN pone las 00:00 del este de ese día: en CDMX todavía
+    es la víspera y un domingo por definir pasaría por sábado. Esas 00:00 caen
+    el mismo día en UTC, así que ahí el día se lee en UTC.
+    """
+    if partido.sin_hora:
+        return partido.inicio.astimezone(timezone.utc).date()
+    return a_cdmx(partido.inicio).date()
+
+
 def _tandas(partidos: list[Partido]) -> list[dict]:
     """Agrupa la jornada en tandas y calcula hasta cuándo se reciben picks.
 
     El organizador cierra a las 23:59 del día anterior al primer partido de
     cada tanda: los de jueves cierran el miércoles, y los de domingo y lunes
     cierran el sábado. Se separa en "antes del domingo" y "del domingo en
-    adelante", que es como está armado el calendario de la NFL.
+    adelante", que es como está armado el calendario de la NFL. Si en una tanda
+    ningún partido tiene hora todavía, su cierre se avisa como por confirmar.
     """
-    con_hora = [p for p in partidos if p.inicio is not None]
-    if not con_hora:
+    con_fecha = [p for p in partidos if p.inicio is not None]
+    if not con_fecha:
         return []
 
     def es_entre_semana(partido: Partido) -> bool:
         # weekday(): lunes=0 … domingo=6. Antes del domingo y después del lunes.
-        return a_cdmx(partido.inicio).weekday() not in (6, 0)
-
-    grupos: list[list[Partido]] = []
-    entre_semana = [p for p in con_hora if es_entre_semana(p)]
-    fin_de_semana = [p for p in con_hora if not es_entre_semana(p)]
-    for grupo in (entre_semana, fin_de_semana):
-        if grupo:
-            grupos.append(sorted(grupo, key=lambda p: p.inicio))
+        return _dia_de(partido).weekday() not in (6, 0)
 
     tandas = []
-    for grupo in grupos:
-        primero = a_cdmx(grupo[0].inicio)
-        cierre = (primero - timedelta(days=1)).replace(
-            hour=HORA_CIERRE[0], minute=HORA_CIERRE[1], second=0, microsecond=0
+    for grupo in (
+        [p for p in con_fecha if es_entre_semana(p)],
+        [p for p in con_fecha if not es_entre_semana(p)],
+    ):
+        if not grupo:
+            continue
+        # Los que no tienen hora van al final de su tanda.
+        grupo = sorted(grupo, key=lambda p: (p.sin_hora, p.inicio))
+        cierre = datetime.combine(
+            min(_dia_de(p) for p in grupo) - timedelta(days=1), time(*HORA_CIERRE), ZONA_CDMX
+        )
+        texto = (
+            f"{_DIAS_LARGOS[cierre.weekday()].lower()} {cierre.day} "
+            f"de {_MESES[cierre.month - 1]} a las {cierre.strftime('%H:%M')}"
         )
         tandas.append(
             {
                 "cierre": cierre.isoformat(),
-                "cierre_texto": f"{_DIAS_LARGOS[cierre.weekday()].lower()} {cierre.day} "
-                f"de {_MESES[cierre.month - 1]} a las {cierre.strftime('%H:%M')}",
+                "cierre_texto": texto + (" (por confirmar)" if all(p.sin_hora for p in grupo) else ""),
                 "claves": [p.clave for p in grupo],
             }
         )
@@ -567,12 +598,13 @@ def _orden_nfl(partidos: list[Partido]) -> list[int]:
     domingo tarde, domingo por la noche, lunes— y así la lee todo el mundo. El
     Excel del organizador los trae en otro orden y ESPN en un tercero, así que
     aquí se fija uno solo. El orden del archivo queda de desempate, para que
-    dos partidos a la misma hora no se muevan de una semana a otra.
+    dos partidos a la misma hora no se muevan de una semana a otra. Los que
+    todavía no tienen hora van al final.
     """
     return sorted(
         range(len(partidos)),
         key=lambda i: (
-            partidos[i].inicio.timestamp() if partidos[i].inicio else float("inf"),
+            partidos[i].inicio.timestamp() if partidos[i].inicio and not partidos[i].sin_hora else float("inf"),
             i,
         ),
     )
@@ -777,22 +809,84 @@ def _entorno() -> Environment:
     )
 
 
-def generar_sello_version(ruta_salida: Path, momento: datetime) -> Path:
-    """Escribe un archivo diminuto con la hora de generación.
+def generar_sello_version(ruta_salida: Path, momento: datetime, firma: str) -> Path:
+    """Escribe un archivo diminuto con la hora de generación y la firma.
 
     GitHub Pages sirve el HTML con `cache-control: max-age=600` y esa cabecera
     no se puede cambiar publicando por rama. O sea que un teléfono se queda
     hasta diez minutos con una copia vieja, justo en domingo. La página
-    consulta este archivo —unos cien bytes, sin caché— y se recarga sola en
-    cuanto detecta que hay una versión más nueva.
+    consulta este archivo —unos cien bytes, sin caché— y se recarga sola si la
+    firma es otra. La hora le dice, además, que el cálculo sigue vivo.
     """
     ruta = Path(ruta_salida)
     ruta.parent.mkdir(parents=True, exist_ok=True)
     ruta.write_text(
-        json.dumps({"generado": momento.isoformat(), "version": VERSION}, ensure_ascii=False) + "\n",
+        json.dumps({"generado": momento.isoformat(), "version": VERSION, "firma": firma}, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     return ruta
+
+
+def _sello_publicado(ruta: Path) -> dict:
+    try:
+        return json.loads(Path(ruta).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def firma_publicada(dir_sitio: Path) -> str | None:
+    """La firma de lo que ya está publicado en esa carpeta, si hay."""
+    return _sello_publicado(Path(dir_sitio) / "version.json").get("firma")
+
+
+#: Lo que cambia con cada jugada en un partido abierto. El navegador lo pide a
+#: ESPN por su cuenta: no vale una publicación ni recargarle la página a nadie.
+_PASAJERO = ("mv", "ml", "g", "vivo", "e")
+_AVISOS = {ESTADOS[estado] for estado in ESTADOS_DE_AVISO}
+
+
+def _sin_lo_pasajero(partido: dict) -> dict:
+    if partido["cerrado"]:
+        return partido
+    fijo = {clave: valor for clave, valor in partido.items() if clave not in _PASAJERO}
+    if partido["e"] in _AVISOS:
+        fijo["e"] = partido["e"]
+    return fijo
+
+
+def _firma(datos: dict) -> str:
+    """Identifica lo que se publica: si no cambia, no hay nada nuevo que contar.
+
+    Cubre los datos oficiales y el código que los dibuja, para que una versión
+    nueva también se publique. Deja fuera la hora y los marcadores en curso.
+    """
+    fijos = {clave: valor for clave, valor in datos.items() if clave not in ("actualizado", "generado")}
+    fijos["semanas"] = [
+        {
+            **semana,
+            "partidos": [_sin_lo_pasajero(p) for p in semana["partidos"]],
+            "por_entregar": [_sin_lo_pasajero(p) for p in semana["por_entregar"]],
+            # Dentro de un empate las filas siguen a quien va ganando en este momento.
+            "tabla": sorted(semana["tabla"], key=lambda fila: fila["p"]),
+        }
+        for semana in datos["semanas"]
+    ]
+    resumen = hashlib.sha256(json.dumps(fijos, ensure_ascii=False, sort_keys=True).encode("utf-8"))
+    aqui = Path(__file__).resolve().parent
+    for ruta in (*sorted(DIR_PLANTILLAS.glob("*.j2")), *(aqui / n for n in ("render_html.py", "render_png.py", "marca.py"))):
+        resumen.update(ruta.read_bytes())
+    return resumen.hexdigest()[:16]
+
+
+def _toca_latido(semanas: list[SemanaRender], sello: dict, momento: datetime) -> bool:
+    """Hay un partido en curso y ya pasó un rato desde el último sello."""
+    if not any(p.en_curso(momento) for s in semanas for p in (*s.partidos, *s.faltantes)):
+        return False
+    try:
+        anterior = datetime.fromisoformat(sello["generado"])
+    except (KeyError, TypeError, ValueError):
+        return True
+    return momento - anterior >= timedelta(minutes=MINUTOS_LATIDO)
 
 
 def generar_pagina_de_carga(ruta_salida: Path, url_funcion: str = URL_FUNCION) -> Path:
@@ -878,7 +972,11 @@ def generar_html(
     momento: datetime | None = None,
     desarrollador: str = DESARROLLADOR,
 ) -> Path:
-    """Escribe la página completa de la temporada y devuelve la ruta."""
+    """Escribe la página de la temporada y devuelve la ruta.
+
+    Si no hay novedad la deja como está: una publicación sin nada nuevo le
+    recargaba la página a todos y dejaba un commit vacío cada dos minutos.
+    """
     momento = momento or ahora_cdmx()
     semanas = sorted(semanas, key=lambda semana: semana.numero)
 
@@ -976,7 +1074,6 @@ def generar_html(
         "cerrados_temporada": cerrados_temporada,
         "umbral_podio": UMBRAL_PODIO,
         "correo": CORREO_ORGANIZADOR,
-        "recarga": SEGUNDOS_RECARGA if hay_juego else 0,
         # Capa en vivo: el navegador consulta ESPN directo. Solo refresca el
         # marcador de partidos que aquí siguen abiertos; jamás cierra uno ni
         # toca el conteo oficial, que se calcula en CI y ya está probado.
@@ -989,6 +1086,23 @@ def generar_html(
             "estados": ESTADOS,
         } if hay_juego else None,
     }
+    firma = _firma(datos)
+    datos["firma"] = firma
+
+    ruta_salida = Path(ruta_salida)
+    ruta_salida.parent.mkdir(parents=True, exist_ok=True)
+    # Estas no llevan hora: si no cambiaron, no dejan nada que publicar.
+    generar_manifiesto(ruta_salida.parent / "manifest.webmanifest")
+    generar_pagina_de_carga(ruta_salida.parent / "cargar.html")
+    generar_prueba_de_red(ruta_salida.parent / "red.html")
+
+    ruta_sello = ruta_salida.parent / "version.json"
+    sello = _sello_publicado(ruta_sello)
+    if sello.get("firma") == firma and ruta_salida.exists():
+        if _toca_latido(semanas, sello, momento):
+            generar_sello_version(ruta_sello, momento, firma)
+        _log.info("Sin novedad: %s se queda como está.", ruta_salida.name)
+        return ruta_salida
 
     podio = _armar_podio(general, participantes, reparto_hoy) if podio_listo else []
     contexto = {
@@ -1000,6 +1114,9 @@ def generar_html(
         "marca": MARCA,
         "etapa": ETAPA,
         "version": VERSION,
+        "sitio": SITIO,
+        "firma": firma,
+        "tamano_portada": TAMANO_PORTADA,
         "anio": anio,
         "desarrollador": desarrollador,
         "actualizado": _fecha_larga(momento),
@@ -1018,12 +1135,7 @@ def generar_html(
     }
 
     html = _entorno().get_template("index.html.j2").render(**contexto)
-    ruta_salida = Path(ruta_salida)
-    ruta_salida.parent.mkdir(parents=True, exist_ok=True)
     ruta_salida.write_text(html, encoding="utf-8")
-    generar_manifiesto(ruta_salida.parent / "manifest.webmanifest")
-    generar_sello_version(ruta_salida.parent / "version.json", momento)
-    generar_pagina_de_carga(ruta_salida.parent / "cargar.html")
-    generar_prueba_de_red(ruta_salida.parent / "red.html")
+    generar_sello_version(ruta_sello, momento, firma)
     _log.info("Escribí %s (%.0f KB).", ruta_salida, len(html.encode("utf-8")) / 1024)
     return ruta_salida

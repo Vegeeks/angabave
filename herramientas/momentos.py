@@ -53,9 +53,9 @@ def semana(D: dict, n: int) -> dict | None:
 
 
 def domingo_de(s: dict) -> date:
-    """El día con más partidos de la semana."""
+    """El día con más partidos de la semana, sin contar los que no tienen hora."""
     juegos = s["partidos"] + (s.get("por_entregar") or [])
-    return Counter(dia(p) for p in juegos).most_common(1)[0][0]
+    return Counter(dia(p) for p in ([p for p in juegos if p["t"]] or juegos)).most_common(1)[0][0]
 
 
 def reabrir(s: dict, desde: datetime) -> None:
@@ -75,8 +75,9 @@ def en_picks(s: dict) -> None:
     """La semana, sin repartir: el jueves cierra la víspera y el resto el sábado."""
     juegos = s["partidos"] + (s.get("por_entregar") or [])
     domingo = domingo_de(s)
-    antes = [p for p in juegos if dia(p) < domingo]
-    resto = [p for p in juegos if dia(p) >= domingo]
+    # Los que no tienen hora ("t" en cero) van con el domingo.
+    antes = [p for p in juegos if p["t"] and dia(p) < domingo]
+    resto = [p for p in juegos if p not in antes]
     tandas = []
     if antes:
         tandas.append(tanda(a_las(min(dia(p) for p in antes) - timedelta(days=1), 23, 59), antes))
