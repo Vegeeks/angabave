@@ -9,6 +9,12 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.24.0
+
+* Campo más vistoso: pasto con franjas, yardas, luces de estadio y las líneas amarilla y azul de la transmisión. Llega al abrir y luego queda quieto, sin gastar batería.
+* Duelo: ya se ve la tarjeta de quien va ganando. En la tabla semanal, medalla solo para quien ganó la semana oficial. Confeti solo para quien ganó.
+* Cancelar compartir ya no descarga la imagen. El marcador en vivo revive solo si se cae la red. El podio ya no cuenta desde cero. Fuera el neón.
+
 ## alfa v0.23.0
 
 **Rediseño completo: moderno, plano y con la línea amarilla de primera y diez como sello.**
