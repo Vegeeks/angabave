@@ -7,6 +7,7 @@
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src data:; img-src data:; connect-src {{ origen_funcion }}; base-uri 'none'; form-action 'none'">
 <meta name="author" content="{{ desarrollador }}">
+<meta name="version" content="{{ etapa }} {{ version }}">
 <meta name="theme-color" content="#041009">
 <link rel="icon" href="{{ favicon }}">
 <title>Cargar semana · {{ marca }}</title>
@@ -89,7 +90,7 @@ footer{margin-top:22px; text-align:center; font-size:.78rem; color:var(--tenue)}
   <section class="tarjeta" id="tarjeta" aria-live="polite">
     <div class="estado"><div class="giro"></div><div><h1>Revisando tu enlace…</h1></div></div>
   </section>
-  <footer>Desarrollado por {{ desarrollador }} · {{ etapa }} {{ version }}</footer>
+  <footer>Desarrollado por {{ desarrollador }} · {{ version }}</footer>
 </main>
 <script id="config" type="application/json">{{ config|tojson }}</script>
 <script>

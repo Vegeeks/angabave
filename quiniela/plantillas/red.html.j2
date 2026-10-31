@@ -33,7 +33,7 @@ button{appearance:none; border:0; border-radius:12px; background:var(--oro); col
   <ol id="lista"></ol>
   <button type="button" id="otra">Repetir la prueba</button>
   <div class="caja" id="equipo"></div>
-  <p class="tenue" style="margin-top:14px">{{ etapa }} {{ version }}</p>
+  <p class="tenue" style="margin-top:14px">{{ version }}</p>
 </main>
 <script>
 /* A propósito sin sintaxis moderna (nada de flechas ni const): esta página
@@ -99,8 +99,9 @@ button{appearance:none; border:0; border-radius:12px; background:var(--oro); col
           try { partes.push("versión " + JSON.parse(texto).version); } catch (e) { partes.push("respuesta ilegible"); }
         }
         if (prueba.leer === "pagina") {
-          var v = texto.match(/alfa v\d+\.\d+\.\d+/i);
-          partes.push(v ? v[0] : "sin versión (¿página incompleta?)");
+          // En <meta name="version">; una copia vieja del CDN todavía la trae en el pie.
+          var v = texto.match(/<meta name="version" content="([^"]+)"/i) || texto.match(/alfa v\d+\.\d+\.\d+/i);
+          partes.push(v ? (v[1] || v[0]) : "sin versión (¿página incompleta?)");
         }
         if (nodo) partes.push("nodo " + nodo.split(",").pop().trim());
         if (edad) partes.push("en caché hace " + edad + " s");
