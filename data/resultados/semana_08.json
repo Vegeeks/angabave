@@ -2,21 +2,10 @@
   "semana": 8,
   "partidos": [
     {
-      "visitante": "Ravens",
-      "local": "Bills",
-      "marcador_visitante": 10,
-      "marcador_local": 36,
-      "ganador": "Bills",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-01T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Titans",
       "local": "Bengals",
       "marcador_visitante": 36,
-      "marcador_local": 36,
+      "marcador_local": 43,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -26,11 +15,11 @@
     {
       "visitante": "Cardinals",
       "local": "Cowboys",
-      "marcador_visitante": 30,
+      "marcador_visitante": 33,
       "marcador_local": 30,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "End of Period",
+      "ganador": "Cardinals",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-01T18:00:00+00:00",
       "hora_definida": true
     },
@@ -38,11 +27,44 @@
       "visitante": "Chargers",
       "local": "Rams",
       "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
       "inicio": "2026-11-01T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Chiefs",
+      "local": "Broncos",
+      "marcador_visitante": 0,
+      "marcador_local": 3,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-01T21:25:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Patriots",
+      "local": "Dolphins",
+      "marcador_visitante": 3,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-01T21:25:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Ravens",
+      "local": "Bills",
+      "marcador_visitante": 10,
+      "marcador_local": 36,
+      "ganador": "Bills",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-01T18:00:00+00:00",
       "hora_definida": true
     },
     {
@@ -98,28 +120,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-01T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Chiefs",
-      "local": "Broncos",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-01T21:25:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Patriots",
-      "local": "Dolphins",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-01T21:25:00+00:00",
       "hora_definida": true
     },
     {
