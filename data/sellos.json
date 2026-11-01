@@ -150,14 +150,16 @@
   },
   "8": {
     "archivo": "Semana_08.xlsx",
-    "sellado": "2026-11-01T21:05:29+00:00",
+    "sellado": "2026-11-01T21:25:56+00:00",
     "partidos": {
       "Browns@Steelers": "6ee774e4229975c0d22192e9f3df75228b5fbfc5d8e8c332fa5ee494f9fa2ab7",
       "Cardinals@Cowboys": "40a65b3f847bdf5c1a368ceecad9150ebfae68cf064f316402764769459bbce8",
       "Chargers@Rams": "ff3bcf243acd8a746583f9a0417f1a6ce5c05e60c5f34a9a8ee8ee71a50e19e8",
+      "Chiefs@Broncos": "748175ed0f8c3aa01e7484d7bad5e580f70708742749d691c4828a3f749c3e8d",
       "Colts@Jaguars": "409934d176b79dc55b475118f7e0063ea92d5a0116c377857081676b0f96a344",
       "Falcons@Buccaneers": "3bf3c1881c650146cf1177d4bbb08a17ae7d880e8c95a68cc391772f74286ce0",
       "Panthers@Packers": "2b3e30d671201734ecf704da9589d51926630d676a78dafbecda55f925910945",
+      "Patriots@Dolphins": "cf2bb15815a25c0283702f8fdd341fe968a7ff5ef0b6a8703f573f772e564ec9",
       "Raiders@Jets": "bb5f9ac7a5a3a704b9f35b3b74d648b7470364ff829be11b092195d6c45b8248",
       "Ravens@Bills": "f18dcc0a8cff783b161e84fdb6d9dbf4c9349d7ed9a742b2722d0a486b64aab6",
       "Titans@Bengals": "d2d6b045a5b742d501ac5085dafc0618e172fb9e574b35ad20ade55acc8fa17d",
