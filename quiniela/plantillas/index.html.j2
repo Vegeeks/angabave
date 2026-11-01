@@ -31,7 +31,7 @@
     es para que Safari pinte :active al instante. #}
 <script>
 (function(){var r=document.documentElement;r.className='js';try{var t=localStorage.getItem('angabave.tema');if(t){r.style.cssText=t;var c=document.querySelector('meta[name="theme-color"]'),m=t.match(/--bg:([^;]+)/);if(c&&m)c.setAttribute('content',m[1])}if(!sessionStorage.getItem('angabave.estreno')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){r.className+=' estreno';window.campoRescate=setTimeout(function(){r.classList.remove('estreno')},6000)}}catch(e){}document.addEventListener('DOMContentLoaded',function(){r.classList.add('listo')});document.addEventListener('touchstart',function(){},{passive:true})})();
-try{var g=JSON.parse(localStorage.getItem('angabave.campo')||'null');if(g&&g.v===2)window.campoGuardado=g}catch(e){}
+try{var g=JSON.parse(localStorage.getItem('angabave.campo')||'null');if(g&&g.v===2){window.campoGuardado=g;if(g.e)document.documentElement.setAttribute('data-campo',g.e)}}catch(e){}
 </script>
 <style>
 {% if tipografia %}
@@ -105,6 +105,13 @@ i,em{font-style:normal}
 .cancha svg{display:block; overflow:visible}
 .cancha .plano,.cancha .luz{position:absolute}
 .cp-fuera{fill:var(--bg)}
+.campo-aro{position:absolute; width:44px; height:44px; margin:-22px 0 0 -22px; border-radius:50%; border:2px solid #fff; opacity:0; pointer-events:none;
+  animation:campo-aro 1.5s var(--sale) 3}
+.campo-aro::before{content:""; position:absolute; inset:15px; border-radius:50%; background:#fff}
+@keyframes campo-aro{0%{opacity:.9; transform:scale(.35)}100%{opacity:0; transform:scale(1.6)}}
+html[data-campo=gano] .cp-palabra{fill:url(#cp-oro)}
+html[data-campo=perdio] .cp-palabra{fill:none; stroke:var(--txt); stroke-width:1.5; stroke-opacity:.65; vector-effect:non-scaling-stroke}
+html[data-campo=juega] .cp-palabra{fill:#F3F6F4}
 .cp-zona{fill:var(--zona)} .cp-palabra{fill:var(--letra)} .cp-raya{fill:var(--letra); opacity:.42}
 .cp-pilon{fill:#ff7a18} .cp-foco{fill:#fff}
 .cancha .vuelo{display:none; position:absolute; left:calc(50% + var(--dx)); top:calc(var(--ancla) + var(--dy)); width:0; height:0; transform-origin:0 0}
@@ -1151,15 +1158,86 @@ try {
     pintarCampo();
   }
 
-  /* Lo que va en la zona de anotación: tu equipo; si no, tu nombre; si no, nada. */
+  /* El partido más reciente de tu equipo que ya empezó: en juego o ya terminado. */
+  function ultimoJuegoDeMiEquipo() {
+    if (!equipo) return null;
+    const semanas = D.semanas.slice().sort((a, b) => b.n - a.n);
+    for (const s of semanas) {
+      const p = todosLosJuegos(s).find((j) => j.v === equipo || j.l === equipo);
+      if (p && (p.cerrado || p.porConfirmar || p.vivo)) return p;
+    }
+    return null;
+  }
+
+  /* Tres pulsos sobre las letras para invitar a tocar, hasta que se toque la primera vez.
+     Espera a que el campo termine de llegar. */
+  function invitarAlCampo() {
+    if (campoInvitado || suave || !equipo || jugador === null || leer("angabave.campo-tocado")) return;
+    campoInvitado = true;
+    setTimeout(() => {
+      const campo = document.querySelector(".cancha");
+      const letras = Array.from(document.querySelectorAll(".cp-palabra")).find((n) => n.getBoundingClientRect().width > 0);
+      if (!campo || !letras || scrollY > 40 || leer("angabave.campo-tocado")) return;
+      const c = campo.getBoundingClientRect(), r = letras.getBoundingClientRect();
+      const aro = crear("span", "campo-aro");
+      aro.setAttribute("aria-hidden", "true");
+      aro.style.left = (r.left + r.width / 2 - c.left) + "px";
+      aro.style.top = (r.top + r.height / 2 - c.top) + "px";
+      aro.addEventListener("animationend", () => aro.remove());
+      campo.append(aro);
+      if (letras.animate) letras.animate([{ opacity: 1 }, { opacity: .5 }, { opacity: 1 }], { duration: 1500, iterations: 3, easing: "ease-in-out" });
+    }, 2800);
+  }
+
+  /* Un toque en el campo cambia entre tu nombre y tu equipo. */
+  document.addEventListener("click", (e) => {
+    if (!equipo || jugador === null || String(getSelection())) return;
+    if (e.target.closest("a,button,select,input,textarea,summary,label,.hoja-fondo")) return;
+    const campo = document.querySelector(".cancha");
+    if (!campo || e.clientY > campo.getBoundingClientRect().bottom) return;
+    guardar("angabave.campo-ver", leer("angabave.campo-ver") === "equipo" ? null : "equipo");
+    guardar("angabave.campo-tocado", "1");
+    document.querySelectorAll(".campo-aro").forEach((n) => n.remove());
+    pintarCampo();
+    if (!suave) document.querySelectorAll(".cp-palabra").forEach((n) => {
+      if (n.animate) n.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: "ease-out" });
+    });
+  });
+
+  /* Lo que va en la zona de anotación: tu nombre; si no, tu equipo; si no, nada. Al tocar, cambia. */
   function pintarCampo() {
-    const quien = equipo || (jugador !== null ? nombre(jugador) : "");
+    const mio = jugador !== null ? nombre(jugador) : "";
+    const alterno = leer("angabave.campo-ver") === "equipo";
+    const juego = ultimoJuegoDeMiEquipo();
+    const sigla = (eq) => (D.siglas && D.siglas[eq]) || eq;
+    const enJuego = juego && juego.vivo && !juego.cerrado && !juego.porConfirmar;
+    const marcador = enJuego ? [sigla(juego.v), juego.mv || 0, sigla(juego.l), juego.ml || 0].join(" ") : "";
+    // Con tu equipo en juego manda el marcador y al tocar sale tu nombre. Si no, tu nombre y al tocar, tu equipo.
+    const quien = marcador ? (alterno ? mio || equipo : marcador) : (equipo && alterno ? equipo : mio || equipo);
+    let estado = "";
+    if (marcador) estado = "juega";
+    else if (juego && (juego.g === "v" || juego.g === "l")) estado = juego.g === (juego.v === equipo ? "v" : "l") ? "gano" : "perdio";
+    if (!document.getElementById("cp-oro")) {
+      const defs = crear("div");
+      defs.innerHTML = '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="cp-oro" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C9971C"/><stop offset=".4" stop-color="#FFE98A"/><stop offset=".65" stop-color="#FFD60A"/><stop offset="1" stop-color="#C9971C"/></linearGradient></defs></svg>';
+      document.body.append(defs.firstChild);
+    }
+    if (estado) document.documentElement.setAttribute("data-campo", estado);
+    else document.documentElement.removeAttribute("data-campo");
+    invitarAlCampo();
     const trazos = pintarNombreCampo(quien);
-    guardar("angabave.campo", quien ? JSON.stringify({ v: 2, trazos: trazos }) : null);
+    if (marcador && marcadorEnCampo && marcador !== marcadorEnCampo && !suave && quien === marcador) {
+      document.querySelectorAll(".cp-palabra").forEach((n) => {
+        if (n.animate) n.animate([{ opacity: .15 }, { opacity: 1 }], { duration: 900, easing: "ease-out" });
+      });
+    }
+    marcadorEnCampo = marcador;
+    guardar("angabave.campo", quien ? JSON.stringify({ v: 2, trazos: trazos, e: estado }) : null);
   }
 
   /* El nombre de tu equipo en la zona de anotación, en las dos tomas y en el vuelo. Son los
      mismos contornos que la palabra del portal, llevados del pasto a la pantalla. */
+  let campoInvitado = false, marcadorEnCampo = "";
   let nombreEnCampo = window.campoGuardado ? null : "";
   function pintarNombreCampo(crudo) {
     const nodos = document.querySelectorAll(".cp-palabra");
@@ -1311,6 +1389,7 @@ try {
         marcadores.set(clave, valor);
       });
       fallosVivo = 0;
+      try { pintarCampo(); } catch (e) { console.error(e); }
       ultimaConsulta = new Date();
       // Redibujar sin que nada cambie borraba lo que la persona tenía a medias.
       if (repintePendiente || JSON.stringify(todosLosJuegos(s)) !== antes) repintarSinEstorbar();

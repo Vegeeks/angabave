@@ -9,6 +9,11 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.25.1
+
+* Si tu equipo ganó su último partido, las letras del campo salen doradas; si perdió, huecas; si está jugando, el campo enseña el marcador.
+* La zona de anotación muestra tu nombre, y un toque en el campo cambia a tu equipo y de regreso. Tres pulsos sobre las letras invitan a tocar, hasta el primer toque.
+
 ## v0.25.0
 
 * La zona de anotación del campo ya no dice ANGABAVE: pinta tu equipo o, si no elegiste, tu nombre, y se repinta al cambiarlos. Los espacios y los acentos se respetan.

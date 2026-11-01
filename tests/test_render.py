@@ -1547,3 +1547,18 @@ def test_la_franja_acomoda_a_los_empatados(tmp_path: Path):
     assert _renglones(nombres, fuente, 240) == ["Luis Toledano", "Tristan Mejia"]
     # Si ni en dos renglones caben, se cuentan.
     assert _renglones(nombres * 10, fuente, 300) is None
+
+
+def test_tocar_el_campo_alterna_equipo_y_nombre():
+    from pathlib import Path
+    plantilla = (Path(__file__).resolve().parent.parent / "quiniela/plantillas/index.html.j2").read_text()
+    assert '(equipo && alterno ? equipo : mio || equipo)' in plantilla
+    assert 'e.target.closest("a,button,select,input,textarea,summary,label,.hoja-fondo")' in plantilla
+
+
+def test_el_campo_responde_al_partido_de_tu_equipo():
+    from pathlib import Path
+    plantilla = (Path(__file__).resolve().parent.parent / "quiniela/plantillas/index.html.j2").read_text()
+    for estado in ("gano", "perdio", "juega"):
+        assert f"html[data-campo={estado}] .cp-palabra" in plantilla
+    assert "function ultimoJuegoDeMiEquipo()" in plantilla

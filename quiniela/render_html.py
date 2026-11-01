@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.25.0"
+VERSION = "v0.25.1"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -253,7 +253,7 @@ CAL_CAMPO = 0.03
 PINTURA_CAMPO: dict[str, str] = {
     "--pasto": "#07301D", "--pasto-luz": "#0C5F38", "--cal": "#205842", "--cal2": "#1A4B37",
     "--primera": "#FFD60A", "--primera2": "#554A07", "--scrim": "#2F8BFF", "--scrim2": "#1B4590",
-    "--zona": "#06221A", "--letra": "#FFD60A", "--haz": "#CFFFE6", "--grada": "#0B1814",
+    "--zona": "#06221A", "--letra": "#F3F6F4", "--haz": "#CFFFE6", "--grada": "#0B1814",
 }
 #: Lo más claro que el campo deja detrás de un texto, por tema: cuanto más oscuro,
 #: menos hay que aclarar el acento del equipo para que siga siendo su color.
