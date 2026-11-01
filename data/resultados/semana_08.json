@@ -16,7 +16,7 @@
       "visitante": "Titans",
       "local": "Bengals",
       "marcador_visitante": 28,
-      "marcador_local": 23,
+      "marcador_local": 29,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -26,7 +26,7 @@
     {
       "visitante": "Cardinals",
       "local": "Cowboys",
-      "marcador_visitante": 17,
+      "marcador_visitante": 24,
       "marcador_local": 27,
       "ganador": null,
       "finalizado": false,
@@ -48,11 +48,11 @@
     {
       "visitante": "Raiders",
       "local": "Jets",
-      "marcador_visitante": 35,
+      "marcador_visitante": 38,
       "marcador_local": 33,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Raiders",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-01T18:00:00+00:00",
       "hora_definida": true
     },
@@ -68,17 +68,6 @@
       "hora_definida": true
     },
     {
-      "visitante": "Falcons",
-      "local": "Buccaneers",
-      "marcador_visitante": 0,
-      "marcador_local": 16,
-      "ganador": "Buccaneers",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-01T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Colts",
       "local": "Jaguars",
       "marcador_visitante": 7,
@@ -86,6 +75,17 @@
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
+      "inicio": "2026-11-01T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Falcons",
+      "local": "Buccaneers",
+      "marcador_visitante": 0,
+      "marcador_local": 16,
+      "ganador": "Buccaneers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-01T18:00:00+00:00",
       "hora_definida": true
     },
