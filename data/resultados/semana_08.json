@@ -6,9 +6,9 @@
       "local": "Bengals",
       "marcador_visitante": 36,
       "marcador_local": 43,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Bengals",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-01T18:00:00+00:00",
       "hora_definida": true
     },
@@ -26,7 +26,7 @@
     {
       "visitante": "Chargers",
       "local": "Rams",
-      "marcador_visitante": 0,
+      "marcador_visitante": 3,
       "marcador_local": 3,
       "ganador": null,
       "finalizado": false,
