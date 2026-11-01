@@ -5,10 +5,10 @@
       "visitante": "Ravens",
       "local": "Bills",
       "marcador_visitante": 10,
-      "marcador_local": 29,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "marcador_local": 36,
+      "ganador": "Bills",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-01T18:00:00+00:00",
       "hora_definida": true
     },
@@ -16,7 +16,7 @@
       "visitante": "Titans",
       "local": "Bengals",
       "marcador_visitante": 36,
-      "marcador_local": 29,
+      "marcador_local": 36,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -26,12 +26,23 @@
     {
       "visitante": "Cardinals",
       "local": "Cowboys",
-      "marcador_visitante": 24,
-      "marcador_local": 27,
+      "marcador_visitante": 30,
+      "marcador_local": 30,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "End of Period",
+      "inicio": "2026-11-01T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Chargers",
+      "local": "Rams",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
-      "inicio": "2026-11-01T18:00:00+00:00",
+      "inicio": "2026-11-01T21:05:00+00:00",
       "hora_definida": true
     },
     {
@@ -68,17 +79,6 @@
       "hora_definida": true
     },
     {
-      "visitante": "Colts",
-      "local": "Jaguars",
-      "marcador_visitante": 7,
-      "marcador_local": 42,
-      "ganador": "Jaguars",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-01T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Falcons",
       "local": "Buccaneers",
       "marcador_visitante": 0,
@@ -90,14 +90,14 @@
       "hora_definida": true
     },
     {
-      "visitante": "Chargers",
-      "local": "Rams",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-11-01T21:05:00+00:00",
+      "visitante": "Colts",
+      "local": "Jaguars",
+      "marcador_visitante": 7,
+      "marcador_local": 42,
+      "ganador": "Jaguars",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-01T18:00:00+00:00",
       "hora_definida": true
     },
     {
