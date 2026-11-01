@@ -452,7 +452,7 @@ def comando_buzon(argumentos) -> int:
 #: Lo que ve la página del enlace cuando algo falla de este lado.
 RESULTADO_FALLA = {
     "aceptado": False,
-    "titulo": "No pude terminar",
+    "titulo": "No se pudo terminar",
     "error": "Algo falló de nuestro lado, no en tu archivo. No se tocó nada y Angel ya tiene el aviso.",
 }
 

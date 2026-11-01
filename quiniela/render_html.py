@@ -46,11 +46,14 @@ __all__ = [
     "MARCA",
     "RUTA_SALIDA",
     "TAMANO_PORTADA",
+    "como_va_la_semana",
+    "descripcion_de_portada",
     "firma_publicada",
     "generar_manifiesto",
     "generar_pagina_de_carga",
     "generar_prueba_de_red",
     "generar_sello_version",
+    "quien_va_primero",
     "SemanaRender",
     "UMBRAL_PODIO",
     "UMBRAL_SEMANA",
@@ -62,8 +65,8 @@ _log = logging.getLogger(__name__)
 
 RAIZ = Path(__file__).resolve().parents[1]
 DIR_PLANTILLAS = Path(__file__).resolve().parent / "plantillas"
-#: Fuente de titulares y números, recortada a mayúsculas y dígitos, para la página
-#: de carga y las imágenes. Licencia en tipografia/OFL.txt.
+#: Fuente de marcador, recortada a mayúsculas y dígitos: en el portal, solo las cifras.
+#: Licencia en tipografia/OFL.txt.
 RUTA_TIPOGRAFIA = Path(__file__).resolve().parent / "tipografia" / "oswald-recortada.woff2"
 RUTA_SALIDA = RAIZ / "docs" / "index.html"
 
@@ -765,6 +768,40 @@ def _pesos(cantidad) -> str:
     return f"${cantidad:,.2f}"
 
 
+def quien_va_primero(tabla_acumulada: pd.DataFrame) -> tuple[list[str], str, str]:
+    """Los nombres de quien va arriba, su verbo y sus aciertos.
+
+    Con tres o más empatados se cuentan: sus nombres ya no caben en una portada.
+    """
+    primeros = tabla_acumulada[tabla_acumulada["posicion"] == 1]
+    if primeros.empty:
+        return [], "", ""
+    cuantos = len(primeros)
+    aciertos = int(primeros.iloc[0]["acumulado"])
+    return (
+        list(primeros["participante"]) if cuantos <= 2 else [f"{cuantos} empatados"],
+        "va" if cuantos == 1 else "van",
+        f"con {aciertos} {'acierto' if aciertos == 1 else 'aciertos'}",
+    )
+
+
+def como_va_la_semana(numero: int, cerrados: int, total: int) -> tuple[str, str]:
+    """El título de la semana y su avance, contando todos sus partidos y no solo los ya repartidos."""
+    if total and cerrados >= total:
+        return f"Semana {numero} cerrada", f"{total} partidos jugados"
+    return f"Semana {numero}", f"{cerrados} de {total} partidos jugados"
+
+
+def descripcion_de_portada(tabla_acumulada: pd.DataFrame, numero: int, cerrados: int, total: int) -> str:
+    """El texto que acompaña a la portada al compartir el enlace: dice lo mismo que ella."""
+    nombres, verbo, aciertos = quien_va_primero(tabla_acumulada)
+    titulo, avance = como_va_la_semana(numero, cerrados, total)
+    semana = f"{titulo}." if total and cerrados >= total else f"{titulo}: {avance}."
+    if not nombres:
+        return semana
+    return f"{verbo.capitalize()} en primero {' y '.join(nombres)} {aciertos}. {semana}"
+
+
 def _tipografia() -> str:
     """La fuente en base64, lista para meterse en un `src:` del CSS."""
     if not RUTA_TIPOGRAFIA.exists():
@@ -878,8 +915,9 @@ def generar_pagina_de_carga(ruta_salida: Path, url_funcion: str = URL_FUNCION) -
         desarrollador=DESARROLLADOR,
         etapa=ETAPA,
         version=VERSION,
-        tipografia=_tipografia(),
-        marca_svg=marca.svg("carga"),
+        tema_campo=tema_campo(),
+        marca_svg=marca.svg(),
+        marca_palabra=marca.palabra(),
         favicon=marca.favicon(),
         origen_funcion=f"{partes.scheme}://{partes.netloc}",
         config={"funcion": url_funcion, "portal": "./", "maximo": TAMANO_MAXIMO},
@@ -900,10 +938,12 @@ def generar_prueba_de_red(ruta_salida: Path, url_funcion: str = URL_FUNCION) -> 
     partes, espn = urlsplit(url_funcion), urlsplit(URL_SCOREBOARD)
     html = _entorno().get_template("red.html.j2").render(
         marca=MARCA,
-        etapa=ETAPA,
         version=VERSION,
         url_funcion=url_funcion,
         url_espn=URL_SCOREBOARD,
+        tema_campo=tema_campo(),
+        marca_svg=marca.svg(),
+        marca_palabra=marca.palabra(),
         favicon=marca.favicon(),
         origen_funcion=f"{partes.scheme}://{partes.netloc}",
         origen_espn=f"{espn.scheme}://{espn.netloc}",
@@ -1082,7 +1122,8 @@ def generar_html(
 
     podio = _armar_podio(general, participantes, reparto_hoy) if podio_listo else []
     contexto = {
-        "marca_svg": marca.svg("cabeza", loseta=False),
+        "marca_svg": marca.svg(),
+        "marca_palabra": marca.palabra(),
         "tema_campo": tema_campo(),
         "favicon": marca.favicon(),
         "marca": MARCA,
@@ -1091,6 +1132,11 @@ def generar_html(
         "sitio": SITIO,
         "firma": firma,
         "tamano_portada": TAMANO_PORTADA,
+        # La semana de la portada es la última con picks, igual que en cli.py.
+        "descripcion": (
+            descripcion_de_portada(tabla_acumulada, jugadas[-1].numero, jugadas[-1].cerrados, jugadas[-1].total)
+            if jugadas else "Tabla general, ganadores por semana y marcador en vivo."
+        ),
         "anio": anio,
         "desarrollador": desarrollador,
         "actualizado": _fecha_larga(momento),

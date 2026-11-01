@@ -6,34 +6,50 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self' {{ origen_funcion }} {{ origen_espn }}; base-uri 'none'; form-action 'none'">
-<meta name="theme-color" content="#041009">
+<meta name="theme-color" content="{{ tema_campo['--bg']|lower }}">
 <link rel="icon" href="{{ favicon }}">
 <title>Prueba de conexión · {{ marca }}</title>
 <style>
-:root{ --bg:#041009; --panel:#102117; --panel2:#162a1f; --linea:#1d3728; --txt:#eef5f0; --tenue:#93a69a;
-  --oro:#f7c948; --verde:#3ddc84; --rojo:#ff6058; --ambar:#ffb547; color-scheme:dark }
+:root{
+  {% for nombre, valor in tema_campo.items() %}{{ nombre }}:{{ valor }}; {% endfor %}
+  --verde:#34d680; --rojo:#ff6b61; --ambar:#ffb547;
+  --pastilla:#f3f6f4; --pastilla-txt:#0a0f0c;
+  --r1:16px; --r2:12px; --r3:8px;
+  color-scheme:dark;
+}
 *{box-sizing:border-box} html,body{margin:0}
-body{background:var(--bg); color:var(--txt); font:15px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif}
+body{background:var(--bg); color:var(--txt); font:14px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
 main{max-width:560px; margin:0 auto; padding:24px 16px 40px}
-h1{font-size:1.3rem; margin:0 0 .3rem} p{margin:.3rem 0} .tenue{color:var(--tenue); font-size:.88rem}
+.casa{display:flex; align-items:center; gap:12px; margin-bottom:20px}
+.casa .marca-svg{width:32px; height:32px; flex:none}
+.casa .marca-palabra{display:block; width:100px; height:16px}
+h1{font-size:20px; line-height:1.25; margin:0 0 4px} p{margin:4px 0} .tenue{color:var(--tenue)}
 ol{list-style:none; padding:0; margin:16px 0; display:grid; gap:8px}
-li{background:var(--panel); border:1px solid var(--linea); border-radius:12px; padding:12px 14px}
-li b{display:block} li small{display:block; color:var(--tenue); margin-top:2px; word-break:break-word}
-.ok b{color:var(--verde)} .mal b{color:var(--rojo)} .espera b{color:var(--ambar)}
-button{appearance:none; border:0; border-radius:12px; background:var(--oro); color:#171203; font:inherit;
-  font-weight:800; width:100%; min-height:48px; margin-top:6px; cursor:pointer}
-.caja{background:var(--panel2); border-radius:12px; padding:10px 12px; margin-top:12px; font-size:.82rem;
+li{background:var(--panel); border:1px solid var(--linea); border-radius:var(--r2); padding:12px}
+li b{display:block; font-size:16px; font-weight:600}
+/* Un punto y nada más: lleno es que pasó, hueco que no. */
+li b::before{content:""; display:inline-block; box-sizing:border-box; width:8px; height:8px; margin-right:8px; border-radius:50%;
+  vertical-align:.1em; background:var(--ambar)}
+li small{display:block; font-size:12px; color:var(--tenue); margin-top:2px; word-break:break-word}
+.ok b::before{background:var(--verde)}
+.mal b{color:var(--rojo)}
+.mal b::before{background:transparent; border:2px solid var(--rojo)}
+button{appearance:none; -webkit-appearance:none; border:0; border-radius:var(--r2); background:var(--pastilla); color:var(--pastilla-txt);
+  font:inherit; font-size:16px; font-weight:700; width:100%; min-height:52px; margin-top:4px; cursor:pointer}
+.caja{background:var(--panel2); border-radius:var(--r2); padding:12px; margin-top:12px; font-size:12px;
   color:var(--tenue); word-break:break-word}
 </style>
 </head>
 <body>
 <main>
+  <div class="casa">{{ marca_svg|safe }}{{ marca_palabra|safe }}</div>
   <h1>Prueba de conexión</h1>
   <p class="tenue">Revisa, desde este teléfono y esta red, cada conexión que usan las páginas de {{ marca }}. Si algo sale en rojo, mándale a Angel una captura de toda la pantalla.</p>
   <ol id="lista"></ol>
   <button type="button" id="otra">Repetir la prueba</button>
   <div class="caja" id="equipo"></div>
-  <p class="tenue" style="margin-top:14px">{{ etapa }} {{ version }}</p>
+  <p class="tenue" style="margin-top:14px">{{ version }}</p>
 </main>
 <script>
 /* A propósito sin sintaxis moderna (nada de flechas ni const): esta página
@@ -56,7 +72,7 @@ button{appearance:none; border:0; border-radius:12px; background:var(--oro); col
     var li = document.createElement("li");
     li.className = "espera";
     var b = document.createElement("b");
-    b.appendChild(document.createTextNode("⏳ " + texto));
+    b.appendChild(document.createTextNode(texto));
     var s = document.createElement("small");
     s.appendChild(document.createTextNode("probando…"));
     li.appendChild(b);
@@ -67,7 +83,7 @@ button{appearance:none; border:0; border-radius:12px; background:var(--oro); col
 
   function poner(r, bien, titulo, detalle) {
     r.li.className = bien ? "ok" : "mal";
-    r.b.textContent = (bien ? "✅ " : "❌ ") + titulo;
+    r.b.textContent = titulo;
     r.s.textContent = detalle;
   }
 
@@ -99,8 +115,9 @@ button{appearance:none; border:0; border-radius:12px; background:var(--oro); col
           try { partes.push("versión " + JSON.parse(texto).version); } catch (e) { partes.push("respuesta ilegible"); }
         }
         if (prueba.leer === "pagina") {
-          var v = texto.match(/alfa v\d+\.\d+\.\d+/i);
-          partes.push(v ? v[0] : "sin versión (¿página incompleta?)");
+          // En <meta name="version">; una copia vieja del CDN todavía la trae en el pie.
+          var v = texto.match(/<meta name="version" content="([^"]+)"/i) || texto.match(/alfa v\d+\.\d+\.\d+/i);
+          partes.push(v ? (v[1] || v[0]) : "sin versión (¿página incompleta?)");
         }
         if (nodo) partes.push("nodo " + nodo.split(",").pop().trim());
         if (edad) partes.push("en caché hace " + edad + " s");

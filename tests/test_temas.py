@@ -66,6 +66,13 @@ def test_son_65_temas_y_la_luz_es_la_de_cada_uno():
     assert _luz(chiefs) == (paleta_equipos()["Chiefs"]["local"], pytest.approx(LUZ_EQUIPO, abs=0.003))
 
 
+def test_el_ambar_de_las_paginas_sueltas_se_lee_sobre_sus_paneles():
+    """Lo usan la carga y la prueba de conexión para lo que hay que revisar."""
+    tema = tema_campo()
+    for fondo in (tema["--bg"], tema["--panel"], tema["--panel2"]):
+        assert contraste("#FFB547", fondo) >= CONTRASTE_SEMANTICO
+
+
 def test_el_campo_es_verde_y_el_acento_la_linea_amarilla():
     rojo, verde, azul = _a_rgb(BASE_CAMPO["bg"])
     assert verde > rojo and verde > azul

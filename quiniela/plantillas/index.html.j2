@@ -17,7 +17,7 @@
 <meta property="og:site_name" content="{{ marca }}">
 <meta property="og:url" content="{{ sitio }}">
 <meta property="og:title" content="{{ marca }} · Quiniela NFL {{ anio }}">
-<meta property="og:description" content="Tabla general, ganadores por semana y marcador en vivo.">
+<meta property="og:description" content="{{ descripcion }}">
 <meta property="og:image" content="{{ sitio }}portada.png?v={{ firma }}">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="{{ tamano_portada[0] }}">
@@ -93,8 +93,9 @@ header.plegado::before{opacity:1}
 .top{display:flex; align-items:center; gap:12px; min-height:56px; transition:opacity .2s ease}
 header.plegado .top{opacity:0; pointer-events:none}
 .logo{display:inline-flex; align-items:center; gap:8px; min-height:44px; margin-right:auto}
-.logo svg{width:30px; height:30px; flex:0 0 auto}
-.logo .marca{font-size:var(--t3); font-weight:800; letter-spacing:-.025em}
+.logo .marca-svg{width:32px; height:32px; flex:0 0 auto}
+.logo .marca-palabra{width:100px; height:16px; flex:0 0 auto}
+.logo .marca-linea{fill:var(--acento)}
 .estado{display:none; align-items:center; gap:6px; font-size:var(--t6); font-weight:600; color:var(--tenue); white-space:nowrap}
 .estado.vivo{color:var(--txt)}
 .estado .punto{width:7px; height:7px; border-radius:50%; background:var(--tenue2)}
@@ -695,6 +696,9 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
 .estreno .navegacion.al-pie{animation:nav-sube .8s var(--resorte) both .25s}
 @keyframes nav-sube{from{transform:translateY(120%)} to{transform:none}}
 .estreno .top,.estreno .fila-yo{animation:aparece .7s ease both}
+/* La línea del logo se traza junto con la del titular. */
+.estreno .logo .marca-linea{transform-box:fill-box; transform-origin:0 50%;
+  animation:traza .56s var(--traza,cubic-bezier(.65,0,.35,1)) backwards .12s}
 
 /* ═══════ pantallas grandes ═══════ */
 @media (min-width:600px){
@@ -757,7 +761,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   <div class="env top">
     <button type="button" class="logo" aria-label="{{ marca }}, ir a Hoy">
       {{ marca_svg|safe }}
-      <span class="marca">{{ marca }}</span>
+      {{ marca_palabra|safe }}
     </button>
     <nav class="navegacion en-cabeza" data-nav aria-label="Secciones">{{ botones_nav() }}</nav>
     <span class="estado" id="estado"><span class="punto"></span><span id="estado-txt">Temporada</span></span>
@@ -1719,39 +1723,27 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
      cada quien la mande por su cuenta antes de que cierre la tanda. */
   const LLAVE_BORRADOR = (n) => "angabave.borrador." + n;
 
-  /* Dibuja el escudo de la marca en el canvas, igual que el del encabezado. */
-  /* La marca en la imagen de picks: las mismas rutas y colores de
+  /* La marca y la palabra en la imagen de picks: las mismas rutas y colores de
      quiniela/marca.py, para que la imagen y el portal no se desalineen. */
   function marcaEnLienzo(ctx, x, y, lado) {
     const L = D.logo, u = lado / 64;
-    const m = new DOMMatrix([u, 0, 0, u, x, y]);
-    const ruta = (d) => { const p = new Path2D(); p.addPath(new Path2D(d), m); return p; };
-    const loseta = ruta("M16 1H48A15 15 0 0 1 63 16V48A15 15 0 0 1 48 63H16A15 15 0 0 1 1 48V16A15 15 0 0 1 16 1Z");
-    const fondo = ctx.createLinearGradient(x, y, x + lado, y + lado);
-    fondo.addColorStop(0, L.loseta[0]);
-    fondo.addColorStop(1, L.loseta[1]);
     ctx.save();
-    ctx.fillStyle = fondo;
-    ctx.fill(loseta);
-    const oro = ([arriba, abajo]) => {
-      const g = ctx.createLinearGradient(0, y + arriba * u, 0, y + abajo * u);
-      g.addColorStop(0, L.oro[0]);
-      g.addColorStop(0.55, L.oro[1]);
-      g.addColorStop(1, L.oro[2]);
-      return g;
-    };
-    ctx.fillStyle = oro(L.alto_a);
-    ctx.fill(ruta(L.rutas.a));
-    const balon = ruta(L.rutas.balon);
-    ctx.fillStyle = oro(L.alto_balon);
-    ctx.fill(balon);
-    ctx.strokeStyle = L.tinta;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-    ctx.lineWidth = L.contorno * u;
-    ctx.stroke(balon);
-    ctx.lineWidth = L.costura * u;
-    ctx.stroke(ruta(L.rutas.costuras));
+    ctx.translate(x, y);
+    ctx.scale(u, u);
+    ctx.fillStyle = L.blanco;
+    ctx.fill(new Path2D(L.rutas.a));
+    ctx.fillStyle = L.oro;
+    ctx.fill(new Path2D(L.rutas.linea));
+    ctx.restore();
+  }
+
+  function palabraEnLienzo(ctx, x, y, alto) {
+    const L = D.logo, u = alto / L.alto_palabra;
+    ctx.save();
+    ctx.translate(x, y + u);
+    ctx.scale(u, u);
+    ctx.fillStyle = L.blanco;
+    ctx.fill(new Path2D(L.rutas.palabra), "evenodd");
     ctx.restore();
   }
 
@@ -1786,10 +1778,8 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
     ctx.fillRect(0, 0, ANCHO, alto);
 
     marcaEnLienzo(ctx, MARGEN, 40, 64);
-    ctx.fillStyle = "#f3f6f4";
-    ctx.font = cuerpo(800, 42);
+    palabraEnLienzo(ctx, MARGEN + 80, 48, 34);
     ctx.textBaseline = "alphabetic";
-    ctx.fillText("ANGABAVE", MARGEN + 80, 82);
     ctx.fillStyle = "#a7b1ab";
     ctx.font = cuerpo(500, 22);
     ctx.fillText("Quiniela NFL " + D.anio, MARGEN + 80, 110);

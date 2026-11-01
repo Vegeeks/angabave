@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from quiniela.espn import ZONA_CDMX, Partido, guardar_cache
 from quiniela.picks import leer_picks
@@ -553,6 +553,93 @@ def test_compatibilidad_con_safari_viejo():
     assert "signal: control.signal" in carga         # nada se queda esperando para siempre
 
 
+# --- las páginas sueltas: la misma casa que el portal ------------------------------
+
+EMOJIS = re.compile("[\U0001F000-\U0001FAFF\u2190-\u21FF\u2300-\u23FF\u2600-\u27BF\uFE0F]")
+
+
+@pytest.mark.parametrize("nombre", ["cargar.html", "red.html"])
+def test_las_paginas_sueltas_son_de_la_misma_casa(armado, tmp_path: Path, nombre: str):
+    from quiniela.render_html import tema_campo
+
+    render(armado, tmp_path)
+    pagina = (tmp_path / nombre).read_text(encoding="utf-8")
+    for variable, valor in tema_campo().items():
+        assert f"{variable}:{valor};" in pagina, variable
+    assert EMOJIS.search(pagina) is None, EMOJIS.findall(pagina)
+    # Lo de la generación pasada.
+    for viejo in ("@font-face", "box-shadow", "radial-gradient", "linear-gradient", "letter-spacing",
+                  "#041009", "#102117", "#f7c948", "#101724"):
+        assert viejo not in pagina, viejo
+    # Letra de 12 px para arriba y solo los tamaños de la casa.
+    assert set(re.findall(r"font(?:-size)?:(\d+)px", pagina)) <= {"12", "14", "16", "20"}
+    assert "rem" not in "".join(re.findall(r"font-size:[^;}]*", pagina))
+
+
+def test_la_red_de_seguridad_es_de_la_misma_casa(armado, tmp_path: Path):
+    render(armado, tmp_path)
+    for nombre in ("index.html", "cargar.html"):
+        rescate = _rescate((tmp_path / nombre).read_text(encoding="utf-8"))
+        assert "La página no abrió en este teléfono" in rescate
+        assert "Ajustes" not in rescate   # no todos los teléfonos son iPhone
+        assert "#101613" in rescate and "#FF6B61" in rescate and "#FFD60A" in rescate
+        assert "box-shadow" not in rescate and "#101724" not in rescate
+        assert EMOJIS.search(rescate) is None
+
+
+def test_los_textos_de_la_carga_que_se_cambiaron_y_los_que_se_quedan(armado, tmp_path: Path):
+    render(armado, tmp_path)
+    pagina = (tmp_path / "cargar.html").read_text(encoding="utf-8")
+    for dice in (
+        "Sube la hoja de la semana tal como la repartes, en Excel o PDF",
+        "Sin conexión", "Revisa tu internet y vuelve a abrir el enlace.", "No se pudo terminar",
+        "Ya empezaron, no cambian", "Última carga: ", "Quedó publicada.", "No pasó la revisión.", "Se está revisando.",
+        "Carga del organizador",
+        # Estos se quedan porque están bien.
+        "Ya quedó. En un par de minutos se ve en el portal.",
+        "No se tocó nada: el portal sigue exactamente como estaba.",
+        "Una quiniela no pasa de 1 MB. ¿Es el archivo correcto?",
+        "Algo falló de nuestro lado, no en tu archivo.",
+    ):
+        assert dice in pagina, dice
+    for ya_no in ("No me pude conectar", "No pude terminar", "te digo", "Sellados", "Tu última carga", "CARGAR SEMANA"):
+        assert ya_no not in pagina, ya_no
+    assert "Desarrollado por Angel Barrera · v" in pagina and "· alfa" not in pagina
+    assert "@media (hover:hover){.zona .arrastra{display:block}}" in pagina
+
+
+def test_la_carga_sigue_hablando_igual_con_la_funcion(armado, tmp_path: Path):
+    """Lo de la casa nueva es CSS y textos: la llave, la subida y la espera no se tocan."""
+    render(armado, tmp_path)
+    pagina = (tmp_path / "cargar.html").read_text(encoding="utf-8")
+    for pieza in (
+        'new URLSearchParams(location.hash.slice(1)).get("k")',
+        'Object.assign({ "x-llave": llave }, opciones.cabeceras || {})',
+        'que === "subir" ? 90000 : 20000',
+        'cuerpo: archivo',
+        '"x-archivo": encodeURIComponent(archivo.name), "content-type": "application/octet-stream"',
+        "archivo.size > CONFIG.maximo",
+        'pedir("estado", { params: { id } })',
+        "CADA = 4000, PACIENCIA = 6 * 60 * 1000",
+        r"/^[A-Za-z0-9_-]{32,64}$/.test(llave)",
+        'entrada.accept = ".xlsx,.xlsm,.pdf,',
+    ):
+        assert pieza in pagina, pieza
+
+
+def test_la_prueba_de_red_encuentra_la_version(armado, tmp_path: Path):
+    """La versión ya no dice "alfa" en pantalla: la prueba de conexión la lee de la meta."""
+    from quiniela.render_html import ETAPA, VERSION
+
+    render(armado, tmp_path)
+    red = (tmp_path / "red.html").read_text(encoding="utf-8")
+    assert '<meta name="version" content="([^"]+)"' in red
+    carga = (tmp_path / "cargar.html").read_text(encoding="utf-8")
+    assert re.search(r'<meta name="version" content="([^"]+)"', carga).group(1) == f"{ETAPA} {VERSION}"
+    # Y el portal, mientras traiga la etapa en el pie o en la meta.
+    assert re.search(r"alfa v\d+\.\d+\.\d+", (tmp_path / "index.html").read_text(encoding="utf-8"))
+
+
 def test_la_prueba_de_red_sale_con_el_portal(armado, tmp_path: Path):
     render(armado, tmp_path)
     pagina = (tmp_path / "red.html").read_text(encoding="utf-8")
@@ -598,12 +685,68 @@ def test_la_marca_es_la_misma_en_todas_partes(armado, tmp_path: Path):
     from quiniela import marca
 
     html = render(armado, tmp_path)
-    assert marca.ruta_a() in html                               # el SVG del encabezado
+    assert marca.ruta_a() in html and marca.ruta_linea() in html  # el SVG del encabezado
+    assert marca.PALABRA in html and 'class="marca"' not in html  # la palabra ya es dibujo
     assert '<link rel="icon" href="data:image/svg+xml,' in html  # el ícono de la pestaña
     assert datos_embebidos(html)["logo"]["rutas"] == marca.rutas()   # el canvas de la imagen
     assert "escudoEnLienzo" not in html                          # el escudo viejo ya no está
-    carga = (tmp_path / "cargar.html").read_text(encoding="utf-8")
-    assert marca.ruta_a() in carga and 'rel="icon"' in carga
+    for pagina in ("cargar.html", "red.html"):
+        suelta = (tmp_path / pagina).read_text(encoding="utf-8")
+        assert marca.ruta_a() in suelta and marca.PALABRA in suelta and 'rel="icon"' in suelta, pagina
+
+
+def test_la_marca_vale_para_cualquier_equipo_y_cualquier_fondo(armado, tmp_path: Path):
+    """La A es del color del texto y la línea del acento; sin fondo propio ni degradados."""
+    from quiniela import marca
+    from quiniela.render_html import BASE_CAMPO, SEMANTICOS, tema_campo
+
+    html = render(armado, tmp_path)
+    assert ".logo .marca-linea{fill:var(--acento)}" in html
+    svg = marca.svg()
+    assert 'fill="currentColor"' in svg and "marca-linea" in svg
+    for ajeno in ("Gradient", "<rect", "stroke", "url(#"):
+        assert ajeno not in svg, ajeno
+    # Los mismos colores del portal.
+    assert marca.ORO == SEMANTICOS["oro"]
+    assert marca.NEGRO == BASE_CAMPO["bg"]
+    assert marca.BLANCO == tema_campo()["--txt"]
+
+
+def test_la_linea_del_logo_se_traza_con_el_titular(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    regla = re.search(r"\.estreno \.logo \.marca-linea\{([^}]*)\}", html).group(1)
+    assert "transform-box:fill-box" in regla and "animation:traza" in regla
+
+
+def test_la_marca_no_se_sale_de_su_caja():
+    from quiniela import marca
+
+    for pieza in (*marca.A, marca.LINEA, *marca.A_ICONO, *marca.A_FAVICON):
+        assert all(0 <= x <= 64 and 0 <= y <= 64 for x, y in pieza)
+    # El ícono que Android recorta: la A entera dentro del círculo seguro.
+    for pieza in marca.A_ICONO:
+        assert all(((x - 32) ** 2 + (y - 32) ** 2) ** 0.5 <= 25.6 for x, y in pieza)
+    # Hay aire de verdad arriba y abajo de la línea, para que no se junte con la A.
+    arriba, pie_izquierdo, _ = marca.A
+    assert max(y for _, y in arriba) < min(y for _, y in marca.LINEA)
+    assert min(y for _, y in pie_izquierdo) > max(y for _, y in marca.LINEA)
+
+
+def test_la_palabra_aplanada_es_la_misma_del_svg():
+    from quiniela import marca
+
+    poligonos = marca.poligonos_de_palabra()
+    assert len(poligonos) == 10   # ocho letras y los dos huecos de la B
+    assert all(0 <= x <= marca.ANCHO_PALABRA and -1 <= y <= marca.ALTO_PALABRA - 1 for p in poligonos for x, y in p)
+
+
+def test_la_palabra_dibujada_respeta_los_huecos_de_la_b():
+    from quiniela.render_png import dibujar_palabra
+
+    palabra = dibujar_palabra(84)     # 2 px por unidad, y la caja empieza en y = -1
+    assert palabra.getpixel((2 * 140, 2 * 21))[3] == 255   # el tronco de la B
+    assert palabra.getpixel((2 * 149, 2 * 12))[3] == 0     # su hueco de arriba
+    assert palabra.getpixel((2 * 149, 2 * 29))[3] == 0     # y el de abajo
 
 
 def test_en_vivo_solo_cuando_se_esta_jugando(armado, tmp_path: Path):
@@ -631,12 +774,21 @@ def test_los_iconos_de_la_app_salen_de_la_marca(tmp_path: Path):
 
     rutas = generar_iconos(tmp_path)
     assert [r.name for r in rutas] == ["icono-180.png", "icono-192.png", "icono-512.png"]
-    with Image.open(rutas[-1]) as icono:
-        assert icono.size == (512, 512)
-        # Al centro, sobre la A, hay oro; en la esquina, la loseta oscura.
-        r, g, b = icono.convert("RGB").getpixel((256, 180))
-        assert r > 200 and g > 150 and r - b > 80
-        assert sum(icono.convert("RGB").getpixel((10, 10))) < 120
+    for ruta, lado in zip(rutas, (180, 192, 512)):
+        with Image.open(ruta) as icono:
+            assert icono.size == (lado, lado)
+            assert icono.mode == "RGB"   # iOS no acepta transparencia
+            lienzo = icono.convert("RGB")
+            # La línea amarilla de orilla a orilla; arriba de ella el pasto y abajo el negro.
+            y_linea = round((35.4 + 2.4) / 64 * lado)
+            for x in (1, lado // 2, lado - 2):
+                r, g, b = lienzo.getpixel((x, y_linea))
+                assert r > 240 and g > 200 and b < 40, (lado, x)
+            r, g, b = lienzo.getpixel((3, 3))
+            assert g > r + 30 and g > b and g < 120
+            assert sum(lienzo.getpixel((3, lado - 4))) < 40
+            # Y sobre la línea, en medio, la punta blanca de la A.
+            assert min(lienzo.getpixel((lado // 2, round(14 / 64 * lado)))) > 230
 
 
 def _funcion(html: str, nombre: str) -> str:
@@ -964,6 +1116,49 @@ def test_el_navegador_tampoco_ordena_ni_pisa_lo_que_no_tiene_hora(armado, tmp_pa
 # --- la vista previa y las imágenes -----------------------------------------------
 
 
+def test_la_vista_previa_dice_quien_va_primero_y_como_va_la_semana():
+    import pandas as pd
+
+    from quiniela.render_html import descripcion_de_portada
+
+    def tabla(*filas):
+        return pd.DataFrame(filas, columns=["posicion", "participante", "acumulado"])
+
+    uno = tabla((1, "Carlos Rodriguez", 69), (2, "Ana", 68))
+    assert descripcion_de_portada(uno, 8, 1, 14) == (
+        "Va en primero Carlos Rodriguez con 69 aciertos. Semana 8: 1 de 14 partidos jugados."
+    )
+    assert descripcion_de_portada(uno, 7, 16, 16) == "Va en primero Carlos Rodriguez con 69 aciertos. Semana 7 cerrada."
+    dos = tabla((1, "Ana", 69), (1, "Beto", 69), (3, "Caro", 60))
+    assert descripcion_de_portada(dos, 8, 0, 14).startswith("Van en primero Ana y Beto con 69 aciertos.")
+    tres = tabla((1, "Ana", 69), (1, "Beto", 69), (1, "Caro", 69))
+    assert descripcion_de_portada(tres, 8, 0, 14).startswith("Van en primero 3 empatados con 69 aciertos.")
+    assert descripcion_de_portada(tabla((1, "Ana", 1)), 1, 1, 16).startswith("Va en primero Ana con 1 acierto.")
+    assert descripcion_de_portada(tabla(), 1, 0, 16) == "Semana 1: 0 de 16 partidos jugados."
+
+
+def test_la_vista_previa_sale_de_la_tabla_publicada(armado, tmp_path: Path):
+    """La misma semana de la portada: la última con picks, no la que falta por cargar."""
+    from quiniela.render_html import descripcion_de_portada
+
+    semanas, general = armado
+    assert not semanas[-1].picks   # la que trae el armado al final todavía no tiene hoja
+    jugada = [s for s in semanas if s.picks][-1]
+    esperado = descripcion_de_portada(general, jugada.numero, jugada.cerrados, jugada.total)
+    assert f'<meta property="og:description" content="{esperado}">' in render(armado, tmp_path)
+    assert f"Semana {jugada.numero}" in esperado and f"Semana {semanas[-1].numero}" not in esperado
+
+
+def test_un_nombre_con_codigo_no_se_cuela_en_la_vista_previa(armado, tmp_path: Path):
+    semanas, general = armado
+    general = general.copy()
+    general["posicion"] = range(1, len(general) + 1)
+    general.loc[general.index[0], "participante"] = '"><script>alert(1)</script>'
+    html = render((semanas, general), tmp_path)
+    descripcion = re.search(r'property="og:description" content="([^"]*)"', html).group(1)
+    assert "<script" not in descripcion and "&lt;script&gt;" in descripcion
+
+
 def test_la_vista_previa_lleva_direcciones_completas(armado, tmp_path: Path):
     """Sin dirección completa WhatsApp no encuentra la imagen."""
     from quiniela.render_html import TAMANO_PORTADA
@@ -991,45 +1186,141 @@ def test_la_portada_mide_lo_que_declara_la_pagina(armado, tmp_path: Path):
 
 
 def test_lo_que_dicen_las_imagenes_de_la_semana():
-    from quiniela.render_png import estado_de_semana, titulo_ganadores
+    from quiniela.render_html import como_va_la_semana
+    from quiniela.render_png import titulo_ganadores
 
-    assert estado_de_semana(8, 1, 14) == "1 DE 14 PARTIDOS"
-    assert estado_de_semana(8, 14, 14) == "CERRADA"
-    assert titulo_ganadores(7, 1, True) == "GANADOR DE LA SEMANA 7"
-    assert titulo_ganadores(7, 2, True) == "GANADORES DE LA SEMANA 7"
-    assert titulo_ganadores(8, 3, False) == "VA GANANDO LA SEMANA 8"
+    assert como_va_la_semana(8, 1, 14) == ("Semana 8", "1 de 14 partidos jugados")
+    assert como_va_la_semana(8, 0, 14) == ("Semana 8", "0 de 14 partidos jugados")
+    assert como_va_la_semana(7, 14, 14) == ("Semana 7 cerrada", "14 partidos jugados")
+    assert titulo_ganadores(7, 1, True) == "Ganó la semana 7"
+    assert titulo_ganadores(7, 2, True) == "Ganaron la semana 7"
+    assert titulo_ganadores(8, 1, False) == "Va ganando la semana 8"
+    assert titulo_ganadores(8, 3, False) == "Van ganando la semana 8"
 
 
 def test_quien_va_arriba_en_la_portada():
     import pandas as pd
 
-    from quiniela.render_png import linea_de_lideres
+    from quiniela.render_html import quien_va_primero
 
     def tabla(*filas):
-        return pd.DataFrame([{"posicion": p, "participante": n, "acumulado": a} for p, n, a in filas])
+        return pd.DataFrame(filas, columns=["posicion", "participante", "acumulado"])
 
-    assert linea_de_lideres(tabla((1, "Ana", 69), (2, "Beto", 68))) == "Ana · 69 aciertos"
-    assert linea_de_lideres(tabla((1, "Ana", 69), (1, "Beto", 69))) == "Ana y Beto · 69 aciertos"
-    assert linea_de_lideres(tabla((1, "Ana", 69), (1, "Beto", 69), (1, "Caro", 69))) == "3 empatados en primero con 69"
+    assert quien_va_primero(tabla((1, "Ana", 69), (2, "Beto", 68))) == (["Ana"], "va", "con 69 aciertos")
+    assert quien_va_primero(tabla((1, "Ana", 69), (1, "Beto", 69))) == (["Ana", "Beto"], "van", "con 69 aciertos")
+    assert quien_va_primero(tabla((1, "Ana", 69), (1, "Beto", 69), (1, "Caro", 69))) == (["3 empatados"], "van", "con 69 aciertos")
+    assert quien_va_primero(tabla((1, "Ana", 1))) == (["Ana"], "va", "con 1 acierto")
+    assert quien_va_primero(tabla()) == ([], "", "")
+
+
+def _tabla_de_prueba(*primeros, resto: int = 33):
+    """Una general con esos en primero y otros de relleno atrás, nombres largos incluidos."""
+    import pandas as pd
+
+    filas = [{"posicion": 1, "participante": n, "acumulado": 69, "errores": 40} for n in primeros]
+    for i in range(resto):
+        filas.append({"posicion": len(primeros) + i + 1, "participante": f"Chucho el Destructor {i:02d}", "acumulado": 60 - i // 4, "errores": 49})
+    return pd.DataFrame(filas)
+
+
+def _letra_fuera(imagen, de_x: int, a_x: int, linea: tuple[int, int]) -> bool:
+    """¿Hay algo claro a los lados de esas columnas, sin contar la línea amarilla?"""
+    gris = imagen.convert("L")
+    ImageDraw.Draw(gris).rectangle([0, linea[0], gris.width, linea[1]], fill=0)
+    lados = (gris.crop((0, 0, de_x, gris.height)), gris.crop((a_x, 0, gris.width, gris.height)))
+    return max(lado.getextrema()[1] for lado in lados) > 90
+
+
+@pytest.mark.parametrize("primeros", [
+    ["Chucho el Destructor"],
+    ["Ana", "Beto"],
+    ["Chucho el Destructor", "Chilangos Norteños"],
+    ["Ana", "Beto", "Caro"],
+    ["Un Nombre Larguísimo Que Nadie Tendría En Una Quiniela De Verdad"],
+])
+@pytest.mark.parametrize("cerrados", [1, 14])
+def test_en_la_portada_nada_se_sale_del_cuadrado_central(tmp_path: Path, primeros, cerrados):
+    """Hay chats que la recortan de x=285 a x=915: fuera solo va la línea amarilla."""
+    from quiniela.render_png import generar_portada
+
+    ruta = generar_portada(tabla_acumulada=_tabla_de_prueba(*primeros), semana=8, anio=2026, cerrados=cerrados,
+                           total_partidos=14, ruta_salida=tmp_path / "portada.png")
+    with Image.open(ruta) as imagen:
+        assert not _letra_fuera(imagen, 285, 915, (312, 317))
+        # La línea sí va de orilla a orilla.
+        assert imagen.convert("RGB").getpixel((0, 314)) == imagen.convert("RGB").getpixel((1199, 314)) == (255, 214, 10)
+    assert ruta.stat().st_size < 300 * 1024
+
+
+@pytest.mark.parametrize("ganadores", [
+    ["Chucho el Destructor"],
+    ["Chucho el Destructor", "Chilangos Norteños"],
+    ["Chucho el Destructor", "Chilangos Norteños", "Karla Villasister"],
+    ["Chucho el Destructor", "Chilangos Norteños", "Karla Villasister", "Leo Villavicencio", "Patrizio Di Toma", "Valentin Esparza"],
+])
+def test_en_la_tabla_nada_se_sale_de_sus_margenes(tmp_path: Path, ganadores):
+    from quiniela.render_png import ANCHO, MARGEN
+
+    ruta = generar_png(tabla_acumulada=_tabla_de_prueba("Chucho el Destructor"), semana=8, anio=2026, cerrados=9,
+                       total_partidos=14, ruta_salida=tmp_path / "tabla.png", momento=MOMENTO,
+                       ganadores=ganadores, premio="$1,733.33", oficial=True, semana_ganadores=7)
+    with Image.open(ruta) as imagen:
+        assert not _letra_fuera(imagen, MARGEN, ANCHO - MARGEN, (112, 115))
+    assert ruta.stat().st_size < 300 * 1024
+
+
+def test_la_tabla_es_de_ahora_sin_verde_ni_rojo_ni_columna_de_fallos(tmp_path: Path):
+    """Los aciertos ya no compiten en color: el único color es la línea, el dinero y la medalla."""
+    from quiniela.render_html import SEMANTICOS
+
+    ruta = generar_png(tabla_acumulada=_tabla_de_prueba("Ana"), semana=8, anio=2026, cerrados=1, total_partidos=14,
+                       ruta_salida=tmp_path / "tabla.png", momento=MOMENTO,
+                       ganadores=["Ana"], premio="$5,200", oficial=True, semana_ganadores=7)
+    with Image.open(ruta) as imagen:
+        colores = {color for _, color in imagen.convert("RGB").getcolors(maxcolors=1 << 20)}
+    for cual in ("verde", "rojo"):
+        hexa = SEMANTICOS[cual]
+        assert tuple(int(hexa[i:i + 2], 16) for i in (1, 3, 5)) not in colores, cual
+
+
+def test_las_imagenes_salen_con_cualquier_fuente(tmp_path: Path, monkeypatch):
+    """Arial en la Mac, Liberation en el runner y, sin ninguna, la que trae Pillow."""
+    from quiniela import render_png
+
+    for estilo in ("normal", "negrita"):
+        rutas = render_png._FUENTES[estilo]
+        assert "Arial" in rutas[0]
+        assert [i for i, r in enumerate(rutas) if "Liberation" in r] < [i for i, r in enumerate(rutas) if "DejaVu" in r]
+
+    monkeypatch.setattr(render_png, "_FUENTES", {"normal": ["/no/existe.ttf"], "negrita": ["/no/existe.ttf"]})
+    render_png._fuente.cache_clear()
+    try:
+        tabla = _tabla_de_prueba("Chucho el Destructor", "Chilangos Norteños")
+        portada = render_png.generar_portada(tabla_acumulada=tabla, semana=8, anio=2026, cerrados=1, total_partidos=14,
+                                             ruta_salida=tmp_path / "portada.png")
+        png = generar_png(tabla_acumulada=tabla, semana=8, anio=2026, cerrados=1, total_partidos=14,
+                          ruta_salida=tmp_path / "tabla.png", momento=MOMENTO, ganadores=["Ana"], premio="$5,200", oficial=True)
+        with Image.open(portada) as imagen:
+            assert not _letra_fuera(imagen, 285, 915, (312, 317))
+        assert png.exists()
+    finally:
+        render_png._fuente.cache_clear()
 
 
 def test_la_imagen_solo_lleva_medalla_en_los_tres_primeros_lugares(tmp_path: Path):
-    """Del 4º en adelante no hay premio, y un 6º no puede salir en bronce."""
-    import pandas as pd
-
-    from quiniela.render_png import COLOR_MEDALLA, ROJO, _campo, _fila
+    """Del 4º en adelante nadie cobra, y un 6º no puede salir en bronce."""
+    from quiniela.render_png import COLOR_MEDALLA, FONDO, _fila, _rgb
 
     def lienzo_con(posicion: int):
-        lienzo = _campo(500, 60)
-        _fila(lienzo, (0, 0, 500, 54), {"posicion": posicion, "participante": "Ana", "acumulado": 60, "errores": 4}, False)
+        lienzo = Image.new("RGBA", (500, 66), _rgb(FONDO) + (255,))
+        _fila(lienzo, (0, 4, 500, 60), {"posicion": posicion, "participante": "Ana", "acumulado": 60})
         return lienzo
 
-    # La franja de la orilla izquierda es del color de la medalla, y solo existe si hay medalla.
+    # El disco de la medalla: se mira a la izquierda de la cifra, en su renglón de en medio.
     for posicion, cual in ((1, "oro"), (2, "plata"), (3, "bronce")):
-        assert lienzo_con(posicion).getpixel((1, 27))[:3] == tuple(int(COLOR_MEDALLA[cual][1][i:i + 2], 16) for i in (1, 3, 5))
+        assert lienzo_con(posicion).getpixel((4, 32))[:3] == _rgb(COLOR_MEDALLA[cual])
     for posicion in (4, 6, 11):
-        rojo, verde, azul = lienzo_con(posicion).getpixel((1, 27))[:3]
-        assert max(rojo, verde, azul) < 60, posicion   # se queda el pasto oscuro
+        assert lienzo_con(posicion).getpixel((4, 32))[:3] == _rgb(FONDO), posicion   # sin disco: el piso
 
 
 def test_la_franja_acomoda_a_los_empatados(tmp_path: Path):

@@ -493,9 +493,10 @@ Qué trae:
 * **El marcador avisa cuando cambia** en vivo, y las cifras cuentan al entrar.
 * **Elegir tu nombre es de un toque**: la invitación abre directo la lista del
   teléfono. Se puede cerrar y elegir después desde el botón del encabezado.
-* **Logo propio**: una A dorada con un balón. Su geometría vive en
-  `quiniela/marca.py` y de ahí salen el encabezado, el ícono de la pestaña, la
-  imagen de picks y los iconos de la app.
+* **Logo propio**: una A cruzada por la línea amarilla de primera y diez, y la
+  palabra ANGABAVE dibujada, sin depender de la letra de cada teléfono. Su
+  geometría vive en `quiniela/marca.py` y de ahí salen el encabezado, el ícono de
+  la pestaña, la imagen de picks, las imágenes para compartir y los iconos de la app.
 * **Modo jugador**: en el encabezado eliges tu nombre y el sitio se vuelve
   tuyo. Cada partido de la semana se pinta según tu pick —verde si vas
   ganando, rojo si vas perdiendo, gris si no empieza— con un resumen de
@@ -541,12 +542,14 @@ Ese relleno no se muestra ni se usa para nada: el partido dice "Hora por
 definir", va al final de la semana y entra en la tanda de su día. Si ninguno de
 la tanda tiene hora, su cierre sale "(por confirmar)".
 
-`docs/tabla.png` es la general como imagen de 1080 px de ancho, con el campo y
-el vidrio del portal, la medalla solo para los tres primeros lugares y una franja
-con el ganador. Con más de 18 participantes se parte en dos columnas para que
-quede casi cuadrada y se lea en WhatsApp sin abrirla. `docs/portada.png` (1200 ×
-630) es lo que se ve al compartir el enlace; lleva lo importante al centro porque
-hay chats que la recortan en cuadrado.
+`docs/tabla.png` es la general como imagen de 1080 px de ancho: negro plano, la
+línea amarilla, la medalla solo para quien cobra y una franja con el ganador. Con
+más de 18 participantes se parte en dos columnas para que quede casi cuadrada y se
+lea en WhatsApp sin abrirla. `docs/portada.png` (1200 × 630) es lo que se ve al
+compartir el enlace: quién va primero y cómo va la semana, con todo el texto en el
+cuadrado central porque hay chats que la recortan. El texto que la acompaña
+(`og:description`) dice lo mismo. Salen con Arial en la Mac y con Liberation, que
+mide igual, en el runner.
 
 Las horas se muestran en horario de Ciudad de México, que está fijo en UTC-6
 todo el año desde que México eliminó el horario de verano en 2022.
