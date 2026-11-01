@@ -284,11 +284,226 @@ def test_la_semana_en_curso_queda_destacada(armado, tmp_path: Path):
 
 
 def test_la_pagina_no_pide_fuentes(armado, tmp_path: Path):
-    """Usa la letra del sistema, la que el teléfono ya trae: nada que bajar ni que esperar."""
+    """Las cifras de marcador viajan dentro de la página; lo demás es la letra del teléfono."""
     html = render(armado, tmp_path)
-    assert "@font-face" not in html
+    caras = re.findall(r"@font-face\{[^}]*\}", html)
+    assert len(caras) == 1
+    assert "font-family:'Rotulo'" in caras[0]
+    assert "src:url(data:font/woff2;base64," in caras[0]
+    assert "unicode-range:U+30-39,U+24,U+25,U+2B-2F,U+3A" in caras[0]     # solo cifras y signos
     assert "-apple-system" in html
     assert _externas(html) == {"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"}
+
+
+def _estilo(html: str) -> str:
+    return html[html.index("<style>"):html.index("</style>")]
+
+
+def _reglas(html: str) -> list[tuple[str, str]]:
+    """El CSS en (selector, declaraciones), también lo que va dentro de un @media."""
+    return [(s.strip(), d) for s, d in re.findall(r"([^{}]+)\{([^{}]*)\}", _estilo(html))]
+
+
+def test_las_cifras_de_marcador_nunca_van_en_nombres_ni_frases(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert "--num:'Rotulo',var(--cuerpo)" in html
+    selectores = ",".join(s for s, d in _reglas(html) if "font-family:var(--num)" in d)
+    for cifra in (".mrc", ".pts", ".sem", ".c-pos .n", ".fila-gan .monto", ".bolsa-final .val", ".campeon .bolsa",
+                  ".mi-barra .linea b", ".mi-barra .linea .rango", ".celda-semana b", ".lugar .puntos",
+                  ".candidato .pct", ".detalle-partido .marcador", ".cifras .cifra b"):
+        assert cifra in selectores, cifra
+    for palabras in (".c-nombre", ".quien", ".nombres", ".nom", ".eq", ".saludo", ".titulo", ".rot", ".sig"):
+        assert not re.search(re.escape(palabras) + r"(?![\w-])", selectores), palabras
+
+
+def test_el_dinero_es_oro_lo_tuyo_acento_y_tu_fila_no_es_mostaza(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    regla = dict(_reglas(html))
+    for dinero in (".lugar .bolsa", ".fila-gan .monto", ".campeon .bolsa"):
+        assert "color:var(--oro)" in regla[dinero], dinero
+    assert "color:var(--oro)" in regla[".bolsa-final .val"]
+    assert "background:var(--oro)" in regla['.saludo::after']
+    assert "color:var(--txt)" in regla[".mi-barra .linea .rango"]
+    assert "box-shadow:inset 3px 0 0 var(--acento)" in regla["tbody tr.yo td:first-child"]
+    assert "background:var(--fila-yo)" in regla["tbody tr.yo td"]
+    nombre = regla["tbody tr.yo .c-nombre"]
+    assert "color:var(--txt)" in nombre and "font-weight:700" in nombre
+    # Lleno es a favor, hueco es en contra: se distingue sin color.
+    assert "background:var(--verde)" in regla[".progreso-semana .ok"]
+    assert "background:transparent" in regla[".progreso-semana .mal"]
+    assert "box-shadow:inset 0 0 0 1.5px var(--rojo)" in regla[".progreso-semana .mal"]
+    assert "background:transparent" in regla[".juego-fila .mio.mal"]
+    assert "box-shadow:inset 0 0 0 1px var(--rojo)" in regla[".juego-fila .mio.mal"]
+    assert "opacity:.55" in regla['.duelo-pick:has(.opcion[aria-pressed="true"]) .opcion[aria-pressed="false"]']
+
+
+def test_los_titulares_son_blancos_y_de_un_solo_color(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert not re.search(r"\bresalta\b", html)
+    h1 = dict(_reglas(html))[".saludo h1"]
+    assert "font-weight:700" in h1 and "letter-spacing:-.03em" in h1 and "color:" not in h1
+
+
+def test_lo_que_se_veia_viejo_no_regresa(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    estilo = _estilo(html)
+    assert "box-shadow:0 0" not in estilo          # nada de neón
+    assert "--mx" not in html and ".tarjeta::after" not in estilo      # la luz que seguía al cursor
+    assert "barrer" not in estilo and "@keyframes listo" not in estilo
+    assert "--resorte" not in html and "--suave" not in html
+
+
+def test_solo_tres_radios_y_el_circulo(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    radios = set(re.findall(r"border-radius:([^;}]+)", _estilo(html)))
+    permitidos = {"var(--r1)", "var(--r2)", "var(--r3)", "50%", "99px",   # los tres y el círculo
+                  "20px", "20px 20px 0 0", "26px",                        # la hoja, y la barra con su pastilla
+                  "2px", "2px 2px 0 0"}                                   # segmentos de una tira o barra
+    assert radios <= permitidos, radios - permitidos
+    assert "--r1:16px; --r2:12px; --r3:8px" in html
+
+
+def test_las_listas_y_tablas_no_llevan_caja(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    listas = {".marco", ".boleta", ".fila-gan", ".split", ".candidato", ".lugar", ".tarjeta", ".ganadores", ".mi-semana"}
+    for selector, declaraciones in _reglas(html):
+        if selector in listas:
+            for caja in ("background", "border:", "border-radius"):
+                assert caja not in declaraciones, (selector, caja)
+    # El encabezado de la tabla no lleva esquinas: la de la última columna se salía del marco.
+    regla = dict(_reglas(html))
+    assert not any(re.search(r"\bth\b", s) and "radius" in d for s, d in _reglas(html))
+    # Y mismo relleno que sus números: el encabezado les cae exacto encima.
+    assert "padding" in regla["th,td"] and "padding" not in regla["thead th"]
+    # Con todas las semanas la tabla se desliza: el nombre no se parte letra por letra.
+    assert "white-space:nowrap" in regla[".rueda.expandida .c-nombre"]
+
+
+def test_un_solo_idioma_de_movimiento(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    for variable in ("--sale:cubic-bezier(.16,1,.3,1)", "--entra:cubic-bezier(.4,0,1,1)",
+                     "--traza:cubic-bezier(.65,0,.35,1)", "--hoja:cubic-bezier(.32,.72,0,1)", "--rebote:linear("):
+        assert variable in html, variable
+    # Nada grande rebota.
+    grande = (".hoja", ".boton", ".juego-fila", ".mi-barra-yo", ".indicador", ".corredera", ".tarjeta",
+              ".aviso-picks", ".opcion", ".celda-semana", ".ver-todas", ".mi-fila", ".flotante")
+    for selector, declaraciones in _reglas(html):
+        if "var(--rebote)" in declaraciones:
+            assert not any(pieza in selector for pieza in grande), selector
+    # Las entradas sueltan su capa al terminar; solo lo que sale se queda como terminó.
+    for selector, declaraciones in _reglas(html):
+        if re.search(r"animation:[^;}]*\bboth\b", declaraciones) and ".cancha" not in selector:
+            assert re.search(r"\.mas|rodillo|saliendo|view-transition", selector), selector
+    # Quedan tres puntos que laten sin parar, y ninguna celda.
+    latidos = [s for s, d in _reglas(html) if "animation:latir" in d and "infinite" in d]
+    assert len(latidos) <= 3, latidos
+
+
+def test_presionar_responde_al_instante(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    tacto = [(s, d) for s, d in _reglas(html) if "transform:scale(.985)" in d]
+    assert tacto and all("transition:transform .07s linear" in d for _, d in tacto)
+    selectores = ",".join(s for s, _ in tacto)
+    for pieza in (".boton-principal:active", ".boton:active", ".juego-fila:active", ".mi-barra-yo:active"):
+        assert pieza in selectores
+    # Sin un touchstart, Safari de iOS no pinta :active.
+    assert "addEventListener('touchstart',function(){},{passive:true})" in html
+
+
+def test_lo_de_abajo_se_revela_una_vez_con_un_observador(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert "new IntersectionObserver" in html
+    assert "revelador.unobserve(entrada.target)" in html
+
+
+def _arranque(html: str) -> str:
+    """El script del <head>, el que corre antes de pintar."""
+    cabeza = html[:html.index("</head>")]
+    return cabeza[cabeza.index("<script>"):cabeza.index("</script>")]
+
+
+def test_el_arranque_no_pinta_la_vista_equivocada(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    arranque = _arranque(html)
+    assert html.index("<script>") < html.index("<style>")      # antes de que haya algo que pintar
+    assert "r.className='js'" in arranque
+    assert "localStorage.getItem('angabave.tema')" in arranque     # tu equipo, desde el primer cuadro
+    assert "sessionStorage.getItem('angabave.estreno')" in arranque
+    # En JavaScript viejo: si el script principal no se entiende, esto sí tiene que correr.
+    for moderno in ("=>", "let ", "const ", "`", "?.", "??", "async ", "class "):
+        assert moderno not in arranque, moderno
+    # Se destapa con DOMContentLoaded: aunque el script principal reviente, la General se ve.
+    assert "addEventListener('DOMContentLoaded',function(){r.classList.add('listo')})" in arranque
+    assert ".js:not(.listo) main>.vista" in html
+    assert 'class="vista anima env" id="vista-general"' in html
+    assert '.setProperty' not in arranque
+    assert 'guardar("angabave.tema", null)' in _funcion(html, "aplicarTema")
+
+
+def test_lo_publicado_no_lleva_notas_internas(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert "/*" not in _estilo(html)
+    principal = html[html.rindex("<script>"):html.rindex("</script>")]
+    assert "/*" not in principal
+    assert not re.search(r"^\s*//", principal, re.M)
+    assert "<!--" not in html
+    # Lo demás se queda: el código, su sangría, la red de seguridad y los datos.
+    assert "\n  function pintarHoy(" in principal
+    assert "window.angabaveListo = true" in principal
+    assert 'var detalle = "";' in html
+    assert datos_embebidos(html)["activa"] == 2
+
+
+def test_quitar_notas_no_toca_textos_ni_expresiones():
+    from quiniela.render_html import _sin_comentarios_js
+
+    assert _sin_comentarios_js('a = "http://x/*y*/"; // nota') == 'a = "http://x/*y*/"; '
+    assert _sin_comentarios_js("b = 'no // es nota'; /* esta\n   sí */ c = 1;") == "b = 'no // es nota';  c = 1;"
+    assert _sin_comentarios_js('d = s.replace(/\\/\\/[/*"]/g, "");') == 'd = s.replace(/\\/\\/[/*"]/g, "");'
+    assert _sin_comentarios_js("e = x / 2 / y; // mitad") == "e = x / 2 / y; "
+    assert _sin_comentarios_js('function f() { return /"\\//.test(a); } // fin') == 'function f() { return /"\\//.test(a); } '
+    assert _sin_comentarios_js('g = () => /^\\d+$/.test(a); // sí') == 'g = () => /^\\d+$/.test(a); '
+    assert _sin_comentarios_js("h = 'it\\'s'; // otra") == "h = 'it\\'s'; "
+
+
+def test_si_no_se_pueden_quitar_las_notas_la_pagina_igual_sale(armado, tmp_path: Path, monkeypatch):
+    """Es un ahorro, no un requisito: el domingo la página se publica aunque esto truene."""
+    import quiniela.render_html as generador
+
+    def truena(_html):
+        raise ValueError("comentario sin cerrar")
+
+    monkeypatch.setattr(generador, "_sin_comentarios", truena)
+    html = render(armado, tmp_path)
+    assert "window.angabaveListo = true" in html
+
+
+def test_el_pie_va_en_dos_renglones_y_sin_la_palabra_alfa(armado, tmp_path: Path):
+    from quiniela.render_html import VERSION
+
+    html = render(armado, tmp_path)
+    pie = html[html.index("<footer>"):html.index("</footer>")]
+    assert pie.count("<p") == 2
+    assert "Actualizado 20 sep 2026, 14:32, hora de Ciudad de México" in pie
+    assert "Desarrollado por Angel Barrera" in pie and VERSION in pie
+    assert "Gana la semana" not in pie               # las reglas viven en Premios
+    # La palabra no se ve en ningún lado: lo que se pinta es el cuerpo sin sus scripts.
+    cuerpo = re.sub(r"<script.*?</script>", "", html[html.index("<body>"):], flags=re.S)
+    assert not re.search(r"\balfa\b", cuerpo, re.I)
+    assert '"alfa"' not in html[html.rindex("<script>"):]
+
+
+def test_la_prueba_de_red_encuentra_la_version_en_las_dos_paginas(armado, tmp_path: Path):
+    from quiniela.render_html import ETAPA, VERSION
+
+    render(armado, tmp_path)
+    red = (tmp_path / "red.html").read_text(encoding="utf-8")
+    patron = r'<meta name="version" content="([^"]+)"'
+    assert patron in red
+    assert re.search(r"\balfa\b", re.sub(r"<script.*?</script>", "", red, flags=re.S), re.I) is None
+    for nombre in ("index.html", "cargar.html"):
+        pagina = (tmp_path / nombre).read_text(encoding="utf-8")
+        assert re.search(patron, pagina).group(1) == f"{ETAPA} {VERSION}", nombre
 
 
 def test_hay_animacion_para_los_cambios_de_marcador(armado, tmp_path: Path):

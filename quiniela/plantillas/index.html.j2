@@ -203,7 +203,7 @@ main{view-transition-name:contenido; min-height:60vh}
    llenan hacia atrás, no hacia adelante: al terminar sueltan su capa. */
 @keyframes sube{from{opacity:0; transform:translate3d(0,12px,0)}}
 @keyframes aparece{from{opacity:0} to{opacity:1}}
-.anima .tarjeta,.anima .marco,.anima .podio,.anima .campeon,.anima .mi-semana,.anima .aviso-picks,.anima .cabeza-semana,.anima .perfil{
+.anima .tarjeta,.anima .podio,.anima .campeon,.anima .mi-semana,.anima .aviso-picks,.anima .cabeza-semana,.anima .perfil{
   animation:sube .36s var(--sale) backwards; animation-delay:calc(min(var(--n,0),5) * 36ms + 60ms)}
 .anima .tabs{animation:aparece .24s ease backwards .06s}
 .panel-entra{animation:panel-entra .26s var(--sale) backwards}
@@ -253,7 +253,7 @@ main{view-transition-name:contenido; min-height:60vh}
 .boton-principal{display:block; width:100%; min-height:48px; border-radius:var(--r2); font-weight:700; font-size:var(--t4);
   color:var(--pastilla-txt); background:var(--pastilla); transition:transform .28s var(--sale),opacity .2s}
 .boton{min-height:44px; padding:0 16px; border-radius:var(--r2); font-size:var(--t5); font-weight:700; white-space:nowrap;
-  background:var(--pastilla); color:var(--pastilla-txt); transition:transform .28s var(--rebote),opacity .2s}
+  background:var(--pastilla); color:var(--pastilla-txt); transition:transform .28s var(--sale),opacity .2s}
 .boton:disabled{opacity:.35}
 /* El tacto: se hunde al instante y regresa con calma. */
 .boton-principal:active,.boton:active,.juego-fila:active,.aviso-picks:active,.opcion:active,.celda-semana:active,.mi-barra-yo:active,
@@ -261,8 +261,8 @@ main{view-transition-name:contenido; min-height:60vh}
 .juego-fila.quieto:active{transform:none}
 .aviso{padding:16px 0; border-top:1px solid var(--linea); color:var(--tenue); font-size:var(--t5)}
 .aviso strong{display:block; color:var(--txt); font-size:var(--t4); margin-bottom:4px}
-.rezago{display:flex; align-items:flex-start; gap:8px; margin-bottom:16px; padding:12px; border-radius:var(--r2);
-  font-size:var(--t5); line-height:1.35; color:var(--tenue); background:var(--panel2); border:1px solid var(--linea2)}
+.rezago{display:flex; align-items:flex-start; gap:8px; margin-bottom:16px; padding-block:12px;
+  font-size:var(--t5); line-height:1.35; color:var(--tenue); border-block:1px solid var(--linea)}
 .rezago b{color:var(--txt); font-weight:600}
 .rezago .icono{color:var(--txt); flex:0 0 auto}
 
@@ -298,7 +298,7 @@ main{view-transition-name:contenido; min-height:60vh}
 .juego-fila .mio.bien{color:var(--verde); background:color-mix(in srgb,var(--verde) 18%,transparent)}
 .juego-fila .mio.mal{color:var(--rojo); background:transparent; box-shadow:inset 0 0 0 1px var(--rojo)}
 .juego-fila .consenso{font-size:var(--t6); color:var(--tenue2); white-space:nowrap}
-.juego-fila.quieto{cursor:default; padding-block:2px}
+.juego-fila.quieto{cursor:default; padding-block:4px}
 /* Cuando alguien anota: una ola del color del equipo y el "+7" que sube. */
 .juego-fila.anoto::before{content:""; position:absolute; inset:0 -16px; pointer-events:none; opacity:0;
   background:linear-gradient(90deg,transparent,var(--c,var(--verde)),transparent); animation:ola 1.5s var(--sale)}
@@ -317,8 +317,8 @@ main{view-transition-name:contenido; min-height:60vh}
 .progreso-semana .ok{background:var(--verde)}
 .progreso-semana .mal{background:transparent; box-shadow:inset 0 0 0 1.5px var(--rojo)}
 /* En juego todavía puede cambiar: el mismo lleno o hueco, a media luz. */
-.progreso-semana .gana{background:color-mix(in srgb,var(--verde) 55%,transparent)}
-.progreso-semana .pierde{background:transparent; box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--rojo) 55%,transparent)}
+.progreso-semana .gana{background:var(--verde); opacity:.6}
+.progreso-semana .pierde{background:transparent; box-shadow:inset 0 0 0 1.5px var(--rojo); opacity:.6}
 .progreso-semana .juega{background:var(--tenue2)}
 .anima .progreso-semana i{animation:brota .36s var(--rebote) backwards; animation-delay:calc(var(--k) * 12ms + 120ms)}
 @keyframes brota{from{transform:scaleY(.1); opacity:0}}
@@ -336,7 +336,7 @@ main{view-transition-name:contenido; min-height:60vh}
 /* Desde tu última visita. */
 .novedades{display:flex; gap:12px; align-items:flex-start; margin-bottom:24px}
 .novedades::before{content:""; flex:0 0 auto; width:3px; align-self:stretch; border-radius:2px; background:var(--acento)}
-.novedades .rot{display:block; font-size:var(--t6); color:var(--tenue); margin-bottom:2px}
+.novedades .rot{display:block; font-size:var(--t6); color:var(--tenue); margin-bottom:4px}
 .novedades p{font-size:var(--t5); line-height:1.4}
 
 /* ═══════ el campeón ═══════ */
@@ -393,13 +393,13 @@ main{view-transition-name:contenido; min-height:60vh}
 .filtro-tabla::before{content:""; position:absolute; left:14px; top:14px; width:12px; height:12px; border:1.8px solid var(--tenue); border-radius:50%; pointer-events:none}
 .filtro-tabla::after{content:""; position:absolute; left:25px; top:25px; width:6px; height:1.8px; background:var(--tenue); transform:rotate(45deg); transform-origin:0 50%; pointer-events:none}
 .mi-fila{flex:0 0 auto; min-height:44px; padding:0 12px; border-radius:var(--r2); font-size:var(--t5); font-weight:600; color:var(--acento); background:var(--panel); border:1px solid var(--linea);
-  transition:transform .28s var(--rebote)}
+  transition:transform .28s var(--sale)}
 .sin-resultados{padding:16px; text-align:center; color:var(--tenue); font-size:var(--t5)}
 .marco{position:relative}
 .rueda.expandida{overflow-x:auto; -webkit-overflow-scrolling:touch}
 .rueda.expandida thead th{top:0}
 table{border-collapse:separate; border-spacing:0; width:100%}
-th,td{height:44px; padding:0 6px; text-align:right; font-size:var(--t4); white-space:nowrap}
+th,td{height:44px; padding:0 4px 0 8px; text-align:right; font-size:var(--t4); white-space:nowrap}
 thead th{height:32px; position:sticky; top:var(--alto-encabezado); z-index:3; font-size:var(--t6); font-weight:600; color:var(--tenue);
   background:var(--bg); border-bottom:1px solid var(--linea)}
 tbody td{border-bottom:1px solid var(--linea)}
@@ -416,6 +416,8 @@ tr.p3 .c-pos .n{color:var(--bronce)}
 .err,.sem{font-weight:500; color:var(--tenue)}
 th.c-sem.vieja,td.c-sem.vieja,th.c-sem.media,td.c-sem.media{display:none}
 .rueda.expandida th.c-sem,.rueda.expandida td.c-sem{display:table-cell}
+/* Con todas las semanas la tabla se desliza: el nombre no se parte letra por letra para caber. */
+.rueda.expandida .c-nombre{white-space:nowrap; overflow-wrap:normal}
 @media (min-width:700px){ th.c-sem.media,td.c-sem.media{display:table-cell} }
 tbody tr.clic{cursor:pointer}
 @media (hover:hover){ tbody tr:hover td{background:var(--panel2)} }
@@ -428,8 +430,9 @@ tbody tr.yo.p1 .c-pos .n{color:var(--oro)}
 tbody tr.yo.p2 .c-pos .n{color:var(--plata)}
 tbody tr.yo.p3 .c-pos .n{color:var(--bronce)}
 tbody tr.yo .c-nombre{color:var(--txt); font-weight:700}
-tbody tr.resaltada td{animation:resaltar 1.6s ease}
-@keyframes resaltar{0%,60%{background:color-mix(in srgb,var(--acento) 34%,var(--panel))} 100%{background:var(--fila-yo)}}
+tbody tr.resaltada td{position:relative}
+tbody tr.resaltada td::after{content:""; position:absolute; inset:0; background:var(--txt); opacity:0; pointer-events:none; animation:resaltar 1.6s ease}
+@keyframes resaltar{0%,60%{opacity:.12}}
 .mov{display:inline-block; margin-left:4px; font-size:var(--t6); font-weight:700; white-space:nowrap}
 .mov.sube{color:var(--verde)} .mov.baja{color:var(--rojo)}
 .ver-todas{display:block; width:100%; min-height:44px; font-size:var(--t5); font-weight:600; color:var(--acento); border-top:1px solid var(--linea);
@@ -583,8 +586,8 @@ select.ancho:focus{outline:0; border-color:var(--acento)}
 @media (max-width:360px){ .opcion .sig{display:none} .opcion{padding-inline:12px} }
 /* El avance y el botón te siguen mientras bajas. */
 .acciones-gen{position:sticky; bottom:calc(var(--alto-pie) + 2px); z-index:6; display:flex; align-items:center; gap:8px; margin:16px -8px 0; padding:8px 8px 8px 12px; overflow:hidden; border-radius:var(--r1);
-  background:var(--cristal); border:1px solid rgba(255,255,255,.09);
-  -webkit-backdrop-filter:blur(22px) saturate(170%); backdrop-filter:blur(22px) saturate(170%)}
+  background:var(--panel3); border:1px solid var(--linea2)}
+.acciones-gen .boton:disabled{opacity:1; background:var(--panel2); color:var(--tenue)}
 .acciones-gen .avance{position:absolute; left:0; top:0; height:2px; width:0; background:var(--acento); transition:width .36s var(--sale)}
 .acciones-gen .cuenta{margin-right:auto; font-size:var(--t3); white-space:nowrap}
 .acciones-gen .cuenta small{font-family:var(--cuerpo); font-size:var(--t5); font-weight:500; color:var(--tenue)}
@@ -650,7 +653,7 @@ select.ancho:focus{outline:0; border-color:var(--acento)}
 @keyframes hoja-sube{from{transform:translateY(100%)}}
 @keyframes hoja-baja{to{transform:translateY(100%)}}
 .rejilla-semanas{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
-.celda-semana{position:relative; display:flex; flex-direction:column; align-items:center; min-height:72px; padding:8px 2px; border-radius:var(--r2);
+.celda-semana{position:relative; display:flex; flex-direction:column; align-items:center; min-height:72px; padding:8px 4px; border-radius:var(--r2);
   background:var(--panel2); border:1px solid var(--linea); transition:transform .28s var(--sale)}
 .celda-semana b{font-size:var(--t3); line-height:1.2}
 .celda-semana small{font-size:var(--t6); color:var(--tenue); white-space:nowrap}
@@ -660,6 +663,7 @@ select.ancho:focus{outline:0; border-color:var(--acento)}
 .celda-semana.vivo small{color:var(--txt)}
 .celda-semana.en-curso::after{content:""; position:absolute; top:8px; right:8px; width:6px; height:6px; border-radius:50%; background:var(--txt)}
 .celda-semana.elegida{background:var(--panel3); border-color:var(--acento)}
+.celda-semana:focus-visible{outline-offset:-2px}
 .hoja .boton-principal.volver-actual{margin-top:12px; color:var(--pastilla-txt); display:block}
 .controles{display:grid; gap:12px}
 .soy{display:grid; gap:4px}
@@ -678,7 +682,7 @@ select.ancho:focus{outline:0; border-color:var(--acento)}
 /* ═══════ pie ═══════ */
 footer{margin-top:32px; padding-block:16px; border-top:1px solid var(--linea); color:var(--tenue); font-size:var(--t6); line-height:1.5}
 footer .firma{font-weight:500}
-footer .version{color:var(--tenue2)}
+footer .pie-version{color:var(--tenue2)}
 .arriba{display:none}
 
 /* ═══════ transiciones entre secciones ═══════ */
@@ -860,7 +864,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
 <footer>
   <div class="env">
     <p>Actualizado {{ actualizado }}, hora de Ciudad de México</p>
-    <p class="firma">Desarrollado por {{ desarrollador }} · <span class="version">{{ version }}</span></p>
+    <p class="firma">Desarrollado por {{ desarrollador }} · <span class="pie-version">{{ version }}</span></p>
   </div>
 </footer>
 
@@ -2006,7 +2010,6 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
       cuenta.appendChild(crear("small", null, " de " + porClave.size));
       descargar.disabled = n === 0;
       limpiar.disabled = n === 0;
-      caja.classList.toggle("lista", n > 0 && n === porClave.size);
       avance.style.width = (porClave.size ? (100 * n) / porClave.size : 0) + "%";
     }
     limpiar.addEventListener("click", () => {
@@ -3550,12 +3553,13 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   function observarRevela(raiz) {
     if (!revelador) return;
     revelador.disconnect();
-    // En el cuadro que sigue: ya con la vista puesta y a la altura donde se va a quedar.
-    requestAnimationFrame(() => {
+    // Dos cuadros después: ya con la vista puesta y a la altura donde se va a quedar, que
+    // al recargar se repone en el cuadro siguiente. Lo que ya se ve no se toca.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
       raiz.querySelectorAll(".lista-juegos,.split,.candidato,.regla,.ganadores,.boleta").forEach((nodo) => {
         if (nodo.getBoundingClientRect().top >= window.innerHeight - (ancho.matches ? 0 : 84)) revelador.observe(nodo);
       });
-    });
+    }));
   }
 
   /* ═══ navegación ═══ */

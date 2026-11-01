@@ -776,15 +776,20 @@ def _tipografia() -> str:
     return base64.b64encode(RUTA_TIPOGRAFIA.read_bytes()).decode("ascii")
 
 
+def _abre_regex(salida: list[str]) -> bool:
+    """Una diagonal abre una expresión regular después de un signo o de `return`; si no, divide."""
+    antes = "".join(salida[-12:]).rstrip()
+    return not antes or antes[-1] in "(,=:[!&|?{};>" or antes.endswith("return")
+
+
 def _sin_comentarios_js(codigo: str) -> str:
     """Quita los comentarios de un script sin tocar textos ni expresiones regulares.
 
-    Solo reconoce lo que usa el portal: comillas, comentarios y expresiones regulares
-    después de un signo o de `return`. Lo demás pasa tal cual.
+    Solo reconoce lo que usa el portal: comillas, comentarios y expresiones regulares.
+    Lo demás pasa tal cual. Si el código no cierra, truena: `generar_html` publica con notas.
     """
     salida: list[str] = []
     i, largo = 0, len(codigo)
-    previo = ""     # el último carácter que no es espacio: distingue una regex de una división
     while i < largo:
         letra = codigo[i]
         if letra in "\"'`":
@@ -792,13 +797,13 @@ def _sin_comentarios_js(codigo: str) -> str:
             while codigo[fin] != letra:
                 fin += 2 if codigo[fin] == "\\" else 1
             salida.append(codigo[i : fin + 1])
-            previo, i = letra, fin + 1
+            i = fin + 1
         elif codigo.startswith("//", i):
             fin = codigo.find("\n", i)
             i = largo if fin < 0 else fin
         elif codigo.startswith("/*", i):
             i = codigo.index("*/", i) + 2
-        elif letra == "/" and (previo in ("", *"(,=:[!&|?{};>") or "".join(salida[-6:]).rstrip().endswith("return")):
+        elif letra == "/" and _abre_regex(salida):
             fin, en_clase = i + 1, False
             while codigo[fin] != "/" or en_clase:
                 if codigo[fin] == "\\":
@@ -807,10 +812,9 @@ def _sin_comentarios_js(codigo: str) -> str:
                     en_clase = codigo[fin] == "["
                 fin += 1
             salida.append(codigo[i : fin + 1])
-            previo, i = "/", fin + 1
+            i = fin + 1
         else:
             salida.append(letra)
-            previo = previo if letra.isspace() else letra
             i += 1
     return "".join(salida)
 
@@ -1170,7 +1174,12 @@ def generar_html(
         "columnas_semana": columnas_semana,
     }
 
-    html = _sin_comentarios(_entorno().get_template("index.html.j2").render(**contexto))
+    html = _entorno().get_template("index.html.j2").render(**contexto)
+    try:
+        html = _sin_comentarios(html)
+    except (ValueError, IndexError):
+        # Quitar las notas es un ahorro: si algo raro lo impide, la página sale con ellas.
+        _log.warning("No pude quitar los comentarios de la página; se publica con ellos.")
     ruta_salida.write_text(html, encoding="utf-8")
     generar_sello_version(ruta_sello, momento, firma)
     _log.info("Escribí %s (%.0f KB).", ruta_salida, len(html.encode("utf-8")) / 1024)

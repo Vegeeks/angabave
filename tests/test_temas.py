@@ -15,12 +15,15 @@ from quiniela.render_html import (
     BASE_CAMPO,
     CONTRASTE_MINIMO,
     CONTRASTE_SEMANTICO,
+    FONDO_PANEL,
     LUZ_EQUIPO,
     LUZ_ESTADIO,
     SEMANTICOS,
     _a_rgb,
+    _luminancia,
     contraste,
     fondos_de_prueba,
+    mezclar,
     paleta_equipos,
     tema_campo,
     temas_equipos,
@@ -57,6 +60,31 @@ def test_cada_tema_se_lee(nombre, tema):
         color = tema.get("--" + clave, base)
         for fondo in fondos:
             assert contraste(color, fondo) >= CONTRASTE_SEMANTICO, (nombre, clave, fondo)
+
+
+@pytest.mark.parametrize("nombre,tema", TEMAS, ids=[t[0] for t in TEMAS])
+def test_la_opcion_que_no_elegiste_se_sigue_leyendo(nombre, tema):
+    """Al elegir un equipo el otro baja a .55: texto y botón se mezclan con el piso."""
+    atenuado = lambda color: mezclar(tema["--bg"], color, 0.55)
+    assert contraste(atenuado(tema["--txt"]), atenuado(tema["--panel2"])) >= CONTRASTE_MINIMO, nombre
+
+
+def test_el_color_de_un_equipo_se_lee_en_cualquier_tema():
+    """.cuenta-lado y .rasgo .val usan el color del equipo sobre el piso y las hojas."""
+    for equipo, colores in paleta_equipos().items():
+        for donde in ("local", "visita"):
+            for nombre, tema in TEMAS:
+                for fondo in (tema["--bg"], tema["--panel"]):
+                    assert contraste(colores[donde], fondo) >= CONTRASTE_MINIMO, (equipo, donde, nombre, fondo)
+
+
+def test_el_panel_de_referencia_es_el_mas_claro_de_todos():
+    assert FONDO_PANEL == max((tema["--panel"] for _, tema in TEMAS), key=_luminancia)
+
+
+@pytest.mark.parametrize("nombre,tema", TEMAS, ids=[t[0] for t in TEMAS])
+def test_tu_fila_es_un_escalon_mas_clara_y_nunca_un_color(nombre, tema):
+    assert tema["--fila-yo"] == tema["--panel2"], nombre
 
 
 def test_son_65_temas_y_la_luz_es_la_de_cada_uno():
