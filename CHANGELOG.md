@@ -9,6 +9,11 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.25.0
+
+* La zona de anotación del campo ya no dice ANGABAVE: pinta tu equipo o, si no elegiste, tu nombre, y se repinta al cambiarlos. Los espacios y los acentos se respetan.
+* Si una pantalla falla al pintar, el resto de la página sigue funcionando.
+
 ## v0.24.0
 
 * Campo más vistoso: pasto con franjas, yardas, luces de estadio y las líneas amarilla y azul de la transmisión. Llega al abrir y luego queda quieto, sin gastar batería.

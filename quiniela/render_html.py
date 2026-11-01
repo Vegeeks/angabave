@@ -15,16 +15,18 @@ import base64
 import hashlib
 import json
 import logging
+import re
 from decimal import Decimal
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta, timezone
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlsplit
 
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
 
-from . import marca
+from . import campo, marca
 from .carga import SITIO, TAMANO_MAXIMO
 from .enlace import URL_FUNCION
 from .equipos import ABREVIATURAS_ESPN
@@ -46,11 +48,14 @@ __all__ = [
     "MARCA",
     "RUTA_SALIDA",
     "TAMANO_PORTADA",
+    "como_va_la_semana",
+    "descripcion_de_portada",
     "firma_publicada",
     "generar_manifiesto",
     "generar_pagina_de_carga",
     "generar_prueba_de_red",
     "generar_sello_version",
+    "quien_va_primero",
     "SemanaRender",
     "UMBRAL_PODIO",
     "UMBRAL_SEMANA",
@@ -62,8 +67,8 @@ _log = logging.getLogger(__name__)
 
 RAIZ = Path(__file__).resolve().parents[1]
 DIR_PLANTILLAS = Path(__file__).resolve().parent / "plantillas"
-#: Fuente de titulares y números, recortada a mayúsculas y dígitos, para la página
-#: de carga y las imágenes. Licencia en tipografia/OFL.txt.
+#: Fuente de marcador, recortada a mayúsculas y dígitos: en el portal, solo las cifras.
+#: Licencia en tipografia/OFL.txt.
 RUTA_TIPOGRAFIA = Path(__file__).resolve().parent / "tipografia" / "oswald-recortada.woff2"
 RUTA_SALIDA = RAIZ / "docs" / "index.html"
 
@@ -73,14 +78,15 @@ MARCA = "ANGABAVE"
 #: Quién firma el sitio.
 DESARROLLADOR = "Angel Barrera"
 
-#: Etapa y versión del portal. Se muestra junto a la marca.
+#: Etapa y versión del portal. En pantalla solo va la versión, en el pie; la etapa viaja
+#: en <meta name="version">, donde la lee la prueba de conexión.
 #:
 #: Esquema: alfa vMAYOR.MENOR.PARCHE
 #:   MENOR  sube con cada función nueva visible
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.24.0"
+VERSION = "v0.25.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -127,8 +133,9 @@ COLORES_EQUIPO: dict[str, dict[str, str]] = {
 # del portal y como fondo de la sigla con texto encima. Ninguna de las dos se
 # deja al ojo: se calcula el contraste (WCAG) y se corrige si no llega.
 
-#: Fondo de los paneles, contra el que se mide el texto de color.
-FONDO_PANEL = "#101724"
+#: El --panel más claro de todos los temas, contra el que se mide el texto de color: un
+#: color de equipo que aquí se lee, se lee sobre el piso y las hojas de cualquier tema.
+FONDO_PANEL = "#212327"
 #: Mínimo exigido: 4.5:1, el umbral de WCAG para texto normal.
 CONTRASTE_MINIMO = 4.5
 
@@ -242,6 +249,17 @@ LUZ_EQUIPO = 0.20
 CAL_CAMPO = 0.03
 
 
+#: Los colores del campo sin equipo: verde noche con la palabra en amarillo.
+PINTURA_CAMPO: dict[str, str] = {
+    "--pasto": "#07301D", "--pasto-luz": "#0C5F38", "--cal": "#205842", "--cal2": "#1A4B37",
+    "--primera": "#FFD60A", "--primera2": "#554A07", "--scrim": "#2F8BFF", "--scrim2": "#1B4590",
+    "--zona": "#06221A", "--letra": "#FFD60A", "--haz": "#CFFFE6", "--grada": "#0B1814",
+}
+#: Lo más claro que el campo deja detrás de un texto, por tema: cuanto más oscuro,
+#: menos hay que aclarar el acento del equipo para que siga siendo su color.
+LUZ_CAL_EQUIPO = 0.062
+
+
 def mezclar(fondo: str, tinte: str, fuerza: float) -> str:
     """Mezcla dos colores; `fuerza` es cuánto pesa el tinte."""
     a, b = _a_rgb(fondo), _a_rgb(tinte)
@@ -282,15 +300,72 @@ def _hasta_que_se_lea(color: str, fondos: list[str], minimo: float) -> str:
     return seguro
 
 
+def _con_luz(color: str, objetivo: float) -> str:
+    """El mismo tono, oscurecido hasta la luminancia que se pide."""
+    claro, oscuro = 0.0, 1.0
+    for _ in range(14):
+        medio = (claro + oscuro) / 2
+        if _luminancia(mezclar(color, "#000000", medio)) > objetivo:
+            claro = medio
+        else:
+            oscuro = medio
+    return mezclar(color, "#000000", oscuro)
+
+
+def _saturacion(color: str) -> float:
+    canales = _a_rgb(color)
+    return (max(canales) - min(canales)) / max(max(canales), 0.001)
+
+
+def fondos_campo(tema: dict[str, str]) -> list[str]:
+    """Lo más claro que el campo puede dejar detrás de un texto, en cualquier punto:
+    las líneas, las cifras, las dos líneas de la transmisión y el pasto con su luz."""
+    return [tema[v] for v in ("--cal", "--cal2", "--primera2", "--scrim2", "--pasto-luz")]
+
+
+def _textos_sobre_campo(tema: dict[str, str]) -> dict[str, str]:
+    """Los textos que van encima del campo, verificados contra lo más claro que les queda detrás."""
+    fondos = fondos_campo(tema)
+    return {
+        "--sobre-campo": _hasta_que_se_lea("#D9E1DC", fondos, CONTRASTE_MINIMO),
+        "--acento-campo": _hasta_que_se_lea(tema["--acento"], fondos, CONTRASTE_MINIMO),
+        "--vivo-campo": _hasta_que_se_lea(tema.get("--vivo", SEMANTICOS["vivo"]), fondos, CONTRASTE_MINIMO),
+    }
+
+
+def _pintura_de_equipo(color: str, acento: str) -> dict[str, str]:
+    """El mismo estadio con las luces y la zona de anotación del equipo."""
+    gris = _saturacion(color) < 0.18
+    # Un color muy claro no aguanta letras blancas encima: la zona se oscurece y la
+    # palabra se pinta de ese color. Con los demás, la zona es del equipo y la letra blanca.
+    claro = gris or _luminancia(color) > 0.42
+    azulado = _a_rgb(color)[2] > 0.55 and _a_rgb(color)[2] >= _a_rgb(color)[0] and not gris
+    pintura = {
+        "--pasto": _con_luz(color, 0.016),
+        "--pasto-luz": _con_luz(color, 0.052),
+        "--cal": _con_luz(mezclar(color, "#FFFFFF", 0.3), LUZ_CAL_EQUIPO),
+        "--cal2": _con_luz(mezclar(color, "#FFFFFF", 0.3), LUZ_CAL_EQUIPO * 0.72),
+        "--primera": acento,
+        "--primera2": _con_luz(acento, LUZ_CAL_EQUIPO),
+        "--scrim": "#7FE0FF" if azulado else "#2F8BFF",
+        "--scrim2": _con_luz("#7FE0FF" if azulado else "#2F8BFF", LUZ_CAL_EQUIPO),
+        "--zona": _con_luz(color, 0.012 if claro else 0.13),
+        "--letra": color if claro else "#FFFFFF",
+        "--haz": mezclar(color, "#FFFFFF", 0.72),
+        "--grada": _con_luz(color, 0.01),
+    }
+    return pintura
+
+
 def _acabado(tema: dict[str, str], luz: str, alfa: float, textos: dict) -> dict[str, str]:
     """Cristal, luz y textos verificados para un tema que ya trae sus superficies."""
     tema["--cristal"] = _rgba(tema["--bg"], OPACIDAD_CRISTAL)
     tema["--resplandor"] = _rgba(luz, alfa)
+    # Tu fila es un escalón más clara, nunca un color: lo tuyo lo dice la raya de acento.
+    tema["--fila-yo"] = tema["--panel2"]
 
-    acento = _hasta_que_se_lea(tema["--acento"], fondos_de_prueba(tema, luz, alfa), CONTRASTE_MINIMO)
-    tema["--fila-yo"] = mezclar(tema["--panel"], acento, 0.12)
     fondos = fondos_de_prueba(tema, luz, alfa)
-    tema["--acento"] = _hasta_que_se_lea(acento, fondos, CONTRASTE_MINIMO)
+    tema["--acento"] = _hasta_que_se_lea(tema["--acento"], fondos, CONTRASTE_MINIMO)
     for nombre, (color, minimo) in textos.items():
         tema["--" + nombre] = _hasta_que_se_lea(color, fondos, minimo)
     for nombre, color in SEMANTICOS.items():
@@ -304,7 +379,10 @@ def tema_campo() -> dict[str, str]:
     """El portal sin equipo: negro, luz de estadio y la línea amarilla, ya verificado."""
     tema = {"--" + nombre: color for nombre, color in BASE_CAMPO.items()}
     tema["--acento"] = ACENTO_CAMPO
-    return _acabado(tema, *LUZ_ESTADIO, _TEXTOS_CAMPO)
+    tema = _acabado(tema, *LUZ_ESTADIO, _TEXTOS_CAMPO)
+    tema.update(PINTURA_CAMPO)
+    tema.update(_textos_sobre_campo(tema))
+    return tema
 
 
 def se_lee(tema: dict[str, str], luz: str, alfa: float) -> bool:
@@ -343,10 +421,13 @@ def tema_equipo(acento: str) -> dict[str, str]:
         tema["--pastilla-txt"] = texto_encima(tema["--acento"])
         tema = _acabado(tema, acento, LUZ_EQUIPO * escala, _TEXTOS)
         if se_lee(tema, acento, LUZ_EQUIPO * escala):
-            return tema
+            break
+    tema.update(_pintura_de_equipo(acento, tema["--acento"]))
+    tema.update(_textos_sobre_campo(tema))
     return tema
 
 
+@lru_cache(maxsize=1)
 def temas_equipos() -> dict[str, dict[str, dict[str, str]]]:
     """Un tema por equipo y por dónde juega (casa o visita)."""
     paleta = paleta_equipos()
@@ -765,12 +846,108 @@ def _pesos(cantidad) -> str:
     return f"${cantidad:,.2f}"
 
 
+def quien_va_primero(tabla_acumulada: pd.DataFrame) -> tuple[list[str], str, str]:
+    """Los nombres de quien va arriba, su verbo y sus aciertos.
+
+    Con tres o más empatados se cuentan: sus nombres ya no caben en una portada.
+    """
+    primeros = tabla_acumulada[tabla_acumulada["posicion"] == 1]
+    if primeros.empty:
+        return [], "", ""
+    cuantos = len(primeros)
+    aciertos = int(primeros.iloc[0]["acumulado"])
+    return (
+        list(primeros["participante"]) if cuantos <= 2 else [f"{cuantos} empatados"],
+        "va" if cuantos == 1 else "van",
+        f"con {aciertos} {'acierto' if aciertos == 1 else 'aciertos'}",
+    )
+
+
+def como_va_la_semana(numero: int, cerrados: int, total: int) -> tuple[str, str]:
+    """El título de la semana y su avance, contando todos sus partidos y no solo los ya repartidos."""
+    if total and cerrados >= total:
+        return f"Semana {numero} cerrada", f"{total} partidos jugados"
+    return f"Semana {numero}", f"{cerrados} de {total} partidos jugados"
+
+
+def descripcion_de_portada(tabla_acumulada: pd.DataFrame, numero: int, cerrados: int, total: int) -> str:
+    """El texto que acompaña a la portada al compartir el enlace: dice lo mismo que ella."""
+    nombres, verbo, aciertos = quien_va_primero(tabla_acumulada)
+    titulo, avance = como_va_la_semana(numero, cerrados, total)
+    semana = f"{titulo}." if total and cerrados >= total else f"{titulo}: {avance}."
+    if not nombres:
+        return semana
+    return f"{verbo.capitalize()} en primero {' y '.join(nombres)} {aciertos}. {semana}"
+
+
 def _tipografia() -> str:
     """La fuente en base64, lista para meterse en un `src:` del CSS."""
     if not RUTA_TIPOGRAFIA.exists():
         _log.warning("No encontré %s; la página usará la fuente del sistema.", RUTA_TIPOGRAFIA)
         return ""
     return base64.b64encode(RUTA_TIPOGRAFIA.read_bytes()).decode("ascii")
+
+
+def _abre_regex(salida: list[str]) -> bool:
+    """Una diagonal abre una expresión regular después de un signo o de `return`; si no, divide."""
+    antes = "".join(salida[-12:]).rstrip()
+    return not antes or antes[-1] in "(,=:[!&|?{};>" or antes.endswith("return")
+
+
+def _sin_comentarios_js(codigo: str) -> str:
+    """Quita los comentarios de un script sin tocar textos ni expresiones regulares.
+
+    Solo reconoce lo que usa el portal: comillas, comentarios y expresiones regulares.
+    Lo demás pasa tal cual. Si el código no cierra, truena: `generar_html` publica con notas.
+    """
+    salida: list[str] = []
+    i, largo = 0, len(codigo)
+    while i < largo:
+        letra = codigo[i]
+        if letra in "\"'`":
+            fin = i + 1
+            while codigo[fin] != letra:
+                fin += 2 if codigo[fin] == "\\" else 1
+            salida.append(codigo[i : fin + 1])
+            i = fin + 1
+        elif codigo.startswith("//", i):
+            fin = codigo.find("\n", i)
+            i = largo if fin < 0 else fin
+        elif codigo.startswith("/*", i):
+            i = codigo.index("*/", i) + 2
+        elif letra == "/" and _abre_regex(salida):
+            fin, en_clase = i + 1, False
+            while codigo[fin] != "/" or en_clase:
+                if codigo[fin] == "\\":
+                    fin += 1
+                elif codigo[fin] in "[]":
+                    en_clase = codigo[fin] == "["
+                fin += 1
+            salida.append(codigo[i : fin + 1])
+            i = fin + 1
+        else:
+            salida.append(letra)
+            i += 1
+    return "".join(salida)
+
+
+def _sin_renglones_vacios(texto: str) -> str:
+    """Conserva la sangría: `_funcion` de las pruebas busca las funciones por ella."""
+    return "\n".join(renglon.rstrip() for renglon in texto.splitlines() if renglon.strip())
+
+
+def _sin_comentarios(html: str) -> str:
+    """Lo publicado no lleva las notas internas del <style> ni las del script principal.
+
+    La base64 de la fuente no puede traer `/*`, el JSON de los datos y la red de
+    seguridad no se tocan, y el script principal es siempre el último de la página.
+    """
+    inicio, fin = html.index("<style>") + len("<style>"), html.index("</style>")
+    css = _sin_renglones_vacios(re.sub(r"/\*.*?\*/", "", html[inicio:fin], flags=re.S))
+    html = f"{html[:inicio]}\n{css}\n{html[fin:]}"
+    inicio, fin = html.rindex("<script>") + len("<script>"), html.rindex("</script>")
+    js = _sin_renglones_vacios(_sin_comentarios_js(html[inicio:fin]))
+    return f"{html[:inicio]}\n{js}\n{html[fin:]}"
 
 
 def _entorno() -> Environment:
@@ -878,8 +1055,9 @@ def generar_pagina_de_carga(ruta_salida: Path, url_funcion: str = URL_FUNCION) -
         desarrollador=DESARROLLADOR,
         etapa=ETAPA,
         version=VERSION,
-        tipografia=_tipografia(),
-        marca_svg=marca.svg("carga"),
+        tema_campo=tema_campo(),
+        marca_svg=marca.svg(),
+        marca_palabra=marca.palabra(),
         favicon=marca.favicon(),
         origen_funcion=f"{partes.scheme}://{partes.netloc}",
         config={"funcion": url_funcion, "portal": "./", "maximo": TAMANO_MAXIMO},
@@ -900,10 +1078,12 @@ def generar_prueba_de_red(ruta_salida: Path, url_funcion: str = URL_FUNCION) -> 
     partes, espn = urlsplit(url_funcion), urlsplit(URL_SCOREBOARD)
     html = _entorno().get_template("red.html.j2").render(
         marca=MARCA,
-        etapa=ETAPA,
         version=VERSION,
         url_funcion=url_funcion,
         url_espn=URL_SCOREBOARD,
+        tema_campo=tema_campo(),
+        marca_svg=marca.svg(),
+        marca_palabra=marca.palabra(),
         favicon=marca.favicon(),
         origen_funcion=f"{partes.scheme}://{partes.netloc}",
         origen_espn=f"{espn.scheme}://{espn.netloc}",
@@ -1082,8 +1262,13 @@ def generar_html(
 
     podio = _armar_podio(general, participantes, reparto_hoy) if podio_listo else []
     contexto = {
-        "marca_svg": marca.svg("cabeza", loseta=False),
+        "marca_svg": marca.svg(),
+        "marca_palabra": marca.palabra(),
         "tema_campo": tema_campo(),
+        "tipografia": _tipografia(),
+        "campo_html": campo.html(),
+        "campo_css": campo.css(),
+        "campo_datos": campo.datos_pagina(),
         "favicon": marca.favicon(),
         "marca": MARCA,
         "etapa": ETAPA,
@@ -1091,6 +1276,11 @@ def generar_html(
         "sitio": SITIO,
         "firma": firma,
         "tamano_portada": TAMANO_PORTADA,
+        # La semana de la portada es la última con picks, igual que en cli.py.
+        "descripcion": (
+            descripcion_de_portada(tabla_acumulada, jugadas[-1].numero, jugadas[-1].cerrados, jugadas[-1].total)
+            if jugadas else "Tabla general, ganadores por semana y marcador en vivo."
+        ),
         "anio": anio,
         "desarrollador": desarrollador,
         "actualizado": _fecha_larga(momento),
@@ -1109,6 +1299,11 @@ def generar_html(
     }
 
     html = _entorno().get_template("index.html.j2").render(**contexto)
+    try:
+        html = _sin_comentarios(html)
+    except (ValueError, IndexError):
+        # Quitar las notas es un ahorro: si algo raro lo impide, la página sale con ellas.
+        _log.warning("No pude quitar los comentarios de la página; se publica con ellos.")
     ruta_salida.write_text(html, encoding="utf-8")
     generar_sello_version(ruta_sello, momento, firma)
     _log.info("Escribí %s (%.0f KB).", ruta_salida, len(html.encode("utf-8")) / 1024)

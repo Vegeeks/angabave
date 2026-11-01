@@ -10,6 +10,9 @@
    44 px. Con --filmar guarda además cuadros de las animaciones de entrada y de un
    cambio de sección, para revisar el movimiento.
 
+   También toma cargar.html y red.html. Ahí la función de carga y ESPN van simulados:
+   estas fotos nunca le pegan a los de verdad ni necesitan una llave real.
+
    No usa dependencias: solo Node y el Chrome ya instalado. Nada de esto se publica. */
 
 import { spawn } from "node:child_process";
@@ -114,6 +117,33 @@ const PESTANA = (t) => `Array.from(document.querySelectorAll('#vista-semana .tab
 const ABAJO = (y) => `window.scrollTo({top:${y},behavior:'instant'})`;
 
 const MOMENTOS = existsSync(join(sitio, "momentos"));
+
+/* Lo que contesta la función de carga en las fotos, con la misma forma que la de verdad. */
+const ENLACE = "#k=" + "a".repeat(40);
+const CARGA = { id: "20261101T180000-0a1b2c3d", cargador: "Organizador", archivo: "Quiniela_semana_9.xlsx" };
+const ENLACE_MALO = { quien: [401, { error: "Este enlace no sirve o ya fue anulado. Pídele a Angel uno nuevo." }] };
+const CON_ULTIMA = (estado, resultado, archivo = CARGA.archivo) => ({
+  quien: [200, { nombre: "Organizador", ultima: { ...CARGA, archivo, estado, resultado, creado: new Date(Date.now() - 3 * 3600e3).toISOString() } }],
+});
+// Una carga recién hecha sigue en revisión al abrir: la página espera su resultado sola.
+const AL_TERMINAR = (estado, resultado) => ({
+  quien: [200, { nombre: "Organizador", ultima: { ...CARGA, estado: "en_cola", creado: new Date().toISOString() } }],
+  estado: [200, { ...CARGA, estado, resultado, creado: new Date().toISOString() }],
+});
+const QUEDO = {
+  aceptado: true, accion: "tanda", semana: 9, titulo: "Semana 9: se agregó la tanda", participantes: 34,
+  partidos_cargados: 13, partidos_semana: 14, sellados: ["Ravens @ Bills"],
+  cambios: ["Entraron 13 partidos de la tanda del domingo.", "Cambió el pick de 2 participantes en partidos que no han empezado."],
+  faltan: "Faltan 1 partido(s) de la semana: entran cuando llegue la hoja de esa tanda.",
+  avisos: ["Sotocles no eligió en Jets @ Dolphins."],
+};
+const RECHAZO = {
+  aceptado: false, accion: "rechazada", semana: 9, titulo: "No se cargó la semana 9",
+  error: "La hoja trae 15 partidos y la semana 9 de la NFL tiene 14.\nRevisa el renglón de Jets @ Dolphins.",
+  avisos: ["Hay dos participantes con el mismo nombre: Luis Santoyo."],
+};
+const FALLA = { aceptado: false, titulo: "No se pudo terminar", error: "Algo falló de nuestro lado, no en tu archivo. No se tocó nada y Angel ya tiene el aviso." };
+
 const pantallas = [
   // El portal tal como está hoy, con nombre elegido.
   { n: "hoy", p: "/index.html", h: "#hoy", yo: YO },
@@ -154,7 +184,39 @@ const pantallas = [
     { n: "final", p: "/momentos/fase-final.html", h: "#hoy", yo: YO },
     { n: "final-premios", p: "/momentos/fase-final.html", h: "#premios", yo: YO },
   ] : []),
+  // Las páginas sueltas: el enlace de carga en cada uno de sus caminos, y la prueba de conexión.
+  { n: "cargar-sin-llave", p: "/cargar.html", h: "" },
+  { n: "cargar-llave-mala", p: "/cargar.html", h: ENLACE, funcion: ENLACE_MALO },
+  { n: "cargar-sin-conexion", p: "/cargar.html", h: ENLACE, funcion: { quien: null } },
+  { n: "cargar-formulario", p: "/cargar.html", h: ENLACE, funcion: CON_ULTIMA("listo", QUEDO) },
+  { n: "cargar-revisando", p: "/cargar.html", h: ENLACE, funcion: AL_TERMINAR("en_cola") },
+  { n: "cargar-listo", p: "/cargar.html", h: ENLACE, funcion: AL_TERMINAR("listo", QUEDO), espera: 4500 },
+  { n: "cargar-sin-cambios", p: "/cargar.html", h: ENLACE, espera: 4500,
+    funcion: AL_TERMINAR("listo", { aceptado: true, accion: "sin_cambios", semana: 9, titulo: "Semana 9: ya estaba igual" }) },
+  { n: "cargar-rechazado", p: "/cargar.html", h: ENLACE, funcion: AL_TERMINAR("rechazado", RECHAZO), espera: 4500 },
+  { n: "cargar-falla", p: "/cargar.html", h: ENLACE, funcion: AL_TERMINAR("falla", FALLA), espera: 4500 },
+  { n: "chico-cargar-formulario", p: "/cargar.html", h: ENLACE, m: CHICO,
+    funcion: CON_ULTIMA("rechazado", RECHAZO, "Quiniela_semana_9_jueves_tanda_final_version_definitiva_de_verdad.xlsx") },
+  { n: "chico-cargar-listo", p: "/cargar.html", h: ENLACE, funcion: AL_TERMINAR("listo", QUEDO), espera: 4500, m: CHICO },
+  { n: "compu-cargar-formulario", p: "/cargar.html", h: ENLACE, funcion: CON_ULTIMA("listo", QUEDO), m: COMPU },
+  { n: "red", p: "/red.html", h: "", funcion: { quien: [401, ENLACE_MALO.quien[1]], espn: [200, {}] } },
+  { n: "red-falla", p: "/red.html", h: "", funcion: { quien: null, espn: null } },
+  { n: "chico-red", p: "/red.html", h: "", funcion: { quien: [401, ENLACE_MALO.quien[1]], espn: [200, {}] }, m: CHICO },
 ];
+
+/* Contesta las pedidas a la función y a ESPN de una pantalla simulada; null es sin red. */
+function contestar({ requestId, request }, s, funcion) {
+  const respuesta = request.method === "OPTIONS" ? [204, null]
+    : funcion[request.url.includes("espn.com") ? "espn" : new URL(request.url).searchParams.get("que")];
+  if (!respuesta) return pedir("Fetch.failRequest", { requestId, errorReason: "InternetDisconnected" }, s);
+  return pedir("Fetch.fulfillRequest", {
+    requestId,
+    responseCode: respuesta[0],
+    responseHeaders: ["Origin", "Headers", "Methods"].map((n) => ({ name: "Access-Control-Allow-" + n, value: "*" }))
+      .concat({ name: "Content-Type", value: "application/json" }),
+    body: Buffer.from(respuesta[1] === null ? "" : JSON.stringify(respuesta[1])).toString("base64"),
+  }, s);
+}
 
 async function abrir(pantalla) {
   const { targetId } = await pedir("Target.createTarget", { url: "about:blank" });
@@ -182,8 +244,10 @@ async function abrir(pantalla) {
     if (dato.method === "Runtime.exceptionThrown") errores.push((dato.params.exceptionDetails.exception || {}).description || dato.params.exceptionDetails.text);
     if (dato.method === "Log.entryAdded" && dato.params.entry.level === "error" && !/scoreboard|Failed to load resource/.test(dato.params.entry.text + (dato.params.entry.url || ""))) errores.push(dato.params.entry.text);
     if (dato.method === "Runtime.consoleAPICalled" && dato.params.type === "error") errores.push(dato.params.args.map((a) => a.value || a.description).join(" "));
+    if (dato.method === "Fetch.requestPaused") contestar(dato.params, s, pantalla.funcion).catch(() => {});
   };
   oyentes.add(oyente);
+  if (pantalla.funcion) await pedir("Fetch.enable", { patterns: [{ urlPattern: "*supabase.co*" }, { urlPattern: "*espn.com*" }] }, s);
   return { s, targetId, errores, cerrar: async () => { oyentes.delete(oyente); await pedir("Target.closeTarget", { targetId }); } };
 }
 
@@ -200,7 +264,7 @@ for (const pantalla of pantallas) {
   const { s, errores, cerrar } = await abrir(pantalla);
   try {
     await pedir("Page.navigate", { url: base + pantalla.p + pantalla.h }, s);
-    await espera(1400);
+    await espera(1400 + (pantalla.espera || 0));
     for (const paso of pantalla.pasos || []) { await hacer(s, paso); await espera(450); }
     await espera(900);
     await foto(s, pantalla.n);
