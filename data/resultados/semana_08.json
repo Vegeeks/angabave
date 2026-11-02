@@ -2,21 +2,10 @@
   "semana": 8,
   "partidos": [
     {
-      "visitante": "Chargers",
-      "local": "Rams",
-      "marcador_visitante": 9,
-      "marcador_local": 24,
-      "ganador": "Rams",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-01T21:05:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Chiefs",
       "local": "Broncos",
       "marcador_visitante": 24,
-      "marcador_local": 13,
+      "marcador_local": 28,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -27,10 +16,10 @@
       "visitante": "Patriots",
       "local": "Dolphins",
       "marcador_visitante": 24,
-      "marcador_local": 13,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "marcador_local": 19,
+      "ganador": "Patriots",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-01T21:25:00+00:00",
       "hora_definida": true
     },
@@ -120,6 +109,17 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-01T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Chargers",
+      "local": "Rams",
+      "marcador_visitante": 9,
+      "marcador_local": 24,
+      "ganador": "Rams",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-01T21:05:00+00:00",
       "hora_definida": true
     },
     {
