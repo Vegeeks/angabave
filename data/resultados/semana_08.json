@@ -2,25 +2,14 @@
   "semana": 8,
   "partidos": [
     {
-      "visitante": "Chiefs",
-      "local": "Broncos",
-      "marcador_visitante": 24,
-      "marcador_local": 28,
-      "ganador": "Broncos",
+      "visitante": "Eagles",
+      "local": "Washington",
+      "marcador_visitante": 10,
+      "marcador_local": 27,
+      "ganador": "Washington",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-11-01T21:25:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Patriots",
-      "local": "Dolphins",
-      "marcador_visitante": 24,
-      "marcador_local": 19,
-      "ganador": "Patriots",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-01T21:25:00+00:00",
+      "inicio": "2026-11-02T01:20:00+00:00",
       "hora_definida": true
     },
     {
@@ -123,14 +112,25 @@
       "hora_definida": true
     },
     {
-      "visitante": "Eagles",
-      "local": "Washington",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-02T01:20:00+00:00",
+      "visitante": "Chiefs",
+      "local": "Broncos",
+      "marcador_visitante": 24,
+      "marcador_local": 28,
+      "ganador": "Broncos",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-01T21:25:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Patriots",
+      "local": "Dolphins",
+      "marcador_visitante": 24,
+      "marcador_local": 19,
+      "ganador": "Patriots",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-01T21:25:00+00:00",
       "hora_definida": true
     },
     {
