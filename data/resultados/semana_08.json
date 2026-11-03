@@ -2,14 +2,25 @@
   "semana": 8,
   "partidos": [
     {
-      "visitante": "Eagles",
-      "local": "Washington",
-      "marcador_visitante": 10,
-      "marcador_local": 27,
-      "ganador": "Washington",
+      "visitante": "Bears",
+      "local": "Seahawks",
+      "marcador_visitante": 34,
+      "marcador_local": 17,
+      "ganador": "Bears",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-11-02T01:20:00+00:00",
+      "inicio": "2026-11-03T01:15:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Panthers",
+      "local": "Packers",
+      "marcador_visitante": 19,
+      "marcador_local": 27,
+      "ganador": "Packers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-10-30T00:15:00+00:00",
       "hora_definida": true
     },
     {
@@ -134,25 +145,14 @@
       "hora_definida": true
     },
     {
-      "visitante": "Panthers",
-      "local": "Packers",
-      "marcador_visitante": 19,
+      "visitante": "Eagles",
+      "local": "Washington",
+      "marcador_visitante": 10,
       "marcador_local": 27,
-      "ganador": "Packers",
+      "ganador": "Washington",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-10-30T00:15:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Bears",
-      "local": "Seahawks",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-03T01:15:00+00:00",
+      "inicio": "2026-11-02T01:20:00+00:00",
       "hora_definida": true
     }
   ]
