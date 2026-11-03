@@ -150,8 +150,9 @@
   },
   "8": {
     "archivo": "Semana_08.xlsx",
-    "sellado": "2026-11-02T01:21:07+00:00",
+    "sellado": "2026-11-03T01:16:05+00:00",
     "partidos": {
+      "Bears@Seahawks": "3c27c6bd6302fd4005df56adc6b12626fcabf2293fd86868a6bbeedc8c69cb2d",
       "Browns@Steelers": "6ee774e4229975c0d22192e9f3df75228b5fbfc5d8e8c332fa5ee494f9fa2ab7",
       "Cardinals@Cowboys": "40a65b3f847bdf5c1a368ceecad9150ebfae68cf064f316402764769459bbce8",
       "Chargers@Rams": "ff3bcf243acd8a746583f9a0417f1a6ce5c05e60c5f34a9a8ee8ee71a50e19e8",
