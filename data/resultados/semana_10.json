@@ -1,0 +1,159 @@
+{
+  "semana": 10,
+  "partidos": [
+    {
+      "visitante": "Washington",
+      "local": "Giants",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-13T01:15:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Patriots",
+      "local": "Lions",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T14:30:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Chiefs",
+      "local": "Falcons",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Texans",
+      "local": "Browns",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Vikings",
+      "local": "Packers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Jaguars",
+      "local": "Titans",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Dolphins",
+      "local": "Colts",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Panthers",
+      "local": "Saints",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Bills",
+      "local": "Jets",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Seahawks",
+      "local": "Raiders",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Rams",
+      "local": "Cardinals",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "49ers",
+      "local": "Cowboys",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-15T21:25:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Steelers",
+      "local": "Bengals",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-16T01:20:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Chargers",
+      "local": "Ravens",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-17T01:15:00+00:00",
+      "hora_definida": true
+    }
+  ]
+}
