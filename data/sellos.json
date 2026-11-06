@@ -170,7 +170,9 @@
   },
   "9": {
     "archivo": "Semana_09.xlsx",
-    "sellado": "2026-11-06T00:14:19+00:00",
-    "partidos": {}
+    "sellado": "2026-11-06T01:16:06+00:00",
+    "partidos": {
+      "Jaguars@Ravens": "5809a5f42e56f242a5226b8b6fa682c3c6236981893197318e18ec9c113cab78"
+    }
   }
 }
