@@ -7,7 +7,10 @@
     baste para arreglarlo.
 
     La página avisa que arrancó con window.angabaveListo = true. Si no lo hace
-    en `espera_rescate` milisegundos, sale este aviso. -#}
+    en `espera_rescate` milisegundos después de haber llegado completa (o en un
+    minuto, si sigue llegando), sale este aviso: con datos móviles la página puede
+    tardar en bajar y mientras siga llegando no es una falla. Si al final sí
+    arranca, el aviso se quita solo. -#}
 <div id="rescate" role="alert" style="display:none; position:fixed; left:16px; right:16px; top:16px; z-index:2147483647; max-width:520px; margin:0 auto; background:#101613; color:#F3F6F4; border:1px solid #FF6B61; border-radius:16px; padding:16px; font:14px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
   <strong style="display:block; font-size:16px; margin-bottom:6px">La página no abrió en este teléfono</strong>
   <span style="display:block; color:#A7B1AB">Ciérrala y vuelve a abrir el enlace. Si sigue igual, actualiza tu teléfono o ábrela en otro, y mándale a Angel una captura de esta pantalla.</span>
@@ -18,6 +21,7 @@
 <script>
 (function () {
   var detalle = "";
+  var inicio = new Date().getTime(), finHtml = 0;
   function anotar(texto) {
     if (!detalle && texto) detalle = String(texto).slice(0, 300);
   }
@@ -27,15 +31,31 @@
   window.addEventListener("unhandledrejection", function (e) {
     anotar(e && e.reason && (e.reason.message || e.reason));
   });
-  window.setTimeout(function () {
+  document.addEventListener("DOMContentLoaded", function () {
+    finHtml = new Date().getTime();
+  });
+  function revisar() {
     if (window.angabaveListo) return;
+    var ahora = new Date().getTime();
+    var llegando = !finHtml && ahora - inicio < 60000;
+    var recien = finHtml && !detalle && ahora - finHtml < 6000;
+    if (llegando || recien) {
+      window.setTimeout(revisar, 1000);
+      return;
+    }
     var caja = document.getElementById("rescate");
     var nota = document.getElementById("rescate-detalle");
     if (!caja || !nota) return;
     nota.appendChild(document.createTextNode(
-      "Detalle: " + (detalle || "la página no terminó de arrancar") + " · " + navigator.userAgent
+      "Detalle: " + (detalle || (finHtml ? "la página no terminó de arrancar" : "la página tardó más de un minuto en llegar")) + " · " + navigator.userAgent
     ));
     caja.style.display = "block";
-  }, {{ espera_rescate }});
+    var vigia = window.setInterval(function () {
+      if (!window.angabaveListo) return;
+      caja.style.display = "none";
+      window.clearInterval(vigia);
+    }, 1000);
+  }
+  window.setTimeout(revisar, {{ espera_rescate }});
 })();
 </script>

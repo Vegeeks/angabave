@@ -9,6 +9,10 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.26.1
+
+* **Con datos móviles ya no sale "La página no abrió" en falso.** El aviso contaba 8 segundos desde que se empezaba a leer la página; con señal floja la página seguía bajando y el aviso salía aunque nada fallara. Ahora solo sale si la página ya llegó completa y no arrancó, o si tarda más de un minuto; y si al final arranca, el aviso se quita solo. Probado con un servidor que entrega la página a medias durante 25 segundos.
+
 ## v0.26.0
 
 * Imagen de picks nueva: el estadio del portal con tu equipo (o tu nombre) en la zona de anotación, tu nombre en grande, un sello con la semana y tarjetas por día con tu pick en los colores del equipo y el rival en gris.
