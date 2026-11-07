@@ -9,6 +9,12 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.26.0
+
+* Imagen de picks nueva: el estadio del portal con tu equipo (o tu nombre) en la zona de anotación, tu nombre en grande, un sello con la semana y tarjetas por día con tu pick en los colores del equipo y el rival en gris.
+* Generarla es un momento: se oscurece la pantalla, prenden las luces, la imagen aparece con un barrido y un brillo, y cae confeti de tu equipo. El botón Mandar abre el menú de compartir dentro del toque.
+* La imagen sale en JPG: con el estadio, un PNG pesaría varias veces más.
+
 ## v0.25.1
 
 * Si tu equipo ganó su último partido, las letras del campo salen doradas; si perdió, huecas; si está jugando, el campo enseña el marcador.

@@ -109,6 +109,31 @@ i,em{font-style:normal}
   animation:campo-aro 1.5s var(--sale) 3}
 .campo-aro::before{content:""; position:absolute; inset:15px; border-radius:50%; background:#fff}
 @keyframes campo-aro{0%{opacity:.9; transform:scale(.35)}100%{opacity:0; transform:scale(1.6)}}
+.revelado{position:fixed; inset:0; z-index:95; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; overflow:hidden;
+  padding:max(56px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom)); background:rgba(6,10,8,.96); animation:aparece .2s ease backwards}
+.revelado::before,.revelado::after{content:""; position:absolute; top:-18%; width:70%; height:75%; pointer-events:none; opacity:0;
+  background:radial-gradient(closest-side,rgba(233,245,238,.2),transparent); animation:revelado-luz 1.1s ease .1s forwards}
+.revelado::before{left:-20%} .revelado::after{right:-20%}
+@keyframes revelado-luz{0%{opacity:0}35%{opacity:1}60%{opacity:.45}100%{opacity:.7}}
+.revelado-estado{position:relative; font-size:var(--t4); font-weight:700; color:var(--txt); text-align:center}
+.revelado-estado::after{content:""; display:block; height:2px; margin-top:10px; background:var(--oro); transform-origin:0 50%; animation:revelado-carga .9s ease-in-out 4}
+.revelado.listo .revelado-estado::after{animation:none; opacity:0}
+@keyframes revelado-carga{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.revelado-marco{position:relative; width:min(420px,100%); border-radius:var(--r1); overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.revelado-marco img{display:block; width:100%; height:auto; max-height:64vh; object-fit:contain; background:#060a08}
+.revelado.listo .revelado-marco{animation:revelado-escaneo .9s var(--sale) backwards}
+@keyframes revelado-escaneo{from{clip-path:inset(0 0 100% 0); transform:translateY(24px) scale(.96)}to{clip-path:inset(0); transform:none}}
+.revelado-marco::after{content:""; position:absolute; inset:0; pointer-events:none; transform:translateX(-130%);
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.32) 50%,transparent 65%)}
+.revelado.listo .revelado-marco::after{animation:revelado-brillo .8s ease .85s backwards}
+@keyframes revelado-brillo{to{transform:translateX(130%)}}
+.revelado-acciones{display:flex; gap:12px; width:min(420px,100%)}
+.revelado-mandar{flex:1; min-height:52px; border-radius:var(--r2); background:#f3f6f4; color:#060a08; font-size:var(--t4); font-weight:800}
+.revelado-cerrar{position:absolute; top:max(8px,env(safe-area-inset-top)); right:8px; width:44px; height:44px; border-radius:50%; font-size:var(--t3); color:var(--tenue)}
+.revelado-pieza{position:absolute; top:-16px; width:9px; height:15px; border-radius:2px; animation:revelado-cae 1.5s cubic-bezier(.2,.6,.4,1) backwards}
+@keyframes revelado-cae{from{transform:none; opacity:1}to{transform:translate(var(--dx),110vh) rotate(var(--giro)); opacity:.85}}
+@media (prefers-reduced-motion:reduce){.revelado,.revelado::before,.revelado::after,.revelado-marco,.revelado-marco::after,.revelado-estado::after{animation:none}
+  .revelado::before,.revelado::after{opacity:.6}}
 html[data-campo=gano] .cp-palabra{fill:url(#cp-oro)}
 html[data-campo=perdio] .cp-palabra{fill:none; stroke:var(--txt); stroke-width:1.5; stroke-opacity:.65; vector-effect:non-scaling-stroke}
 html[data-campo=juega] .cp-palabra{fill:#F3F6F4}
@@ -1940,11 +1965,90 @@ try {
     ctx.restore();
   }
 
+  /* La letra de marcador para la imagen: la misma Oswald que ya viaja en la página, pero
+     completa, cargada solo al generar. Si algo falla, se usa la del sistema. */
+  let letraLienzo = null;
+  function letraDeLienzo() {
+    if (letraLienzo) return letraLienzo;
+    letraLienzo = (async () => {
+      try {
+        if (typeof FontFace === "undefined" || !document.fonts) return false;
+        const css = Array.from(document.querySelectorAll("style")).map((n) => n.textContent).join("");
+        const m = css.match(/font-family:'Rotulo'[^}]*?url\((data:[^)]+)\)/);
+        if (!m) return false;
+        const cara = new FontFace("RotuloLienzo", "url(" + m[1] + ")");
+        await cara.load();
+        document.fonts.add(cara);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    })();
+    return letraLienzo;
+  }
+
+  /* Copia en el lienzo el campo que se ve en el portal, con otro texto en la zona de
+     anotación y sin el dorado o el hueco del último partido. Lo deja como estaba. */
+  async function campoEnLienzo(ctx, ancho, alto, texto, escala) {
+    // Las dos capas de la toma del teléfono (pasto y luces) comparten coordenadas: se
+    // encimen igual que en la página, aunque en esta pantalla estén ocultas.
+    const capas = [".cancha svg.plano.en-telefono", ".cancha svg.luz.en-telefono"]
+      .map((sel) => document.querySelector(sel)).filter(Boolean);
+    if (!capas.length || !capas[0].viewBox || !capas[0].viewBox.baseVal.width) return false;
+    const estado = document.documentElement.getAttribute("data-campo");
+    let copias;
+    try {
+      document.documentElement.removeAttribute("data-campo");
+      pintarNombreCampo(texto);
+      copias = capas.map((fuente) => {
+        const copia = fuente.cloneNode(true);
+        const originales = fuente.querySelectorAll("*"), duplicados = copia.querySelectorAll("*");
+        originales.forEach((n, i) => {
+          const estilo = getComputedStyle(n);
+          ["fill", "fill-opacity", "stroke", "stroke-width", "stroke-opacity", "opacity", "stop-color", "stop-opacity", "display", "visibility"].forEach((prop) => {
+            const valor = estilo.getPropertyValue(prop);
+            if (valor) duplicados[i].style.setProperty(prop, valor);
+          });
+        });
+        copia.removeAttribute("class");
+        copia.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        return copia;
+      });
+    } finally {
+      if (estado) document.documentElement.setAttribute("data-campo", estado);
+      pintarCampo();
+    }
+    const vista = capas[0].viewBox.baseVal;
+    const cubre = Math.max(ancho / vista.width, alto / vista.height);
+    const w = vista.width * cubre, h = vista.height * cubre;
+    const imagenes = [];
+    for (const copia of copias) {
+      copia.setAttribute("width", Math.round(w * escala));
+      copia.setAttribute("height", Math.round(h * escala));
+      const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(copia)], { type: "image/svg+xml" }));
+      try {
+        const img = new Image();
+        await new Promise((listo, falla) => { img.onload = listo; img.onerror = falla; img.src = url; });
+        imagenes.push(img);
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, ancho, alto);
+    ctx.clip();
+    imagenes.forEach((img) => ctx.drawImage(img, (ancho - w) / 2, 0, w, h));
+    ctx.restore();
+    return true;
+  }
+
+
   /* Arma la imagen membretada con los picks elegidos y la comparte o descarga. */
   async function exportarPicks(s, elegidos, porClave) {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
-    const ANCHO = 1080, MARGEN = 56, ALTO_FILA = 96;
+    const ANCHO = 1080, MARGEN = 48;
     // Los partidos salen de los que ofrece este generador (porClave), no de
     // s.partidos: con la semana a medias, s.partidos solo trae la tanda ya
     // cargada y la imagen salía vacía. El orden es el de la NFL, el mismo en
@@ -1952,117 +2056,334 @@ try {
     const claves = [...porClave.keys()].filter((clave) => elegidos.has(clave));
     if (!claves.length) return;
 
-    const cabecera = 320;
-    const pie = 96;
-    const alto = cabecera + claves.length * ALTO_FILA + pie;
+    const conLetra = await letraDeLienzo();
+    const sistema = "-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
+    const cuerpo = (peso, tam) => peso + " " + tam + "px " + sistema;
+    const rotulo = (tam) => "500 " + tam + "px " + (conLetra ? "RotuloLienzo, " : "") + sistema;
+    const CDMX = "America/Mexico_City";
+    const diaDe = (p) => !p.t ? "POR CONFIRMAR" : new Date(p.t * 1000)
+      .toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", timeZone: CDMX }).replace(",", "").toUpperCase();
+    const horaDe = (p) => !p.t ? "" : new Date(p.t * 1000)
+      .toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: CDMX });
 
-    const escala = 2;
-    const lienzo = document.createElement("canvas");
-    lienzo.width = ANCHO * escala;
-    lienzo.height = alto * escala;
-    const ctx = lienzo.getContext("2d");
-    ctx.scale(escala, escala);
-
-    const cuerpo = (peso, tam) => peso + " " + tam + "px -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
-
-    // Fondo plano a propósito: un degradado multiplica por diez el peso del PNG
-    // y esta imagen se manda por correo y por WhatsApp.
-    ctx.fillStyle = "#060a08";
-    ctx.fillRect(0, 0, ANCHO, alto);
-
-    marcaEnLienzo(ctx, MARGEN, 40, 64);
-    palabraEnLienzo(ctx, MARGEN + 80, 48, 34);
-    ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = "#a7b1ab";
-    ctx.font = cuerpo(500, 22);
-    ctx.fillText("Quiniela NFL " + D.anio, MARGEN + 80, 110);
-
-    // La línea amarilla de primera y diez.
-    ctx.fillStyle = "#ffd60a";
-    ctx.fillRect(MARGEN, 136, ANCHO - MARGEN * 2, 4);
-
-    ctx.fillStyle = "#f3f6f4";
-    ctx.font = cuerpo(800, 76);
-    ctx.fillText("Semana " + s.n, MARGEN, 226);
-
-    if (jugador !== null) {
-      ctx.fillStyle = "#ffd60a";
-      ctx.font = cuerpo(700, 34);
-      ctx.fillText(nombre(jugador), MARGEN, 274);
-    }
-    ctx.fillStyle = "#a7b1ab";
-    ctx.font = cuerpo(600, 24);
-    const cuantos = claves.length === 1 ? "1 pick" : claves.length + " picks";
-    ctx.textAlign = "right";
-    ctx.fillText(cuantos, ANCHO - MARGEN, 226);
-    ctx.textAlign = "left";
-
-    claves.forEach((clave, i) => {
-      const p = porClave.get(clave);
-      const lado = elegidos.get(clave);
-      const elegido = lado === "l" ? p.l : p.v;
-      const rival = lado === "l" ? p.v : p.l;
-      const color = (D.colores[elegido] || {}).local || "#ffd60a";
-      const y = cabecera + i * ALTO_FILA;
-
-      ctx.fillStyle = "#101613";
-      ctx.beginPath();
-      // roundRect no existe en Safari anterior a iOS 16: ahí va con esquinas rectas.
-      if (ctx.roundRect) ctx.roundRect(MARGEN, y - 30, ANCHO - MARGEN * 2, ALTO_FILA - 12, 18);
-      else ctx.rect(MARGEN, y - 30, ANCHO - MARGEN * 2, ALTO_FILA - 12);
-      ctx.fill();
-
-      ctx.fillStyle = color;
-      const sigla = D.siglas[elegido] || elegido.slice(0, 3).toUpperCase();
-      ctx.font = cuerpo(700, 24);
-      const anchoSigla = ctx.measureText(sigla).width + 24;
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(MARGEN + 20, y - 21, anchoSigla, 42, 10);
-      else ctx.rect(MARGEN + 20, y - 21, anchoSigla, 42);
-      ctx.fill();
-      ctx.fillStyle = (D.colores[elegido] || {}).local_texto || "#070b12";
-      ctx.fillText(sigla, MARGEN + 32, y + 8);
-
-      ctx.fillStyle = "#f3f6f4";
-      ctx.font = cuerpo(700, 34);
-      ctx.fillText(elegido, MARGEN + 38 + anchoSigla, y + 12);
-
-      ctx.fillStyle = "#a7b1ab";
-      ctx.font = cuerpo(500, 24);
-      ctx.textAlign = "right";
-      ctx.fillText((lado === "l" ? "vs " : "@ ") + rival, ANCHO - MARGEN - 24, y + 9);
-      ctx.textAlign = "left";
+    // Los partidos se agrupan por día; dentro de cada día, tarjetas en dos columnas (una
+    // sola si son 6 o menos en total), en el orden de la NFL.
+    const columnas = claves.length > 6 ? 2 : 1;
+    const grupos = [];
+    claves.forEach((clave) => {
+      const p = porClave.get(clave), dia = diaDe(p);
+      if (!grupos.length || grupos[grupos.length - 1].dia !== dia) grupos.push({ dia, picks: [] });
+      grupos[grupos.length - 1].picks.push({ p, lado: elegidos.get(clave) });
     });
+    const CAMPO = 560, ALTO_DIA = 64, ALTO_TARJETA = 150, SEP = 16, PIE = 150, escala = 2;
+    const anchoTarjeta = (ANCHO - MARGEN * 2 - SEP * (columnas - 1)) / columnas;
+    const alto = CAMPO + 24 + grupos.reduce((suma, g) => suma + ALTO_DIA + Math.ceil(g.picks.length / columnas) * (ALTO_TARJETA + SEP), 0) + PIE;
+    const enZona = equipo || (jugador !== null ? nombre(jugador) : "");
+    const titular = jugador !== null ? nombre(jugador).toUpperCase() : "MIS PICKS";
+    const sello = new Date().toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short", timeZone: CDMX });
+    const direccion = location.host + location.pathname.replace(/index\.html$/, "").replace(/\/$/, "");
 
-    ctx.fillStyle = "#a7b1ab";
-    ctx.font = cuerpo(500, 20);
-    const sello = new Date();
-    ctx.fillText(
-      "Generado " + sello.toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" }) +
-        "  ·  Mandar a " + D.correo,
-      MARGEN, alto - pie + 44
-    );
+    const armar = async (conCampo) => {
+      const lienzo = document.createElement("canvas");
+      lienzo.width = ANCHO * escala;
+      lienzo.height = alto * escala;
+      const ctx = lienzo.getContext("2d");
+      ctx.scale(escala, escala);
+      const caja = (x, y, w, h, r) => {
+        ctx.beginPath();
+        // roundRect no existe en Safari anterior a iOS 16: ahí va con esquinas rectas.
+        if (ctx.roundRect) ctx.roundRect(x, y, w, h, r);
+        else ctx.rect(x, y, w, h);
+      };
+      const espaciado = (px) => { if ("letterSpacing" in ctx) ctx.letterSpacing = px + "px"; };
 
-    const blob = await new Promise((listo) => lienzo.toBlob(listo, "image/png"));
-    if (!blob) return;
-    const archivo = new File([blob], "picks-semana-" + s.n + ".png", { type: "image/png" });
+      ctx.fillStyle = "#060a08";
+      ctx.fillRect(0, 0, ANCHO, alto);
+
+      // Arriba, el mismo campo del portal con tu equipo (o tu nombre) en la zona de anotación.
+      let hayCampo = false;
+      if (conCampo) {
+        try { hayCampo = await campoEnLienzo(ctx, ANCHO, CAMPO, enZona, escala); } catch (e) { hayCampo = false; }
+      }
+      if (!hayCampo) {
+        ctx.fillStyle = "#0b3a24";
+        ctx.fillRect(0, 0, ANCHO, CAMPO);
+        ctx.fillStyle = "rgba(243,246,244,.16)";
+        for (let y = 40; y < CAMPO; y += 92) ctx.fillRect(0, y, ANCHO, 2);
+      }
+      let sombra = ctx.createLinearGradient(0, 0, 0, 140);
+      sombra.addColorStop(0, "rgba(6,10,8,.8)");
+      sombra.addColorStop(1, "rgba(6,10,8,0)");
+      ctx.fillStyle = sombra;
+      ctx.fillRect(0, 0, ANCHO, 140);
+      sombra = ctx.createLinearGradient(0, CAMPO - 230, 0, CAMPO);
+      sombra.addColorStop(0, "rgba(6,10,8,0)");
+      sombra.addColorStop(.55, "rgba(6,10,8,.7)");
+      sombra.addColorStop(1, "rgba(6,10,8,.94)");
+      ctx.fillStyle = sombra;
+      ctx.fillRect(0, CAMPO - 230, ANCHO, 230);
+
+      marcaEnLienzo(ctx, MARGEN, 36, 56);
+      palabraEnLienzo(ctx, MARGEN + 70, 45, 28);
+      ctx.textBaseline = "alphabetic";
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#d7ddd9";
+      ctx.font = cuerpo(700, 20);
+      espaciado(3);
+      ctx.fillText("QUINIELA NFL " + D.anio, ANCHO - MARGEN, 74);
+      ctx.textAlign = "left";
+
+      // El sello dorado con la semana, como boleta oficial.
+      const radio = 92, sx = ANCHO - MARGEN - radio, sy = CAMPO - 148;
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(-0.2);
+      ctx.fillStyle = "rgba(6,10,8,.55)";
+      ctx.beginPath();
+      ctx.arc(0, 0, radio, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#ffd60a";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, radio - 13, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = "#ffd60a";
+      ctx.textAlign = "center";
+      ctx.font = cuerpo(800, 13);
+      espaciado(0);
+      const anillo = "PICKS OFICIALES · ANGABAVE · " + D.anio + " · ";
+      for (let i = 0; i < anillo.length; i++) {
+        ctx.save();
+        ctx.rotate((i / anillo.length) * Math.PI * 2);
+        ctx.fillText(anillo[i], 0, -(radio - 24));
+        ctx.restore();
+      }
+      ctx.font = rotulo(20);
+      ctx.fillText("SEMANA", 0, -10);
+      ctx.font = rotulo(58);
+      ctx.fillText(String(s.n), 0, 44);
+      ctx.restore();
+      ctx.textAlign = "left";
+
+      ctx.fillStyle = "#ffd60a";
+      ctx.font = rotulo(30);
+      espaciado(4);
+      ctx.fillText("MIS PICKS", MARGEN, CAMPO - 126);
+      espaciado(0);
+      let tam = 96;
+      ctx.font = rotulo(tam);
+      const ancholibre = ANCHO - MARGEN * 2 - radio * 2 - 20;
+      while (tam > 40 && ctx.measureText(titular).width > ancholibre) ctx.font = rotulo(--tam);
+      ctx.fillStyle = "#f3f6f4";
+      ctx.fillText(titular, MARGEN, CAMPO - 38);
+      // La línea amarilla de primera y diez es la frontera, como en el portal.
+      ctx.fillStyle = "#ffd60a";
+      ctx.fillRect(0, CAMPO - 4, ANCHO, 8);
+
+      // Un equipo dentro de su tarjeta: el elegido lleno de sus colores, con un brillo
+      // de jersey y la etiqueta PICK; el otro, solo con contorno y en gris.
+      const bloque = (eq, elegido, x, y, w, h) => {
+        const col = D.colores[eq] || {};
+        const sigla = D.siglas[eq] || eq.slice(0, 3).toUpperCase();
+        caja(x, y, w, h, 14);
+        if (elegido) {
+          ctx.fillStyle = col.local || "#ffd60a";
+          ctx.fill();
+          ctx.save();
+          caja(x, y, w, h, 14);
+          ctx.clip();
+          ctx.fillStyle = "rgba(255,255,255,.13)";
+          ctx.beginPath();
+          ctx.moveTo(x + w * .52, y);
+          ctx.lineTo(x + w * .74, y);
+          ctx.lineTo(x + w * .5, y + h);
+          ctx.lineTo(x + w * .28, y + h);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        } else {
+          ctx.strokeStyle = "#26302b";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+        const tinta = elegido ? col.local_texto || "#060a08" : "#5b6661";
+        ctx.fillStyle = tinta;
+        ctx.font = rotulo(columnas === 2 ? 46 : 52);
+        const anchoSigla = ctx.measureText(sigla).width;
+        ctx.fillText(sigla, x + 16, y + (columnas === 2 ? 52 : h / 2 + 18));
+        ctx.font = cuerpo(elegido ? 700 : 500, columnas === 2 ? 19 : 24);
+        if (columnas === 2) ctx.fillText(eq, x + 16, y + h - 14);
+        else ctx.fillText(eq, x + 16 + anchoSigla + 14, y + h / 2 + 10);
+        if (elegido) {
+          ctx.font = cuerpo(800, 14);
+          espaciado(2);
+          const ancho = ctx.measureText("PICK").width + 30;
+          ctx.fillStyle = tinta;
+          caja(x + w - ancho - 10, y + 10, ancho, 26, 13);
+          ctx.fill();
+          ctx.fillStyle = col.local || "#ffd60a";
+          ctx.fillText("PICK", x + w - ancho + 12, y + 28);
+          espaciado(0);
+          ctx.strokeStyle = col.local || "#ffd60a";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(x + w - ancho, y + 23);
+          ctx.lineTo(x + w - ancho + 4, y + 27);
+          ctx.lineTo(x + w - ancho + 10, y + 19);
+          ctx.stroke();
+        }
+      };
+
+      let y = CAMPO + 24;
+      grupos.forEach((g) => {
+        ctx.fillStyle = "#ffd60a";
+        ctx.font = rotulo(26);
+        espaciado(3);
+        ctx.fillText(g.dia, MARGEN, y + 42);
+        const anchoDia = ctx.measureText(g.dia).width;
+        espaciado(0);
+        ctx.fillStyle = "#1e2622";
+        ctx.fillRect(MARGEN + anchoDia + 18, y + 33, ANCHO - MARGEN * 2 - anchoDia - 18, 2);
+        y += ALTO_DIA;
+        g.picks.forEach((pk, i) => {
+          const x = MARGEN + (i % columnas) * (anchoTarjeta + SEP);
+          const yt = y + Math.floor(i / columnas) * (ALTO_TARJETA + SEP);
+          const p = pk.p;
+          ctx.fillStyle = "#101613";
+          caja(x, yt, anchoTarjeta, ALTO_TARJETA, 22);
+          ctx.fill();
+          ctx.fillStyle = "#a7b1ab";
+          ctx.font = cuerpo(600, 18);
+          espaciado(1);
+          ctx.fillText(horaDe(p) || "POR CONFIRMAR", x + 18, yt + 30);
+          espaciado(0);
+          const arroba = 34, bx = x + 14, by = yt + 44, bh = ALTO_TARJETA - 58;
+          const bw = (anchoTarjeta - 28 - arroba) / 2;
+          bloque(p.v, pk.lado === "v", bx, by, bw, bh);
+          ctx.fillStyle = "#5b6661";
+          ctx.font = cuerpo(700, 22);
+          ctx.textAlign = "center";
+          ctx.fillText("@", bx + bw + arroba / 2, by + bh / 2 + 8);
+          ctx.textAlign = "left";
+          bloque(p.l, pk.lado === "l", bx + bw + arroba, by, bw, bh);
+        });
+        y += Math.ceil(g.picks.length / columnas) * (ALTO_TARJETA + SEP);
+      });
+
+      const yp = alto - PIE;
+      ctx.fillStyle = "#1e2622";
+      ctx.fillRect(MARGEN, yp + 20, ANCHO - MARGEN * 2, 2);
+      ctx.fillStyle = "#ffd60a";
+      ctx.font = rotulo(40);
+      ctx.fillText(claves.length === 1 ? "1 PICK" : claves.length + " PICKS", MARGEN, yp + 80);
+      marcaEnLienzo(ctx, ANCHO - MARGEN - 44, yp + 46, 44);
+      ctx.fillStyle = "#a7b1ab";
+      ctx.font = cuerpo(500, 20);
+      ctx.fillText("Hecha el " + sello + "  ·  Para " + D.correo, MARGEN, yp + 120);
+      ctx.textAlign = "right";
+      ctx.fillText(direccion, ANCHO - MARGEN, yp + 120);
+      ctx.textAlign = "left";
+      return lienzo;
+    };
+
     const titulo = "Picks semana " + s.n + (jugador !== null ? " · " + nombre(jugador) : "");
-
-    // En el teléfono se abre el menú de compartir; en escritorio se descarga.
-    if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
-      try {
-        await navigator.share({ files: [archivo], title: titulo, text: titulo });
-        return;
-      } catch (e) { if (e && e.name === "AbortError") return; }
+    const r = abrirRevelado(titulo);
+    let blob = null;
+    try {
+      // Si el navegador no deja leer el lienzo con el campo dibujado, se arma sin él.
+      let lienzo = await armar(true);
+      try { lienzo.getContext("2d").getImageData(0, 0, 1, 1); } catch (e) { lienzo = await armar(false); }
+      // JPEG: con el campo y las sombras, un PNG pesaría varias veces más.
+      blob = await new Promise((listo) => lienzo.toBlob(listo, "image/jpeg", 0.9));
+    } catch (e) {
+      console.error(e);
     }
+    if (!blob) {
+      r.estado.textContent = "No se pudo armar la imagen. Cierra y vuelve a intentar.";
+      return;
+    }
+    const archivo = new File([blob], "picks-semana-" + s.n + ".jpg", { type: "image/jpeg" });
     const url = URL.createObjectURL(blob);
-    const enlace = document.createElement("a");
-    enlace.href = url;
-    enlace.download = archivo.name;
-    document.body.appendChild(enlace);
-    enlace.click();
-    enlace.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    r.alCerrar(() => URL.revokeObjectURL(url));
+    const img = new Image();
+    img.alt = titulo;
+    img.src = url;
+    // Espera a que cargue, pero sin colgarse si el teléfono pausa la página.
+    await Promise.race([new Promise((listo) => { img.onload = listo; img.onerror = listo; }), new Promise((listo) => setTimeout(listo, 1500))]);
+    r.marco.append(img);
+    r.estado.textContent = "Semana " + s.n + " · " + (claves.length === 1 ? "1 pick" : claves.length + " picks");
+    r.capa.classList.add("listo");
+    festejarRevelado(r.capa);
+    const compartible = !!(navigator.canShare && navigator.canShare({ files: [archivo] }));
+    const boton = crear("button", "revelado-mandar");
+    boton.type = "button";
+    boton.textContent = compartible ? "Mandar" : "Descargar imagen";
+    boton.addEventListener("click", async () => {
+      // Se comparte dentro del toque, así el teléfono siempre abre su menú.
+      if (compartible) {
+        try { await navigator.share({ files: [archivo], title: titulo }); return; }
+        catch (e) { if (e && e.name === "AbortError") return; }
+      }
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = archivo.name;
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+    });
+    r.acciones.append(boton);
+    boton.focus({ preventScroll: true });
+  }
+
+  /* La pantalla donde aparece la imagen: luces de estadio, la imagen que se escanea de arriba
+     abajo, un brillo y confeti. Se cierra con la ×, Esc o Atrás. */
+  function abrirRevelado(titulo) {
+    const capa = crear("div", "revelado");
+    capa.setAttribute("role", "dialog");
+    capa.setAttribute("aria-modal", "true");
+    capa.setAttribute("aria-label", titulo);
+    const cerrarBoton = crear("button", "revelado-cerrar");
+    cerrarBoton.type = "button";
+    cerrarBoton.setAttribute("aria-label", "Cerrar");
+    cerrarBoton.textContent = "×";
+    const estado = crear("p", "revelado-estado");
+    estado.textContent = "Armando tus picks…";
+    const marco = crear("div", "revelado-marco");
+    const acciones = crear("div", "revelado-acciones");
+    capa.append(cerrarBoton, estado, marco, acciones);
+    document.body.append(capa);
+    const pendientes = [];
+    const tecla = (e) => { if (e.key === "Escape") cerrar(); };
+    function cerrar() {
+      if (!capa.isConnected) return;
+      capa.remove();
+      document.removeEventListener("keydown", tecla);
+      window.removeEventListener("popstate", cerrar);
+      pendientes.forEach((f) => f());
+    }
+    cerrarBoton.addEventListener("click", cerrar);
+    document.addEventListener("keydown", tecla);
+    window.addEventListener("popstate", cerrar);
+    return { capa, estado, marco, acciones, alCerrar: (f) => pendientes.push(f) };
+  }
+
+  function festejarRevelado(capa) {
+    if (suave) return;
+    const tuyo = equipo && D.colores[equipo] ? D.colores[equipo].local : "#34d680";
+    const colores = [tuyo, "#ffd60a", "#f3f6f4"];
+    for (let i = 0; i < 30; i++) {
+      const pieza = crear("i", "revelado-pieza");
+      pieza.style.left = Math.random() * 100 + "%";
+      pieza.style.background = colores[i % colores.length];
+      pieza.style.setProperty("--dx", Math.round(Math.random() * 140 - 70) + "px");
+      pieza.style.setProperty("--giro", Math.round(Math.random() * 900 - 450) + "deg");
+      pieza.style.animationDelay = (0.6 + Math.random() * 0.3).toFixed(2) + "s";
+      capa.append(pieza);
+      setTimeout(() => pieza.remove(), 2600);
+    }
+    if (navigator.vibrate) navigator.vibrate([12, 40, 18]);
   }
 
   function moduloPicks(s, lista, tandas, parcial) {
