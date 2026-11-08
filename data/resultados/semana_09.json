@@ -2,24 +2,13 @@
   "semana": 9,
   "partidos": [
     {
-      "visitante": "Jaguars",
-      "local": "Ravens",
-      "marcador_visitante": 33,
-      "marcador_local": 10,
-      "ganador": "Jaguars",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-06T01:15:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Bengals",
       "local": "Falcons",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
+      "marcador_visitante": 34,
+      "marcador_local": 17,
+      "ganador": "Bengals",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-08T14:30:00+00:00",
       "hora_definida": true
     },
@@ -153,6 +142,17 @@
       "finalizado": false,
       "estado": "Scheduled",
       "inicio": "2026-11-09T01:20:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Jaguars",
+      "local": "Ravens",
+      "marcador_visitante": 33,
+      "marcador_local": 10,
+      "ganador": "Jaguars",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-06T01:15:00+00:00",
       "hora_definida": true
     },
     {
