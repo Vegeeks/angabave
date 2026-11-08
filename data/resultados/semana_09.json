@@ -28,9 +28,9 @@
       "local": "Eagles",
       "marcador_visitante": 19,
       "marcador_local": 11,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Giants",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-08T18:00:00+00:00",
       "hora_definida": true
     },
