@@ -50,9 +50,9 @@
       "local": "Washington",
       "marcador_visitante": 20,
       "marcador_local": 13,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Rams",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-08T18:00:00+00:00",
       "hora_definida": true
     },
@@ -92,7 +92,7 @@
     {
       "visitante": "Texans",
       "local": "Chargers",
-      "marcador_visitante": 0,
+      "marcador_visitante": 6,
       "marcador_local": 0,
       "ganador": null,
       "finalizado": false,
