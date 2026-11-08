@@ -13,17 +13,6 @@
       "hora_definida": true
     },
     {
-      "visitante": "Jets",
-      "local": "Chiefs",
-      "marcador_visitante": 12,
-      "marcador_local": 35,
-      "ganador": "Chiefs",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Browns",
       "local": "Saints",
       "marcador_visitante": 16,
@@ -46,6 +35,50 @@
       "hora_definida": true
     },
     {
+      "visitante": "Texans",
+      "local": "Chargers",
+      "marcador_visitante": 7,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-08T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Bengals",
+      "local": "Falcons",
+      "marcador_visitante": 34,
+      "marcador_local": 17,
+      "ganador": "Bengals",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T14:30:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Jets",
+      "local": "Chiefs",
+      "marcador_visitante": 12,
+      "marcador_local": 35,
+      "ganador": "Chiefs",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Lions",
+      "local": "Dolphins",
+      "marcador_visitante": 19,
+      "marcador_local": 9,
+      "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
       "visitante": "Rams",
       "local": "Washington",
       "marcador_visitante": 20,
@@ -61,43 +94,10 @@
       "local": "Panthers",
       "marcador_visitante": 26,
       "marcador_local": 21,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Bengals",
-      "local": "Falcons",
-      "marcador_visitante": 34,
-      "marcador_local": 17,
-      "ganador": "Bengals",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-08T14:30:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Lions",
-      "local": "Dolphins",
-      "marcador_visitante": 19,
-      "marcador_local": 9,
-      "ganador": "Lions",
+      "ganador": "Broncos",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Texans",
-      "local": "Chargers",
-      "marcador_visitante": 6,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-11-08T21:05:00+00:00",
       "hora_definida": true
     },
     {
