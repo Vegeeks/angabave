@@ -2,6 +2,83 @@
   "semana": 9,
   "partidos": [
     {
+      "visitante": "Cowboys",
+      "local": "Colts",
+      "marcador_visitante": 20,
+      "marcador_local": 17,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Jets",
+      "local": "Chiefs",
+      "marcador_visitante": 12,
+      "marcador_local": 28,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Lions",
+      "local": "Dolphins",
+      "marcador_visitante": 19,
+      "marcador_local": 9,
+      "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Browns",
+      "local": "Saints",
+      "marcador_visitante": 13,
+      "marcador_local": 9,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Giants",
+      "local": "Eagles",
+      "marcador_visitante": 16,
+      "marcador_local": 8,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Rams",
+      "local": "Washington",
+      "marcador_visitante": 20,
+      "marcador_local": 13,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Broncos",
+      "local": "Panthers",
+      "marcador_visitante": 26,
+      "marcador_local": 14,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
       "visitante": "Bengals",
       "local": "Falcons",
       "marcador_visitante": 34,
@@ -10,83 +87,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-08T14:30:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Cowboys",
-      "local": "Colts",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Jets",
-      "local": "Chiefs",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Lions",
-      "local": "Dolphins",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Browns",
-      "local": "Saints",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Giants",
-      "local": "Eagles",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Rams",
-      "local": "Washington",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Broncos",
-      "local": "Panthers",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-08T18:00:00+00:00",
       "hora_definida": true
     },
     {
