@@ -170,10 +170,17 @@
   },
   "9": {
     "archivo": "Semana_09.xlsx",
-    "sellado": "2026-11-08T14:39:10+00:00",
+    "sellado": "2026-11-08T18:01:08+00:00",
     "partidos": {
       "Bengals@Falcons": "fcac13c6c23a02f31017c2e4482481ad04caf401734e244a67dcda153b14953b",
-      "Jaguars@Ravens": "5809a5f42e56f242a5226b8b6fa682c3c6236981893197318e18ec9c113cab78"
+      "Broncos@Panthers": "fcfc8e944bb1bb5edfdd08d7ab7a452eb7fb59d3e200bae8f20917f1d8caef0b",
+      "Browns@Saints": "34008646d5b973a3d979f4b85e8da6a9e6930ceda257472dd6b91cc7d6a7cdc4",
+      "Cowboys@Colts": "8907ab516a7835311d16ab1a29be3bab9ad2cd9baf0e4f1cb38a39d878befa37",
+      "Giants@Eagles": "a75aa06b63e380637d7293d6529ba4820cb4904b9532af42bf357e79fbfb0960",
+      "Jaguars@Ravens": "5809a5f42e56f242a5226b8b6fa682c3c6236981893197318e18ec9c113cab78",
+      "Jets@Chiefs": "d068330ee367412b23f774067b17cd527786213d5e9758412d26686db520ea7b",
+      "Lions@Dolphins": "0a706c91dedf85454e652f5d70a76a4d6ddd7e7a344ccc8d3014a3228089a350",
+      "Rams@Washington": "47fd57922426f5fb03a4535e90eb5301e90f94849f56c0fcdb79a40ceb844f74"
     }
   }
 }
