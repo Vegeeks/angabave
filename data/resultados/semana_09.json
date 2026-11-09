@@ -2,14 +2,14 @@
   "semana": 9,
   "partidos": [
     {
-      "visitante": "Packers",
-      "local": "Patriots",
-      "marcador_visitante": 45,
+      "visitante": "Buccaneers",
+      "local": "Bears",
+      "marcador_visitante": 24,
       "marcador_local": 27,
-      "ganador": "Packers",
+      "ganador": "Bears",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-11-08T21:25:00+00:00",
+      "inicio": "2026-11-09T01:20:00+00:00",
       "hora_definida": true
     },
     {
@@ -112,6 +112,17 @@
       "hora_definida": true
     },
     {
+      "visitante": "Packers",
+      "local": "Patriots",
+      "marcador_visitante": 45,
+      "marcador_local": 27,
+      "ganador": "Packers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T21:25:00+00:00",
+      "hora_definida": true
+    },
+    {
       "visitante": "Raiders",
       "local": "49ers",
       "marcador_visitante": 17,
@@ -131,17 +142,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-08T21:25:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Buccaneers",
-      "local": "Bears",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-09T01:20:00+00:00",
       "hora_definida": true
     },
     {
