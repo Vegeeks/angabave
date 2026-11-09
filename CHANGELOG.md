@@ -9,6 +9,13 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.28.0
+
+* **La fila de partido se lee con palabras.** En lugar de la pastilla "Tu pick" y el porcentaje: "Solo tú", "Tú y 4 más", "Vas ganando", "Vas perdiendo", "Le atinaron 29", "Le atinó Ana", "Nadie le atinó" o "Empate: nadie le atinó". Tu equipo va en negritas, con un anillo verde o rojo y una ✓ o ✕ al terminar, para que no dependa solo del color. Sin nombre elegido, en personas: "33 con SF". Un empate oficial (marcado con "x") nunca cuenta como acierto.
+* **Titular en vivo:** "Vas ganando 3 de 8" contra los partidos en juego (o "Vas perdiendo 5 de 8" si pesa más); con uno solo, "Vas ganando", "Vas perdiendo" o "Van empatados".
+* **El marcador dice qué tan fresco está:** "Actualizado hace 40 s"; a los 3 minutos sin dato, "Sin señal. Marcadores de las 13:42" con un botón para reintentar. Vuelve a consultar en cuanto regresa la red y ya no consulta a ESPN cuando no hay partido cerca.
+* **En Safari del teléfono la barra de abajo va pegada al borde**, sin renglones asomándose entre ella y la de Safari. Guardado como app sigue flotando.
+
 ## v0.27.0
 
 * **Red de seguridad.** GitHub corre las pruebas cada vez que cambia el código, con el mismo Python con el que publica (3.11); en la Mac corren con otro, y lo que solo truena allá, allá se ve.

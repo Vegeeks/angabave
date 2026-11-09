@@ -272,7 +272,7 @@ def test_el_modo_jugador_viaja_en_la_pagina(armado, tmp_path: Path):
     assert 'id="quien-soy"' in html          # selector de participante
     assert "angabave.jugador" in html        # se recuerda en el navegador
     assert "Tu semana" in html               # resumen personal
-    assert "Tu pick" in html                 # marca en cada partido
+    assert "palabrasDeFila" in html          # lo que dice cada partido de ti
 
 
 def test_la_semana_en_curso_queda_destacada(armado, tmp_path: Path):
@@ -332,8 +332,8 @@ def test_el_dinero_es_oro_lo_tuyo_acento_y_tu_fila_no_es_mostaza(armado, tmp_pat
     assert "background:var(--verde)" in regla[".progreso-semana .ok"]
     assert "background:transparent" in regla[".progreso-semana .mal"]
     assert "box-shadow:inset 0 0 0 1.5px var(--rojo)" in regla[".progreso-semana .mal"]
-    assert "background:transparent" in regla[".juego-fila .mio.mal"]
-    assert "box-shadow:inset 0 0 0 1px var(--rojo)" in regla[".juego-fila .mio.mal"]
+    assert "var(--fila-estado)" in regla[".juego-fila .fila-mi-pick .sig"]   # el anillo
+    assert "✓" in html and "✕" in html           # al terminar, la marca no depende del color
     assert "opacity:.55" in regla['.duelo-pick:has(.opcion[aria-pressed="true"]) .opcion[aria-pressed="false"]']
 
 

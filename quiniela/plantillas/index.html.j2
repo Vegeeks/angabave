@@ -30,7 +30,7 @@
     principal revienta, DOMContentLoaded igual destapa la General. El touchstart vacío
     es para que Safari pinte :active al instante. #}
 <script>
-(function(){var r=document.documentElement;r.className='js';try{var t=localStorage.getItem('angabave.tema');if(t){r.style.cssText=t;var c=document.querySelector('meta[name="theme-color"]'),m=t.match(/--bg:([^;]+)/);if(c&&m)c.setAttribute('content',m[1])}if(!sessionStorage.getItem('angabave.estreno')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){r.className+=' estreno';window.campoRescate=setTimeout(function(){r.classList.remove('estreno')},6000)}}catch(e){}document.addEventListener('DOMContentLoaded',function(){r.classList.add('listo')});document.addEventListener('touchstart',function(){},{passive:true})})();
+(function(){var r=document.documentElement;r.className='js';try{if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches)r.classList.add('instalada')}catch(e){}try{var t=localStorage.getItem('angabave.tema');if(t){r.style.cssText=t;var c=document.querySelector('meta[name="theme-color"]'),m=t.match(/--bg:([^;]+)/);if(c&&m)c.setAttribute('content',m[1])}if(!sessionStorage.getItem('angabave.estreno')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){r.className+=' estreno';window.campoRescate=setTimeout(function(){r.classList.remove('estreno')},6000)}}catch(e){}document.addEventListener('DOMContentLoaded',function(){r.classList.add('listo')});document.addEventListener('touchstart',function(){},{passive:true})})();
 try{var g=JSON.parse(localStorage.getItem('angabave.campo')||'null');if(g&&g.v===2){window.campoGuardado=g;if(g.e)document.documentElement.setAttribute('data-campo',g.e)}}catch(e){}
 </script>
 <style>
@@ -261,6 +261,19 @@ header.plegado .top{opacity:0; pointer-events:none}
 .hay-vivo .navegacion button[data-vista="hoy"]::after{content:""; position:absolute; top:7px; left:calc(50% + 5px); width:12px; height:12px; border-radius:50%;
   background:var(--vivo); background-clip:padding-box; border:2px solid var(--bg); animation:latir 1.6s ease-in-out infinite}
 body{padding-bottom:var(--alto-pie)}
+/* En la pestaña de Safari la barra flotante deja asomar renglones entre ella y la
+   del navegador: ahí va de orilla a orilla, opaca y pegada abajo. */
+@media (max-width:899px){
+  html:not(.instalada){--alto-pie:calc(56px + env(safe-area-inset-bottom))}
+  html:not(.instalada) .navegacion.al-pie{left:0; right:0; bottom:0; height:calc(56px + env(safe-area-inset-bottom));
+    padding:0 max(6px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(6px,env(safe-area-inset-left));
+    border-radius:2px; border-width:1px 0 0; border-color:var(--linea); background:var(--bg);
+    -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:none}
+  html:not(.instalada) .navegacion.al-pie .indicador{top:4px; bottom:4px; border-radius:var(--r2)}
+  html:not(.instalada) .navegacion.al-pie button{gap:0}
+  html:not(.instalada) .navegacion.al-pie svg{width:22px; height:22px}
+  html:not(.instalada) .acciones-gen{bottom:calc(var(--alto-pie) + 8px)}
+}
 
 /* ═══════ las vistas ═══════ */
 main{view-transition-name:contenido; min-height:60vh}
@@ -348,6 +361,10 @@ main{view-transition-name:contenido; min-height:60vh}
 .tarjeta.lista-juegos{margin-bottom:0}
 .subgrupo{font-size:var(--t5); font-weight:600; color:var(--tenue); margin:16px 0 0}
 .tarjeta .cab + .subgrupo{margin-top:0}
+.frescura{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:-4px 0 8px; font-size:var(--t6); color:var(--tenue)}
+.frescura.sin-senal .frescura-texto{color:var(--rojo)}
+.frescura-boton{min-height:44px; padding:0 12px; font-size:var(--t6); font-weight:600; color:var(--acento)}
+.frescura-boton[hidden]{display:none}
 .partidos-hoy.envivo .subgrupo:first-of-type{color:var(--txt)}
 /* Un partido, siempre igual: equipos a la izquierda, marcador en su columna y a la
    derecha la hora y tu pick, de ancho fijo para que los números queden alineados. */
@@ -364,11 +381,19 @@ main{view-transition-name:contenido; min-height:60vh}
 .juego-fila .eq-fila.adelante .mrc{color:var(--txt)}
 .juego-fila .meta{display:flex; flex-direction:column; align-items:flex-end; gap:4px; text-align:right}
 .juego-fila .cuando{font-size:var(--t5); font-weight:600; font-variant-numeric:tabular-nums; line-height:1.2}
-.juego-fila .mio{padding:2px 8px; border-radius:99px; font-size:var(--t6); font-weight:600; white-space:nowrap; background:var(--panel2); color:var(--tenue)}
-/* Lleno es a favor, hueco es en contra: se lee sin color. */
-.juego-fila .mio.bien{color:var(--verde); background:color-mix(in srgb,var(--verde) 18%,transparent)}
-.juego-fila .mio.mal{color:var(--rojo); background:transparent; box-shadow:inset 0 0 0 1px var(--rojo)}
 .juego-fila .consenso{font-size:var(--t6); color:var(--tenue2); white-space:nowrap}
+.juego-fila .fila-palabras{font-size:var(--t6); font-weight:600; line-height:1.25; color:var(--tenue); text-wrap:balance}
+.juego-fila .fila-palabras.bien{color:var(--verde)}
+.juego-fila .fila-palabras.mal{color:var(--rojo)}
+/* Tu equipo: nombre en negritas y un anillo en su sigla, con el color de cómo vas. */
+.juego-fila .fila-mi-pick{--fila-estado:var(--txt); color:var(--txt)}
+.juego-fila .fila-mi-pick.fila-bien{--fila-estado:var(--verde)}
+.juego-fila .fila-mi-pick.fila-mal{--fila-estado:var(--rojo)}
+.juego-fila .fila-mi-pick .eq{font-weight:700; color:var(--txt)}
+.juego-fila .fila-mi-pick .sig{outline:2px solid var(--fila-estado); outline-offset:2px}
+.juego-fila .fila-con-marca{display:flex; align-items:baseline; gap:4px}
+.juego-fila .fila-nombre{min-width:0; overflow:hidden; text-overflow:ellipsis}
+.juego-fila .fila-marca{flex:0 0 auto; font-size:var(--t6); color:var(--fila-estado)}
 .juego-fila.quieto{cursor:default; padding-block:4px}
 /* Cuando alguien anota: una ola del color del equipo y el "+7" que sube. */
 .juego-fila.anoto::before{content:""; position:absolute; inset:0 -16px; pointer-events:none; opacity:0;
@@ -1387,10 +1412,20 @@ try {
     return salida;
   }
 
+  /* ESPN solo se consulta con un partido encima: sin terminar y por empezar en menos
+     de 15 minutos o empezado hace menos de 5 horas. Sin hora definida, sí. */
+  function hayJuegoCerca(s) {
+    const ahora = Date.now();
+    return todosLosJuegos(s).some((p) => !p.cerrado && !p.porConfirmar &&
+      (p.vivo || !p.t || (ahora >= p.t * 1000 - 15 * 60e3 && ahora <= p.t * 1000 + 5 * 3600e3)));
+  }
+
+  let consultando = false;
   async function consultarVivo() {
-    if (!D.vivo || document.hidden) return;
+    if (!D.vivo || document.hidden || consultando) return;
     const s = typeof vistaActual === "number" ? porSemana.get(vistaActual) : porSemana.get(D.activa);
-    if (!s || s.cerrados >= s.total) return;
+    if (!s || s.cerrados >= s.total || !hayJuegoCerca(s)) return;
+    consultando = true;
     const control = new AbortController();
     const corte = setTimeout(() => control.abort(), 8000);
     try {
@@ -1422,7 +1457,24 @@ try {
       fallosVivo++;   // se sigue intentando: el marcador revive solo cuando vuelve la red
     } finally {
       clearTimeout(corte);
+      consultando = false;
+      pintarFrescura();
     }
+  }
+
+  /* Qué tan fresco está el marcador: la hora de la última respuesta buena de ESPN. */
+  const CARGADA = Date.now();
+  function pintarFrescura(linea = document.querySelector(".frescura")) {
+    if (!linea) return;
+    const base = ultimaConsulta ? ultimaConsulta.getTime() : CARGADA, seg = Math.max(0, Math.round((Date.now() - base) / 1000));
+    const caduco = seg > 180;
+    const texto = linea.querySelector(".frescura-texto"), boton = linea.querySelector(".frescura-boton");
+    linea.classList.toggle("sin-senal", caduco);
+    boton.hidden = !caduco;
+    texto.textContent = caduco
+      ? "Sin señal." + (ultimaConsulta ? " Marcadores de las " + hora(base / 1000) : "")
+      : !ultimaConsulta ? "Consultando los marcadores"
+      : "Actualizado hace " + (seg < 90 ? Math.max(seg, 1) + " s" : Math.round(seg / 60) + " min");
   }
 
   /* El navegador nunca cierra un partido: eso lo decide CI, que es la fuente oficial. */
@@ -3296,6 +3348,7 @@ try {
       if (resta > 0) n.textContent = n.dataset.antes + falta(resta);
       else if (!vencidas.has(hasta)) { vencidas.add(hasta); cambio = true; }
     });
+    pintarFrescura();
     if (cambio) repintarSinEstorbar();
   }, 20000);
 
@@ -3322,12 +3375,38 @@ try {
     return caja;
   }
 
+  /* El titular de la fase en vivo contesta cómo vas, con el denominador fijo en los
+     partidos en juego. Sin nombre, o sin nada que decir todavía, cuenta los partidos. */
+  function titularEnVivo(s, vivos) {
+    const n = vivos.length;
+    const cuenta = [n === 1 ? "1 partido" : n + " partidos", "en vivo"];
+    const adelante = (p) => p.g === "v" || p.g === "l";
+    if (jugador === null || !s) return { frase: cuenta };
+    const lado = (p) => {
+      const col = s.partidos.findIndex((q) => q.v === p.v && q.l === p.l);
+      const mio = col >= 0 ? miPick(s, col) : null;
+      return mio ? mio.lado : null;
+    };
+    if (n === 1) {
+      const p = vivos[0], mio = lado(p);
+      if (!mio) return { frase: cuenta };
+      return { frase: [!adelante(p) ? "Van empatados" : p.g === mio ? "Vas ganando" : "Vas perdiendo"], partido: p };
+    }
+    // Un empate ("x" o vacío) no tiene a nadie adelante. Se dice lo que pesa más: nunca "ganando 0".
+    const conLider = vivos.filter(adelante);
+    if (conLider.length < 3) return { frase: cuenta };
+    const gano = conLider.filter((p) => p.g === lado(p)).length;
+    const pierdo = conLider.filter((p) => lado(p) && p.g !== lado(p)).length;
+    return { frase: gano >= pierdo ? ["Vas ganando", gano + " de " + n] : ["Vas perdiendo", pierdo + " de " + n] };
+  }
+
   function saludo(fase, s, vivos, hoy, picks, yaJugados, sinPartidos) {
     const caja = crear("div", "saludo fase-" + fase);
     const fecha = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
     caja.appendChild(crear("div", "fecha", fecha.charAt(0).toUpperCase() + fecha.slice(1)));
+    const enVivo = fase === "vivo" ? titularEnVivo(s, vivos) : null;
     const titulo = {
-      vivo: [vivos.length === 1 ? "Hay un partido" : "Hay " + vivos.length + " partidos", "en vivo"],
+      vivo: fase === "vivo" ? enVivo.frase : null,
       hoy: yaJugados ? [hoy.length === 1 ? "Queda un partido" : "Quedan " + hoy.length + " partidos", "hoy"]
         : hoy.length === 1 ? ["Hoy hay", "partido"] : ["Hoy hay " + hoy.length, "partidos"],
       picks: ["Tiempo de", "picks"],
@@ -3337,13 +3416,17 @@ try {
     caja.appendChild(titular("h1", titulo[0], titulo[1]));
     const detalle = crear("p");
     if (fase === "vivo") {
+      const q = enVivo.partido;
+      if (q) {
+        detalle.textContent = q.v + " " + (q.mv ?? 0) + ", " + q.l + " " + (q.ml ?? 0) + (q.e ? " · " + q.e : "") + ". ";
+      }
       const { semana } = jugador !== null && s ? numerosDe(jugador, s) : { semana: null };
       if (semana && semana.ganando + semana.perdiendo) {
         const suma = semana.ok + semana.ganando;
-        detalle.textContent = "Si todo queda así: " + suma + (suma === 1 ? " acierto" : " aciertos") +
+        detalle.textContent += "Si todo queda así: " + suma + (suma === 1 ? " acierto" : " aciertos") +
           " y " + ordinal(semana.proy) + " lugar de la semana.";
       } else {
-        detalle.textContent = "Los marcadores se actualizan solos cada minuto.";
+        detalle.textContent += "Los marcadores se actualizan solos cada minuto.";
       }
     } else if (fase === "hoy") {
       const primero = hoy.slice().sort((a, b) => a.t - b.t)[0];
@@ -3401,11 +3484,63 @@ try {
       cab.appendChild(todos);
     }
     caja.appendChild(cab);
+    if (vivos.length) {
+      const linea = crear("div", "frescura");
+      linea.appendChild(crear("span", "frescura-texto"));
+      const otra = crear("button", "frescura-boton", "Reintentar");
+      otra.type = "button";
+      otra.addEventListener("click", consultarVivo);
+      linea.appendChild(otra);
+      caja.appendChild(linea);
+      pintarFrescura(linea);
+    }
     grupos.forEach(([titulo, juegos]) => {
       if (grupos.length > 1) caja.appendChild(crear("div", "subgrupo", titulo));
       juegos.slice().sort((a, b) => a.t - b.t).forEach((p) => caja.appendChild(filaJuego(s, p)));
     });
     return caja;
+  }
+
+  /* Lo que dice la segunda línea de la columna derecha: palabras y personas, nunca
+     porcentajes. "Tu lado" es el pick de quien está elegido en este teléfono. */
+  function palabrasDeFila(s, p, col) {
+    if (!s) return null;
+    const sig = (eq) => D.siglas[eq] || eq.slice(0, 3).toUpperCase();
+    const neutro = (texto) => ({ texto, tono: "neutro" });
+    const terminado = !!(p.cerrado || p.porConfirmar), enJuego = !!p.vivo && !terminado;
+    if (col < 0 || !s.picks.length) {
+      let borrador = {};
+      try { borrador = JSON.parse(leer(LLAVE_BORRADOR(s.n)) || "{}"); } catch (e) { borrador = {}; }
+      const lado = borrador[p.v + "@" + p.l];
+      return neutro(lado === "v" || lado === "l" ? "En tu borrador: " + sig(lado === "v" ? p.v : p.l) : "Picks por llegar");
+    }
+    const c = consenso(s, col), mio = miPick(s, col);
+    const con = (n) => (n === 1 ? "Solo tú" : "Tú y " + (n - 1) + " más");
+    // El primer nombre; si otro participante lo comparte, se le suma la inicial del apellido.
+    const quien = () => {
+      const fila = s.picks.findIndex((f) => f[col] === (p.g === "l" ? 1 : 0));
+      const partes = nombre(s.jugadores[fila]).split(" ");
+      const repetido = D.participantes.filter((x) => x.split(" ")[0] === partes[0]).length > 1;
+      return repetido && partes.length > 1 ? partes[0] + " " + partes[partes.length - 1][0] + "." : partes[0];
+    };
+    if (terminado) {
+      if (p.g !== "v" && p.g !== "l") return neutro("Empate: nadie le atinó");
+      const n = p.g === "l" ? c.l : c.v;
+      if (mio && mio.lado === p.g) return { texto: n <= 6 ? con(n) : "Le atinaron " + n, tono: "bien" };
+      const texto = n === 0 ? "Nadie le atinó" : n === 1 ? "Le atinó " + quien() : "Le atinaron " + n;
+      return { texto, tono: mio ? "mal" : "neutro" };
+    }
+    if (mio && enJuego) {
+      if (p.g !== "v" && p.g !== "l") return neutro("Van empatados");
+      return p.g === mio.lado ? { texto: "Vas ganando", tono: "bien" } : { texto: "Vas perdiendo", tono: "mal" };
+    }
+    if (mio) {
+      const n = c[mio.lado];
+      return neutro(n <= 6 ? con(n) : "Elegiste " + sig(mio.equipo));
+    }
+    if (!c.v && !c.l) return null;
+    if (c.v === c.l) return neutro(c.v + " y " + c.l);
+    return neutro(Math.max(c.v, c.l) + " con " + sig(c.l > c.v ? p.l : p.v));
   }
 
   /* Un partido, siempre igual en todo el portal. Tocarlo abre quién le fue a quién. */
@@ -3417,12 +3552,27 @@ try {
     const reciente = anotacion && Date.now() - anotacion.cuando < SEGUNDOS_ANOTACION * 1000;
     const fila = crear("button", "juego-fila" + (p.vivo ? " vivo" : "") + (reciente ? " anoto" : ""));
     fila.type = "button";
+    const palabras = palabrasDeFila(s, p, col);
+    const mio = col >= 0 ? miPick(s, col) : null;
+    const terminado = p.cerrado || p.porConfirmar;
     const lados = crear("div", "lados");
     const empezo = p.vivo || p.cerrado || p.porConfirmar;
     [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, eq, m]) => {
-      const l = crear("div", "eq-fila" + (empezo && p.g === lado ? " adelante" : ""));
+      const mia = !!mio && mio.lado === lado;
+      const l = crear("div", "eq-fila" + (empezo && p.g === lado ? " adelante" : "") +
+        (mia ? " fila-mi-pick fila-" + palabras.tono : ""));
       l.appendChild(sigla(eq));
-      l.appendChild(crear("span", "eq", eq));
+      if (mia) {
+        // Ni el color ni el anillo cargan solos el estado: al final, también ✓ o ✕.
+        const nombreEq = crear("span", "eq fila-con-marca");
+        nombreEq.appendChild(crear("span", "fila-nombre", eq));
+        if (terminado && palabras.tono !== "neutro") {
+          nombreEq.appendChild(crear("span", "fila-marca", palabras.tono === "bien" ? "✓" : "✕"));
+        }
+        l.appendChild(nombreEq);
+      } else {
+        l.appendChild(crear("span", "eq", eq));
+      }
       const hay = empezo && m !== null && m !== undefined;
       const mrc = crear("b", "mrc", hay ? String(m) : "");
       const llave = clave + "|" + lado, antes = pintados.get(llave);
@@ -3445,28 +3595,14 @@ try {
       }
     }
     const meta = crear("div", "meta");
-    meta.appendChild(crear("span", "cuando", p.vivo ? (p.e || "En juego")
-      : p.cerrado || p.porConfirmar ? (p.e || "Final") : p.t ? hora(p.t) : "Por definir"));
-    if (col >= 0) {
-      const mio = miPick(s, col);
-      if (mio) {
-        // En juego el color dice cómo vas; la palomita o la tache, solo con el final.
-        const final = p.cerrado || p.porConfirmar;
-        const estado = !p.g ? "neutro" : p.g === mio.lado ? "bien" : "mal";
-        const marca = !final ? "" : estado === "bien" ? " ✓" : estado === "mal" ? " ✗" : "";
-        const pill = crear("span", "mio " + estado, "Tu pick: " + (D.siglas[mio.equipo] || mio.equipo.slice(0, 3).toUpperCase()) + marca);
-        if (p.vivo && p.g) pill.setAttribute("aria-label", pill.textContent + (estado === "bien" ? ", va ganando" : ", va perdiendo"));
-        meta.appendChild(pill);
-      }
-      const c = consenso(s, col), total = c.v + c.l;
-      if (total) {
-        const mayor = c.l >= c.v ? p.l : p.v;
-        meta.appendChild(crear("span", "consenso", pct(Math.max(c.v, c.l), total) + "% con " + (D.siglas[mayor] || mayor.slice(0, 3).toUpperCase())));
-      }
-    } else if (s && s.jugadores.length) {
-      meta.appendChild(crear("span", "consenso", "por repartir"));
-    }
+    const cuando = p.vivo ? (p.e || "En juego")
+      : p.cerrado || p.porConfirmar ? (p.e || "Final") : p.t ? hora(p.t) : "Por definir";
+    meta.appendChild(crear("span", "cuando", cuando));
+    if (palabras) meta.appendChild(crear("span", "fila-palabras " + palabras.tono, palabras.texto));
     fila.appendChild(meta);
+    const marcador = empezo && p.mv != null && p.ml != null ? p.mv + " a " + p.ml : "";
+    fila.setAttribute("aria-label", [p.v + " contra " + p.l, marcador, cuando, palabras && palabras.texto]
+      .filter(Boolean).join(", "));
     fila.addEventListener("click", () => abrirPartido(s, p, fila));
     return fila;
   }
@@ -4371,6 +4507,7 @@ try {
     consultarVivo();
     setInterval(consultarVivo, D.vivo.cada * 1000);
     document.addEventListener("visibilitychange", () => { if (!document.hidden) consultarVivo(); });
+    window.addEventListener("online", consultarVivo);
   }
   /* ═══ que nadie se quede con una copia vieja ═══
      Pages cachea el HTML diez minutos y esa cabecera no se puede cambiar. Así
