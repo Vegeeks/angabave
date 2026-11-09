@@ -2,32 +2,10 @@
   "semana": 9,
   "partidos": [
     {
-      "visitante": "Cowboys",
-      "local": "Colts",
-      "marcador_visitante": 27,
-      "marcador_local": 23,
-      "ganador": "Cowboys",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Browns",
-      "local": "Saints",
-      "marcador_visitante": 22,
-      "marcador_local": 23,
-      "ganador": "Saints",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-08T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Texans",
       "local": "Chargers",
-      "marcador_visitante": 10,
-      "marcador_local": 3,
+      "marcador_visitante": 41,
+      "marcador_local": 22,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -37,19 +15,8 @@
     {
       "visitante": "Packers",
       "local": "Patriots",
-      "marcador_visitante": 7,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-11-08T21:25:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Raiders",
-      "local": "49ers",
-      "marcador_visitante": 0,
-      "marcador_local": 7,
+      "marcador_visitante": 45,
+      "marcador_local": 21,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -59,8 +26,8 @@
     {
       "visitante": "Cardinals",
       "local": "Seahawks",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_visitante": 3,
+      "marcador_local": 17,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -76,6 +43,17 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-08T14:30:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Cowboys",
+      "local": "Colts",
+      "marcador_visitante": 27,
+      "marcador_local": 23,
+      "ganador": "Cowboys",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T18:00:00+00:00",
       "hora_definida": true
     },
     {
@@ -95,6 +73,17 @@
       "marcador_visitante": 19,
       "marcador_local": 9,
       "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Browns",
+      "local": "Saints",
+      "marcador_visitante": 22,
+      "marcador_local": 23,
+      "ganador": "Saints",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-08T18:00:00+00:00",
@@ -131,6 +120,17 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-08T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Raiders",
+      "local": "49ers",
+      "marcador_visitante": 17,
+      "marcador_local": 38,
+      "ganador": "49ers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T21:25:00+00:00",
       "hora_definida": true
     },
     {
