@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.28.0"
+VERSION = "v0.29.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -736,6 +736,30 @@ def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
     return bloque
 
 
+def cobros_de_semana(semana: SemanaRender) -> dict[str, Decimal]:
+    """Lo que cobra cada ganador de una semana oficial (cerrada y con partidos suficientes).
+
+    Es la misma cuenta que publica cada semana en `premio`: con empate, cada
+    ganador cobra el monto ya redondeado a centavos.
+    """
+    if semana.estado != "cerrada" or semana.tabla is None or semana.tabla.empty:
+        return {}
+    if semana.cerrados < UMBRAL_SEMANA:
+        return {}
+    primeros = ganadores(semana.tabla)
+    cada_uno = premio_semanal(len(primeros))
+    return {nombre: cada_uno for nombre in primeros}
+
+
+def cobrado_en_centavos(semanas: list[SemanaRender], indice_global: dict[str, int]) -> list[int]:
+    """Lo ya ganado en semanas oficiales por cada participante, en centavos."""
+    total = [Decimal("0")] * len(indice_global)
+    for semana in semanas:
+        for nombre, monto in cobros_de_semana(semana).items():
+            total[indice_global[nombre]] += monto
+    return [int((monto * 100).to_integral_value()) for monto in total]
+
+
 #: Medalla de cada lugar con premio. Del 4º en adelante no hay medalla: un
 #: escalón del podio puede quedar en 7º si hay empates arriba, y ese no cobra.
 MEDALLAS = {1: "oro", 2: "plata", 3: "bronce"}
@@ -1190,6 +1214,7 @@ def generar_html(
     ]
     reparto = reparto_hoy if temporada_cerrada else []
 
+    cobrado = cobrado_en_centavos(semanas, indice_global)
     premios = {
         "semanal": _pesos(PREMIO_SEMANAL),
         "acumulado_semanal": _pesos(ACUMULADO_SEMANAL),
@@ -1201,6 +1226,10 @@ def generar_html(
         "temporada_cerrada": temporada_cerrada,
         # Los grupos que hoy se llevarían algo de la bolsa final, con su parte.
         "hoy": _grupos_del_reparto(reparto_hoy),
+        # Lo que cada quien ya ganó en semanas oficiales, por índice de participante.
+        # Los textos salen de aquí para que el navegador no divida centavos.
+        "cobrado": cobrado,
+        "cobrado_texto": [_pesos(Decimal(c) / 100) if c else "" for c in cobrado],
         "reglas": [
             {"lugar": f"{i}.º", "porcentaje": _porciento(pct), "monto": _pesos(ACUMULADO_TOTAL * pct)}
             for i, pct in enumerate(REPARTO_FINAL, start=1)
@@ -1261,6 +1290,9 @@ def generar_html(
         return ruta_salida
 
     podio = _armar_podio(general, participantes, reparto_hoy) if podio_listo else []
+    # Qué lugares cobrarían hoy y tras qué fila cae la raya de la tabla general.
+    cobran = {g["pos"]: MEDALLAS.get(g["pos"], "") for g in premios["hoy"]} if podio_listo else {}
+    corte_tras = max((i for i, fila in enumerate(general) if fila["pos"] in cobran), default=-1)
     contexto = {
         "marca_svg": marca.svg(),
         "marca_palabra": marca.palabra(),
@@ -1292,6 +1324,10 @@ def generar_html(
         "datos": json.dumps(datos, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"),
         "general": general,
         "podio": podio,
+        "cobran": cobran,
+        "corte_tras": corte_tras,
+        "lider": general[0] if general else None,
+        "empates_arriba": [participantes[f["p"]] for f in general if f["pos"] == 1],
         "participantes": participantes,
         "semanas": semanas,
         "activa": activa,

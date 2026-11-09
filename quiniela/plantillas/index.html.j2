@@ -480,6 +480,27 @@ main{view-transition-name:contenido; min-height:60vh}
 .nota-podio{margin:8px 0 0; font-size:var(--t5); line-height:1.4; color:var(--tenue)}
 .nota-podio .enlace-titulo{margin-block:-12px; margin-left:0; padding-inline:2px}
 
+/* ═══════ el campo: la general de un vistazo ═══════ */
+.campo-gral{margin-bottom:24px}
+.campo-gral-nota{margin:0 0 8px; font-size:var(--t6); color:var(--tenue)}
+.campo-gral-pasto{--d:13px; display:flex; align-items:flex-end; height:176px; padding-top:4px}
+.campo-gral-col{position:relative; flex:1 1 0; min-width:0; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%}
+.campo-gral-pila{display:flex; flex-flow:column-reverse wrap; align-content:center; justify-content:flex-start; gap:3px; width:100%; height:150px}
+.campo-gral-p{flex:0 0 auto; width:var(--d); height:var(--d); border-radius:50%; background:var(--tenue2)}
+.campo-gral-p.paga{background:var(--txt)}
+.campo-gral-p.yo{background:var(--acento); outline:1.5px solid var(--acento); outline-offset:2px}
+.campo-gral-num{height:20px; line-height:20px; font-size:var(--t6); font-family:var(--num); font-weight:600; letter-spacing:0; color:var(--tenue); white-space:nowrap}
+.campo-gral-col.yo .campo-gral-num{color:var(--txt)}
+.campo-gral-col.corte::before{content:""; position:absolute; left:-1px; top:0; width:2px; height:150px; background:var(--oro)}
+.campo-gral-pie{margin:8px 0 0; font-size:var(--t5); line-height:1.4; color:var(--tenue)}
+.campo-gral-pie b{font-weight:600; color:var(--txt)}
+.campo-gral-pie .campo-gral-monto{font-family:var(--num); color:var(--oro)}
+.campo-gral-pie .enlace-titulo{margin-block:-12px; margin-left:8px; padding-inline:2px}
+.campo-gral-activo .podio,.campo-gral-activo .nota-podio{display:none}
+@keyframes campo-gral-sube{from{opacity:0; transform:translate3d(0,8px,0)}}
+.anima .campo-gral-p{animation:campo-gral-sube .32s var(--sale) backwards; animation-delay:calc(var(--i,0) * 12ms)}
+@media (min-width:900px){ .campo-gral-pasto{max-width:640px} }
+
 /* ═══════ las tablas ═══════ */
 .filtro-tabla{position:relative; display:flex; gap:8px; margin:0 0 8px}
 .filtro-tabla input{flex:1 1 auto; width:100%; height:44px; padding:0 12px 0 36px; border-radius:var(--r2); background:var(--panel); color:var(--txt); border:1px solid var(--linea);
@@ -504,12 +525,20 @@ tbody tr:last-child td{border-bottom:0}
 /* Los lugares también son columna numérica: a la derecha, sin discos. */
 .c-pos{width:32px; min-width:32px; padding:0 8px 0 0; color:var(--tenue)}
 .c-pos .n{font-size:var(--t4); color:var(--tenue)}
-tr.p1 .c-pos .n{color:var(--oro)}
-tr.p2 .c-pos .n{color:var(--plata)}
-tr.p3 .c-pos .n{color:var(--bronce)}
+/* El color del lugar solo si ese lugar cobra hoy. */
+tr.cobra-oro .c-pos .n{color:var(--oro)}
+tr.cobra-plata .c-pos .n{color:var(--plata)}
+tr.cobra-bronce .c-pos .n{color:var(--bronce)}
 .c-nombre{width:99%; text-align:left; font-weight:500; white-space:normal; line-height:1.2; overflow-wrap:anywhere}
 .pts{font-size:var(--t3)}
 .err,.sem{font-weight:500; color:var(--tenue)}
+/* En el teléfono, la diferencia con el líder ocupa el lugar de Fallos. */
+.c-fallos{display:none}
+@media (min-width:600px){ .c-fallos{display:table-cell} .c-dif{display:none} }
+/* La raya de abajo de la última fila que cobra hoy, con su leyenda. */
+tbody tr.corte-tras td{border-bottom:2px solid var(--oro)}
+tbody tr.corte-fila td{height:auto; padding:4px 0 0; border-bottom:0; text-align:left; font-size:var(--t6); font-weight:600; color:var(--oro)}
+tbody tr.corte-fila:hover td{background:none}
 th.c-sem.vieja,td.c-sem.vieja,th.c-sem.media,td.c-sem.media{display:none}
 .rueda.expandida th.c-sem,.rueda.expandida td.c-sem{display:table-cell}
 /* Con todas las semanas la tabla se desliza: el nombre no se parte letra por letra para caber. */
@@ -518,13 +547,14 @@ th.c-sem.vieja,td.c-sem.vieja,th.c-sem.media,td.c-sem.media{display:none}
 tbody tr.clic{cursor:pointer}
 @media (hover:hover){ tbody tr:hover td{background:var(--panel2)} }
 tbody tr:active td{background:var(--panel2)}
+tbody tr.corte-fila:active td{background:none}
 /* Tu fila: un escalón más clara, una raya de acento y el nombre en blanco. */
 tbody tr.yo td{background:var(--fila-yo)}
 tbody tr.yo td:first-child{box-shadow:inset 3px 0 0 var(--acento)}
 tbody tr.yo .c-pos .n{color:var(--txt)}
-tbody tr.yo.p1 .c-pos .n{color:var(--oro)}
-tbody tr.yo.p2 .c-pos .n{color:var(--plata)}
-tbody tr.yo.p3 .c-pos .n{color:var(--bronce)}
+tbody tr.yo.cobra-oro .c-pos .n{color:var(--oro)}
+tbody tr.yo.cobra-plata .c-pos .n{color:var(--plata)}
+tbody tr.yo.cobra-bronce .c-pos .n{color:var(--bronce)}
 tbody tr.yo .c-nombre{color:var(--txt); font-weight:700}
 tbody tr.resaltada td{position:relative}
 tbody tr.resaltada td::after{content:""; position:absolute; inset:0; background:var(--txt); opacity:0; pointer-events:none; animation:resaltar 1.6s ease}
@@ -710,6 +740,8 @@ select.ancho:focus{outline:0; border-color:var(--acento)}
 .progreso-bolsa{height:4px; background:var(--panel3); overflow:hidden}
 .progreso-bolsa i{display:block; height:100%; width:0; background:var(--oro); transition:width .56s var(--traza)}
 .bolsa-final .pie{font-size:var(--t5); color:var(--tenue); margin-top:8px}
+.ya-ganaste + .bolsa-final .val{font-size:var(--t2)}
+.ya-ganaste{margin-bottom:24px}
 .rebanada{margin:12px 0 0; padding-top:12px; border-top:1px solid var(--linea); font-size:var(--t4); font-weight:600; line-height:1.35}
 .pastel{display:flex; gap:2px; height:12px; margin-bottom:8px}
 .pastel i{display:block; min-width:4px; border-radius:2px; transform-origin:0 50%}
@@ -905,8 +937,15 @@ try {
   {# La general se escribe en el HTML: se ve aunque el navegador no ejecute nada. #}
   <section class="vista anima env" id="vista-general">
     <div class="saludo">
+      {#- Con la tabla ya formada manda el líder; sin ella, el título de siempre. El script lo vuelve tuyo si elegiste nombre. -#}
+      {% if podio_listo and empates_arriba %}
+      {% set frase = ('Mandan ' ~ empates_arriba|length) if empates_arriba|length > 1 else ('Manda ' ~ empates_arriba[0]) %}
+      <div class="fecha">Tabla general</div>
+      {% else %}
+      {% set frase = 'Tabla general' %}
       <div class="fecha">Temporada {{ anio }}</div>
-      <h1><span class="palabra"><i style="--k:0">Tabla</i></span> <span class="palabra"><i style="--k:1">general</i></span></h1>
+      {% endif %}
+      <h1>{% for palabra in frase.split(' ') %}<span class="palabra"><i style="--k:{{ loop.index0 }}">{{ palabra }}</i></span>{% if not loop.last %} {% endif %}{% endfor %}</h1>
     </div>
     {% if podio_listo %}
     <div class="podio">
@@ -944,19 +983,24 @@ try {
         <thead>
           <tr>
             <th class="c-pos">#</th><th class="c-nombre">Participante</th>
-            <th>Aciertos</th><th>Fallos</th>
+            <th>Aciertos</th><th class="c-fallos">Fallos</th><th class="c-dif">Dif.</th>
             {% for columna in columnas_semana|reverse %}<th class="c-sem{% if loop.index > 4 %} vieja{% elif loop.index > 1 %} media{% endif %}">{{ columna }}</th>{% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for fila in general %}
-          <tr class="p{{ fila.pos }}" style="--i:{{ loop.index0 }}">
+          {% set diferencia = lider.total - fila.total %}
+          <tr data-p="{{ fila.p }}" class="{% if cobran.get(fila.pos) %}cobra-{{ cobran.get(fila.pos) }}{% endif %}{% if loop.index0 == corte_tras %} corte-tras{% endif %}" style="--i:{{ loop.index0 }}">
             <td class="c-pos"><span class="n">{{ fila.pos }}</span></td>
             <td class="c-nombre">{{ participantes[fila.p] }}{% if fila.mov %}{% if fila.mov > 0 %}<span class="mov sube" title="Subió {{ fila.mov }} lugares">▲{{ fila.mov }}</span>{% else %}<span class="mov baja" title="Bajó {{ -fila.mov }} lugares">▼{{ -fila.mov }}</span>{% endif %}{% endif %}</td>
             <td class="pts">{{ fila.total }}</td>
-            <td class="err">{{ fila.err }}</td>
+            <td class="err c-fallos">{{ fila.err }}</td>
+            <td class="err c-dif">{% if diferencia %}−{{ diferencia }}{% endif %}</td>
             {% for columna in columnas_semana|reverse %}<td class="sem c-sem{% if loop.index > 4 %} vieja{% elif loop.index > 1 %} media{% endif %}">{{ fila.sem[columna[1:]] }}</td>{% endfor %}
           </tr>
+          {% if loop.index0 == corte_tras %}
+          <tr class="corte-fila"><td class="corte-txt" colspan="2">Si terminara hoy, cobran hasta aquí</td></tr>
+          {% endif %}
           {% endfor %}
         </tbody>
       </table>
@@ -2601,9 +2645,21 @@ try {
     raiz.appendChild(cabezaDeVista(P.temporada_cerrada ? "Temporada cerrada"
       : "Van " + P.semanas_jugadas + " de " + P.semanas_temporada + " semanas", "Los", "premios"));
 
-    // La bolsa, tu parte y quién se llevaría qué si la temporada terminara hoy.
+    // Lo que ya ganaste va primero; la bolsa, tu parte y quién se llevaría qué, después.
+    const cobrado = dineroCobrado(jugador);
+    const falta = faltaParaCobrar();
+    if (cobrado) {
+      const ya = crear("section", "tarjeta bolsa-final ya-ganaste");
+      ya.style.setProperty("--n", 0);
+      ya.appendChild(crear("div", "rot", "Ya ganaste"));
+      ya.appendChild(crear("div", "val", cobrado));
+      const hoy = tocariaHoy();
+      if (hoy) ya.appendChild(crear("p", "pie", hoy));
+      else if (falta) ya.appendChild(crear("p", "pie", falta));
+      raiz.appendChild(ya);
+    }
     const bolsa = crear("section", "tarjeta bolsa-final");
-    bolsa.style.setProperty("--n", 0);
+    bolsa.style.setProperty("--n", cobrado ? 1 : 0);
     bolsa.appendChild(crear("div", "rot", "Bolsa final"));
     bolsa.appendChild(crear("div", "val", P.total));
     const barra = crear("div", "progreso-bolsa"), relleno = crear("i");
@@ -2611,12 +2667,12 @@ try {
     bolsa.appendChild(barra);
     bolsa.appendChild(crear("div", "pie", "Van " + P.apartado + " apartados, " + P.acumulado_semanal + " por semana."));
     requestAnimationFrame(() => { relleno.style.width = (P.semanas_jugadas / P.semanas_temporada) * 100 + "%"; });
-    const mia = tuRebanada();
+    const mia = cobrado ? null : (tocariaHoy() || falta);
     if (mia) bolsa.appendChild(crear("p", "rebanada", mia));
     raiz.appendChild(bolsa);
 
     const tReparto = crear("div", "titulo");
-    tReparto.appendChild(crear("h2", null, P.temporada_cerrada ? "Reparto final" : "La rebanada del pastel"));
+    tReparto.appendChild(crear("h2", null, P.temporada_cerrada ? "Reparto final" : "Cómo se reparte"));
     tReparto.appendChild(crear("span", "nota", P.temporada_cerrada ? "oficial" : "si terminara hoy"));
     raiz.appendChild(tReparto);
     if (P.hoy.length) {
@@ -2714,19 +2770,32 @@ try {
     return caja;
   }
 
-  /* Tu parte si la temporada terminara hoy, o cuántos aciertos te faltan. */
-  function tuRebanada() {
-    if (jugador === null || D.premios.temporada_cerrada || !D.premios.hoy.length) return null;
+  /* Lo ya ganado en semanas oficiales, con el texto que arma Python. Nunca "$0": sin nada, no hay renglón. */
+  function dineroCobrado(idx) {
+    if (idx === null || idx === undefined) return null;
+    const texto = (D.premios.cobrado_texto || [])[idx];
+    return (D.premios.cobrado || [])[idx] > 0 && texto ? texto : null;
+  }
+
+  /* Tu parte de la bolsa final si la temporada terminara hoy. */
+  function tocariaHoy() {
+    if (jugador === null || D.premios.temporada_cerrada) return null;
     const mio = D.premios.hoy.find((g) => g.p.includes(jugador));
-    if (mio) {
-      return "Tu rebanada: " + mio.premio + " si todo acabara hoy" +
-        (mio.p.length > 1 ? " (empatas con " + (mio.p.length - 1) + (mio.p.length === 2 ? " persona)." : " personas).") : ".");
-    }
-    const g = D.general.find((f) => f.p === jugador);
+    if (!mio) return null;
+    return "Te tocarían " + mio.premio + " si terminara hoy." +
+      (mio.p.length > 1 ? " Empatas con " + (mio.p.length - 1) + (mio.p.length === 2 ? " persona." : " personas.") : "");
+  }
+
+  /* Cuántos aciertos te faltan para cobrar de la bolsa final y cuántas semanas quedan. */
+  function faltaParaCobrar() {
+    if (jugador === null || D.premios.temporada_cerrada || !D.premios.hoy.length) return null;
+    if (D.premios.hoy.some((g) => g.p.includes(jugador))) return null;
+    const g = generalPorIdx.get(jugador);
     if (!g) return null;
     const faltan = Math.min(...D.premios.hoy.map((x) => x.aciertos)) - g.total;
-    return "Hoy no te toca rebanada: estás a " + faltan + (faltan === 1 ? " acierto" : " aciertos") +
-      " de la zona de premio, y la temporada es joven.";
+    const semanas = D.premios.semanas_temporada - D.premios.semanas_jugadas;
+    return "A " + faltan + " de cobrar." +
+      (semanas > 0 ? " " + (semanas === 1 ? "Falta 1 semana." : "Faltan " + semanas + " semanas.") : "");
   }
 
   /* ═══ jugadores: buscador, ficha y duelo ═══ */
@@ -2834,6 +2903,8 @@ try {
         ? "Va en la punta de la general."
         : "A " + falta + (falta === 1 ? " acierto" : " aciertos") + " del primer lugar."));
     }
+    const ganado = dineroCobrado(idx);
+    if (ganado) caja.appendChild(crear("p", "nota-perfil", "Ha ganado " + ganado + " en semanas."));
     caja.appendChild(crear("div", "frontera"));
 
     const cerradas = datos.linea.filter((s) => !s.abierta);
@@ -4113,6 +4184,8 @@ try {
         if (cabe) visibles++;
       });
       vacio.hidden = visibles > 0;
+      const corte = destino.querySelector("tr.corte-fila");
+      if (corte) corte.hidden = !!busca;
     });
     destino.insertBefore(caja, destino.firstChild);
     destino.appendChild(vacio);
@@ -4409,28 +4482,124 @@ try {
   /* El podio viene escrito en el HTML; aquí sus cifras arrancan de cero. */
   let podioAnimado = false;
   function marcarFilasPropias() {
-    const filas = vistas.general.querySelectorAll("tbody tr");
+    // Cada fila lleva su participante en data-p: ni el buscador ni el toque dependen del orden.
+    const filas = Array.from(vistas.general.querySelectorAll("tbody tr[data-p]"));
     if (!generalLista && filas.length > 12) {
       generalLista = true;
       const marco = vistas.general.querySelector(".marco");
       const env = crear("div");
       marco.parentNode.insertBefore(env, marco);
       env.appendChild(marco);
-      ponerFiltro(env, Array.from(filas),
-        (fila) => fila.children[1].textContent, "Buscar participante…");
+      ponerFiltro(env, filas, (fila) => nombre(Number(fila.dataset.p)), "Buscar participante…");
     }
     const mia = vistas.general.querySelector(".mi-fila");
     if (mia) mia.hidden = jugador === null;
-    filas.forEach((tr, i) => {
-      const f = D.general[i];
-      if (!f) return;
-      tr.classList.toggle("yo", f.p === jugador);
+    filas.forEach((tr) => {
+      const p = Number(tr.dataset.p);
+      tr.classList.toggle("yo", p === jugador);
       if (!tr.dataset.listo) {
         tr.dataset.listo = "1";
         tr.classList.add("clic");
-        tr.addEventListener("click", () => abrirPerfil(f.p, tr.children[1]));
+        tr.addEventListener("click", () => abrirPerfil(Number(tr.dataset.p), tr.children[1]));
       }
     });
+    pintarTitularGeneral();
+    pintarCampoGeneral();
+  }
+
+  /* Tu dato en el titular de la general; sin nombre, quién manda. */
+  function pintarTitularGeneral() {
+    const lider = D.general[0];
+    if (!D.podio_listo || !lider) return;
+    const arriba = D.general.filter((f) => f.pos === 1);
+    const f = jugador === null ? null : generalPorIdx.get(jugador);
+    let frase;
+    if (!f) frase = arriba.length > 1 ? "Mandan " + arriba.length : "Manda " + nombre(lider.p);
+    else if (f.pos === 1) frase = arriba.length > 1 ? "Empatas en la punta" : "Vas en la punta";
+    else frase = "A " + (lider.total - f.total) + " de la punta";
+    const saludo = vistas.general.querySelector(".saludo");
+    const actual = saludo.querySelector("h1");
+    if (actual.textContent === frase) return;
+    saludo.querySelector(".fecha").textContent = "Tabla general";
+    actual.replaceWith(titular("h1", frase));
+  }
+
+  /* El campo: una columna por número de aciertos y un punto por participante. */
+  function pintarCampoGeneral() {
+    const vista = vistas.general;
+    const previo = vista.querySelector(".campo-gral");
+    if (previo) previo.remove();
+    vista.classList.remove("campo-gral-activo");
+    const P = D.premios;
+    if (!D.podio_listo || !D.general.length || !P.hoy.length) return;
+
+    const cobran = new Set();
+    P.hoy.forEach((g) => g.p.forEach((i) => cobran.add(i)));
+    const totales = D.general.map((f) => f.total);
+    const tope = Math.max(...totales), piso = Math.min(...totales);
+    const porColumna = new Map();
+    D.general.forEach((f) => {
+      if (!porColumna.has(f.total)) porColumna.set(f.total, []);
+      porColumna.get(f.total).push(f);
+    });
+    const entrada = Math.min(...P.hoy.map((g) => g.aciertos));
+    const f = jugador === null ? null : generalPorIdx.get(jugador);
+
+    const caja = crear("section", "campo-gral");
+    caja.appendChild(crear("p", "campo-gral-nota", "Cada punto es uno de los " + D.general.length));
+    const pasto = crear("div", "campo-gral-pasto");
+    pasto.setAttribute("role", "img");
+    const lider = D.general[0];
+    pasto.setAttribute("aria-label", f
+      ? "Vas " + ordinal(f.pos) + " con " + f.total + (f.pos === 1 ? ", en la punta" : ", a " + (lider.total - f.total) + " de la punta")
+      : "Los " + D.general.length + " participantes, de " + piso + " a " + tope + " aciertos. Cobran con " + entrada + " o más.");
+
+    const columnas = tope - piso + 1;
+    caja.appendChild(pasto);
+    vista.insertBefore(caja, vista.querySelector(".podio,.aviso"));
+    const ancho = (pasto.clientWidth || 288) / columnas;
+    // Más de siete en una columna: puntos de 9 px y, si hace falta, de 6; nunca más anchos que su columna.
+    const mayor = Math.max(...Array.from(porColumna.values(), (g) => g.length));
+    let punto = mayor <= 7 ? 13 : mayor * 12 <= 150 ? 9 : 6;
+    punto = Math.max(4, Math.min(punto, Math.floor(ancho) - 2));
+    pasto.style.setProperty("--d", punto + "px");
+    const cada = Math.max(1, Math.ceil(22 / ancho));
+
+    let n = 0;
+    for (let total = piso; total <= tope; total++) {
+      const gente = porColumna.get(total) || [];
+      const col = crear("div", "campo-gral-col" + (total === entrada ? " corte" : "") + (f && f.total === total ? " yo" : ""));
+      const pila = crear("div", "campo-gral-pila");
+      gente.forEach((g) => {
+        const i = crear("i", "campo-gral-p" + (cobran.has(g.p) ? " paga" : "") + (g.p === jugador ? " yo" : ""));
+        i.style.setProperty("--i", n++);
+        pila.appendChild(i);
+      });
+      col.appendChild(pila);
+      const rotulo = (tope - total) % cada === 0 || (f && f.total === total);
+      col.appendChild(crear("span", "campo-gral-num", rotulo ? String(total) : ""));
+      pasto.appendChild(col);
+    }
+
+    // Lo que se llevaría cada grupo, con los montos que publica Python.
+    const pie = crear("p", "campo-gral-pie");
+    pie.appendChild(document.createTextNode(P.temporada_cerrada ? "Así quedó: " : "Si terminara hoy: "));
+    P.hoy.forEach((g, k) => {
+      if (k) pie.appendChild(document.createTextNode(" · "));
+      const yo = jugador !== null && g.p.includes(jugador);
+      const otros = g.p.length - (yo ? 1 : 0);
+      const quien = yo ? (otros ? "Tú y " + otros + " más" : "Tú")
+        : g.p.length > 1 ? nombre(g.p[0]) + " y " + (g.p.length - 1) + " más" : nombre(g.p[0]);
+      pie.appendChild(crear("b", null, quien));
+      pie.appendChild(document.createTextNode(" "));
+      pie.appendChild(crear("span", "campo-gral-monto", g.premio + (g.p.length > 1 ? " c/u" : "")));
+    });
+    const enlace = crear("button", "enlace-titulo", "Cómo se reparte");
+    enlace.type = "button";
+    enlace.addEventListener("click", irADinamica);
+    pie.appendChild(enlace);
+    caja.appendChild(pie);
+    vista.classList.add("campo-gral-activo");
   }
 
   navs.forEach((n) => n.addEventListener("click", (e) => {
@@ -4452,11 +4621,14 @@ try {
     e.preventDefault();
     navegar("hoy");
   });
+  function irADinamica() {
+    navegar("premios", () => requestAnimationFrame(() => {
+      const ancla = document.getElementById("dinamica");
+      if (ancla) ancla.scrollIntoView({ behavior: suave ? "auto" : "smooth", block: "start" });
+    }));
+  }
   const aDinamica = document.getElementById("a-dinamica");
-  if (aDinamica) aDinamica.addEventListener("click", () => navegar("premios", () => requestAnimationFrame(() => {
-    const ancla = document.getElementById("dinamica");
-    if (ancla) ancla.scrollIntoView({ behavior: suave ? "auto" : "smooth", block: "start" });
-  })));
+  if (aDinamica) aDinamica.addEventListener("click", irADinamica);
 
   montarSoy();
   montarEquipo();

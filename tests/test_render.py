@@ -1132,7 +1132,7 @@ def test_la_rebanada_de_hoy_viaja_agrupada_por_lugar(armado, tmp_path: Path):
     assert premios["reparto"] == []                       # el oficial, hasta cerrar la temporada
     assert premios["hoy"] and {"pos", "p", "aciertos", "porcentaje", "premio"} <= set(premios["hoy"][0])
     assert all(g["pos"] <= 3 for g in premios["hoy"])
-    assert "function tuRebanada" in html
+    assert "function tocariaHoy" in html
 
 
 @pytest.mark.skipif(shutil.which("node") is None, reason="hace falta node para revisar la sintaxis")
@@ -1562,3 +1562,57 @@ def test_el_campo_responde_al_partido_de_tu_equipo():
     for estado in ("gano", "perdio", "juega"):
         assert f"html[data-campo={estado}] .cp-palabra" in plantilla
     assert "function ultimoJuegoDeMiEquipo()" in plantilla
+
+
+# --- v0.29: tu dinero ---------------------------------------------------------------
+
+
+def test_el_json_lleva_lo_cobrado_y_su_texto(armado, tmp_path: Path):
+    premios = datos_embebidos(render(armado, tmp_path))["premios"]
+    assert len(premios["cobrado"]) == len(premios["cobrado_texto"]) == 4
+    for centavos, texto in zip(premios["cobrado"], premios["cobrado_texto"]):
+        assert (texto == "") == (centavos == 0)
+        assert "$0" not in texto.replace("$0.", "") or centavos > 0
+
+
+def test_cada_fila_de_la_general_dice_de_quien_es(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    datos = datos_embebidos(html)
+    cuerpo = re.search(r"<tbody>(.*?)</tbody>", html, re.S).group(1)
+    filas = re.findall(r'<tr data-p="(\d+)"', cuerpo)
+    assert [int(p) for p in filas] == [f["p"] for f in datos["general"]]
+    # El script empareja por data-p, no por posición.
+    marcar = _funcion(html, "marcarFilasPropias")
+    assert "tr[data-p]" in marcar and "D.general[i]" not in marcar and "children[1].textContent" not in marcar
+
+
+def test_la_ficha_no_enseña_dinero_en_cero(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert '"$0"' not in html and "$0 " not in _funcion(html, "perfil")
+    ficha = _funcion(html, "perfil")
+    assert "dineroCobrado(idx)" in ficha and "if (ganado)" in ficha
+    assert "> 0 && texto" in _funcion(html, "dineroCobrado")
+
+
+def test_la_raya_de_cobro_cae_tras_el_ultimo_lugar_que_cobra(armado, tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("quiniela.render_html.UMBRAL_PODIO", 1)
+    html = render(armado, tmp_path)
+    datos = datos_embebidos(html)
+    cobran = {g["pos"] for g in datos["premios"]["hoy"]}
+    esperado = max(i for i, f in enumerate(datos["general"]) if f["pos"] in cobran)
+    cuerpo = re.search(r"<tbody>(.*?)</tbody>", html, re.S).group(1)
+    filas = re.findall(r'<tr data-p="\d+" class="[^"]*"|<tr class="corte-fila">', cuerpo)
+    assert filas.count('<tr class="corte-fila">') == 1
+    assert filas.index('<tr class="corte-fila">') == esperado + 1
+    assert "corte-tras" in filas[esperado]
+
+
+def test_la_general_pinta_el_dato_de_cada_quien(armado, tmp_path: Path, monkeypatch):
+    monkeypatch.setattr("quiniela.render_html.UMBRAL_PODIO", 1)
+    html = render(armado, tmp_path)
+    assert re.search(r"<h1>(<span class=\"palabra\"><i style=\"--k:\d+\">[^<]+</i></span> ?)+</h1>", html)
+    for texto in ("Tabla general", "Vas en la punta", "Empatas en la punta", "Cada punto es uno de los",
+                  "Si terminara hoy, cobran hasta aquí", "Si terminara hoy: ", "campo-gral-pasto"):
+        assert texto in html, texto
+    assert "tuRebanada" not in html and "temporada es joven" not in html
+    assert "La rebanada del pastel" not in html and "Cómo se reparte" in html

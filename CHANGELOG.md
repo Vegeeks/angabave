@@ -9,6 +9,13 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.29.0
+
+* **Cuánto llevas ganado.** Premios abre con "Ya ganaste $2,080" y "Te tocarían $17,640 si terminara hoy"; sin cobros, con la bolsa y "A 3 de cobrar. Faltan 9 semanas.". Lo cobrado se suma en Python con los mismos montos publicados por semana (con empates, cada semana ya redondeada) y coincide al centavo para los 34.
+* **La General dice qué tan lejos está el dinero.** Titular con tu dato ("A 1 de la punta", "Vas en la punta"), una gráfica con cada uno de los 34 como un punto y una línea dorada desde donde se cobraría hoy, y debajo quién cobraría y cuánto.
+* **La tabla:** medalla solo para quien cobra, una raya de "Si terminara hoy, cobran hasta aquí", y en el teléfono "Dif." (la distancia al líder) en lugar de Fallos. Cada fila se identifica por persona y no por posición: tocar una fila siempre abre la ficha correcta.
+* "La rebanada del pastel" se llama "Cómo se reparte". Ninguna ficha muestra "$0".
+
 ## v0.28.0
 
 * **La fila de partido se lee con palabras.** En lugar de la pastilla "Tu pick" y el porcentaje: "Solo tú", "Tú y 4 más", "Vas ganando", "Vas perdiendo", "Le atinaron 29", "Le atinó Ana", "Nadie le atinó" o "Empate: nadie le atinó". Tu equipo va en negritas, con un anillo verde o rojo y una ✓ o ✕ al terminar, para que no dependa solo del color. Sin nombre elegido, en personas: "33 con SF". Un empate oficial (marcado con "x") nunca cuenta como acierto.
