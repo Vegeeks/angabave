@@ -9,6 +9,12 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.27.0
+
+* **Red de seguridad.** GitHub corre las pruebas cada vez que cambia el código, con el mismo Python con el que publica (3.11); en la Mac corren con otro, y lo que solo truena allá, allá se ve.
+* **Avisos de falla.** Si fallan las pruebas, la actualización o el directo, se abre un aviso en Issues que le llega a Angel. Uno por incidente: mientras siga abierto no se repite; al cerrarlo, el siguiente vuelve a llegar.
+* Para probar el aviso sin esperar a una falla: correr "Pruebas" a mano con "Fallar a propósito".
+
 ## v0.26.1
 
 * **Con datos móviles ya no sale "La página no abrió" en falso.** El aviso contaba 8 segundos desde que se empezaba a leer la página; con señal floja la página seguía bajando y el aviso salía aunque nada fallara. Ahora solo sale si la página ya llegó completa y no arrancó, o si tarda más de un minuto; y si al final arranca, el aviso se quita solo. Probado con un servidor que entrega la página a medias durante 25 segundos.
