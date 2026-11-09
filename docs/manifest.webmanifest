@@ -1,6 +1,11 @@
 {
+  "id": "/angabave/",
   "name": "ANGABAVE · Quiniela NFL",
   "short_name": "ANGABAVE",
+  "description": "Tabla general, ganadores por semana, premios, marcador en vivo y los picks de todos.",
+  "categories": [
+    "sports"
+  ],
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
@@ -24,6 +29,52 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Armar mis picks",
+      "url": "./#picks",
+      "icons": [
+        {
+          "src": "icono-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Hoy",
+      "url": "./#hoy",
+      "icons": [
+        {
+          "src": "icono-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Semana en curso",
+      "url": "./#semana",
+      "icons": [
+        {
+          "src": "icono-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Tabla general",
+      "url": "./#general",
+      "icons": [
+        {
+          "src": "icono-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
