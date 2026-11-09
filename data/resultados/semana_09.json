@@ -2,35 +2,13 @@
   "semana": 9,
   "partidos": [
     {
-      "visitante": "Texans",
-      "local": "Chargers",
-      "marcador_visitante": 44,
-      "marcador_local": 22,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-11-08T21:05:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Packers",
       "local": "Patriots",
       "marcador_visitante": 45,
-      "marcador_local": 21,
+      "marcador_local": 27,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
-      "inicio": "2026-11-08T21:25:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Cardinals",
-      "local": "Seahawks",
-      "marcador_visitante": 3,
-      "marcador_local": 17,
-      "ganador": "Seahawks",
-      "finalizado": true,
-      "estado": "Final",
       "inicio": "2026-11-08T21:25:00+00:00",
       "hora_definida": true
     },
@@ -123,11 +101,33 @@
       "hora_definida": true
     },
     {
+      "visitante": "Texans",
+      "local": "Chargers",
+      "marcador_visitante": 44,
+      "marcador_local": 22,
+      "ganador": "Texans",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
       "visitante": "Raiders",
       "local": "49ers",
       "marcador_visitante": 17,
       "marcador_local": 38,
       "ganador": "49ers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-08T21:25:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Cardinals",
+      "local": "Seahawks",
+      "marcador_visitante": 3,
+      "marcador_local": 17,
+      "ganador": "Seahawks",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-08T21:25:00+00:00",
