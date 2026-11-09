@@ -251,7 +251,9 @@ def _fila(lienzo: Image.Image, caja: tuple[int, int, int, int], fila: dict) -> N
 
     aciertos = str(int(fila["acumulado"]))
     letra_aciertos = _fuente("negrita", 30)
-    dibujo.text((derecha, centro), aciertos, font=letra_aciertos, fill=TEXTO, anchor="rm")
+    # Dos píxeles adentro: con la Liberation del runner, el último dígito alineado a la
+    # derecha se pasaba un píxel del margen.
+    dibujo.text((derecha - 2, centro), aciertos, font=letra_aciertos, fill=TEXTO, anchor="rm")
 
     x_nombre = izquierda + 50
     letra = _fuente("negrita" if cual else "normal", 26)
