@@ -170,11 +170,12 @@
   },
   "9": {
     "archivo": "Semana_09.xlsx",
-    "sellado": "2026-11-08T21:25:29+00:00",
+    "sellado": "2026-11-09T01:21:07+00:00",
     "partidos": {
       "Bengals@Falcons": "fcac13c6c23a02f31017c2e4482481ad04caf401734e244a67dcda153b14953b",
       "Broncos@Panthers": "fcfc8e944bb1bb5edfdd08d7ab7a452eb7fb59d3e200bae8f20917f1d8caef0b",
       "Browns@Saints": "34008646d5b973a3d979f4b85e8da6a9e6930ceda257472dd6b91cc7d6a7cdc4",
+      "Buccaneers@Bears": "22757fb2485274649716bf235bd65417db3a0869e3a1a388c2739f096d966475",
       "Cardinals@Seahawks": "478446b99f741ccf77424beb9badb4ce56c903b9eb9faaca519c8cfb0cdb937a",
       "Cowboys@Colts": "8907ab516a7835311d16ab1a29be3bab9ad2cd9baf0e4f1cb38a39d878befa37",
       "Giants@Eagles": "a75aa06b63e380637d7293d6529ba4820cb4904b9532af42bf357e79fbfb0960",
