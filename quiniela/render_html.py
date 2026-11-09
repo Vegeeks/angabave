@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.29.0"
+VERSION = "v0.31.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -1121,8 +1121,11 @@ def generar_prueba_de_red(ruta_salida: Path, url_funcion: str = URL_FUNCION) -> 
 def generar_manifiesto(ruta_salida: Path, marca: str = MARCA) -> Path:
     """Escribe el manifiesto que usan iOS y Android al guardar el sitio."""
     contenido = {
+        "id": "/angabave/",
         "name": f"{marca} · Quiniela NFL",
         "short_name": marca,
+        "description": "Tabla general, ganadores por semana, premios, marcador en vivo y los picks de todos.",
+        "categories": ["sports"],
         "start_url": ".",
         "scope": ".",
         "display": "standalone",
@@ -1134,6 +1137,16 @@ def generar_manifiesto(ruta_salida: Path, marca: str = MARCA) -> Path:
             {"src": "icono-192.png", "sizes": "192x192", "type": "image/png"},
             {"src": "icono-512.png", "sizes": "512x512", "type": "image/png"},
             {"src": "icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+        ],
+        # Solo Android: mantener presionado el ícono muestra estos accesos.
+        "shortcuts": [
+            {"name": nombre, "url": url, "icons": [{"src": "icono-192.png", "sizes": "192x192", "type": "image/png"}]}
+            for nombre, url in (
+                ("Armar mis picks", "./#picks"),
+                ("Hoy", "./#hoy"),
+                ("Semana en curso", "./#semana"),
+                ("Tabla general", "./#general"),
+            )
         ],
     }
     ruta = Path(ruta_salida)

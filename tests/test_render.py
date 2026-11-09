@@ -1616,3 +1616,95 @@ def test_la_general_pinta_el_dato_de_cada_quien(armado, tmp_path: Path, monkeypa
         assert texto in html, texto
     assert "tuRebanada" not in html and "temporada es joven" not in html
     assert "La rebanada del pastel" not in html and "Cómo se reparte" in html
+
+
+# ─── v0.31: se siente como app ──────────────────────────────────────────────
+
+def test_el_manifiesto_trae_id_y_accesos_directos(tmp_path: Path):
+    from quiniela.render_html import generar_manifiesto
+    ruta = generar_manifiesto(tmp_path / "manifest.webmanifest")
+    manifiesto = json.loads(ruta.read_text(encoding="utf-8"))
+    assert manifiesto["id"] == "/angabave/"
+    assert manifiesto["categories"] == ["sports"]
+    assert manifiesto["description"]
+    accesos = {a["name"]: a["url"] for a in manifiesto["shortcuts"]}
+    assert accesos == {"Armar mis picks": "./#picks", "Hoy": "./#hoy",
+                       "Semana en curso": "./#semana", "Tabla general": "./#general"}
+    assert all(a["icons"][0]["src"] == "icono-192.png" for a in manifiesto["shortcuts"])
+
+
+def test_el_enlace_al_manifiesto_solo_se_escribe_fuera_de_ios(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    assert '<html lang="es-MX">' in html
+    assert '<link rel="manifest"' not in re.sub(r"<script>.*?</script>", "", html, flags=re.S)
+    arranque = _arranque(html)
+    assert 'href="manifest.webmanifest"' in arranque
+    assert "iP(hone|od|ad)" in arranque and "document.write" in arranque
+
+
+def test_el_nombre_del_enlace_solo_se_aplica_en_la_app_guardada(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    cuerpo = _funcion(html, "aplicarInvitacion")
+    assert cuerpo.index("enAppGuardada()") < cuerpo.index("URLSearchParams")
+    assert "D.participantes.includes(quien)" in cuerpo
+    assert "D.colores[eq]" in cuerpo
+    assert 'leer("angabave.jugador") === null' in cuerpo
+    assert "navigator.standalone === true" in _funcion(html, "enAppGuardada")
+    # Y se aplica antes de leer la memoria.
+    assert html.index("  aplicarInvitacion();\n  montarSoy();") > 0
+    # Abrir desde el ícono arranca en Hoy.
+    assert 'tipoDeCarga === "navigate"' in html
+
+
+def test_las_direcciones_nuevas_se_leen(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    cuerpo = _funcion(html, "leerDireccion")
+    assert '"#semana"' in cuerpo
+    assert "PESTANAS.some" in cuerpo and 'split("@")' in cuerpo
+    assert "partido: { v, l }" in cuerpo
+    assert 'const PESTANAS = [["partidos", "Partidos"], ["tabla", "Tabla"]' in html
+    assert '"escenarios"' in html
+    # Cambiar de pestaña reemplaza la entrada del historial, no agrega otra.
+    assert 'history.replaceState(estadoActual(), "", direccionDe(vistaActual));\n        moverCorredera' in html
+
+
+def test_cada_hoja_tiene_su_boton_de_cerrar(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    cuerpo = _funcion(html, "abrirHoja")
+    assert 'crear("button", "hoja-cerrar", "×")' in cuerpo
+    assert 'setAttribute("aria-label", "Cerrar")' in cuerpo
+    assert 'closest(".hoja-cerrar, .hoja-compartir")' in cuerpo
+    assert "fondoInerte(true)" in cuerpo and "fondoInerte(false)" in cuerpo
+    assert "hoja.tabIndex = -1" in cuerpo
+    # Una hoja sobre otra toma la entrada del historial.
+    assert "history.replaceState(entrada" in cuerpo
+    assert "contenido.parentNode === hoja" in cuerpo
+    # Los dos "cerrar y navegar" pasan por una sola salida.
+    assert html.count("salirDeHojaA(") == 3      # la definición y los dos usos
+    assert "if (estado.hoja) return;" not in html
+    css = dict(_reglas(html))
+    assert "width:44px" in css[".hoja-cerrar,.hoja-compartir"] and "height:44px" in css[".hoja-cerrar,.hoja-compartir"]
+
+
+def test_compartir_y_el_aviso_de_enlace_copiado(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    cuerpo = _funcion(html, "compartir")
+    assert "navigator.share({ title: D.marca, text: texto, url })" in cuerpo
+    assert 'e.name === "AbortError"' in cuerpo
+    assert 'avisoFlotante("Enlace copiado")' in cuerpo
+    assert html.count('setAttribute("aria-label", "Compartir")') == 2    # la hoja del partido y la ficha
+
+
+def test_la_barra_de_abajo_usa_aria_current(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    botones = re.findall(r'<button type="button" data-vista="\w+"[^>]*>', html)
+    assert len(botones) >= 5 and not any("aria-selected" in b for b in botones)
+    assert '.navegacion button[aria-current="page"]' in html
+    assert 'b.setAttribute("aria-current", "page")' in html
+    # Las pestañas internas sí son pestañas.
+    assert 'setAttribute("role", "tabpanel")' in html and 'setAttribute("aria-controls", "panel-semana")' in html
+    assert '"ArrowRight"' in html and '"ArrowLeft"' in html
+    # .sin-anillo es solo para el foco que regresa por programa tras un toque; con teclado sí hay anillo.
+    assert "outline:0" not in "".join(d for s, d in _reglas(html)
+                                      if ":focus" in s and "tabindex" not in s and ".hoja" not in s and ".sin-anillo" not in s)
+    assert "if (!conTeclado)" in html

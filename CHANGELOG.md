@@ -9,6 +9,15 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.31.0
+
+(La v0.30, los cierres de Thanksgiving, espera la regla del organizador.)
+
+* **Guardarla en el iPhone sin perder tu nombre.** En la hoja "Tú", "Tenerlo como app" explica cómo agregarla a la pantalla de inicio; al abrir el ícono ya sabe quién eres y tu equipo. Un enlace reenviado nunca cambia la identidad de nadie: eso solo aplica en la app guardada y con un nombre válido. En Android, el botón usa la instalación del sistema.
+* **Las hojas ya no pierden el historial.** Abrir una sobre otra no agrega pasos, Atrás siempre deja la dirección y la pantalla iguales, y cada hoja tiene su botón ×. Mientras está abierta, lo de atrás no se puede tocar; al cerrarla, el foco regresa a donde estabas (sin el anillo de foco si fue con el dedo).
+* **Enlaces directos y compartir:** #s9/tabla, #s9/partidos o #s9/Bills@Vikings abren justo eso; un botón para compartir la ficha de alguien o un partido. En Android, accesos directos al mantener presionado el ícono.
+* **Accesibilidad:** el lector de pantalla lee tus números de la barra de arriba, cada sección tiene su título, las pestañas se manejan con flechas y con teclado se ve dónde estás.
+
 ## v0.29.0
 
 * **Cuánto llevas ganado.** Premios abre con "Ya ganaste $2,080" y "Te tocarían $17,640 si terminara hoy"; sin cobros, con la bolsa y "A 3 de cobrar. Faltan 9 semanas.". Lo cobrado se suma en Python con los mismos montos publicados por semana (con empates, cada semana ya redondeada) y coincide al centavo para los 34.

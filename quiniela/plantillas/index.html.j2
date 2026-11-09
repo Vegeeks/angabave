@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-MX">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,7 +8,6 @@
 <meta name="description" content="{{ marca }} · Quiniela NFL {{ anio }}: tabla general, ganadores por semana, premios, marcador en vivo y los picks de todos.">
 <meta name="theme-color" content="{{ tema_campo['--bg']|lower }}">
 <link rel="icon" href="{{ favicon }}">
-<link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icono-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -25,11 +24,14 @@
 <meta property="og:image:height" content="{{ tamano_portada[1] }}">
 <meta name="twitter:card" content="summary_large_image">
 <title>{{ marca }} · Quiniela NFL {{ anio }}</title>
+{#- En iOS el manifiesto hace que "Agregar a Inicio" guarde la raíz y no la dirección con tu nombre: ahí
+    el ícono y el nombre salen de las metas apple-*. Solo los demás lo cargan. #}
 {#- Antes de pintar nada: qué vista se esconde mientras corre el script, tu equipo y si
     es la primera vez. En JavaScript viejo, como la red de seguridad: si el script
     principal revienta, DOMContentLoaded igual destapa la General. El touchstart vacío
     es para que Safari pinte :active al instante. #}
 <script>
+if(!/iP(hone|od|ad)/.test(navigator.userAgent)&&!(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform)))document.write('<link rel="manifest" href="manifest.webmanifest">');
 (function(){var r=document.documentElement;r.className='js';try{if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches)r.classList.add('instalada')}catch(e){}try{var t=localStorage.getItem('angabave.tema');if(t){r.style.cssText=t;var c=document.querySelector('meta[name="theme-color"]'),m=t.match(/--bg:([^;]+)/);if(c&&m)c.setAttribute('content',m[1])}if(!sessionStorage.getItem('angabave.estreno')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){r.className+=' estreno';window.campoRescate=setTimeout(function(){r.classList.remove('estreno')},6000)}}catch(e){}document.addEventListener('DOMContentLoaded',function(){r.classList.add('listo')});document.addEventListener('touchstart',function(){},{passive:true})})();
 try{var g=JSON.parse(localStorage.getItem('angabave.campo')||'null');if(g&&g.v===2){window.campoGuardado=g;if(g.e)document.documentElement.setAttribute('data-campo',g.e)}}catch(e){}
 </script>
@@ -246,8 +248,8 @@ header.plegado .top{opacity:0; pointer-events:none}
 .navegacion svg{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;
   transition:transform .28s var(--rebote)}
 .navegacion svg .lleno{fill:currentColor; stroke:none}
-.navegacion button[aria-selected="true"]{color:var(--acento)}
-.navegacion button[aria-selected="true"] svg{transform:translateY(-1px) scale(1.08)}
+.navegacion button[aria-current="page"]{color:var(--acento)}
+.navegacion button[aria-current="page"] svg{transform:translateY(-1px) scale(1.08)}
 .navegacion button:active svg{transform:scale(.86); transition:transform .07s linear}
 .navegacion .indicador{position:absolute; z-index:0; left:0; top:6px; bottom:6px; width:0; border-radius:20px; pointer-events:none; opacity:0;
   background:rgba(255,255,255,.09)}
@@ -506,7 +508,7 @@ main{view-transition-name:contenido; min-height:60vh}
 .filtro-tabla input{flex:1 1 auto; width:100%; height:44px; padding:0 12px 0 36px; border-radius:var(--r2); background:var(--panel); color:var(--txt); border:1px solid var(--linea);
   -webkit-appearance:none; appearance:none}
 .filtro-tabla input::placeholder{color:var(--tenue2)}
-.filtro-tabla input:focus{outline:0; border-color:var(--acento)}
+.filtro-tabla input:focus{outline:2px solid var(--acento); outline-offset:1px; border-color:var(--acento)}
 .filtro-tabla::before{content:""; position:absolute; left:14px; top:14px; width:12px; height:12px; border:1.8px solid var(--tenue); border-radius:50%; pointer-events:none}
 .filtro-tabla::after{content:""; position:absolute; left:25px; top:25px; width:6px; height:1.8px; background:var(--tenue); transform:rotate(45deg); transform-origin:0 50%; pointer-events:none}
 .mi-fila{flex:0 0 auto; min-height:44px; padding:0 12px; border-radius:var(--r2); font-size:var(--t5); font-weight:600; color:var(--acento); background:var(--panel); border:1px solid var(--linea);
@@ -609,7 +611,7 @@ select.ancho{display:block; width:100%; height:44px; margin-bottom:8px; padding:
   border:1px solid var(--linea); -webkit-appearance:none; appearance:none;
   background-image:linear-gradient(45deg,transparent 50%,var(--tenue) 50%),linear-gradient(135deg,var(--tenue) 50%,transparent 50%);
   background-position:calc(100% - 19px) 50%,calc(100% - 14px) 50%; background-size:5px 5px,5px 5px; background-repeat:no-repeat}
-select.ancho:focus{outline:0; border-color:var(--acento)}
+select.ancho:focus{outline:2px solid var(--acento); outline-offset:1px; border-color:var(--acento)}
 .split{display:grid; gap:8px; padding:12px 0}
 .split + .split{border-top:1px solid var(--linea)}
 .split .cab{display:flex; align-items:center; gap:8px; font-weight:600}
@@ -653,6 +655,9 @@ select.ancho:focus{outline:0; border-color:var(--acento)}
 .regreso{display:inline-flex; align-items:center; gap:4px; min-height:44px; margin:0 0 4px; font-weight:600; font-size:var(--t5); color:var(--acento-campo)}
 .perfil{margin-bottom:12px}
 .perfil .cab{display:flex; align-items:flex-start; gap:12px; margin-bottom:8px}
+.perfil .cab>div{flex:1 1 auto; min-width:0}
+h1[tabindex="-1"]:focus,h1[tabindex="-1"]:focus-visible{outline:0}
+.solo-lector{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap}
 .perfil .nom{font-size:var(--t1); font-weight:700; line-height:1; letter-spacing:-.03em; overflow-wrap:anywhere; view-transition-name:nombre-perfil; margin-top:4px}
 .perfil .nota-perfil{margin:0; font-size:var(--t4); color:var(--sobre-campo)}
 .perfil .cab .rotulo{color:var(--sobre-campo)}
@@ -726,7 +731,7 @@ select.ancho:focus{outline:0; border-color:var(--acento)}
 .aviso-gen{font-size:var(--t5); color:var(--tenue); margin-top:12px; line-height:1.4}
 .aviso-gen a{display:inline-flex; align-items:center; min-height:44px; color:var(--acento)}
 /* El aviso de abajo: "Borraste tus picks · Deshacer". */
-.flotante{position:fixed; left:50%; bottom:calc(var(--alto-pie) + 12px); z-index:120; display:flex; align-items:center; gap:12px; max-width:calc(100vw - 32px); padding:4px 8px 4px 16px; border-radius:var(--r1);
+.flotante{position:fixed; left:50%; bottom:calc(var(--alto-pie) + 12px); z-index:230; display:flex; align-items:center; gap:12px; max-width:calc(100vw - 32px); padding:4px 8px 4px 16px; border-radius:var(--r1);
   font-size:var(--t5); white-space:nowrap; background:var(--panel3); border:1px solid var(--linea2); box-shadow:0 12px 34px rgba(0,0,0,.5);
   transform:translateX(-50%); animation:flota .36s var(--sale) backwards}
 .flotante.saliendo{animation:flota-sale .1s var(--entra) both}
@@ -780,7 +785,20 @@ select.ancho:focus{outline:0; border-color:var(--acento)}
 .hoja-fondo.saliendo .hoja{animation:hoja-baja .24s var(--entra) both}
 .hoja .tirador{position:sticky; top:0; z-index:2; padding:8px 0 12px; background:var(--panel); touch-action:none; cursor:grab}
 .hoja .agarradera{width:40px; height:5px; border-radius:99px; background:var(--linea2); margin:0 auto 12px}
-.hoja h3{font-size:var(--t3); font-weight:700; letter-spacing:-.03em; text-align:center}
+.hoja h3{font-size:var(--t3); font-weight:700; letter-spacing:-.03em; text-align:center; padding-inline:44px}
+.hoja:focus,.hoja:focus-visible{outline:0}
+.sin-anillo:focus-visible{outline:0}
+.hoja-cerrar,.hoja-compartir{position:absolute; top:2px; width:44px; height:44px; display:grid; place-items:center; border-radius:50%; color:var(--tenue)}
+.hoja-cerrar{right:-8px; font-size:var(--t3); line-height:1}
+.hoja-compartir{left:-8px}
+.hoja-compartir svg,.perfil-compartir svg{width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.perfil-compartir{flex:0 0 auto; width:44px; height:44px; display:grid; place-items:center; border-radius:50%; color:var(--sobre-campo)}
+.controles-app{margin-top:4px}
+.instalada .controles-app{display:none}
+.guia-app{display:grid; gap:12px}
+.guia-app ol{display:grid; gap:8px; margin:0; padding-left:20px; font-size:var(--t4); line-height:1.4}
+.guia-app .nota-hoja{margin:0}
+.guia-app .guia-app-frase{font-size:var(--t4); font-weight:600; line-height:1.4}
 @keyframes hoja-sube{from{transform:translateY(100%)}}
 @keyframes hoja-baja{to{transform:translateY(100%)}}
 .rejilla-semanas{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
@@ -890,11 +908,11 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
 </head>
 <body>
 {% macro botones_nav() -%}
-<button type="button" data-vista="hoy" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="4"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle class="lleno" cx="12" cy="15.2" r="1.7"/></svg><span>Hoy</span></button>
-<button type="button" data-vista="picks" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M8.3 12.3l2.6 2.6 4.8-5.3"/></svg><span>Picks</span></button>
-<button type="button" data-vista="semana" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(-45 12 12)"><path d="M2.5 12c3-4.4 6.2-6.5 9.5-6.5s6.5 2.1 9.5 6.5c-3 4.4-6.2 6.5-9.5 6.5S5.5 16.4 2.5 12z"/><path d="M8.8 12h6.4M10.4 10.6v2.8M13.6 10.6v2.8"/></g></svg><span>Semana</span></button>
-<button type="button" data-vista="general" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5h17M4.5 20.5v-7h5v7M9.5 20.5V8.5h5v12M14.5 20.5v-5h5v5"/></svg><span>General</span></button>
-<button type="button" data-vista="premios" aria-selected="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5.5a4 4 0 0 1-8 0zM8 6H5.2a2.6 2.6 0 0 0 3.1 3.9M16 6h2.8a2.6 2.6 0 0 1-3.1 3.9M12 13.5v7M8.5 20.5h7"/></svg><span>Premios</span></button>
+<button type="button" data-vista="hoy"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="4"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle class="lleno" cx="12" cy="15.2" r="1.7"/></svg><span>Hoy</span></button>
+<button type="button" data-vista="picks"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M8.3 12.3l2.6 2.6 4.8-5.3"/></svg><span>Picks</span></button>
+<button type="button" data-vista="semana"><svg viewBox="0 0 24 24" aria-hidden="true"><g transform="rotate(-45 12 12)"><path d="M2.5 12c3-4.4 6.2-6.5 9.5-6.5s6.5 2.1 9.5 6.5c-3 4.4-6.2 6.5-9.5 6.5S5.5 16.4 2.5 12z"/><path d="M8.8 12h6.4M10.4 10.6v2.8M13.6 10.6v2.8"/></g></svg><span>Semana</span></button>
+<button type="button" data-vista="general"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5h17M4.5 20.5v-7h5v7M9.5 20.5V8.5h5v12M14.5 20.5v-5h5v5"/></svg><span>General</span></button>
+<button type="button" data-vista="premios"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5.5a4 4 0 0 1-8 0zM8 6H5.2a2.6 2.6 0 0 0 3.1 3.9M16 6h2.8a2.6 2.6 0 0 1-3.1 3.9M12 13.5v7M8.5 20.5h7"/></svg><span>Premios</span></button>
 {%- endmacro %}
 {% set espera_rescate = 8000 %}{% include "_rescate.html.j2" %}
 <div class="cancha" aria-hidden="true">{{ campo_html|safe }}</div>
@@ -928,6 +946,7 @@ try {
     <label class="soy" id="soy"><span>Soy</span><select id="quien-soy" aria-label="Elige tu nombre"></select></label>
     <label class="soy" id="equipo"><span>Mi equipo</span><select id="mi-equipo" aria-label="Elige tu equipo"></select></label>
     <p class="nota-hoja">Con tu nombre ves tus números en todas las secciones. Con tu equipo, el portal se pinta de sus colores. Se guarda solo en este teléfono.</p>
+    <button type="button" class="boton-principal controles-app" id="tener-app">Tenerlo como app</button>
   </div>
 </div>
 
@@ -1167,6 +1186,7 @@ try {
     botonIdentidad.title = partes.length
       ? "Cambiar tu nombre o tu equipo"
       : "Elige tu nombre y tu equipo";
+    botonIdentidad.setAttribute("aria-label", quien ? quien + ". Cambiar tu nombre o tu equipo" : "Elige tu nombre y tu equipo");
     pintarCampo();
   }
 
@@ -1179,10 +1199,82 @@ try {
   }
   botonIdentidad.addEventListener("click", abrirControles);
 
+  /* ═══ tenerlo como app ═══
+     En iPhone la app guardada no comparte memoria con Safari: mientras la hoja
+     está abierta, la dirección lleva tu nombre y tu equipo, que es lo que Safari
+     guarda al agregarla a Inicio. En Android, si el navegador ofrece instalar, se
+     instala con el mismo botón. */
+  const enIOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
+  let ofertaInstalar = null;
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); ofertaInstalar = e; });
+
+  function limpiarDireccion() {
+    const q = new URLSearchParams(location.search);
+    if (!q.has("soy") && !q.has("equipo")) return;
+    q.delete("soy");
+    q.delete("equipo");
+    const resto = q.toString();
+    history.replaceState(history.state, "", location.pathname + (resto ? "?" + resto : "") + location.hash);
+  }
+
+  function abrirGuiaApp(origen) {
+    if (ofertaInstalar) {
+      const oferta = ofertaInstalar;
+      ofertaInstalar = null;
+      oferta.prompt();
+      return;
+    }
+    const caja = crear("div", "guia-app");
+    if (enIOS) {
+      const pasos = crear("ol");
+      ["Toca ••• en la barra de Safari.", "Compartir y luego Ver más.", "Agregar a Inicio y luego Agregar."]
+        .forEach((paso) => pasos.appendChild(crear("li", null, paso)));
+      caja.appendChild(pasos);
+    } else {
+      caja.appendChild(crear("p", "guia-app-frase", "Menú ⋮ y luego Instalar app."));
+    }
+    if (jugador !== null) caja.appendChild(crear("p", "nota-hoja", "Tu nombre y tu equipo se van con él."));
+    else caja.appendChild(crear("p", "nota-hoja", "Elige tu nombre antes y la app ya te reconoce."));
+    abrirHoja("Guárdalo en tu iPhone", caja, { origen, alCerrar: limpiarDireccion });
+    if (jugador !== null) {
+      const otros = new URLSearchParams(location.search);
+      otros.delete("soy");
+      otros.delete("equipo");
+      const resto = otros.toString();
+      history.replaceState(history.state, "", location.pathname + "?" + (resto ? resto + "&" : "") + "soy=" +
+        encodeURIComponent(nombre(jugador)) + (equipo ? "&equipo=" + encodeURIComponent(equipo) : "") + location.hash);
+    }
+  }
+  document.getElementById("tener-app").addEventListener("click", (e) => abrirGuiaApp(e.currentTarget));
+
   /* ═══ quién soy ═══ */
   const cajaSoy = document.getElementById("soy");
   const selSoy = document.getElementById("quien-soy");
   let jugador = null;
+
+  /* La app guardada en iPhone arranca sin memoria: si la dirección guardada trae tu nombre,
+     se precarga una sola vez. En una pestaña normal se ignora siempre, para que un enlace
+     reenviado no le cambie la identidad a nadie. No es una contraseña: son nombres que ya
+     viajan en la página. */
+  const LLAVE_APLICADO = "angabave.soy-aplicado";
+  function enAppGuardada() {
+    try { return navigator.standalone === true || matchMedia("(display-mode: standalone)").matches; }
+    catch (e) { return false; }
+  }
+  function aplicarInvitacion() {
+    if (!enAppGuardada()) return;
+    const q = new URLSearchParams(location.search);
+    if (!q.has("soy") && !q.has("equipo")) return;
+    if (leer("angabave.jugador") === null && leer(LLAVE_APLICADO) === null) {
+      const quien = q.get("soy"), eq = q.get("equipo");
+      if (quien && D.participantes.includes(quien)) {
+        guardar("angabave.jugador", quien);
+        guardar(LLAVE_APLICADO, "1");
+        if (eq && D.colores[eq] && leer("angabave.equipo") === null) guardar("angabave.equipo", eq);
+      }
+    }
+    limpiarDireccion();
+  }
 
   function montarSoy() {
     selSoy.innerHTML = '<option value="">elige tu nombre</option>';
@@ -1783,15 +1875,19 @@ try {
       const b = crear("button", "boton-principal", "Ver toda la semana");
       b.type = "button";
       b.addEventListener("click", () => {
-        if (hojaAbierta) hojaAbierta.cerrar(true);
-        reemplazarEntrada = true;
         pestana = "partidos";
         pestanaElegida = true;
-        navegar(s.n);
+        salirDeHojaA(s.n);
       });
       caja.appendChild(b);
     }
-    abrirHoja(p.v + " @ " + p.l, caja, { origen });
+    let texto = p.v + " @ " + p.l + ".";
+    if (col >= 0) {
+      const casa = s.jugadores.filter((_, fila) => s.picks[fila][col] === 1).length;
+      texto = p.v + " @ " + p.l + ": " + (s.jugadores.length - casa) + " con " + p.v + " y " + casa + " con " + p.l + ".";
+    }
+    const hash = s ? "#s" + s.n + "/" + encodeURIComponent(p.v) + "@" + encodeURIComponent(p.l) : "#hoy";
+    abrirHoja(p.v + " @ " + p.l, caja, { origen, compartir: { texto, hash } });
   }
 
   /* ═══ quién le fue a quién, con consenso ═══ */
@@ -2891,8 +2987,16 @@ try {
     const cab = crear("div", "cab");
     const izq = crear("div");
     izq.appendChild(crear("div", "rotulo", f ? ordinal(f.pos) + " lugar de la general" : "Participante"));
-    izq.appendChild(crear("div", "nom", nombre(idx)));
+    izq.appendChild(crear("h1", "nom", nombre(idx)));
     cab.appendChild(izq);
+    const enviar = crear("button", "perfil-compartir");
+    enviar.type = "button";
+    enviar.setAttribute("aria-label", "Compartir");
+    enviar.innerHTML = ICONO_COMPARTIR;
+    enviar.addEventListener("click", () => compartir(
+      f ? nombre(idx) + " va " + ordinal(f.pos) + " con " + f.total + (f.total === 1 ? " acierto." : " aciertos.") : nombre(idx) + ".",
+      "#jugador/" + encodeURIComponent(nombre(idx))));
+    cab.appendChild(enviar);
     caja.appendChild(cab);
 
     // A cuántos del primero: el dato que todo el mundo quiere saber.
@@ -3220,7 +3324,16 @@ try {
     const { g, semana } = numerosDe(jugador);
     const b = crear("button", "mi-barra-yo");
     b.type = "button";
-    b.setAttribute("aria-label", "Tu avance. Toca para ver tu perfil.");
+    const dicho = [];
+    if (semana) {
+      const enJuego = semana.ganando + semana.perdiendo;
+      dicho.push("Tu semana " + semana.n + ": " + (semana.jugados ? semana.ok + " de " + semana.jugados + " aciertos" : "sin partidos cerrados") +
+        ", vas en el lugar " + (enJuego ? semana.proy : semana.pos) + "." + (enJuego ? " Ganas " + semana.ganando + " de " + enJuego + " en juego." : ""));
+    }
+    if (g) dicho.push("Temporada: " + g.total + " aciertos, lugar " + g.pos + ".");
+    if (!semana && !g) dicho.push("Tu avance: aún sin partidos cerrados.");
+    dicho.push("Abrir tu ficha.");
+    b.setAttribute("aria-label", dicho.join(" "));
     const celda = (rotulo, partes, vivo) => {
       const c = crear("span", "celda" + (vivo ? " vivo" : ""));
       c.appendChild(crear("small", "rot", rotulo));
@@ -3864,11 +3977,8 @@ try {
     const rejilla = crear("div", "rejilla-semanas");
     const g = jugador !== null ? D.general.find((f) => f.p === jugador) : null;
     const ir_ = (n) => {
-      // La hoja ocupaba su lugar en el historial: la semana elegida entra en su lugar.
-      if (hojaAbierta) hojaAbierta.cerrar(true);
-      reemplazarEntrada = true;
       pestanaElegida = false;
-      navegar(n);
+      salirDeHojaA(n);
     };
     D.semanas.forEach((s) => {
       const vivos = juegosEnVivo(s).length;
@@ -3900,12 +4010,33 @@ try {
   }
 
   /* ═══ las hojas que suben ═══
-     Se cierran arrastrando hacia abajo, tocando afuera, con Esc o con el botón
-     Atrás del teléfono: cada hoja ocupa un lugar en el historial. */
-  let hojaAbierta = null, reemplazarEntrada = false, ignorarPop = false;
+     Se cierran con la ×, arrastrando hacia abajo, tocando afuera, con Esc o con el
+     botón Atrás del teléfono. Todas juntas ocupan un solo lugar en el historial: una
+     hoja abierta sobre otra toma su entrada, no agrega otra. */
+  let hojaAbierta = null, reemplazarEntrada = false, ignorarPop = false, conTeclado = false;
+  document.addEventListener("keydown", (e) => { if (!e.metaKey && !e.ctrlKey && !e.altKey) conTeclado = true; }, true);
+  document.addEventListener("pointerdown", () => { conTeclado = false; }, true);
+  const FONDO_DE_HOJA = "header, main, footer, .navegacion.al-pie";
+  const ICONO_COMPARTIR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M8 8l4-4 4 4M7 11H6.5A1.5 1.5 0 0 0 5 12.5v6A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-6a1.5 1.5 0 0 0-1.5-1.5H17"/></svg>';
+  function fondoInerte(valor) {
+    document.querySelectorAll(FONDO_DE_HOJA).forEach((n) => { n.inert = valor; });
+  }
+  function titularDeLaVista() {
+    const vista = vistas[typeof vistaActual === "number" ? "semana" : vistaActual];
+    return vista ? vista.querySelector("h1") : null;
+  }
+  function enfocarTitular() {
+    const h1 = titularDeLaVista();
+    if (!h1) return;
+    h1.tabIndex = -1;
+    h1.focus({ preventScroll: true });
+  }
+
   function abrirHoja(titulo, contenido, opciones) {
-    const { origen, alCerrar } = opciones || {};
-    if (hojaAbierta) hojaAbierta.cerrar(true);
+    const { origen, alCerrar, compartir: paraCompartir } = opciones || {};
+    const previa = hojaAbierta;
+    const regresarA = origen || (previa && previa.origen) || null;
+    if (previa) previa.cerrar(true);
     const fondo = crear("div", "hoja-fondo");
     const hoja = crear("div", "hoja");
     hoja.setAttribute("role", "dialog");
@@ -3914,6 +4045,19 @@ try {
     const tirador = crear("div", "tirador");
     tirador.appendChild(crear("div", "agarradera"));
     tirador.appendChild(crear("h3", null, titulo));
+    if (paraCompartir) {
+      const enviar = crear("button", "hoja-compartir");
+      enviar.type = "button";
+      enviar.setAttribute("aria-label", "Compartir");
+      enviar.innerHTML = ICONO_COMPARTIR;
+      enviar.addEventListener("click", () => compartir(paraCompartir.texto, paraCompartir.hash));
+      tirador.appendChild(enviar);
+    }
+    const equis = crear("button", "hoja-cerrar", "×");
+    equis.type = "button";
+    equis.setAttribute("aria-label", "Cerrar");
+    equis.addEventListener("click", () => cerrar());
+    tirador.appendChild(equis);
     hoja.appendChild(tirador);
     hoja.appendChild(contenido);
     fondo.appendChild(hoja);
@@ -3923,9 +4067,10 @@ try {
     function cerrar(sinHistoria) {
       if (cerrada) return;
       cerrada = true;
-      hojaAbierta = null;
+      if (hojaAbierta === esta) hojaAbierta = null;
       document.documentElement.classList.remove("con-hoja");
       document.removeEventListener("keydown", tecla);
+      fondoInerte(false);
       fondo.classList.add("saliendo");
       hoja.style.transform = "";
       let terminada = false;
@@ -3933,17 +4078,28 @@ try {
         if (terminada) return;
         terminada = true;
         fondo.remove();
-        if (alCerrar) alCerrar();
+        // Si el contenido ya se fue a otra hoja, no es de esta cerrarlo.
+        if (alCerrar && contenido.parentNode === hoja) alCerrar();
       };
       fondo.addEventListener("animationend", fin);
       setTimeout(fin, 320);
-      if (origen && origen.isConnected) origen.focus({ preventScroll: true });
+      if (regresarA && regresarA.isConnected && regresarA.getClientRects().length) {
+        // Tras un toque, Safari pinta el anillo de foco en quien abrió la hoja y parece un
+        // error: el foco regresa (el lector de pantalla lo necesita) sin el anillo.
+        if (!conTeclado) {
+          regresarA.classList.add("sin-anillo");
+          regresarA.addEventListener("blur", () => regresarA.classList.remove("sin-anillo"), { once: true });
+        }
+        regresarA.focus({ preventScroll: true });
+      } else enfocarTitular();
       if (!sinHistoria && history.state && history.state.hoja) { ignorarPop = true; history.back(); }
     }
+    const esta = { cerrar, origen: regresarA };
 
     // Arrastrar desde arriba.
     let inicioY = null, ultimoY = 0, ultimoT = 0, velocidad = 0;
     tirador.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".hoja-cerrar, .hoja-compartir")) return;
       inicioY = e.clientY; ultimoY = e.clientY; ultimoT = e.timeStamp; velocidad = 0;
       hoja.style.animation = "none";
       hoja.style.transition = "none";
@@ -3971,9 +4127,43 @@ try {
     document.addEventListener("keydown", tecla);
     document.documentElement.classList.add("con-hoja");
     document.body.appendChild(fondo);
-    history.pushState(Object.assign({}, history.state, { hoja: true }), "", location.href);
-    hojaAbierta = { cerrar };
+    const entrada = Object.assign({}, history.state, { hoja: true });
+    if (previa && history.state && history.state.hoja) history.replaceState(entrada, "", location.href);
+    else history.pushState(entrada, "", location.href);
+    hojaAbierta = esta;
+    fondoInerte(true);
+    hoja.tabIndex = -1;
+    if (!hoja.contains(document.activeElement)) hoja.focus({ preventScroll: true });
     return hoja;
+  }
+
+  /* Cerrar la hoja e ir a otra sección sin dejar entradas sueltas: la hoja
+     entregaba su lugar en el historial y la sección nueva lo toma. */
+  function salirDeHojaA(destino, despues) {
+    if (hojaAbierta) {
+      hojaAbierta.cerrar(true);
+      reemplazarEntrada = true;
+    }
+    navegar(destino, despues);
+  }
+
+  /* Mandar un enlace: el menú del teléfono si lo hay; si no, queda copiado. */
+  async function compartir(texto, hash) {
+    const url = location.origin + location.pathname + hash;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: D.marca, text: texto, url });
+        return;
+      } catch (e) {
+        if (e && e.name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      avisoFlotante("Enlace copiado");
+    } catch (e) {
+      avisoFlotante("No se pudo copiar el enlace");
+    }
   }
 
   /* El aviso de abajo, con una acción: "Borraste tus picks · Deshacer". */
@@ -3988,13 +4178,17 @@ try {
       setTimeout(() => caja.remove(), 240);
       if (flotanteActual === caja) flotanteActual = null;
     };
-    const b = crear("button", null, accion);
-    b.type = "button";
-    b.addEventListener("click", () => { quitar(); alTocar(); });
-    caja.appendChild(b);
+    if (accion) {
+      const b = crear("button", null, accion);
+      b.type = "button";
+      b.addEventListener("click", () => { quitar(); alTocar(); });
+      caja.appendChild(b);
+    } else {
+      caja.style.padding = "12px 16px";
+    }
     document.body.appendChild(caja);
     flotanteActual = caja;
-    setTimeout(quitar, 7000);
+    setTimeout(quitar, accion ? 7000 : 3000);
   }
 
   /* Una sola línea con todo lo que antes eran tres tarjetas de avisos. */
@@ -4043,6 +4237,7 @@ try {
     raiz.textContent = "";
     if (!s) return;
 
+    raiz.appendChild(crear("h1", "solo-lector", "Semana " + n));
     const cabeza = crear("div", "cabeza-semana");
     cabeza.appendChild(selectorDeSemanas(n));
     const vivos = juegosEnVivo(s).length;
@@ -4097,11 +4292,17 @@ try {
     const corredera = crear("span", "corredera");
     interior.appendChild(corredera);
     const panel = crear("div", "panel-semana");
+    panel.id = "panel-semana";
+    panel.setAttribute("role", "tabpanel");
+    panel.setAttribute("aria-labelledby", "pestana-" + pestana);
     disponibles.forEach(([clave, etiqueta]) => {
       const b = crear("button", null, etiqueta);
       b.type = "button";
+      b.id = "pestana-" + clave;
       b.setAttribute("role", "tab");
+      b.setAttribute("aria-controls", "panel-semana");
       b.setAttribute("aria-selected", String(clave === pestana));
+      b.tabIndex = clave === pestana ? 0 : -1;
       /* Cambiar de pestaña solo cambia lo de abajo: el resto de la vista no se
          redibuja ni vuelve a animarse. Y si ya habías bajado, regresas al inicio de
          la lista nueva, no a la mitad. */
@@ -4112,7 +4313,13 @@ try {
         pestana = clave;
         pestanaElegida = true;
         raiz.classList.remove("anima");
-        interior.querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+        interior.querySelectorAll("button").forEach((x) => {
+          x.setAttribute("aria-selected", String(x === b));
+          x.tabIndex = x === b ? 0 : -1;
+        });
+        panel.setAttribute("aria-labelledby", b.id);
+        // Cambiar de pestaña no agrega pasos al historial: la dirección solo se actualiza.
+        history.replaceState(estadoActual(), "", direccionDe(vistaActual));
         moverCorredera(interior);
         panel.textContent = "";
         panel.appendChild(contenidoDePestana(s));
@@ -4127,6 +4334,16 @@ try {
         recordarSitio();
       });
       interior.appendChild(b);
+    });
+    interior.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      const botones = Array.from(interior.querySelectorAll("button"));
+      const i = botones.indexOf(document.activeElement);
+      if (i < 0) return;
+      e.preventDefault();
+      const siguiente = botones[(i + (e.key === "ArrowRight" ? 1 : -1) + botones.length) % botones.length];
+      siguiente.focus();
+      siguiente.click();
     });
     tabs.appendChild(interior);
     raiz.appendChild(tabs);
@@ -4290,7 +4507,7 @@ try {
   function moverIndicadores() {
     navs.forEach((n) => {
       const pastilla = n.querySelector(".indicador");
-      const elegido = n.querySelector('button[aria-selected="true"]');
+      const elegido = n.querySelector('button[aria-current="page"]');
       if (!pastilla || !elegido || !n.offsetWidth) return;     // la barra oculta no se mide
       const margen = n.classList.contains("al-pie") ? 2 : 0;
       pastilla.style.width = (elegido.offsetWidth - margen * 2) + "px";
@@ -4331,14 +4548,27 @@ try {
       perfil: perfilAbierto === null ? null : D.participantes[perfilAbierto] };
   }
   function direccionDe(vista) {
-    if (typeof vista === "number") return "#s" + vista;
+    if (typeof vista === "number") return "#s" + vista + (pestanaElegida ? "/" + pestana : "");
     if (vista === "jugadores" && perfilAbierto !== null) return "#jugador/" + encodeURIComponent(D.participantes[perfilAbierto]);
     return "#" + (vista === "jugadores" ? "general" : vista);
   }
   function leerDireccion() {
     const hash = location.hash;
-    const semana = hash.match(/^#s(\d+)$/);
-    if (semana && porSemana.has(Number(semana[1]))) return { vista: Number(semana[1]) };
+    if (hash === "#semana") return { vista: "semana" };
+    const semana = hash.match(/^#s(\d+)(?:\/(.+))?$/);
+    if (semana && porSemana.has(Number(semana[1]))) {
+      const n = Number(semana[1]), resto = semana[2];
+      if (!resto) return { vista: n };
+      if (PESTANAS.some(([clave]) => clave === resto)) return { vista: n, pestana: resto, elegida: true };
+      const par = resto.split("@");
+      if (par.length === 2) {
+        try {
+          const v = decodeURIComponent(par[0]), l = decodeURIComponent(par[1]);
+          if (todosLosJuegos(porSemana.get(n)).some((p) => p.v === v && p.l === l)) return { vista: n, partido: { v, l } };
+        } catch (e) { /* un enlace roto abre la semana */ }
+      }
+      return { vista: n };
+    }
     const ficha = hash.match(/^#jugador\/(.+)$/);
     if (ficha) {
       let quien = null;
@@ -4352,11 +4582,24 @@ try {
     history.replaceState(Object.assign({}, history.state, { y: Math.round(window.scrollY) }), "", location.href);
   }
 
+  /* Al cambiar de sección (no al repintar en vivo): el título de la pestaña y el
+     foco al encabezado, para quien navega sin ver la pantalla. */
+  function tituloDeLaVista() {
+    if (typeof vistaActual === "number") return "Semana " + vistaActual;
+    if (vistaActual === "jugadores") return perfilAbierto !== null ? nombre(perfilAbierto) : "General";
+    return { hoy: "Hoy", picks: "Picks", general: "General", premios: "Premios" }[vistaActual] || "Hoy";
+  }
+  function anunciarVista(conFoco) {
+    document.title = tituloDeLaVista() + " · " + D.marca;
+    if (conFoco) enfocarTitular();
+  }
+
   function navegar(destino, despues) {
     anotarAltura();
     const cambio = (quieto) => {
       window.scrollTo({ top: 0, behavior: "instant" });
       ir(destino, true, quieto);
+      anunciarVista(true);
       if (despues) despues();
     };
     if (!conTransicion(rumboHacia(destino), () => cambio(true))) cambio(false);
@@ -4371,6 +4614,7 @@ try {
       if (nodo) nodo.style.viewTransitionName = "";
       window.scrollTo({ top: 0, behavior: "instant" });
       ir("jugadores", true, quieto);
+      anunciarVista(true);
     };
     if (!conTransicion(vistaActual === "jugadores" ? null : "adelante", () => cambio(true))) cambio(false);
   }
@@ -4379,15 +4623,15 @@ try {
     if (ignorarPop) { ignorarPop = false; return; }
     if (hojaAbierta) { hojaAbierta.cerrar(true); return; }
     const estado = evento.state || leerDireccion() || { vista: "hoy" };
-    if (estado.hoja) return;
     const cambio = () => {
       if (estado.perfil !== undefined) {
         const i = estado.perfil ? D.participantes.indexOf(estado.perfil) : -1;
         perfilAbierto = i >= 0 ? i : null;
       }
       if (estado.pestana) pestana = estado.pestana;
-      if (estado.elegida !== undefined) pestanaElegida = !!estado.elegida;
+      if (estado.elegida !== undefined || estado.pestana) pestanaElegida = !!estado.elegida;
       ir(estado.vista, false, true);
+      anunciarVista(true);
       window.scrollTo({ top: estado.y || 0, behavior: "instant" });
     };
     // En Safari el gesto de regresar ya trae su propia animación.
@@ -4451,8 +4695,10 @@ try {
 
     // Las fichas viven dentro de General: la barra marca General.
     const enBarra = cual === "jugadores" ? "general" : cual;
-    navs.forEach((n) => n.querySelectorAll("button").forEach((b) =>
-      b.setAttribute("aria-selected", String(b.dataset.vista === enBarra))));
+    navs.forEach((n) => n.querySelectorAll("button").forEach((b) => {
+      if (b.dataset.vista === enBarra) b.setAttribute("aria-current", "page");
+      else b.removeAttribute("aria-current");
+    }));
     moverIndicadores();
     pintarEstado(cual === "semana" ? vista : D.activa);
 
@@ -4630,13 +4876,25 @@ try {
   const aDinamica = document.getElementById("a-dinamica");
   if (aDinamica) aDinamica.addEventListener("click", irADinamica);
 
+  aplicarInvitacion();
   montarSoy();
   montarEquipo();
   pintarIdentidad();
   calcularNovedades();
 
-  const direccion = leerDireccion();
-  const guardado = sitioGuardado();
+  let direccion = leerDireccion();
+  let guardado = sitioGuardado();
+  /* Abrir la app guardada desde su ícono siempre empieza en Hoy: Safari guardó también
+     la sección en la que estabas. Una recarga que hizo la propia página no cuenta. */
+  const tipoDeCarga = (performance.getEntriesByType("navigation")[0] || {}).type;
+  const recargaPropia = new URLSearchParams(location.search).has("v") || !!(guardado && guardado.auto);
+  if (enAppGuardada() && tipoDeCarga === "navigate" && !recargaPropia) { direccion = null; guardado = null; }
+  if (new URLSearchParams(location.search).has("v")) {
+    const q = new URLSearchParams(location.search);
+    q.delete("v");
+    const resto = q.toString();
+    history.replaceState(history.state, "", location.pathname + (resto ? "?" + resto : "") + location.hash);
+  }
   const valida = (v) => v === "hoy" || v === "picks" || v === "general" || v === "premios" || v === "jugadores" ||
     porSemana.has(Number(v));
 
@@ -4645,6 +4903,7 @@ try {
     : "hoy";
 
   if (guardado && guardado.pestana) pestana = guardado.pestana;
+  if (direccion && direccion.pestana) { pestana = direccion.pestana; pestanaElegida = true; }
   const automatica = !!(guardado && guardado.auto);
   if (automatica && guardado.elegida) pestanaElegida = true;
   const perfilInicial = direccion && direccion.perfil ? direccion.perfil : (guardado && guardado.vista === "jugadores" ? guardado.perfil : null);
@@ -4656,7 +4915,14 @@ try {
   // Ya hay vista: se destapa aquí mismo, para que la altura guardada encuentre su página.
   document.documentElement.classList.add("listo");
   history.replaceState(estadoActual(), "", direccionDe(vistaActual));
+  anunciarVista(false);
   alMoverse();
+  // Un enlace a un partido: la semana queda debajo y Atrás cierra la hoja sin salir de ella.
+  if (direccion && direccion.partido && typeof vistaActual === "number") {
+    const sem = porSemana.get(vistaActual);
+    const juego = todosLosJuegos(sem).find((p) => p.v === direccion.partido.v && p.l === direccion.partido.l);
+    if (juego) abrirPartido(sem, juego, null);
+  }
 
   // La vista ya está dibujada: ahora sí arranca la entrada, para no perder el principio.
   if (document.documentElement.classList.contains("estreno")) {
