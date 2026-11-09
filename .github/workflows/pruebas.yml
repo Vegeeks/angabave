@@ -42,6 +42,16 @@ jobs:
       - name: Correr las pruebas
         run: python -m pytest -q
 
+      # Para ver qué salió mal en una imagen sin poder reproducir las letras del runner.
+      - name: Guardar las imágenes de las pruebas que fallaron
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: imagenes-de-pruebas
+          path: /tmp/pytest-of-runner/**/*.png
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Falla de prueba
         if: inputs.probar_aviso
         run: |
