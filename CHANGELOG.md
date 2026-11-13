@@ -9,6 +9,12 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.35.0
+
+* **Tu distancia en la barra.** Donde decía "Temporada" ahora dice "A 1 de Marco", "A 1 del 2.º", "Le llevas 1 a Marco" o "Empatas en la punta", con los totales oficiales.
+* **El duelo arriba en la ficha.** Al abrir la ficha de alguien: "Tú 94 – 92 Carlos", cómo van en semanas y en qué partidos eligieron distinto y quién acertó. En tu ficha, contra quien va justo arriba (o abajo si vas primero), con "Comparar con otro".
+* **Tarjeta "Mi semana".** Al cerrar una semana, "Compartir mi semana" arma una imagen con el estadio, tus aciertos, la tira de la semana, tu lugar y, si ganaste, el monto y "Semana perfecta". El lugar en la general solo va en la semana más reciente.
+
 ## v0.34.0
 
 * **"Qué pasa si…".** Cuando falta uno o dos partidos y la semana ya se puede proyectar, Hoy dice quién se lleva la semana según cada resultado ("Si gana Bills: empatas con 2, $1,733.33 c/u"); si nada cambia, "Pase lo que pase, gana …". El titular dice "Falta 1 partido" y en cuál se define. Es proyección: lo oficial no se toca, y los montos salen de Python. Un pick que falta no cuenta como visitante.
