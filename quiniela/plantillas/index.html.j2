@@ -93,7 +93,7 @@ i,em{font-style:normal}
 .js:not(.listo) .identidad .ini{color:transparent}
 /* Las cifras de marcador. Nunca en nombres ni en frases. */
 .juego-fila .mrc,.pts,.err,.sem,.c-pos .n,.medalla,.lugar .puntos,.lugar .bolsa,.fila-gan .monto,.bolsa-final .val,.campeon .bolsa,
-.cifras .cifra b,.mi-barra .linea b,.mi-barra .linea .rango,.mi-semana .fila .rango,.leyenda b,.celda-semana b,.duelo .cara .t,
+.cifras .cifra b,.mi-barra .linea b,.mi-barra .linea .rango,.mi-semana .fila .rango,.leyenda b,.celda-semana b,
 .pasa-si-monto,.detalle-partido .marcador,.candidato .n,.candidato .pct,.barras .col small.cima,.lugar-premio b,.acciones-gen .cuenta{
   font-family:var(--num); font-weight:600; letter-spacing:0}
 
@@ -219,7 +219,7 @@ header.plegado .top{opacity:0; pointer-events:none}
 .mi-barra-yo{position:relative; display:flex; align-items:center; width:100%; min-height:56px; overflow:hidden; text-align:left;
   background:var(--panel); border:1px solid var(--linea); border-radius:var(--r2); transition:transform .28s var(--sale)}
 .mi-barra-yo::after{content:""; position:absolute; left:0; bottom:0; height:2px; width:var(--avance,0%); background:var(--oro)}
-.mi-barra .celda{flex:1 1 0; display:flex; flex-direction:column; padding:4px 12px}
+.mi-barra .celda{flex:1 1 0; min-width:0; display:flex; flex-direction:column; padding:4px 12px}
 .mi-barra .celda + .celda{border-left:1px solid var(--linea)}
 .mi-barra .rot{font-size:var(--t6); color:var(--tenue); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .mi-barra .celda.vivo .rot{color:var(--txt); font-weight:600}
@@ -426,6 +426,8 @@ main{view-transition-name:contenido; min-height:60vh}
 .nota-chance{display:block; width:100%; min-height:44px; margin-top:12px; padding-top:12px; text-align:left; font-size:var(--t5); line-height:1.4; color:var(--tenue);
   border-top:1px solid var(--linea); transition:transform .28s var(--sale)}
 .nota-chance b{color:var(--acento); font-weight:600}
+.tu-semana-mandar{margin-top:12px}
+.tu-semana-mandar:disabled{opacity:.5}
 .mi-semana{margin-bottom:16px}
 .mi-semana .fila{display:flex; align-items:baseline; gap:8px; margin-bottom:8px}
 .mi-semana .fila b{font-size:var(--t4); font-weight:700}
@@ -703,20 +705,17 @@ h1[tabindex="-1"]:focus,h1[tabindex="-1"]:focus-visible{outline:0}
 .rasgo .rot{font-size:var(--t6); color:var(--tenue)}
 .rasgo .val{font-size:var(--t3); font-weight:700; letter-spacing:-.03em; overflow-wrap:anywhere; color:var(--c,var(--txt))}
 .rasgo .pie{font-size:var(--t5); color:var(--tenue)}
-.duelo{display:grid; gap:12px}
-.duelo .caras{display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:12px; align-items:center}
-.duelo .cara{padding-block:8px; text-align:center}
-.duelo .cara .q{font-weight:600; font-size:var(--t5); overflow-wrap:anywhere; line-height:1.2}
-.duelo .cara .t{font-size:var(--t2); line-height:1.2; color:var(--tenue)}
-.duelo .cara.va-arriba .t{color:var(--txt)}
-.duelo .vs-mid{font-weight:600; color:var(--tenue); font-size:var(--t6)}
-.dif{display:grid}
-.dif .row{display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:12px; align-items:center; min-height:44px; padding-block:4px; font-size:var(--t5)}
-.dif .row + .row{border-top:1px solid var(--linea)}
-.dif .row .j{font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.dif .row .j.izq{text-align:right} .dif .row .j.der{text-align:left}
-.dif .row .mid{font-size:var(--t6); color:var(--tenue); text-align:center; white-space:nowrap}
-.dif .row .j.gano{color:var(--verde)} .dif .row .j.perdio{color:var(--tenue2)}
+.duelo-bloque{display:grid; gap:4px; margin-bottom:24px}
+.duelo-bloque select.ancho{margin-bottom:4px}
+.duelo-marcador{display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:12px; align-items:baseline; padding-block:4px}
+.duelo-lado{display:flex; align-items:baseline; gap:8px; min-width:0; color:var(--tenue)}
+.duelo-lado.der{justify-content:flex-end}
+.duelo-lado.va-arriba{color:var(--txt)}
+.duelo-nom{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:var(--t5); font-weight:600}
+.duelo-cifra{flex:0 0 auto; font-size:var(--t2); line-height:1.1; font-family:var(--num); font-weight:600; letter-spacing:0}
+.duelo-lado.va-arriba .duelo-cifra{box-shadow:inset 0 -2px 0 var(--acento)}
+.duelo-medio{font-size:var(--t4); color:var(--tenue)}
+.duelo-linea{margin:0; font-size:var(--t5); line-height:1.4; color:var(--tenue)}
 
 /* ═══════ los picks ═══════ */
 .generador .pie-gen{font-size:var(--t5); color:var(--tenue); line-height:1.4; margin:0 0 12px}
@@ -1861,6 +1860,8 @@ try {
     fila.appendChild(crear("span", "rango", ordinal(enJuego ? semana.proy : semana.pos)));
     caja.appendChild(fila);
     caja.appendChild(tiraDeLaSemana(s));
+    const mandar = botonMiSemana(s);
+    if (mandar) caja.appendChild(mandar);
     return caja;
   }
 
@@ -2352,6 +2353,97 @@ try {
   }
 
 
+  /* El encabezado de las imágenes para mandar: el campo del portal con tu equipo (o tu
+     nombre) en la zona de anotación, la marca, el sello de la semana si lo pides y la línea amarilla. */
+  async function encabezadoEnLienzo(ctx, o) {
+    const { ANCHO, CAMPO, MARGEN, escala, conCampo, enZona, etiqueta, titular, semana, cuerpo, rotulo } = o;
+    const espaciado = (px) => { if ("letterSpacing" in ctx) ctx.letterSpacing = px + "px"; };
+    // Arriba, el mismo campo del portal con tu equipo (o tu nombre) en la zona de anotación.
+    let hayCampo = false;
+    if (conCampo) {
+      try { hayCampo = await campoEnLienzo(ctx, ANCHO, CAMPO, enZona, escala); } catch (e) { hayCampo = false; }
+    }
+    if (!hayCampo) {
+      ctx.fillStyle = "#0b3a24";
+      ctx.fillRect(0, 0, ANCHO, CAMPO);
+      ctx.fillStyle = "rgba(243,246,244,.16)";
+      for (let y = 40; y < CAMPO; y += 92) ctx.fillRect(0, y, ANCHO, 2);
+    }
+    let sombra = ctx.createLinearGradient(0, 0, 0, 140);
+    sombra.addColorStop(0, "rgba(6,10,8,.8)");
+    sombra.addColorStop(1, "rgba(6,10,8,0)");
+    ctx.fillStyle = sombra;
+    ctx.fillRect(0, 0, ANCHO, 140);
+    sombra = ctx.createLinearGradient(0, CAMPO - 230, 0, CAMPO);
+    sombra.addColorStop(0, "rgba(6,10,8,0)");
+    sombra.addColorStop(.55, "rgba(6,10,8,.7)");
+    sombra.addColorStop(1, "rgba(6,10,8,.94)");
+    ctx.fillStyle = sombra;
+    ctx.fillRect(0, CAMPO - 230, ANCHO, 230);
+
+    marcaEnLienzo(ctx, MARGEN, 36, 56);
+    palabraEnLienzo(ctx, MARGEN + 70, 45, 28);
+    ctx.textBaseline = "alphabetic";
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#d7ddd9";
+    ctx.font = cuerpo(700, 20);
+    espaciado(3);
+    ctx.fillText("QUINIELA NFL " + D.anio, ANCHO - MARGEN, 74);
+    ctx.textAlign = "left";
+
+    // El sello dorado con la semana, como boleta oficial.
+    const radio = semana === null ? 0 : 92;
+    if (semana !== null) {
+      const sx = ANCHO - MARGEN - radio, sy = CAMPO - 148;
+      ctx.save();
+      ctx.translate(sx, sy);
+      ctx.rotate(-0.2);
+      ctx.fillStyle = "rgba(6,10,8,.55)";
+      ctx.beginPath();
+      ctx.arc(0, 0, radio, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#ffd60a";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, radio - 13, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = "#ffd60a";
+      ctx.textAlign = "center";
+      ctx.font = cuerpo(800, 13);
+      espaciado(0);
+      const anillo = "PICKS OFICIALES · ANGABAVE · " + D.anio + " · ";
+      for (let i = 0; i < anillo.length; i++) {
+        ctx.save();
+        ctx.rotate((i / anillo.length) * Math.PI * 2);
+        ctx.fillText(anillo[i], 0, -(radio - 24));
+        ctx.restore();
+      }
+      ctx.font = rotulo(20);
+      ctx.fillText("SEMANA", 0, -10);
+      ctx.font = rotulo(58);
+      ctx.fillText(String(semana), 0, 44);
+      ctx.restore();
+      ctx.textAlign = "left";
+    }
+
+    ctx.fillStyle = "#ffd60a";
+    ctx.font = rotulo(30);
+    espaciado(4);
+    ctx.fillText(etiqueta, MARGEN, CAMPO - 126);
+    espaciado(0);
+    let tam = 96;
+    ctx.font = rotulo(tam);
+    const ancholibre = ANCHO - MARGEN * 2 - radio * 2 - 20;
+    while (tam > 40 && ctx.measureText(titular).width > ancholibre) ctx.font = rotulo(--tam);
+    ctx.fillStyle = "#f3f6f4";
+    ctx.fillText(titular, MARGEN, CAMPO - 38);
+    // La línea amarilla de primera y diez es la frontera, como en el portal.
+    ctx.fillStyle = "#ffd60a";
+    ctx.fillRect(0, CAMPO - 4, ANCHO, 8);
+  }
+
   /* Arma la imagen membretada con los picks elegidos y la comparte o descarga. */
   async function exportarPicks(s, elegidos, porClave) {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
@@ -2408,87 +2500,7 @@ try {
       ctx.fillStyle = "#060a08";
       ctx.fillRect(0, 0, ANCHO, alto);
 
-      // Arriba, el mismo campo del portal con tu equipo (o tu nombre) en la zona de anotación.
-      let hayCampo = false;
-      if (conCampo) {
-        try { hayCampo = await campoEnLienzo(ctx, ANCHO, CAMPO, enZona, escala); } catch (e) { hayCampo = false; }
-      }
-      if (!hayCampo) {
-        ctx.fillStyle = "#0b3a24";
-        ctx.fillRect(0, 0, ANCHO, CAMPO);
-        ctx.fillStyle = "rgba(243,246,244,.16)";
-        for (let y = 40; y < CAMPO; y += 92) ctx.fillRect(0, y, ANCHO, 2);
-      }
-      let sombra = ctx.createLinearGradient(0, 0, 0, 140);
-      sombra.addColorStop(0, "rgba(6,10,8,.8)");
-      sombra.addColorStop(1, "rgba(6,10,8,0)");
-      ctx.fillStyle = sombra;
-      ctx.fillRect(0, 0, ANCHO, 140);
-      sombra = ctx.createLinearGradient(0, CAMPO - 230, 0, CAMPO);
-      sombra.addColorStop(0, "rgba(6,10,8,0)");
-      sombra.addColorStop(.55, "rgba(6,10,8,.7)");
-      sombra.addColorStop(1, "rgba(6,10,8,.94)");
-      ctx.fillStyle = sombra;
-      ctx.fillRect(0, CAMPO - 230, ANCHO, 230);
-
-      marcaEnLienzo(ctx, MARGEN, 36, 56);
-      palabraEnLienzo(ctx, MARGEN + 70, 45, 28);
-      ctx.textBaseline = "alphabetic";
-      ctx.textAlign = "right";
-      ctx.fillStyle = "#d7ddd9";
-      ctx.font = cuerpo(700, 20);
-      espaciado(3);
-      ctx.fillText("QUINIELA NFL " + D.anio, ANCHO - MARGEN, 74);
-      ctx.textAlign = "left";
-
-      // El sello dorado con la semana, como boleta oficial.
-      const radio = 92, sx = ANCHO - MARGEN - radio, sy = CAMPO - 148;
-      ctx.save();
-      ctx.translate(sx, sy);
-      ctx.rotate(-0.2);
-      ctx.fillStyle = "rgba(6,10,8,.55)";
-      ctx.beginPath();
-      ctx.arc(0, 0, radio, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "#ffd60a";
-      ctx.lineWidth = 4;
-      ctx.stroke();
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.arc(0, 0, radio - 13, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.fillStyle = "#ffd60a";
-      ctx.textAlign = "center";
-      ctx.font = cuerpo(800, 13);
-      espaciado(0);
-      const anillo = "PICKS OFICIALES · ANGABAVE · " + D.anio + " · ";
-      for (let i = 0; i < anillo.length; i++) {
-        ctx.save();
-        ctx.rotate((i / anillo.length) * Math.PI * 2);
-        ctx.fillText(anillo[i], 0, -(radio - 24));
-        ctx.restore();
-      }
-      ctx.font = rotulo(20);
-      ctx.fillText("SEMANA", 0, -10);
-      ctx.font = rotulo(58);
-      ctx.fillText(String(s.n), 0, 44);
-      ctx.restore();
-      ctx.textAlign = "left";
-
-      ctx.fillStyle = "#ffd60a";
-      ctx.font = rotulo(30);
-      espaciado(4);
-      ctx.fillText("MIS PICKS", MARGEN, CAMPO - 126);
-      espaciado(0);
-      let tam = 96;
-      ctx.font = rotulo(tam);
-      const ancholibre = ANCHO - MARGEN * 2 - radio * 2 - 20;
-      while (tam > 40 && ctx.measureText(titular).width > ancholibre) ctx.font = rotulo(--tam);
-      ctx.fillStyle = "#f3f6f4";
-      ctx.fillText(titular, MARGEN, CAMPO - 38);
-      // La línea amarilla de primera y diez es la frontera, como en el portal.
-      ctx.fillStyle = "#ffd60a";
-      ctx.fillRect(0, CAMPO - 4, ANCHO, 8);
+      await encabezadoEnLienzo(ctx, { ANCHO, CAMPO, MARGEN, escala, conCampo, enZona, etiqueta: "MIS PICKS", titular, semana: s.n, cuerpo, rotulo });
 
       // Un equipo dentro de su tarjeta: el elegido lleno de sus colores, con un brillo
       // de jersey y la etiqueta PICK; el otro, solo con contorno y en gris.
@@ -2612,7 +2624,13 @@ try {
       r.estado.textContent = "No se pudo armar la imagen. Cierra y vuelve a intentar.";
       return;
     }
-    const archivo = new File([blob], "picks-semana-" + s.n + ".jpg", { type: "image/jpeg" });
+    await entregarImagen(r, blob, "picks-semana-" + s.n + ".jpg", titulo,
+      "Semana " + s.n + " · " + (claves.length === 1 ? "1 pick" : claves.length + " picks"));
+  }
+
+  /* Pone la imagen lista en la pantalla del revelado y el botón para mandarla o bajarla. */
+  async function entregarImagen(r, blob, nombreArchivo, titulo, textoEstado) {
+    const archivo = new File([blob], nombreArchivo, { type: "image/jpeg" });
     const url = URL.createObjectURL(blob);
     r.alCerrar(() => URL.revokeObjectURL(url));
     const img = new Image();
@@ -2621,7 +2639,7 @@ try {
     // Espera a que cargue, pero sin colgarse si el teléfono pausa la página.
     await Promise.race([new Promise((listo) => { img.onload = listo; img.onerror = listo; }), new Promise((listo) => setTimeout(listo, 1500))]);
     r.marco.append(img);
-    r.estado.textContent = "Semana " + s.n + " · " + (claves.length === 1 ? "1 pick" : claves.length + " picks");
+    r.estado.textContent = textoEstado;
     r.capa.classList.add("listo");
     festejarRevelado(r.capa);
     const compartible = !!(navigator.canShare && navigator.canShare({ files: [archivo] }));
@@ -2644,6 +2662,7 @@ try {
     r.acciones.append(boton);
     boton.focus({ preventScroll: true });
   }
+
 
   /* La pantalla donde aparece la imagen: luces de estadio, la imagen que se escanea de arriba
      abajo, un brillo y confeti. Se cierra con la ×, Esc o Atrás. */
@@ -3038,11 +3057,6 @@ try {
     }
     raiz.appendChild(perfil(idx));
 
-    const t2 = crear("div", "titulo");
-    t2.appendChild(crear("h2", null, "Duelo"));
-    t2.appendChild(crear("span", "nota", "compara a dos"));
-    raiz.appendChild(t2);
-    raiz.appendChild(duelo(idx));
   }
 
   /* Todo lo que se puede decir de alguien cruzando los picks de los 34. */
@@ -3127,6 +3141,15 @@ try {
     if (ganado) caja.appendChild(crear("p", "nota-perfil", "Ha ganado " + ganado + " en semanas."));
     caja.appendChild(crear("div", "frontera"));
 
+    // Con tu nombre elegido: el duelo arriba. En otra ficha, contra ti; en la tuya, contra
+    // quien va justo arriba (o justo abajo, si vas primero).
+    if (jugador !== null && generalPorIdx.has(jugador)) {
+      const orden = D.general.map((x) => x.p);
+      const yo = orden.indexOf(jugador);
+      const contra = idx !== jugador ? idx : (yo > 0 ? orden[yo - 1] : orden[yo + 1]);
+      if (contra !== undefined) caja.appendChild(bloqueDuelo(contra, idx === jugador));
+    }
+
     const cerradas = datos.linea.filter((s) => !s.abierta);
     const semanas = cerradas.length || 1;
     const promedio = (cerradas.reduce((s, x) => s + x.aciertos, 0) / semanas).toFixed(1);
@@ -3208,73 +3231,130 @@ try {
     return nodo;
   }
 
-  function duelo(uno) {
-    const env = crear("div", "duelo");
-    const lista = crear("select", "ancho");
-    lista.setAttribute("aria-label", "Comparar con");
-    lista.appendChild(Object.assign(crear("option", null, "Comparar con…"), { value: "" }));
-    D.general.map((f) => f.p).filter((i) => i !== uno).forEach((i) => {
-      lista.appendChild(Object.assign(crear("option", null, nombre(i)), { value: String(i) }));
+  /* Primer nombre; si lo comparte otro participante, con la inicial del apellido. */
+  function nombreCorto(idx, participantes) {
+    const partes = (participantes[idx] || "?").trim().split(/\s+/);
+    const primero = partes[0];
+    const mismos = participantes.filter((q) => q.trim().split(/\s+/)[0].toLowerCase() === primero.toLowerCase());
+    if (mismos.length < 2 || partes.length < 2) return primero;
+    const corto = primero + " " + partes[partes.length - 1][0].toUpperCase() + ".";
+    const otros = participantes.filter((q, i) => i !== idx).map((q) => {
+      const x = q.trim().split(/\s+/);
+      return x[0].toLowerCase() === primero.toLowerCase() && x.length > 1 ? x[0] + " " + x[x.length - 1][0].toUpperCase() + "." : null;
     });
-    // Si estás viendo a alguien más, la comparación natural es contigo.
-    if (jugador !== null && jugador !== uno) lista.value = String(jugador);
-    env.appendChild(lista);
-    const destino = crear("div", "duelo");
-    env.appendChild(destino);
+    return otros.includes(corto) ? participantes[idx] : corto;
+  }
 
-    const pintar = () => {
-      destino.textContent = "";
-      if (lista.value === "") return;
-      const a = uno, b = Number(lista.value);
-      const fa = generalPorIdx.get(a), fb = generalPorIdx.get(b);
-      const caras = crear("div", "caras");
-      [[fa, a], [fb, b]].forEach(([f, idx], n) => {
-        const otra = n === 0 ? fb : fa;
-        const cara = crear("div", "cara" + (f && otra && f.total > otra.total ? " va-arriba" : ""));
-        cara.appendChild(crear("div", "q", nombre(idx)));
-        cara.appendChild(crear("div", "t", String(f ? f.total : 0)));
-        cara.appendChild(crear("div", "rotulo", f ? ordinal(f.pos) : ""));
-        if (n === 0) { caras.appendChild(cara); caras.appendChild(crear("div", "vs-mid", "VS")); }
-        else caras.appendChild(cara);
-      });
-      destino.appendChild(caras);
+  /* Lo que dice el rótulo de Temporada en tu barra: a cuánto estás de quien va arriba,
+     o cuánto le llevas al que sigue. Solo con los totales oficiales de la general. */
+  function distanciaEnTemporada(general, participantes, idx) {
+    const yo = general.find((f) => f.p === idx);
+    if (!yo || !general.some((f) => f.total + f.err > 0)) return "Temporada";
+    const quien = (grupo) => (grupo.length === 1
+      ? nombreCorto(grupo[0].p, participantes) : null);
+    const arriba = general.filter((f) => f.total > yo.total);
+    if (arriba.length) {
+      const tope = Math.min(...arriba.map((f) => f.total));
+      const grupo = arriba.filter((f) => f.total === tope);
+      const falta = tope - yo.total;
+      const n = quien(grupo);
+      return "A " + falta + " " + (n ? "de " + n : "del " + grupo[0].pos + ".º");
+    }
+    const otros = general.filter((f) => f.p !== idx);
+    if (!otros.length) return "Temporada";
+    if (otros.some((f) => f.total === yo.total)) return "Empatas en la punta";
+    const tope = Math.max(...otros.map((f) => f.total));
+    const grupo = otros.filter((f) => f.total === tope);
+    const n = quien(grupo);
+    return "Le llevas " + (yo.total - tope) + " " + (n ? "a " + n : "al " + grupo[0].pos + ".º");
+  }
 
-      const s = porSemana.get(D.activa) || jugadas[jugadas.length - 1];
-      if (!s || !s.jugadores.length) return;
-      const fa2 = s.jugadores.indexOf(a), fb2 = s.jugadores.indexOf(b);
-      if (fa2 < 0 || fb2 < 0) return;
-      const juegos = partidosDe(s);
-      const difs = [];
-      juegos.forEach((p, col) => {
-        if (s.picks[fa2][col] === s.picks[fb2][col]) return;
-        const ladoA = s.picks[fa2][col] === 1 ? "l" : "v";
-        difs.push({ p, ladoA });
-      });
-      const t = crear("div", "titulo");
-      t.appendChild(crear("h2", null, "Dónde difieren · semana " + s.n));
-      t.appendChild(crear("span", "nota", difs.length + " de " + juegos.length));
-      destino.appendChild(t);
-      if (!difs.length) {
-        destino.appendChild(aviso("Picks idénticos", "Eligieron exactamente lo mismo esta semana."));
-        return;
-      }
-      const caja = crear("div", "dif");
-      difs.forEach(({ p, ladoA }) => {
-        const row = crear("div", "row");
-        const eqA = ladoA === "l" ? p.l : p.v;
-        const eqB = ladoA === "l" ? p.v : p.l;
-        const claseA = p.cerrado ? (p.g === ladoA ? " gano" : " perdio") : "";
-        const claseB = p.cerrado ? (p.g !== ladoA && p.g !== "x" ? " gano" : " perdio") : "";
-        row.appendChild(crear("span", "j izq" + claseA, eqA));
-        row.appendChild(crear("span", "mid", p.mv === null ? "por jugar" : p.mv + "–" + p.ml));
-        row.appendChild(crear("span", "j der" + claseB, eqB));
-        caja.appendChild(row);
-      });
-      destino.appendChild(caja);
+  /* El duelo entre dos: semanas cerradas ganadas, perdidas y empatadas, y en los partidos
+     cerrados donde eligieron distinto, quién acertó. Un pick es 0 (visitante) o 1 (local);
+     otra cosa es "sin pick" y no cuenta. El empate oficial ("x") no es acierto de nadie. */
+  function duelaLaPareja(a, b, semanas) {
+    const sem = { a: 0, b: 0, empates: 0 };
+    const dif = { a: 0, b: 0, ninguno: 0 };
+    let igual = 0, comparados = 0;
+    const lado = (s, fila, col) => {
+      const v = s.picks[fila] ? s.picks[fila][col] : null;
+      return v === 0 || v === 1 ? v : null;
     };
-    lista.addEventListener("change", pintar);
+    (semanas || []).forEach((s) => {
+      if (s.estado === "cerrada") {
+        const fa = (s.tabla || []).find((x) => x.p === a), fb = (s.tabla || []).find((x) => x.p === b);
+        if (fa && fb) {
+          if (fa.f > fb.f) sem.a++; else if (fa.f < fb.f) sem.b++; else sem.empates++;
+        }
+      }
+      const ia = s.jugadores.indexOf(a), ib = s.jugadores.indexOf(b);
+      if (ia < 0 || ib < 0) return;
+      s.partidos.forEach((p, col) => {
+        if (!p.cerrado || (p.g !== "v" && p.g !== "l" && p.g !== "x")) return;
+        const x = lado(s, ia, col), y = lado(s, ib, col);
+        if (x === null || y === null) return;
+        comparados++;
+        if (x === y) { igual++; return; }
+        if (p.g === "x") dif.ninguno++;
+        else if (x === (p.g === "l" ? 1 : 0)) dif.a++;
+        else dif.b++;
+      });
+    });
+    return { sem, dif, igual, comparados };
+  }
+
+  /* El duelo en lo alto de la ficha: tú contra esa persona, sin veredictos. En tu propia
+     ficha hay además un selector para comparar con otro. */
+  function bloqueDuelo(otro, conSelector) {
+    const caja = crear("section", "duelo-bloque");
+    caja.setAttribute("aria-label", "Duelo");
+    const destino = crear("div", "duelo-cifras");
+    let contra = otro;
+    if (conSelector) {
+      const lista = crear("select", "ancho duelo-lista");
+      lista.setAttribute("aria-label", "Comparar con otro");
+      D.general.map((f) => f.p).filter((i) => i !== jugador).forEach((i) => {
+        lista.appendChild(Object.assign(crear("option", null, nombre(i)), { value: String(i) }));
+      });
+      lista.value = String(otro);
+      lista.addEventListener("change", () => { contra = Number(lista.value); pintar(); });
+      caja.appendChild(lista);
+    }
+    caja.appendChild(destino);
+
+    function pintar() {
+      destino.textContent = "";
+      const fa = generalPorIdx.get(jugador), fb = generalPorIdx.get(contra);
+      const ta = fa ? fa.total : 0, tb = fb ? fb.total : 0;
+      const corto = nombreCorto(contra, D.participantes);
+      const marcador = crear("div", "duelo-marcador");
+      marcador.setAttribute("role", "text");
+      marcador.setAttribute("aria-label", "Tú " + ta + ", " + corto + " " + tb);
+      const lado = (quien, cifra, der, arriba) => {
+        const l = crear("span", "duelo-lado" + (der ? " der" : "") + (arriba ? " va-arriba" : ""));
+        const n = crear("span", "duelo-nom", quien), c = crear("b", "duelo-cifra", String(cifra));
+        if (der) { l.appendChild(c); l.appendChild(n); } else { l.appendChild(n); l.appendChild(c); }
+        return l;
+      };
+      marcador.appendChild(lado("Tú", ta, false, ta > tb));
+      marcador.appendChild(crear("span", "duelo-medio", "–"));
+      marcador.appendChild(lado(corto, tb, true, tb > ta));
+      destino.appendChild(marcador);
+
+      const r = duelaLaPareja(jugador, contra, D.semanas);
+      const nEmp = (n) => n + (n === 1 ? " empate" : " empates");
+      if (r.sem.a + r.sem.b + r.sem.empates > 0) {
+        destino.appendChild(crear("p", "duelo-linea", "En semanas: " + r.sem.a + "–" + r.sem.b +
+          (r.sem.empates ? " y " + nEmp(r.sem.empates) : "")));
+      }
+      if (r.comparados > 0) {
+        const otros = r.comparados - r.igual;
+        destino.appendChild(crear("p", "duelo-linea", "Eligieron igual " + r.igual + " de " + r.comparados + "." +
+          (otros ? " En los otros " + otros + ": tú " + r.dif.a + ", " + corto + " " + r.dif.b + ", " + nEmp(r.dif.ninguno) : "")));
+      }
+    }
     pintar();
-    return env;
+    return caja;
   }
 
   /* ═══════════════ el momento de la semana ═══════════════
@@ -3446,7 +3526,8 @@ try {
       dicho.push("Tu semana " + semana.n + ": " + (semana.jugados ? semana.ok + " de " + semana.jugados + " aciertos" : "sin partidos cerrados") +
         ", vas en el lugar " + (enJuego ? semana.proy : semana.pos) + "." + (enJuego ? " Ganas " + semana.ganando + " de " + enJuego + " en juego." : ""));
     }
-    if (g) dicho.push("Temporada: " + g.total + " aciertos, lugar " + g.pos + ".");
+    const distancia = distanciaEnTemporada(D.general, D.participantes, jugador);
+    if (g) dicho.push("Temporada: " + g.total + " aciertos, lugar " + g.pos + "." + (distancia === "Temporada" ? "" : " " + distancia + "."));
     if (!semana && !g) dicho.push("Tu avance: aún sin partidos cerrados.");
     dicho.push("Abrir tu ficha.");
     b.setAttribute("aria-label", dicho.join(" "));
@@ -3469,7 +3550,7 @@ try {
     }
     if (g) {
       const p = pct(g.total, g.total + g.err);
-      celda("Temporada", [
+      celda(distancia, [
         crear("b", null, String(g.total)),
         p === null ? null : crear("span", "por", p + "%"),
         conOrdinal("span", "rango", ordinal(g.pos)),
@@ -4074,6 +4155,149 @@ try {
     return fila;
   }
 
+  /* La tarjeta de una semana cerrada y oficial para mandar al grupo: lo que hiciste tú,
+     con los números de las tablas y el monto tal cual lo publica la semana. */
+  async function exportarMiSemana(s) {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const { g, semana } = numerosDe(jugador, s);
+    const fila = s.jugadores.indexOf(jugador);
+    if (!semana || fila < 0) return;
+
+    const ANCHO = 1080, MARGEN = 48, CAMPO = 560, escala = 2, PIE = 130;
+    const conLetra = await letraDeLienzo();
+    const sistema = "-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
+    const cuerpo = (peso, tam) => peso + " " + tam + "px " + sistema;
+    const rotulo = (tam) => "500 " + tam + "px " + (conLetra ? "RotuloLienzo, " : "") + sistema;
+    const CDMX = "America/Mexico_City";
+
+    // Un segmento por partido, en el orden en que se jugaron.
+    const trazos = s.partidos.map((p, col) => ({ p, col }))
+      .sort((a, b) => (a.p.t || Infinity) - (b.p.t || Infinity) || a.col - b.col)
+      .map(({ p, col }) => {
+        if (p.g === "x") return "x";
+        const v = s.picks[fila][col];
+        return (v === 0 || v === 1) && p.g === (v === 1 ? "l" : "v") ? "ok" : "mal";
+      });
+    const gano = !!s.oficial && (s.ganadores || []).includes(jugador);
+    const perfecta = s.total > 0 && semana.ok === s.total;
+    const filas = [{ n: ordinal(semana.pos), resto: " de " + s.tabla.length + " esta semana" }];
+    if (gano) filas.push({ frase: "Ganaste la semana", monto: s.premio + ((s.ganadores || []).length > 1 ? " c/u" : "") });
+    if (perfecta) filas.push({ frase: "Semana perfecta" });
+    if (g) filas.push({ n: ordinal(g.pos), resto: " en la general con " + g.total });
+
+    const POR_FILA = 112, TIRA = CAMPO + 330;
+    const alto = TIRA + 120 + filas.length * POR_FILA + PIE;
+    const enZona = equipo || nombre(jugador);
+    const titular = nombre(jugador).toUpperCase();
+    const fecha = new Date().toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric", timeZone: CDMX });
+    const direccion = location.host + location.pathname.replace(/index\.html$/, "").replace(/\/$/, "");
+
+    const armar = async (conCampo) => {
+      const lienzo = document.createElement("canvas");
+      lienzo.width = ANCHO * escala;
+      lienzo.height = alto * escala;
+      const ctx = lienzo.getContext("2d");
+      ctx.scale(escala, escala);
+      const espaciado = (px) => { if ("letterSpacing" in ctx) ctx.letterSpacing = px + "px"; };
+      ctx.fillStyle = "#060a08";
+      ctx.fillRect(0, 0, ANCHO, alto);
+      await encabezadoEnLienzo(ctx, { ANCHO, CAMPO, MARGEN, escala, conCampo, enZona, etiqueta: "SEMANA " + s.n, titular, semana: null, cuerpo, rotulo });
+
+      ctx.textBaseline = "alphabetic";
+      ctx.textAlign = "left";
+      espaciado(0);
+      // La cifra grande.
+      ctx.fillStyle = "#f3f6f4";
+      ctx.font = rotulo(240);
+      const cifra = String(semana.ok);
+      ctx.fillText(cifra, MARGEN, CAMPO + 250);
+      const despues = MARGEN + ctx.measureText(cifra).width;
+      ctx.fillStyle = "#a7b1ab";
+      ctx.font = rotulo(88);
+      ctx.fillText(" de " + s.total, despues, CAMPO + 250);
+
+      // La tira.
+      const sep = trazos.length > 18 ? 6 : 10, n = trazos.length;
+      const w = (ANCHO - MARGEN * 2 - sep * (n - 1)) / Math.max(n, 1);
+      const caja = (x, y, ancho, h, r) => {
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x, y, ancho, h, r); else ctx.rect(x, y, ancho, h);
+      };
+      trazos.forEach((tipo, i) => {
+        const x = MARGEN + i * (w + sep);
+        if (tipo === "ok") { ctx.fillStyle = "#34d680"; caja(x, TIRA, w, 40, 8); ctx.fill(); }
+        else if (tipo === "x") { ctx.fillStyle = "#5b6661"; caja(x, TIRA, w, 40, 8); ctx.fill(); }
+        else { ctx.strokeStyle = "#ff6b61"; ctx.lineWidth = 4; caja(x + 2, TIRA + 2, w - 4, 36, 6); ctx.stroke(); }
+      });
+
+      // Lugar de la semana, premio y lugar en la general.
+      let y = TIRA + 175;
+      filas.forEach((f) => {
+        if (f.n) {
+          ctx.fillStyle = "#ffd60a";
+          ctx.font = rotulo(92);
+          ctx.fillText(f.n, MARGEN, y);
+          const x = MARGEN + ctx.measureText(f.n).width;
+          ctx.fillStyle = "#f3f6f4";
+          ctx.font = cuerpo(600, 44);
+          ctx.fillText(f.resto, x, y);
+        } else {
+          ctx.fillStyle = "#f3f6f4";
+          ctx.font = rotulo(72);
+          ctx.fillText(f.frase, MARGEN, y);
+          if (f.monto) {
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#ffd60a";
+            ctx.font = rotulo(72);
+            ctx.fillText(f.monto, ANCHO - MARGEN, y);
+            ctx.textAlign = "left";
+          }
+        }
+        y += POR_FILA;
+      });
+
+      const yp = alto - PIE;
+      ctx.fillStyle = "#1e2622";
+      ctx.fillRect(MARGEN, yp + 20, ANCHO - MARGEN * 2, 2);
+      marcaEnLienzo(ctx, ANCHO - MARGEN - 44, yp + 46, 44);
+      ctx.fillStyle = "#a7b1ab";
+      ctx.font = cuerpo(500, 24);
+      ctx.fillText("Quiniela NFL " + D.anio + "  ·  " + fecha, MARGEN, yp + 90);
+      ctx.fillText(direccion, MARGEN, yp + 122);
+      return lienzo;
+    };
+
+    const titulo = "Mi semana " + s.n + " · " + nombre(jugador);
+    const r = abrirRevelado(titulo);
+    r.estado.textContent = "Armando tu semana…";
+    let blob = null;
+    try {
+      let lienzo = await armar(true);
+      try { lienzo.getContext("2d").getImageData(0, 0, 1, 1); } catch (e) { lienzo = await armar(false); }
+      blob = await new Promise((listo) => lienzo.toBlob(listo, "image/jpeg", 0.9));
+    } catch (e) {
+      console.error(e);
+    }
+    if (!blob) {
+      r.estado.textContent = "No se pudo armar la imagen. Cierra y vuelve a intentar.";
+      return;
+    }
+    const slug = nombre(jugador).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    await entregarImagen(r, blob, "semana-" + s.n + "-" + slug + ".jpg", titulo, "Semana " + s.n);
+  }
+
+  /* Solo con la semana cerrada y oficial, y solo si tienes picks en ella. */
+  function botonMiSemana(s) {
+    if (jugador === null || s.estado !== "cerrada" || !s.oficial || s.jugadores.indexOf(jugador) < 0) return null;
+    const mandar = crear("button", "boton-principal tu-semana-mandar", "Compartir mi semana");
+    mandar.type = "button";
+    mandar.addEventListener("click", async () => {
+      mandar.disabled = true;
+      try { await exportarMiSemana(s); } finally { mandar.disabled = false; }
+    });
+    return mandar;
+  }
+
   function tarjetaTuSemana(s) {
     if (jugador === null || !s || s.estado === "pendiente") return null;
     const { semana } = numerosDe(jugador, s);
@@ -4102,6 +4326,9 @@ try {
     if (enJuego) dato("", semana.ganando, "de " + enJuego + " en juego a favor");
     if (porJugar) dato("", porJugar, "por jugar");
     caja.appendChild(leyenda);
+
+    const mandar = botonMiSemana(s);
+    if (mandar) caja.appendChild(mandar);
 
     const c = chanceDe(s, jugador);
     if (c) {
