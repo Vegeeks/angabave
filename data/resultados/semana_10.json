@@ -4,11 +4,11 @@
     {
       "visitante": "Washington",
       "local": "Giants",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
+      "marcador_visitante": 24,
+      "marcador_local": 21,
+      "ganador": "Washington",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-13T01:15:00+00:00",
       "hora_definida": true
     },
