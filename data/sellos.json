@@ -188,5 +188,12 @@
       "Rams@Washington": "47fd57922426f5fb03a4535e90eb5301e90f94849f56c0fcdb79a40ceb844f74",
       "Texans@Chargers": "c222894bdf815a773ba8dbd6f98594cd2d3de0ef1b5b594592413461ecf880a5"
     }
+  },
+  "10": {
+    "archivo": "Semana_10.xlsx",
+    "sellado": "2026-11-13T01:20:29+00:00",
+    "partidos": {
+      "Washington@Giants": "3b2912d3f842ceb003049c27ca343a8cd0cd1aaa2b718ce5f4d844d75439cb22"
+    }
   }
 }

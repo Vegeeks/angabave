@@ -1,0 +1,148 @@
+{
+  "semana": 11,
+  "partidos": [
+    {
+      "visitante": "Colts",
+      "local": "Texans",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-20T01:15:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Dolphins",
+      "local": "Bills",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Saints",
+      "local": "Bears",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Titans",
+      "local": "Cowboys",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Buccaneers",
+      "local": "Lions",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Cardinals",
+      "local": "Chiefs",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Steelers",
+      "local": "Eagles",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Ravens",
+      "local": "Panthers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Jets",
+      "local": "Chargers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Raiders",
+      "local": "Broncos",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T21:25:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Jaguars",
+      "local": "Giants",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-22T21:25:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Vikings",
+      "local": "49ers",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-23T01:20:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Bengals",
+      "local": "Washington",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Scheduled",
+      "inicio": "2026-11-24T01:15:00+00:00",
+      "hora_definida": true
+    }
+  ]
+}
