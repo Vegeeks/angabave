@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.31.0"
+VERSION = "v0.34.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -1230,6 +1230,10 @@ def generar_html(
     cobrado = cobrado_en_centavos(semanas, indice_global)
     premios = {
         "semanal": _pesos(PREMIO_SEMANAL),
+        # Lo que cobra cada ganador según cuántos ganen: el navegador solo lo lee.
+        "semanal_por_ganadores": {
+            str(n): _pesos(premio_semanal(n)) for n in range(1, max(len(indice_global), 1) + 1)
+        },
         "acumulado_semanal": _pesos(ACUMULADO_SEMANAL),
         "total": _pesos(ACUMULADO_TOTAL),
         "semanas_temporada": SEMANAS_TEMPORADA,

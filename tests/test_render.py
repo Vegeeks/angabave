@@ -132,6 +132,18 @@ def test_el_json_lleva_toda_la_temporada(armado, tmp_path: Path):
     assert set(semana2["picks"][0]) <= {0, 1}
 
 
+def test_el_premio_semanal_viaja_para_cada_numero_de_ganadores(armado, tmp_path: Path):
+    """El navegador no divide dinero: lee lo que cobra cada ganador según cuántos ganen."""
+    from quiniela.scoring import premio_semanal
+    from quiniela.render_html import _pesos
+
+    datos = datos_embebidos(render(armado, tmp_path))
+    por = datos["premios"]["semanal_por_ganadores"]
+    assert list(por) == [str(n) for n in range(1, len(datos["participantes"]) + 1)]
+    assert all(por[str(n)] == _pesos(premio_semanal(n)) for n in range(1, len(datos["participantes"]) + 1))
+    assert por["1"] == datos["premios"]["semanal"]
+
+
 def test_la_semana_sin_picks_se_marca_como_pendiente(armado, tmp_path: Path):
     html = render(armado, tmp_path)
     datos = datos_embebidos(html)

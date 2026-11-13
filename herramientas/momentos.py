@@ -6,17 +6,19 @@
 
 "Hoy" cambia según el momento: picks, partidos de hoy, en vivo, resultados,
 semana cerrada. Esperar al domingo para ver cómo se acomoda no es práctico, así
-que esto toma docs/index.html y la última semana cerrada (S) y arma cinco
+que esto toma docs/index.html y la última semana cerrada (S) y arma seis
 páginas, cada una con los datos retocados, un reloj falso y un ESPN falso:
 
   fase-hoy.html            domingo de S a las 06:00: todo por jugar
   fase-vivo.html           domingo de S, hora y media después del primer partido de la tarde
   fase-domingo-noche.html  domingo de S a las 22:30: ya acabó el domingo, falta el lunes
+  fase-dos-partidos.html   domingo de S a las 22:30, con dos partidos por jugar el lunes
   fase-martes.html         martes después de S: ya cerró y la siguiente está en picks
   fase-final.html          como si la temporada hubiera terminado en S
 
-Las tablas no se recalculan (la de S es la final): las páginas sirven para ver
-el acomodo, no para revisar cuentas. Nada de esto se publica, y por eso la
+Al reabrir partidos la tabla de S se rehace con lo que sigue cerrado (aciertos y
+ganadores; los premios y el resto no se tocan): sirve para ver el acomodo, no para
+revisar cuentas. Nada de esto se publica, y por eso la
 salida no puede quedar dentro de docs/.
 
 Solo usa la biblioteca estándar de Python.
@@ -58,12 +60,28 @@ def domingo_de(s: dict) -> date:
     return Counter(dia(p) for p in ([p for p in juegos if p["t"]] or juegos)).most_common(1)[0][0]
 
 
+def recalcular(s: dict) -> None:
+    """Rehace la tabla y los ganadores con lo que sigue cerrado, como lo haría el generador."""
+    cerrados = [(col, p) for col, p in enumerate(s["partidos"]) if p["cerrado"]]
+    filas = []
+    for fila, jugador in enumerate(s["jugadores"]):
+        f = sum(1 for col, p in cerrados if p["g"] in ("v", "l") and (s["picks"][fila][col] == 1) == (p["g"] == "l"))
+        filas.append({"p": jugador, "f": f, "e": len(cerrados) - f})
+    filas.sort(key=lambda fila: -fila["f"])
+    for fila in filas:
+        fila["pos"] = 1 + sum(1 for x in filas if x["f"] > fila["f"])
+    s["tabla"] = filas
+    s["proyectable"] = len(cerrados) >= s.get("umbral", 8)
+    s["ganadores"] = [f["p"] for f in filas if f["pos"] == 1] if s["proyectable"] and filas else []
+
+
 def reabrir(s: dict, desde: datetime) -> None:
     """Deja abiertos los partidos que arrancan a partir de `desde`."""
     for p in s["partidos"]:
         if p["t"] >= desde.timestamp():
             p.update(mv=None, ml=None, g=None, cerrado=False, vivo=False, e=p["grupo"])
     s.update(cerrados=sum(p["cerrado"] for p in s["partidos"]), estado="en_vivo", oficial=False)
+    recalcular(s)
 
 
 def tanda(cierre: datetime, juegos: list[dict]) -> dict:
@@ -193,6 +211,15 @@ def main(argv: list[str] | None = None) -> int:
     reabrir(semana(D, n), a_las(lunes, 0))
     ahora = a_las(domingo, 22, 30)
     escribir(salida, html, "domingo-noche", D, ahora, marcador(D, semana(D, n), ahora, False))
+
+    # Dos partidos por jugar, los dos el lunes: el último del domingo se pasa a la tarde del lunes.
+    D = base(n + 1)
+    juegos = sorted(semana(D, n)["partidos"], key=lambda p: p["t"])
+    if len(juegos) > 2 and dia(juegos[-2]) == domingo:
+        juegos[-2]["t"] = int(a_las(lunes, 16, 30).timestamp())
+        reabrir(semana(D, n), a_las(lunes, 0))
+        ahora = a_las(domingo, 22, 30)
+        escribir(salida, html, "dos-partidos", D, ahora, marcador(D, semana(D, n), ahora, False))
 
     D = base(n + 1)
     if semana(D, n + 1):

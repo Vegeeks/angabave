@@ -180,6 +180,7 @@ const pantallas = [
     { n: "vivo-escenarios", p: "/momentos/fase-vivo.html", h: "#s7", yo: YO, pasos: [PESTANA("Escenarios")] },
     { n: "domingo-temprano", p: "/momentos/fase-hoy.html", h: "#hoy", yo: YO },
     { n: "domingo-noche", p: "/momentos/fase-domingo-noche.html", h: "#hoy", yo: YO },
+    { n: "dos-partidos", p: "/momentos/fase-dos-partidos.html", h: "#hoy", yo: YO },
     { n: "martes", p: "/momentos/fase-martes.html", h: "#hoy", yo: YO },
     { n: "final", p: "/momentos/fase-final.html", h: "#hoy", yo: YO },
     { n: "final-premios", p: "/momentos/fase-final.html", h: "#premios", yo: YO },

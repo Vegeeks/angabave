@@ -94,7 +94,7 @@ i,em{font-style:normal}
 /* Las cifras de marcador. Nunca en nombres ni en frases. */
 .juego-fila .mrc,.pts,.err,.sem,.c-pos .n,.medalla,.lugar .puntos,.lugar .bolsa,.fila-gan .monto,.bolsa-final .val,.campeon .bolsa,
 .cifras .cifra b,.mi-barra .linea b,.mi-barra .linea .rango,.mi-semana .fila .rango,.leyenda b,.celda-semana b,.duelo .cara .t,
-.detalle-partido .marcador,.candidato .n,.candidato .pct,.barras .col small.cima,.lugar-premio b,.acciones-gen .cuenta{
+.pasa-si-monto,.detalle-partido .marcador,.candidato .n,.candidato .pct,.barras .col small.cima,.lugar-premio b,.acciones-gen .cuenta{
   font-family:var(--num); font-weight:600; letter-spacing:0}
 
 /* ═══════ el campo ═══════
@@ -453,6 +453,31 @@ main{view-transition-name:contenido; min-height:60vh}
 .campeon.compacto .cifra{display:none}
 .campeon.compacto .bolsa{margin:0; font-size:var(--t3); line-height:1.2; grid-column:3; grid-row:1/3}
 .campeon.compacto.provisional .bolsa{font-size:var(--t5)}
+/* Qué pasa si…: un renglón por desenlace, con quién se lleva la semana y cuánto. */
+.pasa-si{margin-bottom:24px}
+.pasa-si-fila{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; column-gap:12px; min-height:52px; padding-block:8px}
+.pasa-si-fila.sola{grid-template-columns:minmax(0,1fr) auto}
+.pasa-si-fila + .pasa-si-fila{border-top:1px solid var(--linea)}
+.pasa-si-teselas{display:flex; gap:4px}
+.pasa-si-fila .sig{min-width:40px; padding-inline:4px}
+.pasa-si-texto{display:block}
+.pasa-si-cuando{display:block; font-size:var(--t5); font-weight:500; line-height:1.3; color:var(--tenue)}
+.pasa-si-quien{display:block; font-size:var(--t4); font-weight:600; line-height:1.25; overflow-wrap:anywhere}
+.pasa-si-fila.tuya .pasa-si-quien{color:var(--acento)}
+.pasa-si-monto{text-align:right; font-size:var(--t3); line-height:1.1; color:var(--oro); white-space:nowrap}
+.pasa-si-monto small{display:block; font-family:var(--cuerpo); font-size:var(--t6); font-weight:500; color:var(--tenue)}
+@media (max-width:360px){ .pasa-si-fila .sig{display:none} .pasa-si-fila{grid-template-columns:minmax(0,1fr) auto} }
+.pasa-si .nota{margin:8px 0 0}
+.cierre-sello{display:inline-block; margin-top:8px; padding:4px 12px; border-radius:99px; border:1px solid var(--oro); color:var(--oro); font-size:var(--t5); font-weight:700}
+/* El cintillo de la jugada de tu pick, sobre la barra de abajo. */
+.jugadas{position:fixed; left:12px; right:12px; bottom:calc(var(--alto-pie) + 8px); z-index:225; display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none}
+.jugada{pointer-events:auto; display:flex; align-items:center; width:100%; max-width:480px; min-height:64px; padding:12px 16px; border-radius:var(--r1);
+  text-align:left; font-size:var(--t4); font-weight:600; line-height:1.3; animation:jugada-entra .34s var(--sale) backwards}
+.jugada.a-favor{background:var(--c,var(--panel3)); color:var(--c-txt,var(--txt))}
+.jugada.en-contra{background:var(--panel2); color:var(--txt); box-shadow:inset 4px 0 0 var(--c,var(--acento))}
+.jugada.saliendo{animation:jugada-sale .22s var(--entra) both}
+@keyframes jugada-entra{from{opacity:0; transform:translate3d(0,calc(100% + 24px),0)}}
+@keyframes jugada-sale{to{opacity:0; transform:translate3d(0,12px,0)}}
 .confetis{position:fixed; inset:0; z-index:150; pointer-events:none; overflow:hidden}
 .confeti{position:absolute; top:-20px; width:8px; height:14px; border-radius:2px; opacity:0; will-change:transform;
   animation:caer var(--d) cubic-bezier(.25,.5,.5,1) forwards}
@@ -888,6 +913,7 @@ html[data-rumbo="atras"]::view-transition-new(contenido){animation-name:vt-llega
   .hoy-rejilla.sola{grid-template-columns:minmax(0,1fr)}
   .acciones-gen{bottom:12px}
   .flotante{bottom:24px}
+  .jugadas{bottom:24px}
   .arriba{position:fixed; right:24px; bottom:24px; z-index:70; width:44px; height:44px; border-radius:50%; display:grid; place-items:center; background:var(--panel2); border:1px solid var(--linea2);
     opacity:0; transform:translateY(16px) scale(.9); pointer-events:none; transition:opacity .24s,transform .36s var(--rebote)}
   .arriba.se-ve{opacity:1; transform:none; pointer-events:auto}
@@ -1035,6 +1061,7 @@ try {
 </main>
 
 <nav class="navegacion al-pie" data-nav aria-label="Secciones">{{ botones_nav() }}</nav>
+<div class="jugadas" id="jugadas" aria-live="polite"></div>
 
 <footer>
   <div class="env">
@@ -1540,7 +1567,7 @@ try {
         e = (reloj.period > 4 ? "TE" : "Q" + reloj.period) + (reloj.displayClock ? " · " + reloj.displayClock : "");
       }
       salida.set(v.eq + "@" + l.eq, {
-        mv: v.m, ml: l.m, g, e,
+        v: v.eq, l: l.eq, mv: v.m, ml: l.m, g, e,
         completado: tipo.completed,
         enJuego: !tipo.completed && !antes,
       });
@@ -1556,12 +1583,94 @@ try {
       (p.vivo || !p.t || (ahora >= p.t * 1000 - 15 * 60e3 && ahora <= p.t * 1000 + 5 * 3600e3)));
   }
 
+  /* Lo que cambió en un partido con tu pick entre dos consultas a ESPN, o nada.
+     `miLado` es "v" o "l" (el lado que elegiste) y null si no hay pick ni nombre.
+     final > volteo > touchdown; una corrección a la baja no avisa. */
+  function jugadaDe(previo, valor, miLado) {
+    if (!previo || !valor || (miLado !== "v" && miLado !== "l")) return null;
+    const mio = (lado) => (lado === "v" ? valor.v : valor.l);
+    const cifra = (lado) => (lado === "v" ? valor.mv : valor.ml) || 0;
+    const otro = miLado === "v" ? "l" : "v";
+    const antes = (lado) => (lado === "v" ? previo.mv : previo.ml) || 0;
+    if (cifra("v") < antes("v") || cifra("l") < antes("l")) return null;
+    if (valor.completado && !previo.completado) {
+      const marcador = cifra(miLado) + "–" + cifra(otro);
+      if (valor.g === miLado) return { tipo: "final", texto: "Ganó tu pick: " + mio(miLado) + " " + marcador, aFavor: true };
+      if (valor.g === otro) return { tipo: "final", texto: "Perdió tu pick: " + mio(miLado) + " " + marcador, aFavor: false };
+      return { tipo: "final", texto: "Terminó empatado: " + mio(miLado) + " " + marcador, aFavor: false };
+    }
+    if (valor.completado || previo.completado) return null;
+    if ((valor.g === "v" || valor.g === "l") && valor.g !== previo.g && /^(Q[34]|TE)/.test(valor.e || "")) {
+      const arriba = valor.g, abajo = arriba === "v" ? "l" : "v";
+      const marcador = cifra(arriba) + "–" + cifra(abajo);
+      return valor.g === miLado
+        ? { tipo: "volteo", texto: "Ahora va ganando tu pick: " + mio(arriba) + " " + marcador, aFavor: true }
+        : { tipo: "volteo", texto: "Ahora va perdiendo tu pick: " + mio(arriba) + " " + marcador, aFavor: false };
+    }
+    const subio = ["v", "l"].filter((lado) => cifra(lado) - antes(lado) >= 6 && cifra(lado) - antes(lado) <= 8);
+    if (subio.length === 1) {
+      const quien = subio[0], contra = quien === "v" ? "l" : "v";
+      return { tipo: "touchdown", texto: "Touchdown de " + mio(quien) + ": " + cifra(quien) + "–" + cifra(contra), aFavor: quien === miLado };
+    }
+    return null;
+  }
+
+  /* El cintillo de la jugada: una cola corta, uno a la vez, sobre la barra de abajo. */
+  const colaJugadas = [];
+  let jugadaEnPantalla = false, ultimaCarrera = 0;
+  const jugadaEstorba = () => !!hojaAbierta || escribiendo() || vistaActual === "picks";
+  function avisarJugadas(s, cambios) {
+    if (jugador === null || jugadaEstorba()) return;
+    const orden = { final: 0, volteo: 1, touchdown: 2 };
+    const avisos = [];
+    cambios.forEach(({ previo, valor }) => {
+      const col = s.partidos.findIndex((q) => q.v === valor.v && q.l === valor.l);
+      const mio = col >= 0 ? miPick(s, col) : null;
+      const jugada = mio ? jugadaDe(previo, valor, mio.lado) : null;
+      if (!jugada) return;
+      const rival = mio.lado === "v" ? s.partidos[col].l : s.partidos[col].v;
+      avisos.push({ s, p: s.partidos[col], jugada, equipo: jugada.tipo === "final" || jugada.aFavor ? mio.equipo : rival });
+    });
+    avisos.sort((a, b) => orden[a.jugada.tipo] - orden[b.jugada.tipo]).slice(0, 3).forEach((a) => colaJugadas.push(a));
+    siguienteJugada();
+  }
+  function siguienteJugada() {
+    const region = document.getElementById("jugadas");
+    if (jugadaEnPantalla || !colaJugadas.length || !region) return;
+    if (jugadaEstorba()) { colaJugadas.length = 0; return; }
+    const { s, p, jugada, equipo } = colaJugadas.shift();
+    const caja = crear("button", "jugada " + (jugada.aFavor ? "a-favor" : "en-contra"));
+    caja.type = "button";
+    const color = D.colores[equipo] || {};
+    if (color.local) {
+      caja.style.setProperty("--c", color.local);
+      caja.style.setProperty("--c-txt", color.local_texto || "#07090b");
+    }
+    caja.appendChild(crear("span", "jugada-texto", jugada.texto));
+    jugadaEnPantalla = true;
+    const quitar = () => {
+      if (!caja.isConnected) return;
+      caja.classList.add("saliendo");
+      setTimeout(() => { caja.remove(); jugadaEnPantalla = false; siguienteJugada(); }, suave ? 0 : 240);
+    };
+    caja.addEventListener("click", () => {
+      quitar();
+      colaJugadas.length = 0;
+      abrirPartido(s, efectivo(p), null);
+    });
+    region.appendChild(caja);
+    setTimeout(quitar, suave ? 3600 : 3000);
+    // Si va a tu favor y el campo está a la vista, el campo corre; cada 10 minutos como mucho.
+    if (jugada.aFavor && Date.now() - ultimaCarrera > 10 * 60e3 && correCampo()) ultimaCarrera = Date.now();
+  }
+
   let consultando = false;
   async function consultarVivo() {
     if (!D.vivo || document.hidden || consultando) return;
     const s = typeof vistaActual === "number" ? porSemana.get(vistaActual) : porSemana.get(D.activa);
     if (!s || s.cerrados >= s.total || !hayJuegoCerca(s)) return;
     consultando = true;
+    let cambios = null;
     const control = new AbortController();
     const corte = setTimeout(() => control.abort(), 8000);
     try {
@@ -1573,8 +1682,10 @@ try {
       const frescos = parsearVivo(await r.json());
       if (!frescos) throw new Error("formato inesperado");
       const antes = JSON.stringify(todosLosJuegos(s));
+      const nuevos = [];
       frescos.forEach((valor, clave) => {
         const previo = marcadores.get(clave);
+        if (previo) nuevos.push({ previo, valor });
         if (previo && (previo.mv !== valor.mv || previo.ml !== valor.ml)) {
           anotaciones.set(clave, {
             cuando: Date.now(),
@@ -1585,6 +1696,7 @@ try {
         marcadores.set(clave, valor);
       });
       fallosVivo = 0;
+      cambios = nuevos;
       try { pintarCampo(); } catch (e) { console.error(e); }
       ultimaConsulta = new Date();
       // Redibujar sin que nada cambie borraba lo que la persona tenía a medias.
@@ -1595,6 +1707,10 @@ try {
       clearTimeout(corte);
       consultando = false;
       pintarFrescura();
+    }
+    // Aparte de la consulta: si esto falla, el marcador sigue y ESPN no cuenta como caído.
+    if (cambios) {
+      try { avisarJugadas(s, cambios); } catch (e) { console.error(e); }
     }
   }
 
@@ -3378,6 +3494,156 @@ try {
   }
 
   /* ═══ hoy ═══ */
+  /* Qué pasa con la semana según cómo terminen los 1 o 2 partidos que faltan: los
+     aciertos oficiales (s.tabla) más los de esos partidos, con la misma regla que se
+     publica (más aciertos gana; si empatan, se reparte). Un partido terminado pero
+     sin confirmar cuenta con su resultado. Es solo una proyección: no toca tablas
+     ni premios. Los desenlaces que dan lo mismo se juntan en una fila. */
+  function desenlacesDeLaSemana(s, juegos) {
+    if (!s || !s.proyectable || (s.por_entregar || []).length || !(s.tabla || []).length) return null;
+    const abiertos = [];
+    juegos.forEach((p, col) => { if (!p.cerrado && !p.porConfirmar) abiertos.push(col); });
+    const n = abiertos.length, total = 1 << n;
+    if (n < 1 || n > 2) return null;
+    const lado = (p) => (p.g === "v" || p.g === "l" ? p.g : null);
+    const base = new Map();
+    s.tabla.forEach((f) => {
+      const fila = s.jugadores.indexOf(f.p);
+      let suma = f.f;
+      if (fila >= 0) juegos.forEach((p, col) => {
+        const pk = s.picks[fila][col];
+        // Sin pick (ni 0 ni 1) no suma: no es lo mismo que elegir al visitante.
+        if (p.cerrado || !p.porConfirmar || !lado(p) || (pk !== 0 && pk !== 1)) return;
+        if ((pk === 1 ? "l" : "v") === lado(p)) suma++;
+      });
+      base.set(f.p, { fila, suma });
+    });
+    const grupos = new Map();
+    for (let m = 0; m < total; m++) {
+      const cuentas = [];
+      base.forEach((b, p) => {
+        let suma = b.suma;
+        if (b.fila >= 0) abiertos.forEach((col, i) => {
+          const pk = s.picks[b.fila][col];
+          if (pk !== 0 && pk !== 1) return;
+          if ((pk === 1) === (((m >> (n - 1 - i)) & 1) === 1)) suma++;
+        });
+        cuentas.push([p, suma]);
+      });
+      const tope = Math.max(...cuentas.map((c) => c[1]));
+      const ganadores = cuentas.filter((c) => c[1] === tope).map((c) => c[0]).sort((a, b) => a - b);
+      const llave = ganadores.join(",");
+      if (!grupos.has(llave)) grupos.set(llave, { ganadores, combos: [] });
+      grupos.get(llave).combos.push(m);
+    }
+    // Cada grupo se parte en el menor número de filas: cubos de resultados donde
+    // algunos partidos quedan fijos y los demás da igual cómo terminen.
+    const bits = (m) => (m & 1) + ((m >> 1) & 1);
+    const fijos = Array.from({ length: total }, (_, m) => m).sort((a, b) => bits(a) - bits(b) || a - b);
+    const filas = [];
+    grupos.forEach((g) => {
+      const usados = new Set();
+      fijos.forEach((fijo) => {
+        for (let valor = 0; valor < total; valor++) {
+          if ((valor & ~fijo) !== 0) continue;
+          const cubo = g.combos.filter((m) => (m & fijo) === valor);
+          const todos = Array.from({ length: total }, (_, m) => m).filter((m) => (m & fijo) === valor);
+          if (cubo.length !== todos.length || cubo.some((m) => usados.has(m))) continue;
+          cubo.forEach((m) => usados.add(m));
+          const pone = [];
+          abiertos.forEach((col, i) => {
+            if (!((fijo >> (n - 1 - i)) & 1)) return;
+            const local = ((valor >> (n - 1 - i)) & 1) === 1;
+            pone.push({ col, lado: local ? "l" : "v", equipo: local ? juegos[col].l : juegos[col].v });
+          });
+          filas.push({ pone, ganadores: g.ganadores, primero: cubo[0] });
+        }
+      });
+    });
+    filas.sort((a, b) => a.primero - b.primero);
+    return { abiertos: abiertos.map((col) => ({ col, p: juegos[col] })), filas };
+  }
+
+  /* Quién se lleva la semana, dicho para quien lo lee: "Ganas tú", "Empatas con 2"
+     o el nombre ("Leo Villavicencio y 2 más"). */
+  function quienGana(ganadores, yo, nombreDe) {
+    const n = ganadores.length;
+    if (yo !== null && ganadores.includes(yo)) {
+      return n === 1 ? { fila: "Ganas tú", frase: "ganas tú", mio: true }
+        : { fila: "Empatas con " + (n - 1), frase: "empatas con " + (n - 1), mio: true };
+    }
+    const nombres = ganadores.map(nombreDe).sort((a, b) => a.localeCompare(b, "es"));
+    const quien = nombres[0] + (n > 1 ? " y " + (n - 1) + " más" : "");
+    return { fila: quien, frase: (n > 1 ? "ganan " : "gana ") + quien, mio: false };
+  }
+
+  /* El titular y el detalle de una semana recién cerrada y oficial. Sin juicios: a
+     quien ganó se le dice, a los demás se les dice cómo quedó y dónde quedaron. */
+  function cierreDeSemana(s, yo, nombreDe) {
+    if (!s || !s.oficial || !(s.ganadores || []).length || !(s.tabla || []).length) return null;
+    const gente = s.ganadores, cima = s.tabla.find((f) => f.pos === 1);
+    if (!cima) return null;
+    const mia = yo === null ? null : s.tabla.find((f) => f.p === yo) || null;
+    const decididos = s.partidos.filter((p) => p.cerrado && (p.g === "v" || p.g === "l")).length;
+    const cuenta = cima.f + " de " + s.cerrados + ".";
+    if (yo !== null && gente.includes(yo)) {
+      return {
+        gano: true,
+        titulo: gente.length > 1 ? ["Ganaste la semana " + s.n, "con " + (gente.length - 1) + " más"] : ["Ganaste la", "semana " + s.n],
+        detalle: (mia ? mia.f : cima.f) + " de " + s.cerrados + ". Cobras " + s.premio + ".",
+        perfecta: !!mia && decididos > 0 && mia.f === decididos,
+      };
+    }
+    const titulo = gente.length === 1 ? ["Ganó", nombreDe(gente[0])] : ["Ganaron " + gente.length, "con " + cima.f];
+    return { gano: false, titulo, detalle: cuenta + (mia ? " Tú: " + mia.f + ", " + ordinal(mia.pos) + "." : ""), perfecta: false };
+  }
+
+  /* "Qué pasa si…": con 1 o 2 partidos por definirse, quién se lleva la semana en
+     cada desenlace y cuánto cobra. Los montos vienen de Python, no se calculan aquí. */
+  function tarjetaPasaSi(desenlaces) {
+    const caja = crear("section", "tarjeta pasa-si");
+    const cab = crear("div", "cab");
+    cab.appendChild(crear("h3", null, "Qué pasa si…"));
+    caja.appendChild(cab);
+    const montos = (D.premios || {}).semanal_por_ganadores || {};
+    desenlaces.filas.forEach((f) => {
+      const quien = quienGana(f.ganadores, jugador, nombre);
+      const fila = crear("div", "pasa-si-fila" + (quien.mio ? " tuya" : "") + (f.pone.length ? "" : " sola"));
+      const texto = crear("span", "pasa-si-texto");
+      if (f.pone.length) {
+        const teselas = crear("span", "pasa-si-teselas");
+        f.pone.forEach((x) => teselas.appendChild(sigla(x.equipo)));
+        fila.appendChild(teselas);
+        const equipos = f.pone.map((x) => x.equipo);
+        texto.appendChild(crear("span", "pasa-si-cuando", (equipos.length > 1 ? "Si ganan " : "Si gana ") + equipos.join(" y ")));
+        texto.appendChild(crear("b", "pasa-si-quien", quien.fila));
+      } else {
+        texto.appendChild(crear("b", "pasa-si-quien", "Pase lo que pase, " + quien.frase));
+      }
+      fila.appendChild(texto);
+      const cuanto = montos[String(f.ganadores.length)];
+      if (cuanto) {
+        const monto = crear("span", "pasa-si-monto", cuanto);
+        if (f.ganadores.length > 1) monto.appendChild(crear("small", null, "c/u"));
+        fila.appendChild(monto);
+      }
+      caja.appendChild(fila);
+    });
+    caja.appendChild(crear("p", "nota", "Es una proyección. Lo oficial llega cuando cierra cada partido."));
+    return caja;
+  }
+
+  /* "Se define en Eagles @ Washington, hoy a las 19:20": cuándo se juega lo que falta. */
+  function cuandoSeDefine(abiertos) {
+    const ahora = Date.now();
+    const cuando = (t) => {
+      if (!t) return "hora por definir";
+      return mismoDia(t * 1000, ahora) ? "hoy a las " + hora(t) : cuandoEs(t);
+    };
+    return "Se define en " + abiertos.slice().sort((a, b) => (a.p.t || Infinity) - (b.p.t || Infinity))
+      .map((x) => x.p.v + " @ " + x.p.l + ", " + cuando(x.p.t)).join(" y ") + ".";
+  }
+
   function pintarHoy() {
     const raiz = vistas.hoy;
     raiz.textContent = "";
@@ -3395,7 +3661,16 @@ try {
     const fase = vivos.length ? "vivo" : hoy.length ? "hoy" : apuran ? "picks" : cerrada ? "cerrada" : "semana";
 
     const sinPartidos = !vivos.length && !hoy.length && !terminados.length;
-    raiz.appendChild(saludo(fase, s, vivos, hoy, picks, terminados.length, sinPartidos));
+    const previa = semanaRecienCerrada();
+    // Lo nuevo de Hoy nunca debe romper la pantalla: si algo falla, queda la de siempre.
+    let desenlaces = null, cierre = null;
+    try {
+      desenlaces = s && s.estado !== "cerrada" ? desenlacesDeLaSemana(s, partidosDe(s)) : null;
+      const apuraPicks = !!picks && Date.parse(picks.cierre.cierre) - Date.now() < 12 * 3600e3;
+      cierre = (fase === "cerrada" || fase === "picks") && !apuraPicks ? cierreDeSemana(previa, jugador, nombre) : null;
+    } catch (e) { console.error(e); }
+    raiz.appendChild(saludo(fase, s, vivos, hoy, picks, terminados.length, sinPartidos, { desenlaces, cierre }));
+    if (desenlaces) raiz.appendChild(tarjetaPasaSi(desenlaces));
     if (novedades) raiz.appendChild(tarjetaNovedades());
     const rejilla = crear("div", "hoy-rejilla");
     const principal = crear("div", "hoy-principal");
@@ -3404,7 +3679,6 @@ try {
     rejilla.appendChild(lateral);
     raiz.appendChild(rejilla);
 
-    const previa = semanaRecienCerrada();
     const tarjetas = {
       partidos: () => tarjetaPartidos(s, vivos, hoy, terminados),
       // Con la semana nueva sin repartir, "tu semana" es la que acaba de cerrar.
@@ -3584,12 +3858,13 @@ try {
     return { frase: gano >= pierdo ? ["Vas ganando", gano + " de " + n] : ["Vas perdiendo", pierdo + " de " + n] };
   }
 
-  function saludo(fase, s, vivos, hoy, picks, yaJugados, sinPartidos) {
+  function saludo(fase, s, vivos, hoy, picks, yaJugados, sinPartidos, extra) {
+    const { desenlaces, cierre } = extra || {};
     const caja = crear("div", "saludo fase-" + fase);
     const fecha = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
     caja.appendChild(crear("div", "fecha", fecha.charAt(0).toUpperCase() + fecha.slice(1)));
     const enVivo = fase === "vivo" ? titularEnVivo(s, vivos) : null;
-    const titulo = {
+    let titulo = {
       vivo: fase === "vivo" ? enVivo.frase : null,
       hoy: yaJugados ? [hoy.length === 1 ? "Queda un partido" : "Quedan " + hoy.length + " partidos", "hoy"]
         : hoy.length === 1 ? ["Hoy hay", "partido"] : ["Hoy hay " + hoy.length, "partidos"],
@@ -3597,9 +3872,16 @@ try {
       cerrada: [s ? "Semana " + s.n : "Semana", "cerrada"],
       semana: s ? ["Semana " + s.n, "en curso"] : ["Temporada", String(D.anio)],
     }[fase];
+    const faltan = fase === "semana" && desenlaces ? desenlaces.abiertos.length : 0;
+    if (faltan) titulo = [faltan === 1 ? "Falta 1" : "Faltan " + faltan, faltan === 1 ? "partido" : "partidos"];
+    if (cierre) titulo = cierre.titulo;
     caja.appendChild(titular("h1", titulo[0], titulo[1]));
     const detalle = crear("p");
-    if (fase === "vivo") {
+    if (cierre) {
+      detalle.textContent = cierre.detalle;
+    } else if (faltan) {
+      detalle.textContent = cuandoSeDefine(desenlaces.abiertos);
+    } else if (fase === "vivo") {
       const q = enVivo.partido;
       if (q) {
         detalle.textContent = q.v + " " + (q.mv ?? 0) + ", " + q.l + " " + (q.ml ?? 0) + (q.e ? " · " + q.e : "") + ". ";
@@ -3632,6 +3914,7 @@ try {
       detalle.textContent = s.cerrados + " de " + s.total + " partidos cerrados.";
     }
     if (detalle.textContent) caja.appendChild(detalle);
+    if (cierre && cierre.perfecta) caja.appendChild(crear("span", "cierre-sello", "Semana perfecta"));
     if (sinPartidos) caja.appendChild(diaSinPartidos(picks));
     return caja;
   }
@@ -4452,9 +4735,10 @@ try {
      movimiento reducido no hace nada, y no toca nada que no sea transform y opacity. */
   function correCampo() {
     const cancha = document.querySelector(".cancha");
-    if (suave || window.scrollY > cancha.offsetHeight || cancha.classList.contains("corre")) return;
+    if (!cancha || suave || window.scrollY > cancha.offsetHeight || cancha.classList.contains("corre")) return false;
     cancha.classList.add("corre");
     setTimeout(() => cancha.classList.remove("corre"), 1500);
+    return true;
   }
   window.correCampo = correCampo;
 

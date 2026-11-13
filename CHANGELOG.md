@@ -9,6 +9,12 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.34.0
+
+* **"Qué pasa si…".** Cuando falta uno o dos partidos y la semana ya se puede proyectar, Hoy dice quién se lleva la semana según cada resultado ("Si gana Bills: empatas con 2, $1,733.33 c/u"); si nada cambia, "Pase lo que pase, gana …". El titular dice "Falta 1 partido" y en cuál se define. Es proyección: lo oficial no se toca, y los montos salen de Python. Un pick que falta no cuenta como visitante.
+* **"Ganaste la semana".** Si la ganaste, Hoy lo dice con tus aciertos y lo que cobras, y "Semana perfecta" si acertaste todo. Si no, quién ganó y cómo quedaste, sin juicios.
+* **Tu pick en vivo.** Un cintillo cuando tu equipo anota un touchdown, cuando tu pick pasa adelante o atrás del tercer cuarto en adelante, y cuando termina; a favor con los colores del equipo y el campo corriendo. No sale con una hoja abierta ni mientras armas picks; tocarlo abre el partido.
+
 ## v0.31.0
 
 (La v0.30, los cierres de Thanksgiving, espera la regla del organizador.)
