@@ -4179,11 +4179,15 @@ try {
         return (v === 0 || v === 1) && p.g === (v === 1 ? "l" : "v") ? "ok" : "mal";
       });
     const gano = !!s.oficial && (s.ganadores || []).includes(jugador);
-    const perfecta = s.total > 0 && semana.ok === s.total;
+    // Perfecta es acertar todo lo que tuvo ganador: un empate oficial no es de nadie.
+    const conGanador = s.partidos.filter((p) => p.g === "v" || p.g === "l").length;
+    const perfecta = conGanador > 0 && semana.ok === conGanador;
     const filas = [{ n: ordinal(semana.pos), resto: " de " + s.tabla.length + " esta semana" }];
     if (gano) filas.push({ frase: "Ganaste la semana", monto: s.premio + ((s.ganadores || []).length > 1 ? " c/u" : "") });
     if (perfecta) filas.push({ frase: "Semana perfecta" });
-    if (g) filas.push({ n: ordinal(g.pos), resto: " en la general con " + g.total });
+    // El lugar en la general es el de hoy: solo se dice en la semana más reciente.
+    const ultimaOficial = Math.max(...D.semanas.filter((x) => x.oficial).map((x) => x.n));
+    if (g && s.n === ultimaOficial) filas.push({ n: ordinal(g.pos), resto: " en la general con " + g.total });
 
     const POR_FILA = 112, TIRA = CAMPO + 330;
     const alto = TIRA + 120 + filas.length * POR_FILA + PIE;
