@@ -281,7 +281,7 @@ for (const pantalla of pantallas) {
 }
 
 /* ── el movimiento: cuadros de la entrada y de un cambio de sección ── */
-async function filmacion(nombre, pantalla, accion, ms) {
+async function filmacion(nombre, pantalla, accion, ms, desde = 0) {
   const { s, errores, cerrar } = await abrir(pantalla);
   const cuadros = [];
   const oyente = (dato) => {
@@ -300,9 +300,10 @@ async function filmacion(nombre, pantalla, accion, ms) {
   const carpeta = join(salida, "cine-" + nombre);
   mkdirSync(carpeta, { recursive: true });
   // Con ocho cuadros repartidos en el tiempo basta para ver la coreografía.
-  const paso = Math.max(1, Math.floor(cuadros.length / 8));
   const inicio = cuadros.length ? cuadros[0].t : 0;
-  const elegidos = cuadros.filter((_, i) => i % paso === 0).slice(0, 10);
+  const vistos = cuadros.filter((c) => (c.t - inicio) * 1000 >= desde);
+  const paso = Math.max(1, Math.floor(vistos.length / 8));
+  const elegidos = vistos.filter((_, i) => i % paso === 0).slice(0, 10);
   elegidos.forEach((c) => writeFileSync(join(carpeta, String(Math.round((c.t - inicio) * 1000)).padStart(5, "0") + "ms.jpg"), Buffer.from(c.data, "base64")));
   console.log("cine-" + nombre, cuadros.length + " cuadros,", elegidos.length, "guardados", errores.length ? "ERRORES" : "");
   await cerrar();
@@ -310,6 +311,8 @@ async function filmacion(nombre, pantalla, accion, ms) {
 if (filmar) {
   const base_ = { p: "/index.html", h: "#hoy", yo: YO };
   await filmacion("entrada", { ...base_, estreno: true }, null, 2200);
+  // El gol de campo (con nombre elegido): empieza a los 1.9 s de la llegada y dura 1.6 s.
+  await filmacion("gol", { ...base_, estreno: true }, null, 4200, 1900);
   await filmacion("a-general", base_, VISTA("general"), 1300);
   await filmacion("a-premios", { ...base_, h: "#general" }, VISTA("premios"), 1300);
   await filmacion("pestana", { ...base_, h: "#s7" }, PESTANA("Tabla"), 900);

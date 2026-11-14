@@ -1105,7 +1105,7 @@ def test_hoy_dice_cuando_no_hay_partidos(armado, tmp_path: Path):
     html = render(armado, tmp_path)
     hoy = _funcion(html, "pintarHoy")
     assert "!vivos.length && !hoy.length && !terminados.length" in hoy
-    assert "diaSinPartidos(picks)" in _funcion(html, "saludo")
+    assert "diaSinPartidos(picks, delCierre)" in _funcion(html, "saludo")
     aviso = _funcion(html, "diaSinPartidos")
     assert '"Hoy no hay partidos ni eventos."' in aviso and "cierran los picks" in aviso
 
@@ -1820,3 +1820,49 @@ def test_el_estado_de_picks_y_la_comparacion_con_la_imagen(armado, tmp_path: Pat
     cotejo = html[html.index("function cotejoConImagen"):html.index("function botonRecordar")]
     assert "borrador" not in cotejo.lower()
     assert "dif.slice(0, 5)" in cotejo
+
+
+def test_las_frases_de_la_v037(armado, tmp_path: Path):
+    """Los partidos se juegan y los picks son los que cierran; el campeón y los picks hablan claro."""
+    html = render(armado, tmp_path)
+    assert "partidos cerrados" not in html and "partido cerrado" not in html
+    assert "partidos jugados" in html
+    assert "Ganador de la semana" not in html and "Ganadores de la semana" not in html
+    assert '"Ganaron la semana "' in html and '"Ganó la semana "' in html
+    modulo = _funcion(html, "moduloPicks")
+    assert "Elige un equipo en cada partido, genera tu imagen y mándala a" in modulo
+    assert "cuentan cuando el organizador sube su hoja" in modulo
+    assert "Al generarla se abre compartir" not in html and "Son los que el organizador todavía no reparte" not in html
+
+
+def test_la_barra_no_inventa_porcentajes_ni_lugares_con_pocos_partidos(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    barra = _funcion(html, "pintarMiBarra")
+    assert "semana.jugados >= 4 ? pct(semana.ok, semana.jugados) : null" in barra
+    assert 'porSemana.get(semana.n) || {}).proyectable' in barra
+    assert "lugarSemana ? conOrdinal" in barra
+
+
+def test_el_encabezado_compacto_es_de_todas_las_vistas_menos_hoy(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    reglas = dict(_reglas(html))
+    assert "font-size:var(--t2)" in reglas[".saludo.compacto h1"]
+    assert "font-size:var(--t2)" in reglas[".perfil .nom"]
+    assert 'class="saludo compacto"' in html
+    assert 'crear("div", "saludo compacto")' in _funcion(html, "cabezaDeVista")
+    assert 'crear("div", "saludo fase-" + fase)' in _funcion(html, "saludo")
+
+
+def test_el_gol_de_campo_vive_en_su_capa_y_se_borra_solo(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    gol = _funcion(html, "golDeCampo")
+    assert "setTimeout(() => quitar.remove(), 2500)" in gol
+    assert gol.count("catch (e)") >= 1 and "rodar(rueda" in gol
+    assert "textContent" not in gol.replace("rodar(rueda", "")      # nada toca el texto real de la barra
+    assert "entradaConGol();" in html
+    assert 'LLAVE_GOL = "angabave.gol"' in html
+    estilo = _estilo(html)
+    assert "@media (prefers-reduced-motion:reduce){.gol-capa{display:none}}" in estilo
+    for selector, declaraciones in _reglas(html):
+        if selector.startswith(".gol-"):
+            assert "box-shadow" not in declaraciones and "animation" not in declaraciones

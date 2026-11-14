@@ -183,6 +183,20 @@ html[data-campo=juega] .cp-palabra{fill:#F3F6F4}
 @keyframes cp-prende{0%,5%{opacity:0} 7%{opacity:.9} 11%{opacity:.25} 14%{opacity:1} 18%{opacity:.7} 26%,100%{opacity:1}}
 @keyframes cp-prende-tarde{0%,45%{opacity:0} 47%{opacity:.9} 50%{opacity:.3} 53%{opacity:1} 100%{opacity:1}}
 
+/* El gol de campo de la entrada: unos postes, un balón y un +3 que viven un segundo y medio y se
+   borran. Todo se anima con transform y opacity desde el script; aquí solo dónde y cómo se ve. */
+.gol-capa{position:absolute; left:0; top:0; width:0; height:0; z-index:70; pointer-events:none}
+.gol-postes{position:absolute}
+.gol-postes svg{display:block; width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:6; stroke-linecap:square}
+.gol-postes.oro{color:var(--oro)}
+.gol-postes.blanco{color:#fff}
+.gol-balon{position:absolute; width:34px; height:20px; margin:-10px 0 0 -17px}
+.gol-balon svg{display:block; width:100%; height:100%}
+.gol-cifra,.gol-mas{position:absolute; display:flex; align-items:center; background:var(--panel); white-space:nowrap;
+  font-family:var(--num); font-size:var(--t3); font-weight:600; letter-spacing:0}
+.gol-mas{color:var(--verde)}
+@media (prefers-reduced-motion:reduce){.gol-capa{display:none}}
+
 /* ═══════ encabezado ═══════
    La fila de la marca se va con la página y queda solo tu avance: lo que está fijo
    arriba y abajo no llega a 15% de la pantalla. */
@@ -315,6 +329,11 @@ main{view-transition-name:contenido; min-height:60vh}
 .saludo p b{color:var(--txt); font-weight:600}
 .saludo .cuenta{color:var(--txt); font-weight:600; white-space:nowrap}
 .saludo .dia-libre{margin-top:8px}
+/* Fuera de Hoy el encabezado ocupa menos: el campo grande con el titular enorme es de Hoy. */
+.saludo.compacto{padding-top:8px; margin-bottom:16px}
+.saludo.compacto h1{font-size:var(--t2); line-height:1.1; letter-spacing:-.02em; margin:2px 0 4px}
+.saludo.compacto::after{margin-top:10px}
+.saludo.compacto p{font-size:var(--t5); line-height:1.35}
 
 .titulo{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:32px 0 8px}
 .titulo h2{font-size:var(--t3); font-weight:700; letter-spacing:-.03em}
@@ -605,7 +624,7 @@ tbody tr.resaltada td::after{content:""; position:absolute; inset:0; background:
   transition:transform .3s var(--sale),width .3s var(--sale)}
 
 /* ═══════ semana ═══════ */
-.cabeza-semana{margin:14px 0 16px; text-align:center}
+.cabeza-semana{margin:8px 0 12px; text-align:center}
 .cabeza-semana .estado-semana{color:var(--sobre-campo)}
 .cabeza-semana .volver-actual{color:var(--acento-campo)}
 .cambia-semana{display:grid; grid-template-columns:44px minmax(0,1fr) 44px; align-items:center; gap:8px}
@@ -685,7 +704,7 @@ select.ancho:focus{outline:2px solid var(--acento); outline-offset:1px; border-c
 .perfil .cab>div{flex:1 1 auto; min-width:0}
 h1[tabindex="-1"]:focus,h1[tabindex="-1"]:focus-visible{outline:0}
 .solo-lector{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap}
-.perfil .nom{font-size:var(--t1); font-weight:700; line-height:1; letter-spacing:-.03em; overflow-wrap:anywhere; view-transition-name:nombre-perfil; margin-top:4px}
+.perfil .nom{font-size:var(--t2); font-weight:700; line-height:1.1; letter-spacing:-.03em; overflow-wrap:anywhere; view-transition-name:nombre-perfil; margin-top:4px}
 .perfil .nota-perfil{margin:0; font-size:var(--t4); color:var(--sobre-campo)}
 .perfil .cab .rotulo{color:var(--sobre-campo)}
 .cifras{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:16px; margin-bottom:24px}
@@ -766,8 +785,7 @@ h1[tabindex="-1"]:focus,h1[tabindex="-1"]:focus-visible{outline:0}
 .borrar{flex:0 0 auto; width:44px; height:44px; border-radius:var(--r2); display:grid; place-items:center; color:var(--tenue); transition:opacity .2s}
 .borrar svg{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
 .borrar:disabled{opacity:.3}
-.aviso-gen{font-size:var(--t5); color:var(--tenue); margin-top:12px; line-height:1.4}
-.aviso-gen a{display:inline-flex; align-items:center; min-height:44px; color:var(--acento)}
+.generador .pie-gen a{display:inline-flex; align-items:center; min-height:44px; color:var(--acento)}
 /* El aviso de abajo: "Borraste tus picks · Deshacer". */
 .flotante{position:fixed; left:50%; bottom:calc(var(--alto-pie) + 12px); z-index:230; display:flex; align-items:center; gap:12px; max-width:calc(100vw - 32px); padding:4px 8px 4px 16px; border-radius:var(--r1);
   font-size:var(--t5); white-space:nowrap; background:var(--panel3); border:1px solid var(--linea2); box-shadow:0 12px 34px rgba(0,0,0,.5);
@@ -994,7 +1012,7 @@ try {
   <section class="vista oculto env" id="vista-picks"></section>
   {# La general se escribe en el HTML: se ve aunque el navegador no ejecute nada. #}
   <section class="vista anima env" id="vista-general">
-    <div class="saludo">
+    <div class="saludo compacto">
       {#- Con la tabla ya formada manda el líder; sin ella, el título de siempre. El script lo vuelve tuyo si elegiste nombre. -#}
       {% if podio_listo and empates_arriba %}
       {% set frase = ('Mandan ' ~ empates_arriba|length) if empates_arriba|length > 1 else ('Manda ' ~ empates_arriba[0]) %}
@@ -1028,7 +1046,7 @@ try {
     {% else %}
     <div class="aviso">
       <strong>El podio se arma con más partidos</strong>
-      Van {{ cerrados_temporada }} de {{ umbral_podio }} partidos cerrados. Con tan pocos juegos
+      Van {{ cerrados_temporada }} de {{ umbral_podio }} partidos jugados. Con tan pocos juegos
       casi todos van empatados y un podio no diría nada. La tabla de abajo ya cuenta.
     </div>
     {% endif %}
@@ -1818,7 +1836,7 @@ try {
     const caja = crear("div", "campeon " + (oficial ? "oficial" : "provisional") + (compacto ? " compacto" : ""));
     caja.insertAdjacentHTML("beforeend", COPA);
     caja.appendChild(crear("div", "rot", oficial
-      ? (gente.length > 1 ? "Ganadores de la semana " + s.n : "Ganador de la semana " + s.n)
+      ? (gente.length > 1 ? "Ganaron la semana " + s.n : "Ganó la semana " + s.n)
       : "Va ganando la semana " + s.n));
     const nombres = crear("div", "nombres");
     nombres.appendChild(nombrar(gente, oficial));
@@ -1827,7 +1845,7 @@ try {
     const ac = fila ? fila.f : 0;
     caja.appendChild(crear("div", "cifra",
       ac + (ac === 1 ? " acierto" : " aciertos") + " de " + s.cerrados +
-      (s.cerrados === 1 ? " partido cerrado" : " partidos cerrados")));
+      (s.cerrados === 1 ? " partido jugado" : " partidos jugados")));
     const bolsa = crear("div", "bolsa");
     bolsa.textContent = oficial ? s.premio + (gente.length > 1 ? " c/u" : "")
                                 : s.premio_total + " en juego";
@@ -2860,8 +2878,10 @@ try {
 
     const caja = crear("div", "generador");
     const explica = crear("p", "pie-gen");
-    explica.textContent = (parcial ? "Son los que el organizador todavía no reparte. " : "") +
-      "Elige los que quieras y manda la imagen al organizador: aquí no se registra nada.";
+    explica.innerHTML = "Elige un equipo en cada partido, genera tu imagen y mándala a " +
+      '<a href="mailto:' + D.correo + '?subject=' +
+      encodeURIComponent("Picks semana " + s.n + (jugador !== null ? " · " + nombre(jugador) : "")) +
+      '">' + D.correo + "</a> antes del cierre. Aquí no se registra nada: cuentan cuando el organizador sube su hoja.";
     caja.appendChild(explica);
 
     // A nombre de quién va la imagen ya lo dice la barra de arriba; solo se
@@ -2945,12 +2965,6 @@ try {
     acciones.appendChild(descargar);
     caja.appendChild(acciones);
 
-    const nota = crear("p", "aviso-gen");
-    nota.innerHTML = "Al generarla se abre compartir o se descarga. " +
-      'Mándala a <a href="mailto:' + D.correo + '?subject=' +
-      encodeURIComponent("Picks semana " + s.n + (jugador !== null ? " · " + nombre(jugador) : "")) +
-      '">' + D.correo + "</a>.";
-    caja.appendChild(nota);
 
     function pintarFila(clave) {
       const fila = filas.get(clave);
@@ -3075,7 +3089,7 @@ try {
         fila.appendChild(crear("span", "sN", "S" + s.n));
         if (!s.proyectable) {
           const q = crear("div", "quien", "En curso");
-          q.appendChild(crear("small", null, s.cerrados + " de " + s.total + " cerrados · aún no se proyecta"));
+          q.appendChild(crear("small", null, s.cerrados + " de " + s.total + " jugados · aún no se proyecta"));
           fila.appendChild(q);
           fila.appendChild(crear("span", "monto", "—"));
         } else {
@@ -3083,7 +3097,7 @@ try {
           if (!gente.length) q.appendChild(document.createTextNode("—"));
           else q.appendChild(nombrar(gente, s.oficial));
           q.appendChild(crear("small", null, s.oficial ? "semana cerrada"
-            : "va ganando · " + s.cerrados + " de " + s.total + " cerrados"));
+            : "va ganando · " + s.cerrados + " de " + s.total + " jugados"));
           fila.appendChild(q);
           fila.appendChild(crear("span", "monto",
             s.oficial ? (s.premio + (gente.length > 1 ? " c/u" : "")) : "en juego"));
@@ -3345,7 +3359,7 @@ try {
       rasgos.appendChild(rasgo(
         "Acierto",
         Math.round((datos.aciertos / datos.cerrados) * 100) + "%",
-        "de " + datos.cerrados + " partidos cerrados"
+        "de " + datos.cerrados + " partidos jugados"
       ));
       const racha = rachaDe(idx);
       rasgos.appendChild(rasgo(
@@ -3661,18 +3675,20 @@ try {
     const b = crear("button", "mi-barra-yo");
     b.type = "button";
     const dicho = [];
+    // Con pocos partidos jugados un porcentaje o un lugar es ruido: el lugar espera a la proyección.
+    const lugarSemana = !!semana && !!(porSemana.get(semana.n) || {}).proyectable;
     if (semana) {
       const enJuego = semana.ganando + semana.perdiendo;
-      dicho.push("Tu semana " + semana.n + ": " + (semana.jugados ? semana.ok + " de " + semana.jugados + " aciertos" : "sin partidos cerrados") +
-        ", vas en el lugar " + (enJuego ? semana.proy : semana.pos) + "." + (enJuego ? " Ganas " + semana.ganando + " de " + enJuego + " en juego." : ""));
+      dicho.push("Tu semana " + semana.n + ": " + (semana.jugados ? semana.ok + " de " + semana.jugados + " aciertos" : "sin partidos jugados") +
+        (lugarSemana ? ", vas en el lugar " + (enJuego ? semana.proy : semana.pos) : "") + "." + (enJuego ? " Ganas " + semana.ganando + " de " + enJuego + " en juego." : ""));
     }
     const distancia = distanciaEnTemporada(D.general, D.participantes, jugador);
     if (g) dicho.push("Temporada: " + g.total + " aciertos, lugar " + g.pos + "." + (distancia === "Temporada" ? "" : " " + distancia + "."));
-    if (!semana && !g) dicho.push("Tu avance: aún sin partidos cerrados.");
+    if (!semana && !g) dicho.push("Tu avance: aún sin partidos jugados.");
     dicho.push("Abrir tu ficha.");
     b.setAttribute("aria-label", dicho.join(" "));
-    const celda = (rotulo, partes, vivo) => {
-      const c = crear("span", "celda" + (vivo ? " vivo" : ""));
+    const celda = (rotulo, partes, vivo, clase) => {
+      const c = crear("span", "celda" + (vivo ? " vivo" : "") + (clase ? " " + clase : ""));
       c.appendChild(crear("small", "rot", rotulo));
       const linea = crear("span", "linea");
       partes.filter(Boolean).forEach((parte) => linea.appendChild(parte));
@@ -3681,11 +3697,11 @@ try {
     };
     if (semana) {
       const enJuego = semana.ganando + semana.perdiendo;
-      const p = pct(semana.ok, semana.jugados);
+      const p = semana.jugados >= 4 ? pct(semana.ok, semana.jugados) : null;
       celda(enJuego ? "En vivo · ganas " + semana.ganando + " de " + enJuego : "Semana " + semana.n, [
         crear("b", null, semana.ok + "/" + semana.jugados),
         p === null ? null : crear("span", "por", p + "%"),
-        conOrdinal("span", "rango", ordinal(enJuego ? semana.proy : semana.pos)),
+        lugarSemana ? conOrdinal("span", "rango", ordinal(enJuego ? semana.proy : semana.pos)) : null,
       ], enJuego > 0);
     }
     if (g) {
@@ -3695,9 +3711,9 @@ try {
         p === null ? null : crear("span", "por", p + "%"),
         conOrdinal("span", "rango", ordinal(g.pos)),
         g.mov ? crear("span", "mov " + (g.mov > 0 ? "sube" : "baja"), (g.mov > 0 ? "▲" : "▼") + Math.abs(g.mov)) : null,
-      ]);
+      ], false, "celda-temporada");
     }
-    if (!semana && !g) celda(nombre(jugador), [crear("span", "por", "Aún sin partidos cerrados")]);
+    if (!semana && !g) celda(nombre(jugador), [crear("span", "por", "Aún sin partidos jugados")]);
     b.addEventListener("click", () => abrirPerfil(jugador));
     // La línea de abajo avanza con los partidos cerrados de la semana.
     const enCurso = semana ? porSemana.get(semana.n) : null;
@@ -3906,7 +3922,7 @@ try {
       tuSemana: () => tarjetaTuSemana(s && s.estado !== "pendiente" ? s : previa),
       resultado: () => (s && (cerrada || s.proyectable) ? campeon(s, !cerrada) : null),
       previo: () => (previa && previa !== s ? campeon(previa) : null),
-      picks: () => (picks ? tarjetaPicks(picks) : null),
+      picks: () => (picks ? tarjetaPicks(picks, fase === "picks" && !cierre) : null),
       // El titular de un día sin partidos ya dice cuál es el próximo.
       proximo: () => (sinPartidos ? null : tarjetaProximo()),
     };
@@ -3944,7 +3960,7 @@ try {
     try {
       if (previa && ahora.cerrados > previa.cerrados) {
         const n = ahora.cerrados - previa.cerrados;
-        let texto = n === 1 ? "Cerró 1 partido" : "Cerraron " + n + " partidos";
+        let texto = n === 1 ? "Se jugó 1 partido" : "Se jugaron " + n + " partidos";
         if (yo && previa.quien === ahora.quien) {
           texto += ": acertaste " + (ahora.total - previa.total) + " y fallaste " + (ahora.err - previa.err);
           if (ahora.pos !== previa.pos) {
@@ -3973,9 +3989,9 @@ try {
     if (mismoDia(fecha, Date.now() + 864e5)) return "mañana a las " + hora(t);
     return "el " + DIAS_SEMANA[fecha.getDay()] + " " + fecha.getDate() + " a las " + hora(t);
   }
-  function diaSinPartidos(picks) {
+  function diaSinPartidos(picks, ceroHora) {
     const linea = crear("p", "dia-libre");
-    const cierraHoy = picks ? tandasAbiertas(picks).find((x) => mismoDia(Date.parse(x.cierre), Date.now())) : null;
+    const cierraHoy = !ceroHora && picks ? tandasAbiertas(picks).find((x) => mismoDia(Date.parse(x.cierre), Date.now())) : null;
     linea.appendChild(crear("b", null, cierraHoy ? "Hoy no hay partidos." : "Hoy no hay partidos ni eventos."));
     const partes = [];
     if (cierraHoy) partes.push("Hoy a las " + hora(Date.parse(cierraHoy.cierre) / 1000) + " cierran los picks.");
@@ -3983,6 +3999,52 @@ try {
     if (prox) partes.push("El próximo: " + prox.p.v + " @ " + prox.p.l + ", " + cuandoEs(prox.p.t) + ".");
     if (partes.length) linea.appendChild(document.createTextNode(" " + partes.join(" ")));
     return linea;
+  }
+
+  /* Los días de picks, Hoy habla de lo tuyo: cuándo cierran, cómo vas con ellos y en qué lugar
+     estás. Las tres frases son funciones puras para poder probarlas. */
+  function tituloDeCierre(cierre, ahora) {
+    const d = new Date(cierre);
+    if (mismoDia(d, ahora)) return ["Hoy cierran", "los picks"];
+    if (mismoDia(d, ahora + 864e5)) return ["Cierran", "mañana"];
+    return ["Cierran el", DIAS_SEMANA[d.getDay()]];
+  }
+  function estadoDeMisPicks(x) {
+    if (x.registrados && !x.faltanEntregar) {
+      return x.registrados === 1 ? "Tu pick ya quedó registrado ✓." : "Tus " + x.registrados + " picks ya quedaron registrados ✓.";
+    }
+    if (x.imagen) return "Ya generaste tu imagen el " + x.imagen + ": mándala a " + x.correo + ".";
+    if (!x.armados) return x.total === 1 ? "Te falta 1 pick por armar." : "Te faltan " + x.total + " picks por armar.";
+    const llevas = "Llevas " + x.armados + " de " + x.total + " en tu borrador";
+    return x.armados >= x.total ? llevas + "; falta generar la imagen." : llevas + ".";
+  }
+  function lugarEnLaGeneral(distancia, pos) {
+    let m = /^A (\d+) (del?) (.+)$/.exec(distancia);
+    if (m) return "Vas " + pos + ".º en la general, a " + m[1] + " " + m[2] + " " + m[3] + ".";
+    m = /^Le llevas (\d+) (al?) (.+)$/.exec(distancia);
+    if (m) return "Vas " + pos + ".º en la general, " + (m[1] === "1" ? "uno" : m[1]) + " arriba " + (m[2] === "al" ? "del " : "de ") + m[3] + ".";
+    if (distancia === "Empatas en la punta") return "Vas " + pos + ".º en la general, empatado en la punta.";
+    return null;
+  }
+  function detallesDeCierre(picks) {
+    const cierre = Date.parse(picks.cierre.cierre), nodos = [];
+    const cuando = crear("p");
+    cuando.appendChild(document.createTextNode("A las " + hora(cierre / 1000) + " · "));
+    cuando.appendChild(cuentaRegresiva("cuenta", "en ", cierre));
+    nodos.push(cuando);
+    if (jugador === null) return nodos;
+    try {
+      const s = picks.s, env = enviadoDe(s.n), reg = registroDe(s);
+      nodos.push(crear("p", null, estadoDeMisPicks({
+        total: porElegir(picks), armados: borradorDe(picks), correo: D.correo,
+        imagen: env ? cuandoImagen(env.t, ", ") : null, registrados: reg ? reg.n : 0,
+        faltanEntregar: (s.por_entregar || []).length > 0,
+      })));
+      const g = generalPorIdx.get(jugador);
+      const lugar = g ? lugarEnLaGeneral(distanciaEnTemporada(D.general, D.participantes, jugador), g.pos) : null;
+      if (lugar) nodos.push(crear("p", null, lugar));
+    } catch (e) { console.error(e); }
+    return nodos;
   }
 
   /* La última semana cerrada sigue siendo noticia hasta el jueves. */
@@ -4047,7 +4109,7 @@ try {
     return h;
   }
   function cabezaDeVista(fecha, texto, resaltado, detalle) {
-    const caja = crear("div", "saludo");
+    const caja = crear("div", "saludo compacto");
     if (fecha) caja.appendChild(crear("div", "fecha", fecha));
     caja.appendChild(titular("h1", texto, resaltado));
     if (detalle) caja.appendChild(crear("p", null, detalle));
@@ -4096,6 +4158,9 @@ try {
     const faltan = fase === "semana" && desenlaces ? desenlaces.abiertos.length : 0;
     if (faltan) titulo = [faltan === 1 ? "Falta 1" : "Faltan " + faltan, faltan === 1 ? "partido" : "partidos"];
     if (cierre) titulo = cierre.titulo;
+    // Un día de picks sin partidos en juego: el titular dice cuándo cierran.
+    const delCierre = fase === "picks" && !cierre && !!picks && !!picks.cierre;
+    if (delCierre) titulo = tituloDeCierre(Date.parse(picks.cierre.cierre), Date.now());
     caja.appendChild(titular("h1", titulo[0], titulo[1]));
     const detalle = crear("p");
     if (cierre) {
@@ -4132,11 +4197,12 @@ try {
       else if (gente.length && gente.length <= 3) detalle.textContent = "Ganaron " + gente.slice(0, -1).join(", ") + " y " + gente[gente.length - 1] + con;
       else if (gente.length) detalle.textContent = "Ganaron " + gente.length + " empatados" + con;
     } else if (fase === "semana" && s) {
-      detalle.textContent = s.cerrados + " de " + s.total + " partidos cerrados.";
+      detalle.textContent = s.cerrados + " de " + s.total + " partidos jugados.";
     }
     if (detalle.textContent) caja.appendChild(detalle);
+    if (delCierre) detallesDeCierre(picks).forEach((n) => caja.appendChild(n));
     if (cierre && cierre.perfecta) caja.appendChild(crear("span", "cierre-sello", "Semana perfecta"));
-    if (sinPartidos) caja.appendChild(diaSinPartidos(picks));
+    if (sinPartidos) caja.appendChild(diaSinPartidos(picks, delCierre));
     return caja;
   }
 
@@ -4492,18 +4558,20 @@ try {
     return caja;
   }
 
-  function tarjetaPicks(picks) {
+  /* Con "corta" la hora y la cuenta regresiva ya las dijo el titular de Hoy: aquí quedan el
+     botón, el estado corto y Recordármelo. */
+  function tarjetaPicks(picks, corta) {
     const caja = crear("section", "tarjeta tus-picks");
     const cab = crear("div", "cab");
     cab.appendChild(crear("h3", null, "Semana " + picks.s.n));
-    cab.appendChild(cuentaRegresiva("cuenta-regresiva", "cierran en ", Date.parse(picks.cierre.cierre)));
+    if (!corta) cab.appendChild(cuentaRegresiva("cuenta-regresiva", "cierran en ", Date.parse(picks.cierre.cierre)));
     caja.appendChild(cab);
     const cuantos = porElegir(picks), llevas = borradorDe(picks);
-    caja.appendChild(crear("p", "nota", (llevas
-      ? "Llevas " + llevas + " de " + cuantos + ". "
-      : cuantos + (cuantos === 1 ? " partido por elegir. " : " partidos por elegir. ")) + textoCierres(picks)));
+    const corto = llevas ? "Llevas " + llevas + " de " + cuantos + "." : cuantos + (cuantos === 1 ? " partido por elegir." : " partidos por elegir.");
+    caja.appendChild(crear("p", "nota", corta ? corto : corto + " " + textoCierres(picks)));
     const registro = lineaRegistrados(picks.s, registroDe(picks.s));
-    if (registro) caja.appendChild(crear("p", "nota picks-registro" + (registro.ok ? " ok" : ""), (registro.ok ? "✓ " : "") + registro.texto));
+    const yaDicho = corta && registro && registro.ok && !(picks.s.por_entregar || []).length;
+    if (registro && !yaDicho) caja.appendChild(crear("p", "nota picks-registro" + (registro.ok ? " ok" : ""), (registro.ok ? "✓ " : "") + registro.texto));
     const b = crear("button", "boton-principal", llevas ? "Seguir con mis picks" : "Armar mis picks");
     b.type = "button";
     b.addEventListener("click", () => navegar("picks"));
@@ -4868,7 +4936,7 @@ try {
       partes.push("Picks por cargar");
       if (tanda) partes.push("cierran el " + tanda.cierre_texto);
     } else {
-      partes.push(s.cerrados + " de " + s.total + " partidos cerrados");
+      partes.push(s.cerrados + " de " + s.total + " partidos jugados");
       if (s.estado !== "cerrada" && !s.proyectable) partes.push("ganador desde " + s.umbral);
     }
     caja.appendChild(crear("p", "linea-estado", partes.join(" · ")));
@@ -5118,6 +5186,115 @@ try {
     return true;
   }
   window.correCampo = correCampo;
+
+  /* El gol de campo de la entrada. Una vez al día por dispositivo, con nombre elegido, sin partidos en
+     vivo y con movimiento: el balón sube por tu cifra de temporada. La decisión es pura para poder
+     probarla; lo que se dibuja vive en una capa aparte que se borra sola y nunca toca el texto real. */
+  const LLAVE_GOL = "angabave.gol", LLAVE_GOL_VISTO = "angabave.gol-visto";
+  function decidirGol(x) {
+    if (!x.nombre || x.reducido || x.enVivo || !(x.total >= 3) || x.ultimoDia === x.fecha) return null;
+    const dif = typeof x.visto === "number" ? x.total - x.visto : 0;
+    const sube = dif >= 1 && dif <= 8 ? dif : 3;
+    return { sube, desde: x.total - sube, hasta: x.total };
+  }
+  function fechaLocal() {
+    const d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function entradaConGol() {
+    try {
+      const g = jugador !== null ? generalPorIdx.get(jugador) : null;
+      if (!g) return;
+      const quien = nombre(jugador);
+      let visto = null;
+      try {
+        const v = JSON.parse(leer(LLAVE_GOL_VISTO) || "null");
+        if (v && v.q === quien && typeof v.total === "number") visto = v.total;
+      } catch (e) { visto = null; }
+      guardar(LLAVE_GOL_VISTO, JSON.stringify({ q: quien, total: g.total }));
+      const juega = decidirGol({ nombre: quien, total: g.total, visto, fecha: fechaLocal(), ultimoDia: leer(LLAVE_GOL),
+        enVivo: juegosEnVivo(porSemana.get(D.activa)).length > 0, reducido: suave });
+      // La cámara de la llegada dura 2.2 s: el balón sale cuando ya casi se acomoda.
+      if (juega) setTimeout(() => golDeCampo(juega), 1900);
+    } catch (e) { console.error(e); }
+  }
+  function golDeCampo(juega) {
+    let capa = null;
+    try {
+      if (!document.documentElement.classList.contains("llegando") || window.scrollY > 40) return;
+      const palabra = Array.from(document.querySelectorAll(".cancha svg.plano .cp-palabra"))
+        .find((n) => n.getBoundingClientRect().width > 0);
+      const saludo = document.querySelector(".vista:not(.oculto) .saludo");
+      const cifra = document.querySelector(".mi-barra-yo .celda-temporada .linea b");
+      if (!palabra || !saludo || !cifra || !cifra.getBoundingClientRect().width) return;
+      const z = palabra.getBoundingClientRect(), linea = saludo.getBoundingClientRect(), c = cifra.getBoundingClientRect();
+      const sx = window.scrollX, sy = window.scrollY;
+      guardar(LLAVE_GOL, fechaLocal());
+      capa = crear("div", "gol-capa");
+      capa.setAttribute("aria-hidden", "true");
+      document.body.appendChild(capa);
+      const quitar = capa;
+      setTimeout(() => quitar.remove(), 2500);
+
+      // Los postes: una H plana sobre la zona de anotación.
+      // Algo a la izquierda del centro: la cifra que rueda arriba queda a la vista.
+      const W = Math.round(Math.min(112, Math.max(84, z.width * 0.32))), Hh = Math.round(W * 0.72);
+      const px = z.left + sx + z.width * 0.3 - W / 2, py = z.top + sy + z.height * 0.9 - Hh;
+      const H = '<svg viewBox="0 0 100 72" aria-hidden="true"><path d="M22 4V42M78 4V42M22 42H78M50 42V70"/></svg>';
+      const poste = (clase) => {
+        const n = crear("div", "gol-postes " + clase);
+        n.style.cssText = "left:" + px + "px;top:" + py + "px;width:" + W + "px;height:" + Hh + "px";
+        n.innerHTML = H;
+        capa.appendChild(n);
+        return n;
+      };
+      const total = 1560, f = (ms) => ms / total;
+      poste("oro").animate([{ opacity: 0, offset: 0 }, { opacity: 1, offset: f(200) }, { opacity: 1, offset: f(1300) },
+        { opacity: 0, offset: 1 }], { duration: total, fill: "both" });
+      poste("blanco").animate([{ opacity: 0, offset: 0 }, { opacity: 0, offset: f(900) }, { opacity: 0.9, offset: f(1000) },
+        { opacity: 0, offset: f(1150) }, { opacity: 0, offset: 1 }], { duration: total, fill: "both" });
+
+      // El balón: sale de abajo, cerca de la línea amarilla, y se achica con la distancia.
+      const x0 = z.left + sx + z.width * 0.2, y0 = linea.bottom + sy - 14;
+      const dx = px + W / 2 - x0, dy = py + Hh * 0.28 - y0, arco = 70;
+      const balon = crear("div", "gol-balon");
+      balon.style.cssText = "left:" + x0 + "px;top:" + y0 + "px";
+      balon.innerHTML = '<svg viewBox="0 0 34 20" aria-hidden="true"><ellipse cx="17" cy="10" rx="16" ry="9" fill="#8B4A22"/>' +
+        '<path d="M11 10H23M14 7.4V12.6M17 7.4V12.6M20 7.4V12.6" stroke="#fff" stroke-width="1.4" fill="none"/></svg>';
+      capa.appendChild(balon);
+      const cuadros = [];
+      for (let i = 0; i <= 12; i++) {
+        const k = i / 12, u = 1 - Math.pow(1 - k, 1.5);
+        cuadros.push({
+          transform: "translate(" + (dx * u).toFixed(1) + "px," + (dy * u - 4 * arco * u * (1 - u)).toFixed(1) + "px) rotate(" +
+            Math.round(660 * k) + "deg) scale(" + (1 - 0.78 * k).toFixed(3) + ")",
+          opacity: i === 0 ? 0 : i === 12 ? 0 : 1, offset: k,
+        });
+      }
+      balon.animate(cuadros, { duration: 750, delay: 150, fill: "both" });
+
+      // La cifra de temporada rueda en una capa encima; la de verdad no cambia.
+      const caja = (clase, r, texto) => {
+        const n = crear("span", clase, texto);
+        n.style.cssText = "left:" + (r.left + sx - 1) + "px;top:" + (r.top + sy) + "px;height:" + r.height +
+          "px;min-width:" + (r.width + 2) + "px";
+        capa.appendChild(n);
+        return n;
+      };
+      const rueda = caja("gol-cifra", c, String(juega.desde));
+      const por = cifra.parentElement.querySelector(".por");
+      const pr = por ? por.getBoundingClientRect() : null;
+      const mas = caja("gol-mas", { left: pr && pr.width ? pr.left : c.right + 6, top: c.top, height: c.height, width: pr && pr.width ? pr.width : 26 }, "+" + juega.sube);
+      const aparece = { duration: 660, delay: 900, fill: "both" };
+      rueda.animate([{ opacity: 0, offset: 0 }, { opacity: 1, offset: 0.06 }, { opacity: 1, offset: 0.85 }, { opacity: 0, offset: 1 }], aparece);
+      mas.animate([{ opacity: 0, transform: "translateY(6px)", offset: 0 }, { opacity: 1, transform: "none", offset: 0.15 },
+        { opacity: 1, transform: "none", offset: 0.85 }, { opacity: 0, transform: "none", offset: 1 }], aparece);
+      setTimeout(() => { try { rodar(rueda, juega.desde, juega.hasta); } catch (e) { /* queda la cifra puesta */ } }, 900);
+    } catch (e) {
+      console.error(e);
+      if (capa) capa.remove();
+    }
+  }
 
   /* La frontera: el campo arranca donde termina el encabezado y acaba en la línea amarilla
      de lo que se está viendo. Se mide al pintar y al cambiar de tamaño, nunca al bajar. */
@@ -5592,6 +5769,7 @@ try {
     clearTimeout(window.campoRescate);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       document.documentElement.classList.add("llegando");
+      entradaConGol();
       setTimeout(() => document.documentElement.classList.remove("estreno", "llegando"), 2600);
     }));
   }
