@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.35.0"
+VERSION = "v0.33.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -623,10 +623,10 @@ def _tandas(partidos: list[Partido]) -> list[dict]:
         return _dia_de(partido).weekday() not in (6, 0)
 
     tandas = []
-    for grupo in (
+    for orden, grupo in enumerate((
         [p for p in con_fecha if es_entre_semana(p)],
         [p for p in con_fecha if not es_entre_semana(p)],
-    ):
+    ), start=1):
         if not grupo:
             continue
         # Los que no tienen hora van al final de su tanda.
@@ -638,11 +638,16 @@ def _tandas(partidos: list[Partido]) -> list[dict]:
             f"{_DIAS_LARGOS[cierre.weekday()].lower()} {cierre.day} "
             f"de {_MESES[cierre.month - 1]} a las {cierre.strftime('%H:%M')}"
         )
+        por_confirmar = all(p.sin_hora for p in grupo)
         tandas.append(
             {
                 "cierre": cierre.isoformat(),
-                "cierre_texto": texto + (" (por confirmar)" if all(p.sin_hora for p in grupo) else ""),
+                "cierre_texto": texto + (" (por confirmar)" if por_confirmar else ""),
                 "claves": [p.clave for p in grupo],
+                # 1 = antes del domingo, 2 = del domingo en adelante: identifica la tanda
+                # aunque la semana llegue a medias.
+                "orden": orden,
+                "por_confirmar": por_confirmar,
             }
         )
     return tandas
@@ -734,6 +739,114 @@ def _datos_semana(semana: SemanaRender, indice_global: dict[str, int]) -> dict:
             if valores["gana_solo"] or valores["empata"]
         }
     return bloque
+
+
+#: El dominio con el que se identifican los eventos del calendario.
+DOMINIO_EVENTOS = "vegeeks.github.io"
+
+#: Cuánto dura el evento del recordatorio: arranca una hora antes del cierre.
+_HORA_ANTES = timedelta(hours=1)
+
+
+def _semana_con_picks_abiertos(bloques: list[dict], activa: int | None, momento: datetime) -> tuple[dict, list[dict]] | None:
+    """La semana y las tandas que ofrece el generador de picks, igual que en el navegador."""
+    def abiertas(tandas: list[dict]) -> list[dict]:
+        return [t for t in tandas if datetime.fromisoformat(t["cierre"]) > momento]
+
+    actual = next((b for b in bloques if b["n"] == activa), None)
+    if actual and actual["por_entregar"] and abiertas(actual["tandas_por_entregar"]):
+        return actual, abiertas(actual["tandas_por_entregar"])
+    siguiente = next((b for b in bloques if b["estado"] == "pendiente"), None)
+    if siguiente and abiertas(siguiente["tandas"]):
+        return siguiente, abiertas(siguiente["tandas"])
+    return None
+
+
+def _plan_recordatorio(bloques: list[dict], activa: int | None, momento: datetime) -> dict | None:
+    """Qué eventos lleva el archivo de recordatorio. Solo tandas con hora de cierre definida."""
+    elegida = _semana_con_picks_abiertos(bloques, activa, momento)
+    if not elegida:
+        return None
+    bloque, tandas = elegida
+    tandas = [
+        {"orden": t["orden"], "cierre": t["cierre"], "partidos": len(t["claves"])}
+        for t in tandas
+        if not t["por_confirmar"]
+    ]
+    if not tandas:
+        return None
+    return {"semana": bloque["n"], "archivo": f"recordatorio-s{bloque['n']}.ics", "tandas": tandas}
+
+
+def _plegar_ics(linea: str) -> str:
+    """Parte la línea en trozos de 75 octetos como máximo, sin cortar un carácter a la mitad."""
+    trozos, actual, octetos = [], "", 0
+    for caracter in linea:
+        largo = len(caracter.encode("utf-8"))
+        # La continuación empieza con un espacio, que también cuenta.
+        if octetos + largo > (75 if not trozos else 74):
+            trozos.append(actual)
+            actual, octetos = "", 0
+        actual += caracter
+        octetos += largo
+    trozos.append(actual)
+    return "\r\n ".join(trozos)
+
+
+def _texto_ics(texto: str) -> str:
+    return texto.replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", "\\n")
+
+
+def _utc_ics(momento: datetime) -> str:
+    return momento.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+
+
+def contenido_recordatorio(plan: dict, correo: str = CORREO_ORGANIZADOR) -> str:
+    """El iCalendar de una semana: un evento por tanda, con dos avisos. No lleva la hora de ahora."""
+    hora = f"{HORA_CIERRE[0]:02d}:{HORA_CIERRE[1]:02d}"
+    lineas = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ANGABAVE//Quiniela NFL//ES", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"]
+    for tanda in plan["tandas"]:
+        cierre = datetime.fromisoformat(tanda["cierre"])
+        n = tanda["partidos"]
+        resumen = f"Cierran los picks · semana {plan['semana']} ({n} partido{'' if n == 1 else 's'})"
+        descripcion = f"Manda tu imagen a {correo} antes de las {hora}. {SITIO}#picks"
+        lineas += [
+            "BEGIN:VEVENT",
+            f"UID:angabave-s{plan['semana']}-t{tanda['orden']}@{DOMINIO_EVENTOS}",
+            f"DTSTAMP:{_utc_ics(cierre)}",
+            f"DTSTART:{_utc_ics(cierre - _HORA_ANTES)}",
+            f"DTEND:{_utc_ics(cierre)}",
+            f"SUMMARY:{_texto_ics(resumen)}",
+            f"DESCRIPTION:{_texto_ics(descripcion)}",
+            f"URL:{SITIO}#picks",
+            "BEGIN:VALARM",
+            "ACTION:DISPLAY",
+            f"DESCRIPTION:{_texto_ics(resumen)}",
+            "TRIGGER:-PT2H",
+            "END:VALARM",
+            "BEGIN:VALARM",
+            "ACTION:DISPLAY",
+            f"DESCRIPTION:{_texto_ics(resumen)}",
+            "TRIGGER:PT0M",
+            "END:VALARM",
+            "END:VEVENT",
+        ]
+    lineas.append("END:VCALENDAR")
+    return "".join(_plegar_ics(linea) + "\r\n" for linea in lineas)
+
+
+def escribir_recordatorio(carpeta: Path, plan: dict | None) -> Path | None:
+    """Deja en la carpeta el recordatorio de la semana abierta y borra los de las demás."""
+    destino = carpeta / plan["archivo"] if plan else None
+    for viejo in carpeta.glob("recordatorio-s*.ics"):
+        if viejo != destino:
+            viejo.unlink()
+    if not plan:
+        return None
+    texto = contenido_recordatorio(plan)
+    if not destino.exists() or destino.read_bytes() != texto.encode("utf-8"):
+        destino.write_bytes(texto.encode("utf-8"))
+    return destino
 
 
 def cobros_de_semana(semana: SemanaRender) -> dict[str, Decimal]:
@@ -1254,6 +1367,9 @@ def generar_html(
         "dinamica": dinamica(),
     }
 
+    bloques = [_datos_semana(semana, indice_global) for semana in semanas]
+    plan_recordatorio = _plan_recordatorio(bloques, activa.numero if activa else None, momento)
+
     datos = {
         "marca": MARCA,
         "anio": anio,
@@ -1269,13 +1385,15 @@ def generar_html(
         "siglas": _siglas(),
         "temas": temas_equipos(),
         "general": general,
-        "semanas": [_datos_semana(semana, indice_global) for semana in semanas],
+        "semanas": bloques,
         "activa": activa.numero if activa else None,
         "premios": premios,
         "podio_listo": podio_listo,
         "cerrados_temporada": cerrados_temporada,
         "umbral_podio": UMBRAL_PODIO,
         "correo": CORREO_ORGANIZADOR,
+        # El archivo del cierre para el calendario, si esta semana lo hay.
+        "recordatorio": plan_recordatorio,
         # Capa en vivo: el navegador consulta ESPN directo. Solo refresca el
         # marcador de partidos que aquí siguen abiertos; jamás cierra uno ni
         # toca el conteo oficial, que se calcula en CI y ya está probado.
@@ -1297,6 +1415,7 @@ def generar_html(
     generar_manifiesto(ruta_salida.parent / "manifest.webmanifest")
     generar_pagina_de_carga(ruta_salida.parent / "cargar.html")
     generar_prueba_de_red(ruta_salida.parent / "red.html")
+    escribir_recordatorio(ruta_salida.parent, plan_recordatorio)
 
     ruta_sello = ruta_salida.parent / "version.json"
     sello = _sello_publicado(ruta_sello)

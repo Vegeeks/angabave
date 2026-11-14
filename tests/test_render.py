@@ -1720,3 +1720,103 @@ def test_la_barra_de_abajo_usa_aria_current(armado, tmp_path: Path):
     assert "outline:0" not in "".join(d for s, d in _reglas(html)
                                       if ":focus" in s and "tabindex" not in s and ".hoja" not in s and ".sin-anillo" not in s)
     assert "if (!conTeclado)" in html
+
+
+# ═══ recordatorio de cierre (.ics) ═══
+
+def _ics(ruta: Path) -> str:
+    return ruta.read_bytes().decode("utf-8")
+
+
+def _eventos(texto: str) -> list[list[str]]:
+    """Las líneas ya desplegadas de cada VEVENT."""
+    desplegado = re.sub(r"\r\n ", "", texto)
+    return [bloque.split("\r\n") for bloque in re.findall(r"BEGIN:VEVENT\r\n(.*?)END:VEVENT", desplegado, re.S)]
+
+
+def test_el_recordatorio_lleva_un_evento_por_tanda_abierta(armado, tmp_path: Path):
+    render(armado, tmp_path)
+    texto = _ics(tmp_path / "recordatorio-s3.ics")
+    assert texto.startswith("BEGIN:VCALENDAR\r\nVERSION:2.0\r\n") and texto.endswith("END:VCALENDAR\r\n")
+    assert "\n" not in texto.replace("\r\n", "")
+    eventos = _eventos(texto)
+    assert len(eventos) == 2
+    jueves, domingo = ({l.split(":", 1)[0]: l.split(":", 1)[1] for l in e[: e.index("BEGIN:VALARM")]} for e in eventos)
+    assert jueves["UID"] == "angabave-s3-t1@vegeeks.github.io"
+    assert domingo["UID"] == "angabave-s3-t2@vegeeks.github.io"
+    # Cierra el miércoles 23 a las 23:59 de CDMX (UTC-6): jueves 00:00 UTC menos un minuto.
+    assert jueves["DTEND"] == "20260924T055900Z" and jueves["DTSTART"] == "20260924T045900Z"
+    assert jueves["DTSTAMP"] == jueves["DTEND"]
+    assert jueves["SUMMARY"] == "Cierran los picks · semana 3 (1 partido)"
+    assert "quinielanfl@hotmail.com antes de las 23:59. https://vegeeks.github.io/angabave/#picks" in jueves["DESCRIPTION"]
+    assert jueves["URL"] == "https://vegeeks.github.io/angabave/#picks"
+    assert [l for l in eventos[0] if l.startswith("TRIGGER")] == ["TRIGGER:-PT2H", "TRIGGER:PT0M"]
+    assert eventos[0].count("ACTION:DISPLAY") == 2
+
+
+def test_el_recordatorio_no_lleva_lineas_largas_ni_la_hora_de_ahora(armado, tmp_path: Path):
+    from quiniela.render_html import _plegar_ics
+    render(armado, tmp_path)
+    texto = _ics(tmp_path / "recordatorio-s3.ics")
+    assert all(len(l.encode("utf-8")) <= 75 for l in texto.split("\r\n"))
+    assert _plegar_ics("SUMMARY:" + "é" * 70).count("\r\n ") >= 1
+    assert re.sub(r"\r\n ", "", _plegar_ics("SUMMARY:" + "é" * 70)) == "SUMMARY:" + "é" * 70
+    # Dos corridas en momentos distintos dejan el mismo archivo.
+    antes = (tmp_path / "recordatorio-s3.ics").read_bytes()
+    semanas, general = armado
+    generar_html(anio=2026, semanas=semanas, tabla_acumulada=general, ruta_salida=tmp_path / "otra" / "index.html",
+                 momento=MOMENTO + timedelta(hours=5))
+    assert (tmp_path / "otra" / "recordatorio-s3.ics").read_bytes() == antes
+
+
+def test_sin_tandas_abiertas_no_hay_recordatorio_y_los_viejos_se_borran(armado, tmp_path: Path):
+    semanas, general = armado
+    (tmp_path / "recordatorio-s1.ics").write_text("viejo")
+    generar_html(anio=2026, semanas=semanas, tabla_acumulada=general, ruta_salida=tmp_path / "index.html", momento=MOMENTO)
+    assert not (tmp_path / "recordatorio-s1.ics").exists()
+    assert (tmp_path / "recordatorio-s3.ics").exists()
+    # Ya cerraron las dos tandas: ni archivo ni dato.
+    generar_html(anio=2026, semanas=semanas, tabla_acumulada=general, ruta_salida=tmp_path / "index.html",
+                 momento=MOMENTO + timedelta(days=10))
+    assert not list(tmp_path.glob("recordatorio-s*.ics"))
+    assert datos_embebidos((tmp_path / "index.html").read_text(encoding="utf-8"))["recordatorio"] is None
+
+
+def test_una_tanda_cerrada_ya_no_va_en_el_recordatorio(armado, tmp_path: Path):
+    semanas, general = armado
+    generar_html(anio=2026, semanas=semanas, tabla_acumulada=general, ruta_salida=tmp_path / "index.html",
+                 momento=datetime(2026, 9, 25, 10, 0, tzinfo=ZONA_CDMX))
+    assert len(_eventos(_ics(tmp_path / "recordatorio-s3.ics"))) == 1
+    assert "angabave-s3-t2@" in _ics(tmp_path / "recordatorio-s3.ics")
+
+
+def test_las_tandas_por_confirmar_no_van_al_recordatorio(tmp_path: Path):
+    from quiniela.render_html import _plan_recordatorio, _tandas
+    sin_hora = datetime(2026, 1, 10, 0, 0, tzinfo=timezone.utc)
+    partidos = [Partido("Bears", "Vikings", 0, 0, None, False, "Scheduled", sin_hora, hora_definida=False)]
+    bloque = {"n": 19, "estado": "pendiente", "por_entregar": [], "tandas": _tandas(partidos), "tandas_por_entregar": []}
+    assert bloque["tandas"][0]["por_confirmar"]
+    assert _plan_recordatorio([bloque], 18, datetime(2026, 1, 1, tzinfo=ZONA_CDMX)) is None
+
+
+def test_el_boton_recordarmelo_depende_del_archivo(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    datos = datos_embebidos(html)
+    assert datos["recordatorio"]["archivo"] == "recordatorio-s3.ics" and datos["recordatorio"]["semana"] == 3
+    assert "Recordármelo" in html
+    # El botón es un enlace normal al archivo, no un blob: Safari lo abre como evento.
+    assert "Blob" not in html[html.index("function botonRecordar"):html.index("function pasosDePicks")]
+    assert 'enlace.href = r.archivo' in html
+    assert "if (!r || r.semana !== picks.s.n" in html
+    assert re.search(r"\.picks-recordar\{[^}]*min-height:44px", html)
+
+
+def test_el_estado_de_picks_y_la_comparacion_con_la_imagen(armado, tmp_path: Path):
+    html = render(armado, tmp_path)
+    for texto in ("Falta generar la imagen", "Registrados: cuando el organizador suba la hoja", "angabave.enviado.",
+                  "Ya quedaron registrados tus ", "Tu nombre no aparece en la hoja que subió el organizador. Si mandaste tus picks, avísale.",
+                  "Si mandaste otra imagen después, ignora esto."):
+        assert texto in html, texto
+    cotejo = html[html.index("function cotejoConImagen"):html.index("function botonRecordar")]
+    assert "borrador" not in cotejo.lower()
+    assert "dif.slice(0, 5)" in cotejo

@@ -720,6 +720,20 @@ h1[tabindex="-1"]:focus,h1[tabindex="-1"]:focus-visible{outline:0}
 /* ═══════ los picks ═══════ */
 .generador .pie-gen{font-size:var(--t5); color:var(--tenue); line-height:1.4; margin:0 0 12px}
 .generador .quien-soy{margin-bottom:12px; font-size:var(--t5); color:var(--acento)}
+.picks-pasos{margin-bottom:24px}
+.picks-pasos-lista{list-style:none; margin:0; padding:0; display:grid; gap:4px}
+.picks-pasos-lista li{display:flex; align-items:center; gap:12px; min-height:28px; font-size:var(--t5); color:var(--tenue)}
+.picks-pasos-lista li.hecho{color:var(--txt)}
+.picks-marca{flex:0 0 auto; width:12px; height:12px; border-radius:50%; border:1.5px solid var(--linea2)}
+.hecho .picks-marca{background:var(--acento); border-color:var(--acento)}
+.picks-registro{margin:12px 0 0; font-size:var(--t5); line-height:1.4; color:var(--tenue)}
+.picks-registro.ok{color:var(--txt)}
+.tarjeta .nota.picks-registro{margin:0 0 12px}
+.picks-cotejo{margin-top:12px; font-size:var(--t5); line-height:1.4; color:var(--tenue)}
+.picks-cotejo p+p{margin-top:4px}
+.picks-recordar{display:flex; align-items:center; justify-content:center; min-height:44px; margin-top:12px; padding-inline:16px; border-radius:var(--r2);
+  font-size:var(--t5); font-weight:700; color:var(--acento); text-decoration:none; border:1px solid var(--linea2)}
+.picks-recordar:active{opacity:.6}
 .tanda{margin-top:16px}
 .tanda:first-of-type{margin-top:4px}
 .tanda .cab{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:4px}
@@ -2249,6 +2263,127 @@ try {
      No manda nada ni guarda nada aquí: arma una imagen membretada para que
      cada quien la mande por su cuenta antes de que cierre la tanda. */
   const LLAVE_BORRADOR = (n) => "angabave.borrador." + n;
+  /* Lo que llevó la última imagen que generaste de esa semana, para cotejarlo con la hoja. */
+  const LLAVE_ENVIADO = (n) => "angabave.enviado." + n;
+  function enviadoDe(n) {
+    try {
+      const e = JSON.parse(leer(LLAVE_ENVIADO(n)) || "null");
+      return e && typeof e.t === "number" && e.picks && typeof e.picks === "object" ? e : null;
+    } catch (x) { return null; }
+  }
+
+  /* "sáb 14 a las 18:43", en la hora de CDMX, la misma que lleva la imagen. */
+  function cuandoImagen(t, union) {
+    const partes = {};
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/Mexico_City", weekday: "short", day: "numeric",
+      hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date(t))
+      .forEach((x) => { partes[x.type] = x.value; });
+    const dia = { Sun: "dom", Mon: "lun", Tue: "mar", Wed: "mié", Thu: "jue", Fri: "vie", Sat: "sáb" }[partes.weekday] || "";
+    return dia + " " + partes.day + union + partes.hour + ":" + partes.minute;
+  }
+
+  /* Tus picks en la hoja que subió el organizador: null si todavía no hay hoja. */
+  function registroDe(s) {
+    if (jugador === null || !s || !(s.jugadores || []).length) return null;
+    const fila = s.jugadores.indexOf(jugador);
+    if (fila < 0) return { ausente: true, n: 0, fila: -1 };
+    let n = 0;
+    (s.picks[fila] || []).forEach((v) => { if (v === 0 || v === 1) n++; });
+    return { ausente: false, n, fila };
+  }
+
+  /* El día en que se juega la tanda, en CDMX: "jueves", "domingo". */
+  function diaDeTanda(tanda, lista) {
+    const juego = (lista || []).find((p) => p.v + "@" + p.l === tanda.claves[0]);
+    if (!juego || !juego.t) return null;
+    return new Date(juego.t * 1000).toLocaleDateString("es-MX", { weekday: "long", timeZone: "America/Mexico_City" });
+  }
+
+  function lineaRegistrados(s, reg) {
+    if (!reg) return null;
+    if (reg.ausente) return { ok: false, texto: "Tu nombre no aparece en la hoja que subió el organizador. Si mandaste tus picks, avísale." };
+    if (!reg.n) return null;
+    const n = reg.n;
+    const faltan = (s.por_entregar || []).length > 0;
+    const unica = (tandas) => (tandas || []).length === 1 ? diaDeTanda(tandas[0], tandas === s.tandas ? s.partidos : s.por_entregar) : null;
+    const dia = faltan ? unica(s.tandas) : null;
+    const de = dia ? "del " + dia : "de la semana " + s.n;
+    const registrado = n === 1 ? "Ya quedó registrado tu pick " + de + "." : "Ya quedaron registrados tus " + n + " picks " + de + ".";
+    if (!faltan) return { ok: true, texto: registrado };
+    const resto = unica(s.tandas_por_entregar);
+    return { ok: true, texto: registrado + " Los " + (resto ? "del " + resto : "demás") + ", cuando el organizador suba la hoja." };
+  }
+
+  /* Solo contra la imagen que generaste, nunca contra el borrador: ese lo puedes cambiar
+     después de mandar. Devuelve las líneas, o null si coincide o no hay con qué cotejar. */
+  function cotejoConImagen(s, reg) {
+    const env = enviadoDe(s.n);
+    if (!env || !reg || reg.fila < 0) return null;
+    const dif = [];
+    s.partidos.forEach((p, col) => {
+      const lado = env.picks[p.v + "@" + p.l];
+      if (lado !== "v" && lado !== "l") return;
+      const hoja = s.picks[reg.fila][col];
+      if (hoja === 0 || hoja === 1) {
+        if ((hoja === 1 ? "l" : "v") !== lado) dif.push({ eligio: lado === "l" ? p.l : p.v, hoja: hoja === 1 ? p.l : p.v });
+      } else {
+        dif.push({ eligio: lado === "l" ? p.l : p.v, otro: lado === "l" ? p.v : p.l });
+      }
+    });
+    if (!dif.length) return null;
+    const antes = "En la imagen que generaste el " + cuandoImagen(env.t, " a las ") + " elegiste ";
+    const lineas = dif.slice(0, 5).map((d) => d.hoja
+      ? antes + d.eligio + "; en la hoja aparece " + d.hoja + "."
+      : antes + d.eligio + " contra " + d.otro + "; en la hoja ese partido aparece sin pick.");
+    if (dif.length > 5) lineas.push("y " + (dif.length - 5) + " más");
+    lineas.push("Si mandaste otra imagen después, ignora esto.");
+    return lineas;
+  }
+
+  /* El archivo del calendario con el cierre, si el generador escribió uno para esta semana. */
+  function botonRecordar(picks) {
+    const r = D.recordatorio;
+    if (!r || r.semana !== picks.s.n || !r.tandas.some((t) => Date.parse(t.cierre) > Date.now())) return null;
+    const enlace = crear("a", "picks-recordar", "Recordármelo");
+    enlace.href = r.archivo;
+    return enlace;
+  }
+
+  /* Tres pasos y lo que falta de cada uno, arriba en la vista Picks. */
+  function pasosDePicks(abiertos) {
+    const caja = crear("div", "picks-pasos");
+    caja.rellenar = () => {
+      caja.textContent = "";
+      const s = abiertos.s, total = porElegir(abiertos), armados = borradorDe(abiertos);
+      const env = enviadoDe(s.n), reg = registroDe(s);
+      const lista = crear("ul", "picks-pasos-lista");
+      const paso = (hecho, texto) => {
+        const li = crear("li", hecho ? "hecho" : null);
+        li.appendChild(crear("span", "picks-marca"));
+        li.appendChild(crear("span", null, texto));
+        lista.appendChild(li);
+      };
+      paso(total > 0 && armados >= total, "Armaste " + armados + " de " + total);
+      paso(!!env, env ? "Generaste la imagen el " + cuandoImagen(env.t, ", ") : "Falta generar la imagen");
+      if (jugador !== null) {
+        paso(!!reg && reg.n > 0, !reg ? "Registrados: cuando el organizador suba la hoja"
+          : reg.n ? "Registrados: " + reg.n + " ✓" : "Registrados: no aparecen en la hoja");
+      }
+      caja.appendChild(lista);
+      const linea = lineaRegistrados(s, reg);
+      if (linea) caja.appendChild(crear("p", "picks-registro" + (linea.ok ? " ok" : ""), (linea.ok ? "✓ " : "") + linea.texto));
+      const cotejo = cotejoConImagen(s, reg);
+      if (cotejo) {
+        const nota = crear("div", "picks-cotejo");
+        cotejo.forEach((t) => nota.appendChild(crear("p", null, t)));
+        caja.appendChild(nota);
+      }
+      const recordar = botonRecordar(abiertos);
+      if (recordar) caja.appendChild(recordar);
+    };
+    caja.rellenar();
+    return caja;
+  }
 
   /* La marca y la palabra en la imagen de picks: las mismas rutas y colores de
      quiniela/marca.py, para que la imagen y el portal no se desalineen. */
@@ -2624,6 +2759,9 @@ try {
       r.estado.textContent = "No se pudo armar la imagen. Cierra y vuelve a intentar.";
       return;
     }
+    const llevados = {};
+    claves.forEach((clave) => { llevados[clave] = elegidos.get(clave); });
+    guardar(LLAVE_ENVIADO(s.n), JSON.stringify({ t: Date.now(), picks: llevados }));
     await entregarImagen(r, blob, "picks-semana-" + s.n + ".jpg", titulo,
       "Semana " + s.n + " · " + (claves.length === 1 ? "1 pick" : claves.length + " picks"));
   }
@@ -2833,6 +2971,8 @@ try {
       descargar.disabled = n === 0;
       limpiar.disabled = n === 0;
       avance.style.width = (porClave.size ? (100 * n) / porClave.size : 0) + "%";
+      const pasos = vistas.picks.querySelector(".picks-pasos");
+      if (pasos && pasos.rellenar) pasos.rellenar();
     }
     limpiar.addEventListener("click", () => {
       const antes = new Map(elegidos), n = cuantosElegidos();
@@ -4362,10 +4502,14 @@ try {
     caja.appendChild(crear("p", "nota", (llevas
       ? "Llevas " + llevas + " de " + cuantos + ". "
       : cuantos + (cuantos === 1 ? " partido por elegir. " : " partidos por elegir. ")) + textoCierres(picks)));
+    const registro = lineaRegistrados(picks.s, registroDe(picks.s));
+    if (registro) caja.appendChild(crear("p", "nota picks-registro" + (registro.ok ? " ok" : ""), (registro.ok ? "✓ " : "") + registro.texto));
     const b = crear("button", "boton-principal", llevas ? "Seguir con mis picks" : "Armar mis picks");
     b.type = "button";
     b.addEventListener("click", () => navegar("picks"));
     caja.appendChild(b);
+    const recordar = botonRecordar(picks);
+    if (recordar) caja.appendChild(recordar);
     return caja;
   }
 
@@ -4425,6 +4569,8 @@ try {
     }
     raiz.appendChild(cabezaDeVista(s ? "Semana " + s.n : "Temporada " + D.anio,
       abiertos ? "Tus" : "Picks", abiertos ? "picks" : "cerrados", detalle));
+
+    if (abiertos) raiz.appendChild(pasosDePicks(abiertos));
 
     if (abiertos) {
       const tarjeta = crear("section", "tarjeta tus-picks completa");

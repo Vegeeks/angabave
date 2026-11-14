@@ -21,6 +21,13 @@ La versión se muestra junto a la marca en el portal y vive en
 * **"Ganaste la semana".** Si la ganaste, Hoy lo dice con tus aciertos y lo que cobras, y "Semana perfecta" si acertaste todo. Si no, quién ganó y cómo quedaste, sin juicios.
 * **Tu pick en vivo.** Un cintillo cuando tu equipo anota un touchdown, cuando tu pick pasa adelante o atrás del tercer cuarto en adelante, y cuando termina; a favor con los colores del equipo y el campo corriendo. No sale con una hoja abierta ni mientras armas picks; tocarlo abre el partido.
 
+## v0.33.0
+
+* **Recordármelo.** Junto al cierre de picks, un botón agrega a tu calendario un evento por cada tanda abierta con hora de cierre (las "por confirmar" no entran), con avisos 3 horas y 1 hora antes. Es un archivo `recordatorio-sN.ics` que el sitio escribe para la semana abierta y borra cuando ya no hace falta.
+* **"Ya quedaron registrados tus picks".** Con tu nombre elegido, Hoy y Picks cuentan los que el organizador cargó a tu nombre; si ya subió la hoja y no apareces, te lo dice a ti, con tono neutro y sin botón.
+* **Tu imagen contra la hoja.** Al generar la imagen se guarda en este teléfono lo que llevó. Si la hoja trae otra cosa, Picks te lo muestra solo a ti (hasta 5 partidos), siempre contra esa copia y nunca contra el borrador. Sin copia guardada, no dice nada.
+* **Tres pasos arriba en Picks:** "Armaste 13 de 13", "Generaste la imagen el sáb 14, 18:43" y "Registrados".
+
 ## v0.31.0
 
 (La v0.30, los cierres de Thanksgiving, espera la regla del organizador.)
