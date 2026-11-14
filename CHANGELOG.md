@@ -9,6 +9,15 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.36.0
+
+(Es la que el plan llamaba v0.33; sale después de la v0.35.)
+
+* **Recordármelo.** Junto al cierre de picks, un botón agrega a tu calendario un evento por cada tanda abierta con hora de cierre (las "por confirmar" no entran), con avisos 3 horas y 1 hora antes. Es un archivo `recordatorio-sN.ics` que el sitio escribe para la semana abierta y borra cuando ya no hace falta.
+* **"Ya quedaron registrados tus picks".** Con tu nombre elegido, Hoy y Picks cuentan los que el organizador cargó a tu nombre; si ya subió la hoja y no apareces, te lo dice a ti, con tono neutro y sin botón.
+* **Tu imagen contra la hoja.** Al generar la imagen se guarda en este teléfono lo que llevó. Si la hoja trae otra cosa, Picks te lo muestra solo a ti (hasta 5 partidos), siempre contra esa copia y nunca contra el borrador. Sin copia guardada, no dice nada.
+* **Tres pasos arriba en Picks:** "Armaste 13 de 13", "Generaste la imagen el sáb 14, 18:43" y "Registrados".
+
 ## v0.35.0
 
 * **Tu distancia en la barra.** Donde decía "Temporada" ahora dice "A 1 de Marco", "A 1 del 2.º", "Le llevas 1 a Marco" o "Empatas en la punta", con los totales oficiales.
@@ -20,13 +29,6 @@ La versión se muestra junto a la marca en el portal y vive en
 * **"Qué pasa si…".** Cuando falta uno o dos partidos y la semana ya se puede proyectar, Hoy dice quién se lleva la semana según cada resultado ("Si gana Bills: empatas con 2, $1,733.33 c/u"); si nada cambia, "Pase lo que pase, gana …". El titular dice "Falta 1 partido" y en cuál se define. Es proyección: lo oficial no se toca, y los montos salen de Python. Un pick que falta no cuenta como visitante.
 * **"Ganaste la semana".** Si la ganaste, Hoy lo dice con tus aciertos y lo que cobras, y "Semana perfecta" si acertaste todo. Si no, quién ganó y cómo quedaste, sin juicios.
 * **Tu pick en vivo.** Un cintillo cuando tu equipo anota un touchdown, cuando tu pick pasa adelante o atrás del tercer cuarto en adelante, y cuando termina; a favor con los colores del equipo y el campo corriendo. No sale con una hoja abierta ni mientras armas picks; tocarlo abre el partido.
-
-## v0.33.0
-
-* **Recordármelo.** Junto al cierre de picks, un botón agrega a tu calendario un evento por cada tanda abierta con hora de cierre (las "por confirmar" no entran), con avisos 3 horas y 1 hora antes. Es un archivo `recordatorio-sN.ics` que el sitio escribe para la semana abierta y borra cuando ya no hace falta.
-* **"Ya quedaron registrados tus picks".** Con tu nombre elegido, Hoy y Picks cuentan los que el organizador cargó a tu nombre; si ya subió la hoja y no apareces, te lo dice a ti, con tono neutro y sin botón.
-* **Tu imagen contra la hoja.** Al generar la imagen se guarda en este teléfono lo que llevó. Si la hoja trae otra cosa, Picks te lo muestra solo a ti (hasta 5 partidos), siempre contra esa copia y nunca contra el borrador. Sin copia guardada, no dice nada.
-* **Tres pasos arriba en Picks:** "Armaste 13 de 13", "Generaste la imagen el sáb 14, 18:43" y "Registrados".
 
 ## v0.31.0
 
