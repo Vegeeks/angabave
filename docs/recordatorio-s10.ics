@@ -1,0 +1,26 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//ANGABAVE//Quiniela NFL//ES
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:angabave-s10-t2@vegeeks.github.io
+DTSTAMP:20261115T055900Z
+DTSTART:20261115T045900Z
+DTEND:20261115T055900Z
+SUMMARY:Cierran los picks · semana 10 (13 partidos)
+DESCRIPTION:Manda tu imagen a quinielanfl@hotmail.com antes de las 23:59. h
+ ttps://vegeeks.github.io/angabave/#picks
+URL:https://vegeeks.github.io/angabave/#picks
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Cierran los picks · semana 10 (13 partidos)
+TRIGGER:-PT2H
+END:VALARM
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Cierran los picks · semana 10 (13 partidos)
+TRIGGER:PT0M
+END:VALARM
+END:VEVENT
+END:VCALENDAR
