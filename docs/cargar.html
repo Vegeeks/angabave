@@ -7,7 +7,7 @@
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src https://hxaajhsizdnlismnelqu.supabase.co; base-uri 'none'; form-action 'none'">
 <meta name="author" content="Angel Barrera">
-<meta name="version" content="alfa v0.37.0">
+<meta name="version" content="alfa v0.37.1">
 <meta name="theme-color" content="#060a08">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2212%22%20fill%3D%22%23060A08%22%2F%3E%3Cpath%20fill%3D%22%230A4329%22%20d%3D%22M0%2036V12A12%2012%200%200%201%2012%200H52A12%2012%200%200%201%2064%2012V36Z%22%2F%3E%3Crect%20y%3D%2236%22%20width%3D%2264%22%20height%3D%228%22%20fill%3D%22%23FFD60A%22%2F%3E%3Cpath%20fill%3D%22%23F3F6F4%22%20d%3D%22M17.5%2032L27%208L37%208L46.5%2032L34.5%2032L32%2025.68L29.5%2032ZM8%2056L11.17%2048L23.17%2048L20%2056ZM56%2056L52.83%2048L40.83%2048L44%2056Z%22%2F%3E%3C%2Fsvg%3E">
 <title>Cargar semana · ANGABAVE</title>
@@ -75,16 +75,17 @@ footer{margin-top:20px; text-align:center; font-size:12px; color:var(--tenue)}
 </head>
 <body>
 <div id="rescate" role="alert" style="display:none; position:fixed; left:16px; right:16px; top:16px; z-index:2147483647; max-width:520px; margin:0 auto; background:#101613; color:#F3F6F4; border:1px solid #FF6B61; border-radius:16px; padding:16px; font:14px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
-  <strong style="display:block; font-size:16px; margin-bottom:6px">La página no abrió en este teléfono</strong>
-  <span style="display:block; color:#A7B1AB">Ciérrala y vuelve a abrir el enlace. Si sigue igual, actualiza tu teléfono o ábrela en otro, y mándale a Angel una captura de esta pantalla.</span>
-  <a href="" style="display:inline-block; margin-top:4px; padding:12px 0; color:#FFD60A; font-weight:700">Volver a intentar</a>
+  <strong id="rescate-titulo" style="display:block; font-size:16px; margin-bottom:6px">La página no abrió en este teléfono</strong>
+  <span id="rescate-texto" style="display:block; color:#A7B1AB">Vuelve a intentar. Si sigue igual, abre la prueba de conexión y mándale a Angel una captura de esta pantalla y de esa.</span>
+  <a id="rescate-otra" href="" style="display:inline-block; margin:4px 24px 0 0; padding:12px 0; color:#FFD60A; font-weight:700">Volver a intentar</a>
+  <a href="red.html" style="display:inline-block; margin-top:4px; padding:12px 0; color:#F3F6F4; font-weight:700">Probar la conexión</a>
   <small id="rescate-detalle" style="display:block; font-size:12px; color:#A7B1AB; word-break:break-word"></small>
 </div>
 <noscript><div style="margin:16px; padding:16px; border:1px solid #FF6B61; border-radius:16px; background:#101613; color:#F3F6F4; font:14px/1.45 -apple-system,Arial,sans-serif">Esta página necesita JavaScript. Actívalo en los ajustes del navegador, o ábrela desde otro.</div></noscript>
 <script>
 (function () {
   var detalle = "";
-  var inicio = new Date().getTime(), finHtml = 0;
+  var inicio = new Date().getTime(), finHtml = 0, mostrado = "";
   function anotar(texto) {
     if (!detalle && texto) detalle = String(texto).slice(0, 300);
   }
@@ -97,27 +98,64 @@ footer{margin-top:20px; text-align:center; font-size:12px; color:var(--tenue)}
   document.addEventListener("DOMContentLoaded", function () {
     finHtml = new Date().getTime();
   });
+
+  function otraVez() {
+    var partes = location.href.split("#"), base = partes.shift();
+    base = base.replace(/([?&])r=\d*(&|$)/, "$1").replace(/[?&]$/, "");
+    return base + (base.indexOf("?") < 0 ? "?" : "&") + "r=" + new Date().getTime() + (partes.length ? "#" + partes.join("#") : "");
+  }
+
+  function reintentar() {
+    try {
+      var antes = Number(sessionStorage.getItem("angabave.reintento")) || 0, ahora = new Date().getTime();
+      if (ahora - antes < 120000) return false;
+      sessionStorage.setItem("angabave.reintento", String(ahora));
+    } catch (e) {
+      return false;   // sin dónde anotarlo no hay candado: mejor no recargar solo
+    }
+    location.replace(otraVez());
+    return true;
+  }
+
+  function poner(id, texto) {
+    var nodo = document.getElementById(id);
+    if (nodo) nodo.textContent = texto;
+  }
+
+  function mostrar(tipo) {
+    var caja = document.getElementById("rescate");
+    if (!caja || mostrado === tipo) return;
+    mostrado = tipo;
+    if (tipo === "lenta") {
+      poner("rescate-titulo", "Tu señal va muy lenta");
+      poner("rescate-texto", "La página sigue llegando y se abre sola en cuanto termine. Si tarda mucho, vuelve a intentar con mejor señal o con wifi.");
+    } else {
+      poner("rescate-titulo", "La página no abrió en este teléfono");
+      poner("rescate-texto", "Vuelve a intentar. Si sigue igual, abre la prueba de conexión y mándale a Angel una captura de esta pantalla y de esa.");
+    }
+    var otra = document.getElementById("rescate-otra");
+    if (otra) otra.setAttribute("href", otraVez());
+    poner("rescate-detalle",
+      "Detalle: " + (detalle || (finHtml ? "la página no terminó de arrancar" : "la página tardó más de un minuto en llegar")) + " · " + navigator.userAgent
+    );
+    caja.style.display = "block";
+  }
+
   function revisar() {
-    if (window.angabaveListo) return;
-    var ahora = new Date().getTime();
-    var llegando = !finHtml && ahora - inicio < 60000;
-    var recien = finHtml && !detalle && ahora - finHtml < 6000;
-    if (llegando || recien) {
-      window.setTimeout(revisar, 1000);
+    var caja = document.getElementById("rescate");
+    if (window.angabaveListo) {
+      if (caja) caja.style.display = "none";
       return;
     }
-    var caja = document.getElementById("rescate");
-    var nota = document.getElementById("rescate-detalle");
-    if (!caja || !nota) return;
-    nota.appendChild(document.createTextNode(
-      "Detalle: " + (detalle || (finHtml ? "la página no terminó de arrancar" : "la página tardó más de un minuto en llegar")) + " · " + navigator.userAgent
-    ));
-    caja.style.display = "block";
-    var vigia = window.setInterval(function () {
-      if (!window.angabaveListo) return;
-      caja.style.display = "none";
-      window.clearInterval(vigia);
-    }, 1000);
+    var ahora = new Date().getTime();
+    if (!finHtml) {
+      if (ahora - inicio >= 60000) mostrar("lenta");
+    } else if (detalle || ahora - finHtml >= 6000) {
+      // Una sola vuelta automática por carga: con el aviso a la vista ya no se recarga sola.
+      if (mostrado !== "fallo" && reintentar()) return;
+      mostrar("fallo");
+    }
+    window.setTimeout(revisar, 1000);
   }
   window.setTimeout(revisar, 20000);
 })();
@@ -129,7 +167,7 @@ footer{margin-top:20px; text-align:center; font-size:12px; color:var(--tenue)}
   <section class="tarjeta" id="tarjeta" aria-live="polite">
     <div class="estado"><div class="giro"></div><div><h1>Revisando tu enlace…</h1></div></div>
   </section>
-  <footer>Desarrollado por Angel Barrera · v0.37.0</footer>
+  <footer>Desarrollado por Angel Barrera · v0.37.1</footer>
 </main>
 <script id="config" type="application/json">{"funcion": "https://hxaajhsizdnlismnelqu.supabase.co/functions/v1/angabave-carga", "maximo": 10485760, "portal": "./"}</script>
 <script>

@@ -48,7 +48,7 @@ button{appearance:none; -webkit-appearance:none; border:0; border-radius:var(--r
   <ol id="lista"></ol>
   <button type="button" id="otra">Repetir la prueba</button>
   <div class="caja" id="equipo"></div>
-  <p class="tenue" style="margin-top:14px">v0.37.0</p>
+  <p class="tenue" style="margin-top:14px">v0.37.1</p>
 </main>
 <script>
 /* A propósito sin sintaxis moderna (nada de flechas ni const): esta página
@@ -113,14 +113,18 @@ button{appearance:none; -webkit-appearance:none; border:0; border-radius:var(--r
         if (prueba.leer === "version") {
           try { partes.push("versión " + JSON.parse(texto).version); } catch (e) { partes.push("respuesta ilegible"); }
         }
+        var cortada = false;
         if (prueba.leer === "pagina") {
           // En <meta name="version">; una copia vieja del CDN todavía la trae en el pie.
           var v = texto.match(/<meta name="version" content="([^"]+)"/i) || texto.match(/alfa v\d+\.\d+\.\d+/i);
           partes.push(v ? (v[1] || v[0]) : "sin versión (¿página incompleta?)");
+          // Con datos celulares la página puede llegar a medias: una que no cierra no sirve.
+          cortada = respuesta.ok && !/<\/html>\s*$/.test(texto);
+          if (cortada) partes.push("llegó cortada");
         }
         if (nodo) partes.push("nodo " + nodo.split(",").pop().trim());
         if (edad) partes.push("en caché hace " + edad + " s");
-        var bien = prueba.esperado ? respuesta.status === prueba.esperado : respuesta.ok;
+        var bien = (prueba.esperado ? respuesta.status === prueba.esperado : respuesta.ok) && !cortada;
         poner(r, bien, prueba.nombre, partes.join(" · "));
         hecho();
       });
@@ -133,11 +137,48 @@ button{appearance:none; -webkit-appearance:none; border:0; border-radius:var(--r
     });
   }
 
+  /* La copia que guarda el portal en este teléfono para cuando la red falla (sw.js). No usa la red. */
+  function revisarCopia() {
+    var titulo = "Copia guardada en este teléfono";
+    var r = renglon(titulo);
+    function falta(detalle) {
+      r.li.className = "espera";
+      r.b.textContent = titulo;
+      r.s.textContent = detalle;
+    }
+    try {
+      if (!("serviceWorker" in navigator) || !window.caches) {
+        falta("Este navegador no guarda copia: el portal depende siempre de la señal.");
+        return;
+      }
+      var raiz = location.href.split("#")[0].split("?")[0].replace(/[^\/]*$/, "");
+      caches.open("angabave-pagina-v1").then(function (caja) {
+        return caja.match(raiz);
+      }).then(function (guardada) {
+        if (!guardada) {
+          falta("Todavía no hay. Abre el portal una vez con buena señal o con wifi y queda guardada.");
+          return;
+        }
+        var cuando = Number(guardada.headers.get("X-Angabave-Guardada")) || 0;
+        return guardada.text().then(function (texto) {
+          var v = texto.match(/<meta name="version" content="([^"]+)"/i);
+          var dia = new Date(cuando).toLocaleString("es-MX", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
+          poner(r, true, titulo, "Sí: " + (v ? v[1] + ", " : "") + "guardada el " + dia + ". Si la red falla, el portal abre esta.");
+        });
+      }).catch(function (error) {
+        falta("No se pudo revisar (" + ((error && error.message) || error) + ").");
+      });
+    } catch (e) {
+      falta("No se pudo revisar (" + ((e && e.message) || e) + ").");
+    }
+  }
+
   function correr() {
     while (lista.firstChild) lista.removeChild(lista.firstChild);
     var i = 0;
     (function siguiente() {
       if (i < pruebas.length) probar(pruebas[i++], siguiente);
+      else revisarCopia();
     })();
   }
 
