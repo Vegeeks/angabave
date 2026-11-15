@@ -8,7 +8,7 @@
    <sitio>/momentos, y deja en <salida>/reporte.json lo que se puede medir: errores
    de consola, desbordes a lo ancho, letra de menos de 12 px y botones de menos de
    44 px. Con --filmar guarda además cuadros de las animaciones de entrada y de un
-   cambio de sección, para revisar el movimiento.
+   cambio de sección, para revisar el movimiento (y, en cuadros-avance*, todos los de la entrada a Semana).
 
    También toma cargar.html y red.html. Ahí la función de carga y ESPN van simulados:
    estas fotos nunca le pegan a los de verdad ni necesitan una llave real.
@@ -23,6 +23,7 @@ import { extname, join, normalize } from "node:path";
 
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const TELEFONO = { width: 390, height: 844, deviceScaleFactor: 2, mobile: true };
+const TELEFONO3 = { width: 390, height: 844, deviceScaleFactor: 3, mobile: true };
 const CHICO = { width: 320, height: 640, deviceScaleFactor: 2, mobile: true };
 const COMPU = { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false };
 const YO = "Angel D Luffy";
@@ -172,11 +173,21 @@ const pantallas = [
   { n: "compu-hoy", p: "/index.html", h: "#hoy", yo: YO, m: COMPU },
   { n: "compu-general", p: "/index.html", h: "#general", yo: YO, m: COMPU },
   { n: "compu-semana", p: "/index.html", h: "#s7", yo: YO, m: COMPU },
+  { n: "compu-semana-ganada", p: "/index.html", h: "#s8", yo: YO, m: COMPU },
+  { n: "chico-semana", p: "/index.html", h: "#s7", yo: YO, m: CHICO },
+  { n: "chico-semana-ganada", p: "/index.html", h: "#s8", yo: YO, m: CHICO },
+  { n: "semana-curso", p: "/index.html", h: "#s10", yo: YO },
+  { n: "semana-curso-3x", p: "/index.html", h: "#s10", yo: YO, m: TELEFONO3 },
+  { n: "semana-ganada-3x", p: "/index.html", h: "#s8", yo: YO, m: TELEFONO3 },
+  { n: "chico-semana-curso", p: "/index.html", h: "#s10", yo: YO, m: CHICO },
+  { n: "semana-sin-nombre", p: "/index.html", h: "#s7" },
   // Otros momentos de la semana (reloj y ESPN de mentira).
   ...(MOMENTOS ? [
     { n: "vivo-hoy", p: "/momentos/fase-vivo.html", h: "#hoy", yo: YO },
     { n: "vivo-hoy-abajo", p: "/momentos/fase-vivo.html", h: "#hoy", yo: YO, pasos: [ABAJO(800)] },
     { n: "vivo-semana", p: "/momentos/fase-vivo.html", h: "#s7", yo: YO, pasos: [PESTANA("Partidos")] },
+    { n: "vivo-semana-curso", p: "/momentos/fase-vivo.html", h: "#s10", yo: YO },
+    { n: "chico-vivo-semana-curso", p: "/momentos/fase-vivo.html", h: "#s10", yo: YO, m: CHICO },
     { n: "vivo-escenarios", p: "/momentos/fase-vivo.html", h: "#s7", yo: YO, pasos: [PESTANA("Escenarios")] },
     { n: "domingo-temprano", p: "/momentos/fase-hoy.html", h: "#hoy", yo: YO },
     { n: "domingo-noche", p: "/momentos/fase-domingo-noche.html", h: "#hoy", yo: YO },
@@ -308,6 +319,28 @@ async function filmacion(nombre, pantalla, accion, ms, desde = 0) {
   console.log("cine-" + nombre, cuadros.length + " cuadros,", elegidos.length, "guardados", errores.length ? "ERRORES" : "");
   await cerrar();
 }
+/* Todos los cuadros de una entrada, a la resolución real de la pantalla (para armar un GIF): las animaciones se
+   detienen al nacer y se llevan a mano de 0 a `ms` de 1/30 de segundo en 1/30, tomando una foto en cada paso. */
+async function cuadros(nombre, pantalla, accion, ms) {
+  const { s, errores, cerrar } = await abrir(pantalla);
+  await pedir("Page.navigate", { url: base + pantalla.p + pantalla.h }, s);
+  await espera(1800);
+  await hacer(s, `(() => { document.startViewTransition = undefined; const o = Element.prototype.animate;
+    Element.prototype.animate = function (k, op) { const a = o.call(this, k, op); a.pause(); return a; }; })()`);
+  await hacer(s, accion);
+  const carpeta = join(salida, "cuadros-" + nombre);
+  mkdirSync(carpeta, { recursive: true });
+  let n = 0;
+  for (let t = 0; t <= ms; t += 1000 / 30) {
+    await hacer(s, `document.getAnimations().forEach((a) => { a.pause(); a.currentTime = ${t.toFixed(1)}; })`);
+    await espera(40);
+    const { data } = await pedir("Page.captureScreenshot", { format: "jpeg", quality: 92 }, s);
+    writeFileSync(join(carpeta, String(Math.round(t)).padStart(5, "0") + "ms.jpg"), Buffer.from(data, "base64"));
+    n++;
+  }
+  console.log("cuadros-" + nombre, n + " cuadros", errores.length ? "ERRORES" : "");
+  await cerrar();
+}
 if (filmar) {
   const base_ = { p: "/index.html", h: "#hoy", yo: YO };
   await filmacion("entrada", { ...base_, estreno: true }, null, 2200);
@@ -317,6 +350,9 @@ if (filmar) {
   await filmacion("a-premios", { ...base_, h: "#general" }, VISTA("premios"), 1300);
   await filmacion("pestana", { ...base_, h: "#s7" }, PESTANA("Tabla"), 900);
   await filmacion("ficha", { ...base_, h: "#general" }, "document.querySelector('#vista-general tbody tr').click()", 1300);
+  // La entrada a Semana, con todos los cuadros para armar un preview: a la semana abierta y a una que ganaste.
+  await cuadros("avance", { ...base_, h: "#hoy", m: TELEFONO3 }, VISTA("semana"), 1700);
+  await cuadros("avance-ganada", { ...base_, h: "#s7", m: TELEFONO3 }, "document.querySelectorAll('.flecha-semana')[1].click()", 1700);
   await filmacion("hoja", { ...base_, h: "#s8" }, "document.querySelector('.semana-elegida').click()", 1000);
 }
 

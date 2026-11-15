@@ -9,6 +9,14 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.38.0
+
+* **Tu avance en el campo de la semana.** En Semana, el campo de fondo del encabezado cuenta cómo vas: tu balón sale de la yarda 0 y avanza hacia la zona de anotación según tus aciertos oficiales contra los del primer lugar de esa semana. Solo quien gana una semana ya oficial mete touchdown; mientras la semana sigue abierta, la punta se queda en primera y gol (yarda 99).
+* **Las líneas.** Una azul en tu yarda y una amarilla en la del líder (si vas en la punta, solo la amarilla), de lado a lado del campo y en perspectiva. Se trazan de izquierda a derecha al entrar, y en Semana reemplazan a las de la transmisión.
+* **Un renglón debajo del estado**, sin agregar alto: "Vas en la yarda 82 · Leo anotó", "Ganaste: anotaste touchdown", "Vas en la yarda 82 · a 2 aciertos de la punta", "Vas en la punta: primera y gol", y sin nombre elegido, "Leo anotó" o "Van 3 en primera y gol".
+* **El balón**, de cuero con brillo, sombra y un aro de tu color, avanza en unos 800 ms una sola vez por visita a esa semana (sin repetirse al repintar ni al cambiar de pestaña); si ganaste, la zona de anotación destella una vez. Con movimiento reducido todo aparece quieto. El balón busca un carril libre para no pasar sobre el selector ni el texto.
+* En semanas por cargar no se dibuja nada. Hoy, General, Premios y el gol de campo de Hoy quedan como estaban.
+
 ## v0.37.1
 
 Para quien no podía entrar con datos celulares.

@@ -337,6 +337,20 @@ main{view-transition-name:contenido; min-height:60vh}
 .anima .frontera{animation:traza .56s var(--traza) backwards .12s}
 .cabeza-semana .avance-semana{width:100vw; max-width:none; height:2px; margin:14px 0 10px calc(50% - 50vw); border-radius:2px; background:color-mix(in srgb,var(--oro) 26%,var(--bg))}
 .cabeza-semana .avance-semana i{border-radius:2px}
+/* El renglón de tu avance cabe en el hueco que había sobre la barra: la cabeza no crece. */
+.avance-yarda{margin:0; font-size:var(--t6); line-height:14px; font-weight:600; color:var(--sobre-campo);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.avance-yarda + .detalle-semana{margin-top:0}
+.avance-yarda + .detalle-semana .avance-semana{margin-top:0}
+/* Tu avance va dentro del SVG de la toma visible, con la perspectiva del campo. En Semana las
+   líneas de la transmisión se apagan: aquí las líneas son las tuyas. */
+.cancha.avance-activo svg.plano path[fill^="url(#cp-azul"],.cancha.avance-activo svg.plano path[fill^="url(#cp-prim"]{opacity:0}
+.avance-azul{fill:var(--scrim)}
+.avance-oro{fill:var(--oro)}
+.avance-aro{fill:none; stroke:var(--acento); stroke-width:1.5; vector-effect:non-scaling-stroke}
+.avance-destello{fill:#fff; opacity:0}
+.avance-letras{fill:var(--oro); opacity:0}
+.avance-cifra{font-family:var(--num); font-size:var(--t5); font-weight:600; line-height:0}
 .saludo .fecha{font-size:var(--t5); color:var(--sobre-campo); font-weight:500}
 .saludo h1{font-size:var(--t1); line-height:1; font-weight:700; letter-spacing:-.03em; margin:4px 0 8px}
 .saludo .palabra{display:inline-block; overflow:hidden; vertical-align:top; padding:.04em .02em .12em 0; margin-bottom:-.12em}
@@ -5040,6 +5054,18 @@ try {
     }
     cabeza.appendChild(fila);
     if (s.estado === "pendiente") cabeza.appendChild(crear("div", "frontera"));
+    try {
+      const av = s.estado === "pendiente" ? null : avanceDeSemana(s, jugador, nombre);
+      if (av && av.hay) {
+        const renglon = crear("p", "avance-yarda");
+        av.texto.split(/(\d+)/).forEach((trozo, i) => {
+          if (i % 2) renglon.appendChild(crear("b", "avance-cifra", trozo));
+          else if (trozo) renglon.appendChild(document.createTextNode(trozo));
+        });
+        renglon.title = av.texto;
+        cabeza.appendChild(renglon);
+      }
+    } catch (e) { console.error(e); }
     cabeza.appendChild(lineaDeEstado(s));
     raiz.appendChild(cabeza);
 
@@ -5363,6 +5389,256 @@ try {
     }
   }
 
+  /* ═══ tu avance en la semana ═══
+     Con los aciertos oficiales de la tabla, tu balón sale de tu zona (yarda 0) hacia la zona de anotación
+     (yarda 100). Solo quien gana una semana ya oficial anota; mientras la semana sigue abierta, la punta
+     se queda en primera y gol (99). Es pura: lo que se dibuja vive más abajo, en pintarAvance. */
+  function avanceDeSemana(s, yo, nombreDe) {
+    const tabla = (s && s.tabla) || [];
+    if (!tabla.length) return { hay: false };
+    const cima = tabla.reduce((m, f) => Math.max(m, f.f), 0);
+    if (!(s.cerrados > 0) || cima <= 0) {
+      return { hay: true, sinJuego: true, p: 0, yarda: 0, lider: { p: 0, yarda: 0 }, lideres: [], anota: false, ganaste: false,
+        esLider: false, texto: "Todos en la yarda 0" };
+    }
+    const oficial = !!s.oficial;
+    const lideres = oficial && (s.ganadores || []).length ? s.ganadores.slice() : tabla.filter((f) => f.f === cima).map((f) => f.p);
+    const conNombre = yo !== null && yo !== undefined;
+    const esLider = conNombre && lideres.includes(yo);
+    const liderP = oficial ? 1 : 0.99;
+    const fila = conNombre ? tabla.find((f) => f.p === yo) : null;
+    const mios = fila ? fila.f : 0;
+    const p = !conNombre || esLider ? liderP : Math.min(0.99, mios / cima);
+    const varios = lideres.length > 1;
+    const delLider = oficial
+      ? (varios ? "Anotaron " + lideres.length : nombreDe(lideres[0]) + " anotó")
+      : (varios ? "Van " + lideres.length + " en primera y gol" : nombreDe(lideres[0]) + " va en primera y gol");
+    let texto = delLider;
+    if (conNombre) {
+      const falta = cima - mios;
+      if (esLider) texto = oficial ? "Ganaste: anotaste touchdown" : "Vas en la punta: primera y gol";
+      else texto = "Vas en la yarda " + Math.round(p * 100) + " · " +
+        (oficial ? delLider : "a " + falta + (falta === 1 ? " acierto" : " aciertos") + " de la punta");
+    }
+    return { hay: true, sinJuego: false, p, yarda: Math.round(p * 100), lider: { p: liderP, yarda: Math.round(liderP * 100) }, lideres,
+      anota: oficial && (!conNombre || esLider), ganaste: conNombre && oficial && esLider, esLider, texto };
+  }
+
+  let avanceVisto = null, avanceFirma = "", avanceDatos = null;
+  function quitarAvance() {
+    avanceFirma = "";
+    const cancha = document.querySelector(".cancha");
+    if (cancha) cancha.classList.remove("avance-activo");
+    document.querySelectorAll(".cancha .avance-capa").forEach((n) => n.remove());
+  }
+
+  /* Dibuja la línea azul (la tuya), la amarilla (la del líder) y el balón dentro del SVG de la toma
+     visible, con la misma homografía que la palabra de la zona. Así siguen la perspectiva del campo. */
+  function pintarAvance(s, animar) {
+    if (!s || s.estado === "pendiente") { quitarAvance(); return; }
+    const av = avanceDeSemana(s, jugador, nombre);
+    const svg = Array.from(document.querySelectorAll(".cancha svg.plano")).find((n) => n.getBoundingClientRect().width > 0);
+    const barra = document.querySelector(".cabeza-semana .avance-semana");
+    if (!av.hay || !svg || !barra) { quitarAvance(); return; }
+    if (!avanceDatos) avanceDatos = JSON.parse(document.getElementById("datos-campo").textContent);
+    const h = avanceDatos.h[svg.classList.contains("en-compu") ? "c" : "t"];
+    if (!h || h.length !== 8) { quitarAvance(); return; }
+    const medio = avanceDatos.zona.medio || 26.665, hondo = avanceDatos.zona.hondo || 15;
+    const vb = svg.viewBox.baseVal, r = svg.getBoundingClientRect(), k = r.width / vb.width;
+    const proy = (x, y) => {
+      const w = h[6] * x + h[7] * y + 1;
+      return [(h[0] * x + h[1] * y + h[2]) / w, (h[3] * x + h[4] * y + h[5]) / w];
+    };
+    const pantalla = (q) => [r.left + (q[0] - vb.x) * k, r.top + (q[1] - vb.y) * k];
+
+    // La yarda 0 es la línea de campo más cercana que se alcanza a ver sobre la barra del encabezado
+    // y donde el balón cabe sin pisar el selector ni el texto; si no cabe, la siguiente hacia el fondo.
+    const tope = barra.getBoundingClientRect().top - 3;
+    const medioPantalla = document.documentElement.clientWidth / 2;
+    // Dónde cae una línea del campo, de lado a lado, justo a mitad de la pantalla.
+    const vEn = (y) => {
+      const a = pantalla(proy(-medio, y)), b = pantalla(proy(medio, y));
+      return a[1] + (b[1] - a[1]) * (medioPantalla - a[0]) / (b[0] - a[0]);
+    };
+    const lineas = [30, 35, 40, 45].map((y) => ({ y, v: vEn(y) })).filter((l) => l.v <= tope).sort((a, b) => b.v - a.v);
+    if (!lineas.length) lineas.push({ y: 45 });
+
+    // Cuánto ocupa una yarda en pantalla, en cada eje del pasto, en este punto.
+    const huella = (x, y) => {
+      const o = proy(x, y), a = proy(x + 1, y), b = proy(x, y + 1);
+      return { o, ax: a[0] - o[0], ay: a[1] - o[1], bx: b[0] - o[0], by: b[1] - o[1] };
+    };
+    const BOLA = 2.6, ARO = 1.3, MARGEN = 8, CRECE = av.anota ? 1.45 : 1;
+    // Al anotar el balón crece sobre el último tramo, para que el touchdown se vea.
+    const fac = (u) => 1 + (CRECE - 1) * Math.pow(Math.max(0, (u - 0.5) / 0.5), 2);
+    const lugar = (x, y, f) => {
+      const m = huella(x, y), sx = Math.hypot(m.ax, m.ay);
+      return { m, sx, kb: BOLA * sx * (f || 1) / 31 };
+    };
+
+    // Todo lo que no debe quedar a menos de 8 px de la bola, el aro o la sombra: el texto del encabezado, las
+    // flechas, el selector, el renglón, la barra de arriba y las orillas de la pantalla.
+    const rect = (n, m) => { const b = n.getBoundingClientRect(); return b.width && b.height ? [b.left - m, b.top - m, b.right + m, b.bottom + m] : null; };
+    const letra = (n) => { const g = document.createRange(); g.selectNodeContents(n); const b = g.getBoundingClientRect(); return b.width ? [b.left - MARGEN, b.top - MARGEN, b.right + MARGEN, b.bottom + MARGEN] : null; };
+    const ancha = document.documentElement.clientWidth, cabeza = encabezado.getBoundingClientRect().bottom;
+    // Se mide lo que se ve (el texto, el caret, la flecha dibujada), no la zona de toque de 44 px alrededor.
+    const estorbos = Array.from(document.querySelectorAll(".cabeza-semana .semana-elegida .num,.cabeza-semana .estado-fila>*,.cabeza-semana .avance-yarda")).map(letra)
+      .concat(Array.from(document.querySelectorAll(".cabeza-semana .semana-elegida .abre,.cabeza-semana .flecha-semana svg")).map((n) => rect(n, MARGEN))).filter(Boolean)
+      .concat([[-1e4, -1e4, 1e4, cabeza + 4], [-1e4, -1e4, 6, 1e4], [ancha - 6, -1e4, 1e4, 1e4]]);
+    const palabra = svg.querySelector(".cp-palabra");
+    const hayPalabra = !!(palabra && palabra.getAttribute("d") && palabra.isPointInFill);
+    // Cuántos puntos del cuero caen sobre las letras del nombre (en coordenadas del SVG).
+    const sobreLetras = (x, y) => {
+      if (!hayPalabra) return 0;
+      const L = lugar(x, y), ox = L.m.o[0], oy = L.m.o[1] - L.sx * 0.2, mw = BOLA * CRECE * L.sx / 2, mh = mw * 8.8 / 15.5;
+      let n = 0;
+      for (let i = -2; i <= 2; i++) for (let j = -1; j <= 1; j++) {
+        if (palabra.isPointInFill(new DOMPoint(ox + mw * i / 2, oy + mh * j))) n++;
+      }
+      return n;
+    };
+    const choca = (x, y, f) => {
+      const m = huella(x, y), c = pantalla(m.o), sx = Math.hypot(m.ax, m.ay) * k;
+      const ex = ARO * f * Math.hypot(m.ax, m.bx) * k, ey = ARO * f * Math.hypot(m.ay, m.by) * k;
+      const wb = BOLA * f * sx / 2, hb = wb * 8.8 / 15.5, cb = c[1] - sx * 0.2;
+      return estorbos.some((e) => (c[0] + ex > e[0] && c[0] - ex < e[2] && c[1] + ey > e[1] && c[1] - ey < e[3]) ||
+        (c[0] + wb > e[0] && c[0] - wb < e[2] && cb + hb > e[1] && cb - hb < e[3]));
+    };
+    /* Un carril por donde el balón no pase encima, el centro si cabe, y se queda en él todo el recorrido. Si anota,
+       termina dentro de la zona, bajo la barra y lo más libre de las letras que se pueda. */
+    const CARRILES = [0];
+    for (let i = 1; i <= 36; i++) CARRILES.push(i / 2, -i / 2);
+    const FINALES = [51.2, 50.8, 51.7, 52.3, 50.5, 53];
+    const yDeCon = (c, p) => c + p * (50 - c);
+    let elegido = null;
+    lineas.forEach((l, li) => {
+      (av.anota ? FINALES : [yDeCon(l.y, av.p)]).forEach((yFinal, fi) => {
+        CARRILES.forEach((x, ci) => {
+          let choques = 0;
+          for (let i = 0; i <= 8; i++) if (choca(x, l.y + (yFinal - l.y) * i / 8, fac(i / 8))) choques++;
+          const costo = [choques, choques || !av.anota ? 0 : sobreLetras(x, yFinal), li, ci, fi];
+          const i = elegido ? costo.findIndex((v, j) => v !== elegido.costo[j]) : 0;
+          if (!elegido || (i >= 0 && costo[i] < elegido.costo[i])) {
+            elegido = { cero: l.y, yFinal, carril: x, costo };
+          }
+        });
+      });
+    });
+    const { cero, yFinal, carril } = elegido;
+    const yDe = (p) => yDeCon(cero, p);
+    // Una línea solo se dibuja si cae entera en la franja visible: bajo la barra y sobre el borde del campo.
+    const visible = (y) => { const v = vEn(y); return v >= cabeza + 2 && v <= tope; };
+
+    const firma = [s.n, av.texto, av.yarda, cero, carril, Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(tope), Math.round(cabeza)].join("|");
+    if (firma === avanceFirma && svg.querySelector(".avance-capa")) return;
+    quitarAvance();
+    avanceFirma = firma;
+    const cancha = svg.closest(".cancha");
+    cancha.classList.add("avance-activo");
+
+    const NS = "http://www.w3.org/2000/svg";
+    const el = (nombreEl, atributos, padre) => {
+      const n = document.createElementNS(NS, nombreEl);
+      Object.keys(atributos || {}).forEach((a) => n.setAttribute(a, atributos[a]));
+      if (padre) padre.appendChild(n);
+      return n;
+    };
+    const f1 = (v) => (Math.round(v * 10) / 10).toString();
+    const capa = el("g", { class: "avance-capa", "aria-hidden": "true" }, svg);
+    const defs = el("defs", {}, capa);
+    const cuero = el("radialGradient", { id: "avance-cuero", cx: "0.36", cy: "0.28", r: "0.85" }, defs);
+    [["0", "#EDB07A"], ["0.45", "#C8742F"], ["1", "#7A3F17"]].forEach((p) => el("stop", { offset: p[0], "stop-color": p[1] }, cuero));
+
+    const movimiento = animar && !suave && svg.animate;
+    const espera = document.documentElement.classList.contains("estreno") || document.documentElement.classList.contains("llegando") ? 2300 : 0;
+    const salida = "cubic-bezier(.22,1,.36,1)";
+
+    // Cuándo cruza el balón la línea de gol, con la misma curva de su recorrido.
+    const cruce = (() => {
+      const u = Math.min(1, Math.max(0, (50 - cero) / (yFinal - cero)));
+      const f = (a, b, s) => 3 * a * (1 - s) * (1 - s) * s + 3 * b * (1 - s) * s * s + s * s * s;
+      let lo = 0, hi = 1;
+      for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (f(1, 1, m) < u) lo = m; else hi = m; }
+      return espera + 240 + 800 * f(0.22, 0.36, (lo + hi) / 2);
+    })();
+    // Si ganaste: un solo pulso. La zona sube de brillo, las letras toman un dorado que se apaga, y el
+    // renglón del touchdown aparece justo cuando el balón cruza la línea.
+    if (movimiento && av.ganaste) {
+      const zona = [[-medio, 50], [medio, 50], [medio, 50 + hondo], [-medio, 50 + hondo]].map((q) => proy(q[0], q[1]));
+      const d = el("path", { class: "avance-destello", d: "M" + zona.map((q) => f1(q[0]) + " " + f1(q[1])).join("L") + "z" }, capa);
+      d.animate([{ opacity: 0 }, { opacity: 0.2, offset: 0.3 }, { opacity: 0 }], { duration: 760, delay: cruce, easing: "ease-out", fill: "backwards" });
+      if (hayPalabra) {
+        const oro = el("path", { class: "avance-letras", d: palabra.getAttribute("d") }, capa);
+        oro.animate([{ opacity: 0 }, { opacity: 0.8, offset: 0.3 }, { opacity: 0 }], { duration: 760, delay: cruce, easing: "ease-out", fill: "backwards" });
+      }
+      const renglon = document.querySelector(".cabeza-semana .avance-yarda");
+      if (renglon && renglon.animate) renglon.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, delay: cruce, fill: "backwards" });
+    }
+
+    // Una línea de lado a lado del campo, con la orilla que se apaga y el grosor que da la distancia.
+    const izquierda = vb.x - 4, derecha = vb.x + vb.width + 4;
+    const linea = (y, clase, color, retraso, idx) => {
+      const g = 0.15;
+      const q = [[-medio, y - g], [medio, y - g], [medio, y + g], [-medio, y + g]].map((p) => proy(p[0], p[1]));
+      const xa = Math.min(q[0][0], q[3][0]), xb = Math.max(q[1][0], q[2][0]);
+      const id = "avance-hilo-" + idx;
+      const grad = el("linearGradient", { id, gradientUnits: "userSpaceOnUse", x1: f1(xa), y1: "0", x2: f1(xb), y2: "0" }, defs);
+      [["0", 0], ["0.08", 1], ["0.92", 1], ["1", 0]].forEach((p) => el("stop", { offset: p[0], "stop-color": color, "stop-opacity": p[1] }, grad));
+      const p = el("path", { class: clase, d: "M" + q.map((z) => f1(z[0]) + " " + f1(z[1])).join("L") + "z", fill: "url(#" + id + ")" }, capa);
+      if (movimiento) {
+        // Se traza de izquierda a derecha por lo que se ve de pantalla: un recorte que se corre.
+        const va = Math.max(xa, izquierda), vbb = Math.min(xb, derecha), ancho = Math.max(vbb - va, 1);
+        const cid = "avance-traza-" + idx;
+        const clip = el("clipPath", { id: cid }, defs);
+        el("rect", { x: f1(xa - 2e3), y: f1(vb.y - 50), width: f1(va - xa + 2e3), height: f1(vb.height + 100) }, clip);
+        el("rect", { x: f1(vbb), y: f1(vb.y - 50), width: f1(xb - vbb + 2e3), height: f1(vb.height + 100) }, clip);
+        const corre = el("rect", { x: f1(va), y: f1(vb.y - 50), width: f1(ancho), height: f1(vb.height + 100) }, clip);
+        p.setAttribute("clip-path", "url(#" + cid + ")");
+        corre.animate([{ transform: "translateX(" + f1(-ancho) + "px)" }, { transform: "translateX(0px)" }],
+          { duration: 300, delay: espera + retraso, easing: salida, fill: "backwards" });
+        p.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 120, delay: espera + retraso, fill: "backwards" });
+      }
+    };
+    if (!av.esLider && !av.sinJuego && visible(yDe(av.p))) linea(yDe(av.p), "avance-azul", "var(--scrim)", 120, 1);
+    if (!av.sinJuego && visible(yDe(av.lider.p))) linea(yDe(av.lider.p), "avance-oro", "var(--oro)", 0, 2);
+
+    // El balón: una sombra y un aro en el pasto (en perspectiva) y el cuero de pie, del tamaño que le toca.
+    const suelo = el("g", {}, capa);
+    const sombra = el("ellipse", { cx: "0", cy: "0.12", rx: "1.05", ry: "0.5", fill: "#000" }, suelo);
+    el("circle", { class: "avance-aro", r: String(ARO), cx: "0", cy: "0" }, suelo);
+    const bola = el("g", {}, capa);
+    el("ellipse", { rx: "15.5", ry: "8.8", fill: "url(#avance-cuero)", stroke: "#2A1507", "stroke-width": "1" }, bola);
+    el("path", { d: "M-9.4-6.2Q-11.8 0-9.4 6.2M9.4-6.2Q11.8 0 9.4 6.2", stroke: "#fff", "stroke-width": "1.5", fill: "none", "stroke-linecap": "round" }, bola);
+    el("path", { d: "M-5.8 0H5.8M-3.2-2.7V2.7M0-2.7V2.7M3.2-2.7V2.7", stroke: "#fff", "stroke-width": "1.3", fill: "none", "stroke-linecap": "round" }, bola);
+    el("ellipse", { cx: "-2.5", cy: "-3.7", rx: "8.5", ry: "2", fill: "#fff", opacity: "0.2" }, bola);
+
+    const tenue = (y) => 0.34 - 0.16 * (y - cero) / Math.max(50 - cero, 1);
+    const poner = (y, u) => {
+      const f = fac(u), L = lugar(carril, y, f), m = L.m, mx = [m.ax * f, m.ay * f, m.bx * f, m.by * f, m.o[0], m.o[1]];
+      const dy = L.m.o[1] - L.sx * 0.2 * f;
+      return { suelo: "matrix(" + mx.map((v) => v.toFixed(3)).join(" ") + ")",
+        bola: "translate(" + m.o[0].toFixed(2) + " " + dy.toFixed(2) + ") scale(" + L.kb.toFixed(4) + ")",
+        px: "translate(" + m.o[0].toFixed(2) + "px," + dy.toFixed(2) + "px)", kb: L.kb, mx };
+    };
+    const fin = poner(yFinal, 1);
+    suelo.setAttribute("transform", fin.suelo);
+    bola.setAttribute("transform", fin.bola);
+    sombra.setAttribute("opacity", tenue(yFinal).toFixed(3));
+    if (movimiento) {
+      const pasos = 20, kfSuelo = [], kfBola = [], kfSombra = [];
+      for (let i = 0; i <= pasos; i++) {
+        const u = i / pasos, q = poner(cero + (yFinal - cero) * u, u), gira = -22 * (1 - u);
+        kfSuelo.push({ transform: "matrix(" + q.mx.map((v) => v.toFixed(3)).join(",") + ")", opacity: i === 0 ? 0 : 1 });
+        kfBola.push({ transform: q.px + " rotate(" + gira.toFixed(1) + "deg) scale(" + q.kb.toFixed(4) + ")", opacity: i === 0 ? 0 : 1 });
+        kfSombra.push({ opacity: i === 0 ? 0 : tenue(cero + (yFinal - cero) * u) });
+      }
+      const opciones = { duration: 800, delay: espera + 240, easing: salida, fill: "backwards" };
+      suelo.animate(kfSuelo, opciones);
+      bola.animate(kfBola, opciones);
+      sombra.animate(kfSombra, opciones);
+    }
+  }
+
   /* La frontera: el campo arranca donde termina el encabezado y acaba en la línea amarilla
      de lo que se está viendo. Se mide al pintar y al cambiar de tamaño, nunca al bajar. */
   function ajustarCampo() {
@@ -5380,6 +5656,7 @@ try {
     document.documentElement.style.setProperty("--alto-marca", altoMarca + "px");
     document.documentElement.style.setProperty("--alto-encabezado", (todo - altoMarca) + "px");
     ajustarCampo();
+    try { if (avanceVisto !== null) pintarAvance(porSemana.get(avanceVisto), false); } catch (e) { console.error(e); }
   }
   medirEncabezado();
   if (window.ResizeObserver) new ResizeObserver(medirEncabezado).observe(encabezado);
@@ -5585,6 +5862,13 @@ try {
     } catch (e) { console.error(e); try { avisoFlotante("Algo no se pudo mostrar. Recarga la página."); } catch (e2) { /* sin aviso */ }; }
     try { pintarMiBarra(); } catch (e) { console.error(e); }
     ajustarCampo();
+    try {
+      if (cual === "semana") {
+        const nuevo = avanceVisto !== vista;
+        avanceVisto = vista;
+        pintarAvance(porSemana.get(vista), nuevo);
+      } else { avanceVisto = null; quitarAvance(); }
+    } catch (e) { console.error(e); try { quitarAvance(); } catch (e2) { /* sin avance */ } }
 
     // Solo se anima lo que acaba de entrar: redibujar no lanza nada otra vez.
     const nodo = vistas[cual];

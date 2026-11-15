@@ -661,4 +661,4 @@ def css() -> str:
 def datos_pagina() -> dict:
     """Lo que necesita la página para pintar el nombre de un equipo en las dos tomas."""
     return {"glifos": GLIFOS, "h": {"t": CAMARA_TELEFONO.homografia(), "c": CAMARA_COMPU.homografia()},
-            "zona": {"hondo": HONDO_ZONA, "alto": ALTO_LETRA, "largo": LARGO_PALABRA, "maxX": ESCALA_X_MAX, "cap": ALTO_CAP}}
+            "zona": {"medio": MEDIO, "hondo": HONDO_ZONA, "alto": ALTO_LETRA, "largo": LARGO_PALABRA, "maxX": ESCALA_X_MAX, "cap": ALTO_CAP}}

@@ -112,3 +112,77 @@ def test_tu_lugar_usa_la_distancia_de_la_barra():
         "Vas 1.º en la general, empatado en la punta.",
         None,
     ]
+
+
+# --- tu avance en la semana ---------------------------------------------------
+
+NOMBRES = ["Ana", "Beto", "Caro", "Dani", "Eli"]
+
+
+def _tabla(*aciertos):
+    return [{"p": i, "pos": 1, "f": f, "e": 0} for i, f in enumerate(aciertos)]
+
+
+def _semana(aciertos, oficial=False, ganadores=None, cerrados=None):
+    return {"tabla": _tabla(*aciertos), "oficial": oficial, "ganadores": ganadores or [], "cerrados": cerrados if cerrados is not None else max(aciertos, default=0), "total": 14}
+
+
+def _avance(casos):
+    entradas = [{"s": s, "yo": yo} for s, yo in casos]
+    return _correr(("avanceDeSemana",), f"avanceDeSemana(c.s, c.yo, (i) => {json.dumps(NOMBRES)}[i])", entradas)
+
+
+def test_semana_oficial_con_un_ganador():
+    s = _semana([12, 9, 6, 12 - 1], oficial=True, ganadores=[0])
+    gana, otro, ajeno = _avance([(s, 0), (s, 1), (s, None)])
+    assert gana["p"] == 1 and gana["yarda"] == 100 and gana["anota"] and gana["ganaste"]
+    assert gana["texto"] == "Ganaste: anotaste touchdown"
+    assert otro["yarda"] == 75 and not otro["anota"] and otro["texto"] == "Vas en la yarda 75 · Ana anotó"
+    assert ajeno["texto"] == "Ana anotó" and ajeno["anota"] and ajeno["yarda"] == 100
+
+
+def test_semana_oficial_con_empate_en_la_punta():
+    s = _semana([12, 12, 12, 8], oficial=True, ganadores=[0, 1, 2])
+    gana, otro, ajeno = _avance([(s, 1), (s, 3), (s, None)])
+    assert gana["texto"] == "Ganaste: anotaste touchdown" and gana["yarda"] == 100
+    assert otro["texto"] == "Vas en la yarda 67 · Anotaron 3"
+    assert ajeno["texto"] == "Anotaron 3"
+
+
+def test_semana_en_curso_nadie_anota_y_la_punta_es_primera_y_gol():
+    s = _semana([8, 6, 4, 0], cerrados=8)
+    lider, otro, cero, ajeno = _avance([(s, 0), (s, 1), (s, 3), (s, None)])
+    assert lider["texto"] == "Vas en la punta: primera y gol" and lider["p"] == 0.99 and not lider["anota"]
+    assert otro["yarda"] == 75 and otro["texto"] == "Vas en la yarda 75 · a 2 aciertos de la punta"
+    assert cero["yarda"] == 0 and cero["texto"] == "Vas en la yarda 0 · a 8 aciertos de la punta"
+    assert ajeno["texto"] == "Ana va en primera y gol" and ajeno["yarda"] == 99
+
+
+def test_semana_en_curso_con_empate_en_la_punta():
+    s = _semana([5, 5, 5, 4], cerrados=6)
+    lider, otro, ajeno = _avance([(s, 2), (s, 3), (s, None)])
+    assert lider["texto"] == "Vas en la punta: primera y gol"
+    assert otro["texto"] == "Vas en la yarda 80 · a 1 acierto de la punta"
+    assert ajeno["texto"] == "Van 3 en primera y gol"
+
+
+def test_sin_partidos_jugados_todos_en_la_yarda_cero():
+    s0 = _semana([0, 0, 0], cerrados=0)
+    s1 = _semana([0, 0, 0], cerrados=3)
+    for av in _avance([(s0, 0), (s1, 1), (s1, None)]):
+        assert av["hay"] and av["sinJuego"] and av["p"] == 0 and av["yarda"] == 0 and not av["anota"]
+    assert _avance([({"tabla": [], "cerrados": 0, "oficial": False, "ganadores": []}, 0)])[0]["hay"] is False
+
+
+def test_sin_nombre_solo_se_ve_al_lider_y_sin_ganador_oficial_nadie_pasa_de_099():
+    en_curso = _semana([9, 3, 9, 7], cerrados=9)
+    oficial = _semana([9, 3, 9, 8], oficial=True, ganadores=[0, 2])
+    salida = _avance([(en_curso, yo) for yo in (None, 0, 1, 2, 3, 4)] + [(oficial, yo) for yo in (None, 0, 1, 2, 3, 4)])
+    for av in salida[:6]:
+        assert av["p"] <= 0.99 and av["yarda"] <= 99 and not av["anota"] and not av["ganaste"]
+    assert salida[0]["texto"] == "Van 2 en primera y gol"
+    # Un participante que ni aparece en la tabla se queda en la yarda 0.
+    assert salida[5]["yarda"] == 0
+    # En una semana oficial solo los ganadores llegan a 100.
+    assert [av["yarda"] for av in salida[6:]] == [100, 100, 33, 100, 89, 0]
+    assert salida[10]["p"] < 1
