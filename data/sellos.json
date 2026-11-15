@@ -191,8 +191,9 @@
   },
   "10": {
     "archivo": "Semana_10.xlsx",
-    "sellado": "2026-11-13T01:20:29+00:00",
+    "sellado": "2026-11-15T14:31:04+00:00",
     "partidos": {
+      "Patriots@Lions": "9dde11c36ee94b50573162b10711b89a48dbe2f9b742a6c3080479cfb338c2b6",
       "Washington@Giants": "3b2912d3f842ceb003049c27ca343a8cd0cd1aaa2b718ce5f4d844d75439cb22"
     }
   }
