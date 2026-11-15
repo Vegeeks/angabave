@@ -6,9 +6,9 @@
       "local": "Falcons",
       "marcador_visitante": 35,
       "marcador_local": 13,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Chiefs",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-15T18:00:00+00:00",
       "hora_definida": true
     },
@@ -48,11 +48,11 @@
     {
       "visitante": "Panthers",
       "local": "Saints",
-      "marcador_visitante": 17,
+      "marcador_visitante": 20,
       "marcador_local": 17,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Panthers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-15T18:00:00+00:00",
       "hora_definida": true
     },
