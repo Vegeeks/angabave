@@ -2,35 +2,13 @@
   "semana": 10,
   "partidos": [
     {
-      "visitante": "Chiefs",
-      "local": "Falcons",
-      "marcador_visitante": 35,
-      "marcador_local": 13,
-      "ganador": "Chiefs",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-15T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Texans",
       "local": "Browns",
       "marcador_visitante": 24,
       "marcador_local": 27,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-11-15T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Jaguars",
-      "local": "Titans",
-      "marcador_visitante": 40,
-      "marcador_local": 23,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Browns",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-15T18:00:00+00:00",
       "hora_definida": true
     },
@@ -42,6 +20,72 @@
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Seahawks",
+      "local": "Raiders",
+      "marcador_visitante": 0,
+      "marcador_local": 0,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-15T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Rams",
+      "local": "Cardinals",
+      "marcador_visitante": 0,
+      "marcador_local": 3,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "In Progress",
+      "inicio": "2026-11-15T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Patriots",
+      "local": "Lions",
+      "marcador_visitante": 10,
+      "marcador_local": 35,
+      "ganador": "Lions",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-15T14:30:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Chiefs",
+      "local": "Falcons",
+      "marcador_visitante": 35,
+      "marcador_local": 13,
+      "ganador": "Chiefs",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Vikings",
+      "local": "Packers",
+      "marcador_visitante": 30,
+      "marcador_local": 10,
+      "ganador": "Vikings",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Jaguars",
+      "local": "Titans",
+      "marcador_visitante": 40,
+      "marcador_local": 23,
+      "ganador": "Jaguars",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-15T18:00:00+00:00",
       "hora_definida": true
     },
@@ -65,50 +109,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-15T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Patriots",
-      "local": "Lions",
-      "marcador_visitante": 10,
-      "marcador_local": 35,
-      "ganador": "Lions",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-15T14:30:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Vikings",
-      "local": "Packers",
-      "marcador_visitante": 30,
-      "marcador_local": 10,
-      "ganador": "Vikings",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-15T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Seahawks",
-      "local": "Raiders",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-11-15T21:05:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Rams",
-      "local": "Cardinals",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
-      "inicio": "2026-11-15T21:05:00+00:00",
       "hora_definida": true
     },
     {
