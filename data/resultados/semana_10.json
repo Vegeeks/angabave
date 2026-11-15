@@ -2,32 +2,10 @@
   "semana": 10,
   "partidos": [
     {
-      "visitante": "Texans",
-      "local": "Browns",
-      "marcador_visitante": 24,
-      "marcador_local": 27,
-      "ganador": "Browns",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-15T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Dolphins",
-      "local": "Colts",
-      "marcador_visitante": 22,
-      "marcador_local": 24,
-      "ganador": "Colts",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-15T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Seahawks",
       "local": "Raiders",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
+      "marcador_visitante": 21,
+      "marcador_local": 13,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -37,12 +15,23 @@
     {
       "visitante": "Rams",
       "local": "Cardinals",
-      "marcador_visitante": 0,
-      "marcador_local": 3,
+      "marcador_visitante": 34,
+      "marcador_local": 6,
+      "ganador": "Rams",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-15T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "49ers",
+      "local": "Cowboys",
+      "marcador_visitante": 31,
+      "marcador_local": 19,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
-      "inicio": "2026-11-15T21:05:00+00:00",
+      "inicio": "2026-11-15T21:25:00+00:00",
       "hora_definida": true
     },
     {
@@ -62,6 +51,17 @@
       "marcador_visitante": 35,
       "marcador_local": 13,
       "ganador": "Chiefs",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Texans",
+      "local": "Browns",
+      "marcador_visitante": 24,
+      "marcador_local": 27,
+      "ganador": "Browns",
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-15T18:00:00+00:00",
@@ -90,6 +90,17 @@
       "hora_definida": true
     },
     {
+      "visitante": "Dolphins",
+      "local": "Colts",
+      "marcador_visitante": 22,
+      "marcador_local": 24,
+      "ganador": "Colts",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
       "visitante": "Panthers",
       "local": "Saints",
       "marcador_visitante": 20,
@@ -109,17 +120,6 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-15T18:00:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "49ers",
-      "local": "Cowboys",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-15T21:25:00+00:00",
       "hora_definida": true
     },
     {
