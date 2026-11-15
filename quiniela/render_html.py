@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.37.0"
+VERSION = "v0.37.1"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -466,6 +466,14 @@ TAMANO_PORTADA = (1200, 630)
 
 #: Cada cuántos segundos el navegador pide marcadores a ESPN por su cuenta.
 SEGUNDOS_VIVO = 60
+
+#: La copia guardada en el teléfono (sw.js): con mala señal se abre la última página completa
+#: que llegó. En False, sw.js se da de baja solo, borra la copia y la página deja de registrarlo.
+TRABAJADOR = True
+#: Cuánto espera el teléfono a que la red entregue la página completa antes de abrir la copia.
+ESPERA_COPIA_MS = 3500
+#: El nombre de la copia en el teléfono. Cambiarlo tira las copias anteriores.
+CAJA_COPIA = "angabave-pagina-v1"
 
 #: A dónde se mandan los picks. Lo usa el generador de imagen del sitio.
 CORREO_ORGANIZADOR = "quinielanfl@hotmail.com"
@@ -1218,6 +1226,7 @@ def generar_prueba_de_red(ruta_salida: Path, url_funcion: str = URL_FUNCION) -> 
         version=VERSION,
         url_funcion=url_funcion,
         url_espn=URL_SCOREBOARD,
+        caja=CAJA_COPIA,
         tema_campo=tema_campo(),
         marca_svg=marca.svg(),
         marca_palabra=marca.palabra(),
@@ -1228,6 +1237,29 @@ def generar_prueba_de_red(ruta_salida: Path, url_funcion: str = URL_FUNCION) -> 
     ruta = Path(ruta_salida)
     ruta.parent.mkdir(parents=True, exist_ok=True)
     ruta.write_text(html, encoding="utf-8")
+    return ruta
+
+
+def generar_trabajador(ruta_salida: Path) -> Path:
+    """Escribe sw.js, el que guarda en el teléfono la última página completa del portal.
+
+    Con datos celulares la página a veces no llega o llega cortada: así, quien ya la abrió una
+    vez la vuelve a abrir aunque la red falle, con aviso de que es lo guardado.
+    """
+    tema = tema_campo()
+    texto = _entorno().get_template("sw.js.j2").render(
+        trabajador=TRABAJADOR,
+        caja=CAJA_COPIA,
+        espera=ESPERA_COPIA_MS,
+        marca=MARCA,
+        fondo=tema["--bg"],
+        letra=tema["--txt"],
+        tenue=tema["--tenue"],
+        acento=tema["--acento"],
+    )
+    ruta = Path(ruta_salida)
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+    ruta.write_text(texto, encoding="utf-8")
     return ruta
 
 
@@ -1415,6 +1447,7 @@ def generar_html(
     generar_manifiesto(ruta_salida.parent / "manifest.webmanifest")
     generar_pagina_de_carga(ruta_salida.parent / "cargar.html")
     generar_prueba_de_red(ruta_salida.parent / "red.html")
+    generar_trabajador(ruta_salida.parent / "sw.js")
     escribir_recordatorio(ruta_salida.parent, plan_recordatorio)
 
     ruta_sello = ruta_salida.parent / "version.json"
@@ -1441,6 +1474,7 @@ def generar_html(
         "marca": MARCA,
         "etapa": ETAPA,
         "version": VERSION,
+        "trabajador": TRABAJADOR,
         "sitio": SITIO,
         "firma": firma,
         "tamano_portada": TAMANO_PORTADA,

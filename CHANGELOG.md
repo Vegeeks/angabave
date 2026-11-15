@@ -9,6 +9,16 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.37.1
+
+Para quien no podía entrar con datos celulares.
+
+* **Copia guardada en el teléfono.** La primera vez que el portal abre bien, el teléfono guarda una copia completa. Después siempre se intenta primero la red; si no entrega la página completa en 3.5 segundos (sin señal, señal débil, una página que llega cortada o un nodo del CDN que no contesta), se abre la copia. Arriba aparece "Sin señal. Ves lo guardado en este teléfono, con datos de hoy a las 23:48", y el aviso se quita solo en cuanto la red confirma que es lo último publicado. Nunca se abre algo más viejo que la copia. Solo cuida la página del portal: la del enlace, la prueba de conexión, ESPN y lo demás siguen yendo a la red.
+* **La recarga automática ya no deja la pantalla en negro.** Cuando hay una versión nueva, primero se baja completa y solo entonces se cambia; si la red falla a la mitad, te quedas viendo lo que tenías.
+* **Si la página llega cortada, se vuelve a pedir sola una vez.** Si tampoco abre, el aviso trae "Probar la conexión". Si sigue llegando después de un minuto, el aviso dice que la señal va lenta en vez de decir que falló.
+* **Mientras carga se nota.** Una barra y "Cargando la quiniela…" en lugar de pantalla negra; si tarda, "Tu señal va lenta. Ya casi…". La llegada del estadio solo se hace si la página está lista en 2.5 segundos.
+* **Prueba de conexión:** marca en rojo una página que llegó cortada y dice si este teléfono ya tiene copia guardada y de cuándo es.
+
 ## v0.37.0
 
 * **Hoy según el momento.** En días de picks, el titular dice "Hoy cierran los picks", "Cierran mañana" o "Cierran el sábado"; debajo, la hora con la cuenta regresiva una sola vez, el estado de tus picks y tu lugar en la general. Sin nombre elegido, solo la hora y lo próximo. Si hoy no hay partidos, termina con el próximo.

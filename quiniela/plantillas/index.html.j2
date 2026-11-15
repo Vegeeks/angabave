@@ -32,7 +32,7 @@
     es para que Safari pinte :active al instante. #}
 <script>
 if(!/iP(hone|od|ad)/.test(navigator.userAgent)&&!(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform)))document.write('<link rel="manifest" href="manifest.webmanifest">');
-(function(){var r=document.documentElement;r.className='js';try{if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches)r.classList.add('instalada')}catch(e){}try{var t=localStorage.getItem('angabave.tema');if(t){r.style.cssText=t;var c=document.querySelector('meta[name="theme-color"]'),m=t.match(/--bg:([^;]+)/);if(c&&m)c.setAttribute('content',m[1])}if(!sessionStorage.getItem('angabave.estreno')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){r.className+=' estreno';window.campoRescate=setTimeout(function(){r.classList.remove('estreno')},6000)}}catch(e){}document.addEventListener('DOMContentLoaded',function(){r.classList.add('listo')});document.addEventListener('touchstart',function(){},{passive:true})})();
+(function(){var r=document.documentElement;r.className='js';try{if(navigator.standalone===true||matchMedia('(display-mode: standalone)').matches)r.classList.add('instalada')}catch(e){}try{var t=localStorage.getItem('angabave.tema');if(t){r.style.cssText=t;var c=document.querySelector('meta[name="theme-color"]'),m=t.match(/--bg:([^;]+)/);if(c&&m)c.setAttribute('content',m[1])}if(!sessionStorage.getItem('angabave.estreno')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){r.className+=' estreno';window.campoRescate=setTimeout(function(){r.classList.remove('estreno')},2500)}}catch(e){}document.addEventListener('DOMContentLoaded',function(){r.classList.add('listo')});document.addEventListener('touchstart',function(){},{passive:true})})();
 try{var g=JSON.parse(localStorage.getItem('angabave.campo')||'null');if(g&&g.v===2){window.campoGuardado=g;if(g.e)document.documentElement.setAttribute('data-campo',g.e)}}catch(e){}
 </script>
 <style>
@@ -91,6 +91,21 @@ i,em{font-style:normal}
 .js:not(.listo) main>.vista,.js:not(.listo) footer{display:none}
 .js:not(.listo) .fila-yo{min-height:64px}
 .js:not(.listo) .identidad .ini{color:transparent}
+/* Mientras llega el resto de la página: que se note que sigue cargando, que con datos celulares
+   puede tardar. Si la página está lista pronto, la llegada del estadio lo tapa y ni se ve. */
+.arranque{display:none}
+.js:not(.listo) .arranque{display:block; padding-block:40px; text-align:center; font-size:var(--t5); color:var(--tenue)}
+.estreno .arranque{visibility:hidden}
+.arranque-barra{position:relative; display:block; width:96px; height:2px; margin:0 auto 12px; overflow:hidden;
+  border-radius:2px; background:var(--linea2)}
+.arranque-barra::after{content:""; position:absolute; top:0; bottom:0; left:0; width:40%; border-radius:2px;
+  background:var(--oro); animation:arranque-corre 1.2s ease-in-out 50 backwards}
+@keyframes arranque-corre{0%{transform:translateX(-100%)} 100%{transform:translateX(250%)}}
+@media (prefers-reduced-motion:reduce){.arranque-barra::after{animation:none; width:100%; opacity:.5}}
+/* Lo que se ve es la copia guardada en el teléfono porque la red no la entregó a tiempo (sw.js). */
+.sin-senal{margin-top:12px; padding-block:12px; font-size:var(--t5); line-height:1.35; color:var(--tenue);
+  border-block:1px solid var(--linea)}
+.sin-senal b{color:var(--txt); font-weight:600}
 /* Las cifras de marcador. Nunca en nombres ni en frases. */
 .juego-fila .mrc,.pts,.err,.sem,.c-pos .n,.medalla,.lugar .puntos,.lugar .bolsa,.fila-gan .monto,.bolsa-final .val,.campeon .bolsa,
 .cifras .cifra b,.mi-barra .linea b,.mi-barra .linea .rango,.mi-semana .fila .rango,.leyenda b,.celda-semana b,
@@ -1012,6 +1027,22 @@ try {
 </div>
 
 <main>
+  <p class="sin-senal env oculto" id="sin-senal" role="status"></p>
+  <div class="arranque env" role="status"><span class="arranque-barra" aria-hidden="true"></span><p id="arranque-txt">Cargando la quiniela…</p></div>
+  <script>
+  /* En JavaScript viejo, como la red de seguridad: corre mientras el resto sigue llegando. */
+  (function () {
+    var t = document.getElementById("arranque-txt"), r = document.documentElement;
+    function luego(ms, texto, siguiente) {
+      window.setTimeout(function () {
+        if (!t || /(^|\s)listo(\s|$)/.test(r.className)) return;
+        t.textContent = texto;
+        if (siguiente) siguiente();
+      }, ms);
+    }
+    luego(4000, "Tu señal va lenta. Ya casi…", function () { luego(8000, "Sigue llegando. No cierres la página."); });
+  })();
+  </script>
   <section class="vista oculto env" id="vista-hoy"></section>
   <section class="vista oculto env" id="vista-picks"></section>
   {# La general se escribe en el HTML: se ve aunque el navegador no ejecute nada. #}
@@ -5761,11 +5792,14 @@ try {
   /* Abrir la app guardada desde su ícono siempre empieza en Hoy: Safari guardó también
      la sección en la que estabas. Una recarga que hizo la propia página no cuenta. */
   const tipoDeCarga = (performance.getEntriesByType("navigation")[0] || {}).type;
-  const recargaPropia = new URLSearchParams(location.search).has("v") || !!(guardado && guardado.auto);
+  // ?v= la pone la recarga automática y ?r= la otra vuelta de la red de seguridad: las dos se van.
+  const deRecarga = (q) => q.has("v") || q.has("r");
+  const recargaPropia = deRecarga(new URLSearchParams(location.search)) || !!(guardado && guardado.auto);
   if (enAppGuardada() && tipoDeCarga === "navigate" && !recargaPropia) { direccion = null; guardado = null; }
-  if (new URLSearchParams(location.search).has("v")) {
+  if (deRecarga(new URLSearchParams(location.search))) {
     const q = new URLSearchParams(location.search);
     q.delete("v");
+    q.delete("r");
     const resto = q.toString();
     history.replaceState(history.state, "", location.pathname + (resto ? "?" + resto : "") + location.hash);
   }
@@ -5852,22 +5886,103 @@ try {
     catch (e) { return {}; }
   }
 
+  /* La versión nueva se baja completa ANTES de soltar la que se ve: con datos celulares, recargar a
+     ciegas dejaba la pantalla en negro si la red se caía a la mitad. Con sw.js la baja él y la deja
+     lista para abrir al instante; sin él la baja la página y la recarga sale del caché del navegador. */
+  function precargarConTrabajador() {
+    return new Promise((listo) => {
+      const control = navigator.serviceWorker && navigator.serviceWorker.controller;
+      if (!control || typeof MessageChannel === "undefined") { listo(null); return; }
+      const canal = new MessageChannel();
+      const reloj = setTimeout(() => listo({ ok: false }), 90000);
+      canal.port1.onmessage = (e) => { clearTimeout(reloj); listo(e.data || { ok: false }); };
+      control.postMessage({ tipo: "precargar" }, [canal.port2]);
+    });
+  }
+
+  async function bajarCompleta(firma) {
+    const destino = new URL(location.href);
+    destino.searchParams.set("v", String(Date.now()));
+    try {
+      const trabajador = await precargarConTrabajador();
+      if (trabajador) return trabajador.ok && trabajador.firma === firma ? destino.toString() : null;
+      const control = new AbortController();
+      const reloj = setTimeout(() => control.abort(), 90000);
+      const r = await fetch(destino.toString(), { cache: "reload", signal: control.signal });
+      const texto = r.ok ? await r.text() : "";
+      clearTimeout(reloj);
+      const entera = /<\/html>\s*$/.test(texto) && texto.indexOf('"firma":"' + firma + '"') > 0;
+      return entera ? destino.toString() : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const recargaPendiente = { bajando: false, lista: null, falla: 0 };
   function recargarFresco(version) {
-    const ahora = Date.now(), previa = leerRecarga();
+    const ahora = Date.now(), previa = leerRecarga(), pendiente = recargaPendiente;
     if (previa.cuando && ahora - previa.cuando < TRES_MIN) return;
     if (previa.version === version && ahora - previa.cuando < ONCE_MIN) return;
-    try {
-      sessionStorage.setItem(LLAVE_RECARGA, JSON.stringify({ cuando: ahora, version }));
-    } catch (e) {
-      // Sin dónde anotar la recarga no hay candado: mejor no recargar solo.
-      return;
-    }
-    recargaAutomatica = true;
-    recordarSitio();
-    const url = new URL(location.href);
-    url.searchParams.set("v", String(ahora));
-    location.replace(url.toString());
+    if (pendiente.bajando || ahora - pendiente.falla < TRES_MIN) return;
+    // Ya se bajó en una revisión anterior, cuando la persona estaba en algo: sigue lista un rato.
+    const yaLista = pendiente.lista && pendiente.lista.version === version && ahora - pendiente.lista.cuando < 9 * 60000;
+    pendiente.bajando = true;
+    (yaLista ? Promise.resolve(pendiente.lista.destino) : bajarCompleta(version)).then((destino) => {
+      pendiente.bajando = false;
+      if (!destino) { pendiente.falla = Date.now(); return; }
+      if (!yaLista) pendiente.lista = { version, destino, cuando: Date.now() };
+      // Mientras bajaba pudo empezar algo: la siguiente revisión ya la encuentra lista.
+      if (escribiendo() || document.querySelector(".hoja-fondo") || Date.now() - ultimoToque < 30000) return;
+      try {
+        sessionStorage.setItem(LLAVE_RECARGA, JSON.stringify({ cuando: Date.now(), version }));
+      } catch (e) {
+        // Sin dónde anotar la recarga no hay candado: mejor no recargar solo.
+        return;
+      }
+      recargaAutomatica = true;
+      recordarSitio();
+      location.replace(destino);
+    });
   }
+
+  /* ═══ la copia guardada ═══
+     Si la red no entregó la página a tiempo, sw.js abre la última completa que llegó a este teléfono y
+     lo marca en <html data-copia>. Se avisa solo si la red tampoco contesta en un momento, y el aviso
+     se va en cuanto version.json confirma que lo guardado es lo último publicado. */
+  const enCopia = document.documentElement.hasAttribute("data-copia");
+  const avisoCopia = document.getElementById("sin-senal");
+  let redConfirmada = false;
+
+  function cuandoDeLaCopia() {
+    const t = marca(D.generado);
+    if (!isFinite(t)) return "de la última vez";
+    const fecha = new Date(t);
+    if (mismoDia(fecha, Date.now())) return "de hoy a las " + hora(t / 1000);
+    if (mismoDia(fecha, Date.now() - 864e5)) return "de ayer a las " + hora(t / 1000);
+    return "del " + DIAS_SEMANA[fecha.getDay()] + " " + fecha.getDate() + " a las " + hora(t / 1000);
+  }
+
+  function pintarAvisoCopia(hayNueva) {
+    if (!enCopia || !avisoCopia) return;
+    avisoCopia.textContent = "";
+    if (hayNueva) {
+      avisoCopia.appendChild(crear("b", null, "Ves lo guardado en este teléfono."));
+      avisoCopia.appendChild(document.createTextNode(" Datos " + cuandoDeLaCopia() + ". Ya hay algo más nuevo y se carga solo en un momento."));
+    } else {
+      avisoCopia.appendChild(crear("b", null, "Sin señal."));
+      avisoCopia.appendChild(document.createTextNode(" Ves lo guardado en este teléfono, con datos " + cuandoDeLaCopia() +
+        ". Se pone al día solo en cuanto vuelva la red."));
+    }
+    avisoCopia.classList.remove("oculto");
+  }
+
+  function hayRed(alDia) {
+    redConfirmada = true;
+    if (!enCopia || !avisoCopia) return;
+    if (alDia) avisoCopia.classList.add("oculto");
+    else pintarAvisoCopia(true);
+  }
+  if (enCopia) setTimeout(() => { if (!redConfirmada) pintarAvisoCopia(false); }, 2500);
 
   /* El aviso de "lleva tanto sin recalcularse" entra o sale según el último latido. */
   function revisarRezago() {
@@ -5879,13 +5994,18 @@ try {
   async function revisarVersion() {
     if (document.hidden) return;
     try {
-      const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store" });
-      if (!r.ok) return;
-      const sello = await r.json();
+      // Con la red colgada no se queda esperando: a los veinte segundos se suelta y se intenta luego.
+      const control = new AbortController();
+      const reloj = setTimeout(() => control.abort(), 20000);
+      const r = await fetch("version.json?t=" + Date.now(), { cache: "no-store", signal: control.signal });
+      const sello = r.ok ? await r.json() : null;
+      clearTimeout(reloj);
+      if (!sello) return;
       const publicada = marca(sello.generado), esta = marca(D.generado);
       if (publicada > latido) latido = publicada;
       latidoVisto = true;
       revisarRezago();
+      hayRed(!sello.firma || sello.firma === D.firma || !(publicada > esta));
       if (!sello.firma || sello.firma === D.firma) return;   // nada oficial cambió
       if (!(publicada > esta)) return;   // el CDN trajo uno más viejo o ilegible
       if (escribiendo() || document.querySelector(".hoja-fondo") || Date.now() - ultimoToque < 30000) return;
@@ -5895,7 +6015,23 @@ try {
 
   setInterval(revisarVersion, 90000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) revisarVersion(); });
+  window.addEventListener("online", revisarVersion);
   revisarVersion();
+
+  /* sw.js se registra con la página ya a la vista, para no competirle a lo que falta por llegar.
+     Si algo falla, el portal sigue igual, solo sin copia. */
+  try {
+    if ("serviceWorker" in navigator) {
+      {% if trabajador %}
+      const registrar = () => navigator.serviceWorker.register("sw.js", { scope: "./" }).catch(() => {});
+      if (document.readyState === "complete") setTimeout(registrar, 1500);
+      else window.addEventListener("load", () => setTimeout(registrar, 1500), { once: true });
+      {% else %}
+      navigator.serviceWorker.getRegistrations().then((todos) => todos.forEach((r) => r.unregister())).catch(() => {});
+      if (window.caches) caches.keys().then((cajas) => cajas.forEach((c) => { if (c.indexOf("angabave-") === 0) caches.delete(c); })).catch(() => {});
+      {% endif %}
+    }
+  } catch (e) { /* sin trabajador: todo igual, solo sin copia */ }
 
   // Arrancó bien: la red de seguridad ya no hace falta.
   window.angabaveListo = true;
