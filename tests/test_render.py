@@ -1856,7 +1856,7 @@ def test_el_encabezado_compacto_es_de_todas_las_vistas_menos_hoy(armado, tmp_pat
 def test_el_gol_de_campo_vive_en_su_capa_y_se_borra_solo(armado, tmp_path: Path):
     html = render(armado, tmp_path)
     gol = _funcion(html, "golDeCampo")
-    assert "setTimeout(() => quitar.remove(), 2500)" in gol
+    assert "setTimeout(() => quitar.forEach((n) => n.remove()), 2500)" in gol
     assert gol.count("catch (e)") >= 1 and "rodar(rueda" in gol
     assert "textContent" not in gol.replace("rodar(rueda", "")      # nada toca el texto real de la barra
     assert "entradaConGol();" in html

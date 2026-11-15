@@ -5256,6 +5256,8 @@ try {
       const cifra = document.querySelector(".mi-barra-yo .celda-temporada .linea b");
       if (!palabra || !saludo || !cifra || !cifra.getBoundingClientRect().width) return;
       const z = palabra.getBoundingClientRect(), linea = saludo.getBoundingClientRect(), c = cifra.getBoundingClientRect();
+      const zonaNodo = Array.from(document.querySelectorAll(".cancha svg.plano .cp-zona")).find((n) => n.getBoundingClientRect().width > 0);
+      const zr = zonaNodo ? zonaNodo.getBoundingClientRect() : z;
       const sx = window.scrollX, sy = window.scrollY;
       if (!aMano) guardar(LLAVE_GOL, fechaLocal());
       golEnCurso = true;
@@ -5263,15 +5265,15 @@ try {
       capa = crear("div", "gol-capa");
       capa.setAttribute("aria-hidden", "true");
       document.body.appendChild(capa);
-      const quitar = capa;
-      setTimeout(() => quitar.remove(), 2500);
+      const quitar = [capa];
+      setTimeout(() => quitar.forEach((n) => n.remove()), 2500);
 
       // Los postes: una H plana sobre la zona de anotación.
       // Algo a la izquierda del centro: la cifra que rueda arriba queda a la vista.
-      const W = Math.round(Math.min(88, Math.max(64, z.width * 0.26))), Hh = Math.round(W * 0.72);
-      const barra = document.querySelector(".mi-barra");
-      const piso = barra && barra.getBoundingClientRect().height ? barra.getBoundingClientRect().bottom + sy + 6 : 0;
-      const px = z.left + sx + z.width * 0.3 - W / 2, py = Math.max(z.top + sy + z.height * 0.95 - Hh, piso);
+      // En la línea del fondo, detrás de la zona de anotación. Con esta cámara esa línea queda
+      // justo bajo la barra de arriba: durante el gol los postes van encima, como gráfica de la transmisión.
+      const W = Math.round(Math.min(80, Math.max(48, zr.width * 0.16))), Hh = Math.round(W * 0.72);
+      const px = zr.left + sx + zr.width / 2 - W / 2, py = zr.top + sy - Hh * 70 / 72;
       const H = '<svg viewBox="0 0 100 72" aria-hidden="true"><path d="M22 4V42M78 4V42M22 42H78M50 42V70"/></svg>';
       const poste = (clase) => {
         const n = crear("div", "gol-postes " + clase);
@@ -5281,8 +5283,9 @@ try {
         return n;
       };
       const total = 1560, f = (ms) => ms / total;
-      poste("oro").animate([{ opacity: 0, offset: 0 }, { opacity: 1, offset: f(200) }, { opacity: 1, offset: f(1300) },
-        { opacity: 0, offset: 1 }], { duration: total, fill: "both" });
+      // Se van justo después de que pasa el balón: así la cifra que rueda queda limpia.
+      poste("oro").animate([{ opacity: 0, offset: 0 }, { opacity: 1, offset: f(200) }, { opacity: 1, offset: f(1000) },
+        { opacity: 0, offset: f(1200) }, { opacity: 0, offset: 1 }], { duration: total, fill: "both" });
       poste("blanco").animate([{ opacity: 0, offset: 0 }, { opacity: 0, offset: f(900) }, { opacity: 0.9, offset: f(1000) },
         { opacity: 0, offset: f(1150) }, { opacity: 0, offset: 1 }], { duration: total, fill: "both" });
 
