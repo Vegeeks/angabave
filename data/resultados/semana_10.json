@@ -17,9 +17,9 @@
       "local": "Colts",
       "marcador_visitante": 22,
       "marcador_local": 24,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Colts",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-15T18:00:00+00:00",
       "hora_definida": true
     },
