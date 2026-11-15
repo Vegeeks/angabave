@@ -17,6 +17,8 @@ La versión se muestra junto a la marca en el portal y vive en
 * **Frases:** "partidos jugados", "Ganó la semana" y "Ganaron la semana", y un texto de Picks que aclara que aquí no se registra nada.
 * **El gol de campo de entrada.** Con nombre elegido, una vez al día, sin partidos en vivo y con 3 o más aciertos, unos postes aparecen sobre la zona de anotación, un balón los cruza y la cifra de temporada rueda con "+3" (o lo que sumaste desde tu última visita). Todo va en una capa que se borra sola; los números reales no cambian.
 
+* El gol de campo de entrada también se puede ver a mano con el botón "Gol" de Hoy, junto a la fecha. El balón es más grande y claro, y los postes ya no tapan la barra de arriba.
+
 ## v0.36.0
 
 (Es la que el plan llamaba v0.33; sale después de la v0.35.)
