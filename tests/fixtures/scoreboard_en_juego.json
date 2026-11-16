@@ -1,0 +1,562 @@
+{
+ "events": [
+  {
+   "id": "401873053",
+   "shortName": "NE VS DET",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "35",
+       "team": {
+        "id": "8",
+        "abbreviation": "DET"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "10",
+       "team": {
+        "id": "17",
+        "abbreviation": "NE"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873058",
+   "shortName": "KC @ ATL",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "13",
+       "team": {
+        "id": "1",
+        "abbreviation": "ATL"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "35",
+       "team": {
+        "id": "12",
+        "abbreviation": "KC"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873056",
+   "shortName": "HOU @ CLE",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "27",
+       "team": {
+        "id": "5",
+        "abbreviation": "CLE"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "24",
+       "team": {
+        "id": "34",
+        "abbreviation": "HOU"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873060",
+   "shortName": "MIN @ GB",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "10",
+       "team": {
+        "id": "9",
+        "abbreviation": "GB"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "30",
+       "team": {
+        "id": "16",
+        "abbreviation": "MIN"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873057",
+   "shortName": "JAX @ TEN",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "23",
+       "team": {
+        "id": "10",
+        "abbreviation": "TEN"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "40",
+       "team": {
+        "id": "30",
+        "abbreviation": "JAX"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873059",
+   "shortName": "MIA @ IND",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "24",
+       "team": {
+        "id": "11",
+        "abbreviation": "IND"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "22",
+       "team": {
+        "id": "15",
+        "abbreviation": "MIA"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873055",
+   "shortName": "CAR @ NO",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "17",
+       "team": {
+        "id": "18",
+        "abbreviation": "NO"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "20",
+       "team": {
+        "id": "29",
+        "abbreviation": "CAR"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873054",
+   "shortName": "BUF @ NYJ",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "12",
+       "team": {
+        "id": "20",
+        "abbreviation": "NYJ"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "31",
+       "team": {
+        "id": "2",
+        "abbreviation": "BUF"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873062",
+   "shortName": "SEA @ LV",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "13",
+       "team": {
+        "id": "13",
+        "abbreviation": "LV"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "21",
+       "team": {
+        "id": "26",
+        "abbreviation": "SEA"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873061",
+   "shortName": "LAR @ ARI",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "6",
+       "team": {
+        "id": "22",
+        "abbreviation": "ARI"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "34",
+       "team": {
+        "id": "14",
+        "abbreviation": "LAR"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873063",
+   "shortName": "SF @ DAL",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "40",
+       "team": {
+        "id": "6",
+        "abbreviation": "DAL"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "46",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873064",
+   "shortName": "PIT @ CIN",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "0",
+       "team": {
+        "id": "4",
+        "abbreviation": "CIN"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "0",
+       "team": {
+        "id": "23",
+        "abbreviation": "PIT"
+       }
+      }
+     ],
+     "status": {
+      "period": 1,
+      "displayClock": "12:22",
+      "type": {
+       "state": "in",
+       "completed": false,
+       "description": "In Progress",
+       "name": "STATUS_IN_PROGRESS"
+      }
+     },
+     "situation": {
+      "lastPlay": {
+       "id": "401873064175",
+       "type": {
+        "id": "24",
+        "text": "Pass Reception",
+        "abbreviation": "REC"
+       },
+       "text": " (Shotgun) J.Burrow pass deep right to J.Chase ran ob at PIT 32 for 27 yards.",
+       "scoreValue": 0,
+       "team": {
+        "id": "4"
+       },
+       "probability": {
+        "tiePercentage": 0.0,
+        "homeWinPercentage": 0.7668,
+        "awayWinPercentage": 0.23319999999999996,
+        "secondsLeft": 0
+       },
+       "statYardage": 27,
+       "drive": {
+        "description": "5 plays, 54 yards, 2:38",
+        "start": {
+         "yardLine": 14,
+         "text": "CIN 14"
+        },
+        "timeElapsed": {
+         "displayValue": "2:38"
+        }
+       },
+       "start": {
+        "yardLine": 41,
+        "team": {
+         "id": "4"
+        }
+       },
+       "end": {
+        "yardLine": 68,
+        "team": {
+         "id": "4"
+        }
+       }
+      },
+      "down": 1,
+      "yardLine": 68,
+      "distance": 10,
+      "downDistanceText": "1st & 10 at PIT 32",
+      "shortDownDistanceText": "1st & 10",
+      "possessionText": "PIT 32",
+      "isRedZone": false,
+      "homeTimeouts": 3,
+      "awayTimeouts": 3,
+      "possession": "4"
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873052",
+   "shortName": "WSH @ NYG",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "21",
+       "team": {
+        "id": "19",
+        "abbreviation": "NYG"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "24",
+       "team": {
+        "id": "28",
+        "abbreviation": "WSH"
+       }
+      }
+     ],
+     "status": {
+      "period": 4,
+      "displayClock": "0:00",
+      "type": {
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "name": "STATUS_FINAL"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "401873065",
+   "shortName": "LAC @ BAL",
+   "competitions": [
+    {
+     "competitors": [
+      {
+       "homeAway": "home",
+       "score": "0",
+       "team": {
+        "id": "33",
+        "abbreviation": "BAL"
+       }
+      },
+      {
+       "homeAway": "away",
+       "score": "0",
+       "team": {
+        "id": "24",
+        "abbreviation": "LAC"
+       }
+      }
+     ],
+     "status": {
+      "period": 0,
+      "displayClock": "0:00",
+      "type": {
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "name": "STATUS_SCHEDULED"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

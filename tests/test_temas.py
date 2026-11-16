@@ -70,7 +70,7 @@ def test_la_opcion_que_no_elegiste_se_sigue_leyendo(nombre, tema):
 
 
 def test_el_color_de_un_equipo_se_lee_en_cualquier_tema():
-    """.cuenta-lado y .rasgo .val usan el color del equipo sobre el piso y las hojas."""
+    """.rasgo .val usa el color del equipo sobre el piso y las hojas."""
     for equipo, colores in paleta_equipos().items():
         for donde in ("local", "visita"):
             for nombre, tema in TEMAS:

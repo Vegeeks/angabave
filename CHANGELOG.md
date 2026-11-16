@@ -9,6 +9,14 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.39.0
+
+* **La jugada en vivo.** Con un partido corriendo, la fila del partido marca con un balón al equipo que lo trae y, debajo, la oportunidad y dónde está: "1.ª y 10 en PIT 32", "3.ª y gol en CIN 4", con "Zona roja" cuando toca. Sale de la misma consulta a ESPN que ya traía el marcador.
+* **En la hoja del partido**, arriba del reparto: quién trae el balón, la oportunidad, la serie (jugadas, yardas y tiempo), la última jugada en español, los tiempos fuera de cada equipo y la probabilidad de ganar que da ESPN. Mientras la hoja está abierta se actualiza sola, marcador incluido.
+* **Más seguido con partido en juego.** El navegador pregunta a ESPN cada 20 segundos mientras hay un partido corriendo; sin ninguno, una vez por minuto, como antes. En el medio tiempo no se muestra jugada, y lo que ESPN no manda completo o no se sabe traducir no se dice. Nada de esto toca marcadores oficiales ni el conteo.
+* **Quién le fue a quién, con filtro.** En la hoja del partido y en la pestaña de la semana, un toque en un equipo deja solo a quienes le fueron ("PIT 7 · Todos 34 · 27 CIN"); otro toque, o "Todos", regresa a los dos lados. Cada renglón de nombres empieza con la sigla de su equipo, la barra apaga el lado que no ves y la hoja no cambia de alto al filtrar. El filtro se recuerda por partido mientras la página siga abierta.
+* En la hoja del partido, la tarjeta del reparto se titula "Quién le fue a quién" en vez de repetir el partido y el marcador de arriba.
+
 ## v0.38.0
 
 * **Tu avance en el campo de la semana.** En Semana, el campo de fondo del encabezado cuenta cómo vas: tu balón sale de la yarda 0 y avanza hacia la zona de anotación según tus aciertos oficiales contra los del primer lugar de esa semana. Solo quien gana una semana ya oficial mete touchdown; mientras la semana sigue abierta, la punta se queda en primera y gol (yarda 99).

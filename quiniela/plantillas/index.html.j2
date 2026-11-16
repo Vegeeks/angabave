@@ -447,6 +447,12 @@ main{view-transition-name:contenido; min-height:60vh}
 .juego-fila .fila-mi-pick .sig{outline:2px solid var(--fila-estado); outline-offset:2px}
 .juego-fila .fila-con-marca{display:flex; align-items:baseline; gap:4px}
 .juego-fila .fila-nombre{min-width:0; overflow:hidden; text-overflow:ellipsis}
+/* La jugada en vivo: el balón junto a quien lo trae y, debajo, la oportunidad y dónde. */
+.balon{display:inline-block; flex:none; width:16px; height:11px; align-self:center; vertical-align:middle;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 22'%3E%3Cellipse cx='16' cy='11' rx='14.6' ry='9.4' fill='%238A4520' stroke='%23F4E7D7' stroke-width='1.4'/%3E%3Cpath d='M9.5 11h13M12.6 8.2v5.6M16 8.2v5.6M19.4 8.2v5.6' stroke='%23fff' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.juego-fila .situacion{grid-column:1 / -1; display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; margin-top:8px;
+  font-size:var(--t6); font-weight:600; line-height:1.3; color:var(--txt); font-variant-numeric:tabular-nums}
+.zr{padding:1px 6px; border-radius:var(--r3); background:color-mix(in srgb,var(--rojo) 18%,transparent); color:var(--rojo); font-weight:700; white-space:nowrap}
 .juego-fila .fila-marca{flex:0 0 auto; font-size:var(--t6); color:var(--fila-estado)}
 .juego-fila.quieto{cursor:default; padding-block:4px}
 /* Cuando alguien anota: una ola del color del equipo y el "+7" que sube. */
@@ -700,12 +706,24 @@ select.ancho:focus{outline:2px solid var(--acento); outline-offset:1px; border-c
 .sello-consenso.unanime{color:var(--txt)}
 .balanza{display:flex; gap:2px; height:6px; border-radius:99px; overflow:hidden; background:var(--panel3)}
 .balanza i{display:block; height:100%; width:0; transition:width .56s var(--traza)}
-.cuenta-lado{display:flex; justify-content:space-between; font-size:var(--t5); font-weight:600}
+/* Quién le fue a quién: un toque en un equipo deja solo a los suyos. */
+.filtro-lado{display:grid; grid-template-columns:1fr auto 1fr; gap:6px}
+.filtro-op{display:flex; align-items:center; gap:6px; min-height:40px; padding:4px 10px; border-radius:var(--r2);
+  background:var(--panel2); color:var(--tenue); border:1px solid transparent; font-size:var(--t5); font-weight:600; font-variant-numeric:tabular-nums;
+  transition:background-color .2s var(--sale),border-color .2s var(--sale),color .2s var(--sale)}
+.filtro-op.lado-l{flex-direction:row-reverse}
+.filtro-op.todos{justify-content:center}
+.filtro-op[aria-pressed="true"]{background:var(--panel3); border-color:var(--acento); color:var(--txt)}
+.filtro-op .sig,.gente>.sig{height:20px; padding-inline:6px}
+.split[data-filtro="v"] .gente.lado-l,.split[data-filtro="l"] .gente.lado-v{display:none}
+.split[data-filtro="v"] .balanza i:last-child,.split[data-filtro="l"] .balanza i:first-child{opacity:.3}
+.balanza i{transition:width .56s var(--traza),opacity .2s var(--sale)}
 .gente{display:flex; flex-wrap:wrap; gap:4px}
 .gente span{font-size:var(--t6); padding:2px 8px; border-radius:var(--r3); background:var(--panel2); color:var(--tenue); overflow-wrap:anywhere}
 .gente span.ok{color:var(--verde)}
 .gente span.no{color:var(--tenue2)}
 .gente span.tu{box-shadow:inset 0 0 0 1px var(--acento); color:var(--txt)}
+.gente span.nadie{background:none; padding-inline:2px}
 .boleta{display:grid}
 .boleta .linea{display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:12px; min-height:44px; padding-block:4px; font-size:var(--t5)}
 .boleta .linea + .linea{border-top:1px solid var(--linea)}
@@ -916,6 +934,12 @@ h1[tabindex="-1"]:focus,h1[tabindex="-1"]:focus-visible{outline:0}
 .detalle-partido .marcador{display:flex; align-items:center; justify-content:center; gap:12px; font-size:var(--t2)}
 .detalle-partido .marcador .sig{font-family:var(--cuerpo); font-size:var(--t6); letter-spacing:.01em; min-width:38px; padding-inline:4px}
 .detalle-partido .linea-estado{text-align:center}
+.vivo-hoja{display:contents}
+.jugada-hoja{display:grid; gap:8px; padding:12px; border-radius:var(--r2); background:var(--panel2)}
+.jugada-cab{display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; font-size:var(--t4); font-weight:700; font-variant-numeric:tabular-nums}
+.jugada-hoja dl{display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 12px; margin:0; font-size:var(--t5)}
+.jugada-hoja dt{color:var(--tenue)}
+.jugada-hoja dd{margin:0; text-align:right; font-variant-numeric:tabular-nums}
 
 /* ═══════ pie ═══════ */
 footer{margin-top:32px; padding-block:16px; border-top:1px solid var(--linea); color:var(--tenue); font-size:var(--t6); line-height:1.5}
@@ -1657,13 +1681,90 @@ try {
       if (tipo.state === "in" && crudo === "In Progress" && Number(reloj.period) > 0) {
         e = (reloj.period > 4 ? "TE" : "Q" + reloj.period) + (reloj.displayClock ? " · " + reloj.displayClock : "");
       }
+      // Quién trae el balón: solo con el reloj corriendo; en el medio tiempo no hay jugada que contar.
+      const corriendo = tipo.state === "in" && !tipo.completed && tipo.name !== "STATUS_HALFTIME" && crudo !== "Halftime";
       salida.set(v.eq + "@" + l.eq, {
         v: v.eq, l: l.eq, mv: v.m, ml: l.m, g, e,
         completado: tipo.completed,
         enJuego: !tipo.completed && !antes,
+        sit: corriendo ? situacionDe(comp) : null,
       });
     }
     return salida;
+  }
+
+  /* La jugada según ESPN: quién trae el balón, la oportunidad, cuánto le falta y dónde
+     está. Es solo para mirar: no toca marcadores ni el conteo. Lo que no llega completo no
+     se dice, y de lo que ESPN escribe en inglés solo se usa lo que se sabe traducir. */
+  const JUGADAS_ESPN = {
+    "Rush": "acarreo", "Pass Reception": "pase completo", "Pass Incompletion": "pase incompleto",
+    "Sack": "captura", "Penalty": "castigo", "Punt": "despeje", "Kickoff": "patada de salida",
+    "Timeout": "tiempo fuera", "Official Timeout": "tiempo fuera oficial", "Two-minute warning": "aviso de dos minutos",
+    "End Period": "fin del cuarto", "Field Goal Good": "gol de campo bueno", "Field Goal Missed": "gol de campo fallado",
+    "Blocked Field Goal": "gol de campo bloqueado", "Blocked Punt": "despeje bloqueado",
+    "Passing Touchdown": "touchdown por pase", "Rushing Touchdown": "touchdown por tierra",
+    "Pass Interception Return": "intercepción", "Interception Return Touchdown": "intercepción regresada para touchdown",
+    "Fumble Recovery (Own)": "balón suelto, lo recupera la ofensiva", "Fumble Recovery (Opponent)": "balón suelto, lo recupera la defensa",
+    "Sack Opp Fumble Recovery": "captura con balón suelto, lo recupera la defensa",
+    "Fumble Return Touchdown": "balón suelto regresado para touchdown", "Punt Return Touchdown": "despeje regresado para touchdown",
+    "Kickoff Return Touchdown": "patada regresada para touchdown", "Safety": "safety",
+    "Extra Point Good": "punto extra bueno", "Extra Point Missed": "punto extra fallado",
+  };
+  function ultimaJugada(ult) {
+    const tipo = JUGADAS_ESPN[((ult || {}).type || {}).text];
+    if (!tipo) return null;
+    const y = Number(ult.statYardage);
+    const yardas = (n) => n + (n === 1 ? " yarda" : " yardas");
+    if (!Number.isInteger(y) || !["acarreo", "pase completo", "captura"].includes(tipo)) return tipo;
+    if (tipo === "captura") return y < 0 ? "captura, pierde " + yardas(-y) : tipo;
+    if (y === 0) return tipo + " sin ganancia";
+    return y > 0 ? tipo + " de " + yardas(y) : tipo + ", pierde " + yardas(-y);
+  }
+  function situacionDe(comp) {
+    try {
+      const s = comp.situation;
+      if (!s || typeof s !== "object") return null;
+      const lados = {};
+      comp.competitors.forEach((c) => { lados[String((c.team || {}).id)] = c.homeAway === "home" ? "l" : "v"; });
+      const lado = lados[String(s.possession)];
+      if (!lado) return null;
+      const sit = { lado, zr: s.isRedZone === true };
+      const bajada = Number(s.down), faltan = Number(s.distance);
+      if (Number.isInteger(bajada) && bajada >= 1 && bajada <= 4 && Number.isInteger(faltan) && faltan >= 0 && faltan <= 99) {
+        sit.bajada = bajada;
+        sit.faltan = /goal/i.test(String(s.shortDownDistanceText || s.downDistanceText || "")) ? "gol" : faltan;
+      }
+      const donde = String(s.possessionText || "").trim(), yarda = donde.match(/^([A-Z]{2,4}) (\d{1,2})$/);
+      if (yarda && Number(yarda[2]) >= 1 && Number(yarda[2]) <= 49) {
+        const eq = D.vivo.equipos[yarda[1]];
+        sit.en = (eq && D.siglas[eq] ? D.siglas[eq] : yarda[1]) + " " + yarda[2];
+      } else if (donde === "50") sit.en = "medio campo";
+      const ult = s.lastPlay || {};
+      // La serie solo si es del que trae el balón: tras un despeje, la del rival ya no cuenta.
+      if (String((ult.team || {}).id) === String(s.possession)) {
+        const serie = String((ult.drive || {}).description || "").match(/^(\d+) plays?, (-?\d+) yards?, (\d{1,2}:\d{2})$/);
+        if (serie) sit.serie = { jugadas: Number(serie[1]), yardas: Number(serie[2]), tiempo: serie[3] };
+      }
+      const ultima = ultimaJugada(ult);
+      if (ultima) sit.ultima = ultima;
+      const prob = ult.probability || {}, pl = Number(prob.homeWinPercentage), pv = Number(prob.awayWinPercentage);
+      if (pl >= 0 && pv >= 0 && Math.abs(pl + pv - 1) < 0.02) sit.prob = { l: Math.round(pl * 100), v: 100 - Math.round(pl * 100) };
+      const tl = Number(s.homeTimeouts), tv = Number(s.awayTimeouts);
+      if ([tl, tv].every((x) => Number.isInteger(x) && x >= 0 && x <= 3)) sit.tiempos = { v: tv, l: tl };
+      return sit;
+    } catch (e) {
+      return null;
+    }
+  }
+  /* "1.ª y 10 en PIT 32": la oportunidad, cuánto falta y dónde, como se canta en la tele. */
+  function textoSituacion(sit) {
+    if (!sit || !sit.bajada) return "";
+    return sit.bajada + ".ª y " + sit.faltan + (sit.en ? " en " + sit.en : "");
+  }
+  function balon() {
+    const b = crear("i", "balon");
+    b.setAttribute("aria-hidden", "true");
+    return b;
   }
 
   /* ESPN solo se consulta con un partido encima: sin terminar y por empezar en menos
@@ -1760,6 +1861,9 @@ try {
     if (!D.vivo || document.hidden || consultando) return;
     const s = typeof vistaActual === "number" ? porSemana.get(vistaActual) : porSemana.get(D.activa);
     if (!s || s.cerrados >= s.total || !hayJuegoCerca(s)) return;
+    // Con un partido corriendo se pregunta cada D.vivo.cada segundos, para seguir la jugada;
+    // sin ninguno, una vez por minuto, como siempre.
+    if (!juegosEnVivo(s).length && ultimaConsulta && Date.now() - ultimaConsulta.getTime() < 55000) return;
     consultando = true;
     let cambios = null;
     const control = new AbortController();
@@ -1789,6 +1893,7 @@ try {
       fallosVivo = 0;
       cambios = nuevos;
       try { pintarCampo(); } catch (e) { console.error(e); }
+      try { refrescarHojaPartido(); } catch (e) { console.error(e); }
       ultimaConsulta = new Date();
       // Redibujar sin que nada cambie borraba lo que la persona tenía a medias.
       if (repintePendiente || JSON.stringify(todosLosJuegos(s)) !== antes) repintarSinEstorbar();
@@ -1829,6 +1934,7 @@ try {
       mv: vivo.mv, ml: vivo.ml, g: vivo.g, vivo: vivo.enJuego,
       e: vivo.completado ? "Final · por confirmar" : (vivo.e || p.e),
       porConfirmar: vivo.completado,
+      sit: vivo.enJuego ? vivo.sit || null : null,
     });
   }
   const partidosDe = (s) => s.partidos.map(efectivo);
@@ -2065,21 +2171,74 @@ try {
   }
 
   /* Al tocar un partido sube una hoja con quién le fue a quién. */
-  function abrirPartido(s, p, origen) {
-    const col = s ? s.partidos.findIndex((q) => q.v === p.v && q.l === p.l) : -1;
-    const caja = crear("div", "detalle-partido");
+  /* Lo de arriba de la hoja de un partido: marcador, estado y, en juego, la jugada. Mientras
+     la hoja siga abierta se repinta con cada consulta a ESPN. */
+  let hojaPartido = null;
+  function pintarArribaHoja(nodo, p) {
+    nodo.textContent = "";
     const empezo = p.vivo || p.cerrado || p.porConfirmar;
     if (empezo && p.mv !== null && p.mv !== undefined) {
       const marcador = crear("div", "marcador");
       marcador.appendChild(sigla(p.v));
       marcador.appendChild(document.createTextNode(p.mv + " – " + p.ml));
       marcador.appendChild(sigla(p.l));
-      caja.appendChild(marcador);
+      nodo.appendChild(marcador);
     }
-    caja.appendChild(crear("p", "linea-estado", empezo ? (p.e || "Final")
+    nodo.appendChild(crear("p", "linea-estado", empezo ? (p.e || "Final")
       : p.t ? "Se juega " + cuandoEs(p.t) : "Hora por definir"));
-    if (col >= 0) caja.appendChild(tarjetaSplit(s, p, col));
-    else caja.appendChild(crear("p", "nota-hoja", "El organizador todavía no reparte los picks de este partido. Puedes elegir el tuyo en Picks."));
+    const sit = p.vivo ? p.sit : null;
+    if (sit) nodo.appendChild(jugadaEnHoja(p, sit));
+  }
+  function jugadaEnHoja(p, sit) {
+    const caja = crear("div", "jugada-hoja");
+    const sig = (eq) => D.siglas[eq] || eq;
+    const cab = crear("div", "jugada-cab");
+    cab.appendChild(sigla(sit.lado === "v" ? p.v : p.l));
+    cab.appendChild(balon());
+    cab.appendChild(crear("span", null, textoSituacion(sit) || "Con el balón"));
+    if (sit.zr) cab.appendChild(crear("span", "zr", "Zona roja"));
+    caja.appendChild(cab);
+    const filas = [];
+    if (sit.serie) {
+      const { jugadas, yardas, tiempo } = sit.serie;
+      filas.push(["Serie", jugadas + (jugadas === 1 ? " jugada" : " jugadas") + " · " + yardas + (Math.abs(yardas) === 1 ? " yarda" : " yardas") +
+        (tiempo === "0:00" ? "" : " · " + tiempo)]);
+    }
+    if (sit.ultima) filas.push(["Última jugada", sit.ultima.charAt(0).toUpperCase() + sit.ultima.slice(1)]);
+    if (sit.tiempos) filas.push(["Tiempos fuera", sig(p.v) + " " + sit.tiempos.v + " · " + sig(p.l) + " " + sit.tiempos.l]);
+    if (sit.prob) {
+      const arriba = sit.prob.l >= sit.prob.v ? "l" : "v";
+      filas.push(["Según ESPN", sig(arriba === "v" ? p.v : p.l) + " gana " + sit.prob[arriba] + "%"]);
+    }
+    if (filas.length) {
+      const dl = crear("dl");
+      filas.forEach(([dt, dd]) => { dl.appendChild(crear("dt", null, dt)); dl.appendChild(crear("dd", null, dd)); });
+      caja.appendChild(dl);
+    }
+    return caja;
+  }
+  function refrescarHojaPartido() {
+    if (!hojaPartido) return;
+    if (!hojaPartido.nodo.isConnected) { hojaPartido = null; return; }
+    const { s, v, l, nodo } = hojaPartido;
+    const fresco = todosLosJuegos(s).find((q) => q.v === v && q.l === l);
+    if (fresco) pintarArribaHoja(nodo, fresco);
+  }
+
+  function abrirPartido(s, p, origen) {
+    const col = s ? s.partidos.findIndex((q) => q.v === p.v && q.l === p.l) : -1;
+    const caja = crear("div", "detalle-partido");
+    const arriba = crear("div", "vivo-hoja");
+    caja.appendChild(arriba);
+    pintarArribaHoja(arriba, p);
+    hojaPartido = s && !p.cerrado ? { s, v: p.v, l: p.l, nodo: arriba } : null;
+    if (col >= 0) {
+      // En la hoja, el partido y el marcador ya están arriba: la tarjeta solo dice de qué trata.
+      const reparto = tarjetaSplit(s, p, col);
+      reparto.querySelector(".cab .vs").textContent = "Quién le fue a quién";
+      reparto.querySelector(".cab .mr").remove();
+      caja.appendChild(reparto);
+    } else caja.appendChild(crear("p", "nota-hoja", "El organizador todavía no reparte los picks de este partido. Puedes elegir el tuyo en Picks."));
     if (s && vistaActual !== s.n) {
       const b = crear("button", "boton-principal", "Ver toda la semana");
       b.type = "button";
@@ -2125,6 +2284,10 @@ try {
     return caja;
   }
 
+  /* Un toque en un equipo deja solo a quienes le fueron; otro toque, o "Todos", regresa
+     a los dos lados. Se recuerda por partido mientras la página siga abierta, para que el
+     marcador en vivo no lo borre al repintar. */
+  const filtroReparto = new Map();
   function tarjetaSplit(s, p, col) {
     const visita = [], casa = [];
     s.jugadores.forEach((idx, fila) => { (s.picks[fila][col] === 1 ? casa : visita).push(idx); });
@@ -2150,23 +2313,45 @@ try {
       il.style.width = (casa.length / total) * 100 + "%";
     });
 
-    const cuentas = crear("div", "cuenta-lado");
-    const izq = crear("span", null, p.v + " · " + visita.length);
-    izq.style.color = iv.style.background;
-    const der = crear("span", null, casa.length + " · " + p.l);
-    der.style.color = il.style.background;
-    cuentas.appendChild(izq); cuentas.appendChild(der);
-    nodo.appendChild(cuentas);
+    const clave = p.v + "@" + p.l;
+    const filtro = crear("div", "filtro-lado");
+    filtro.setAttribute("role", "group");
+    filtro.setAttribute("aria-label", "Ver quién le fue a cada equipo");
+    const botones = [];
+    const aplicar = (lado) => {
+      // En una hoja, quitar nombres la encogía y el botón se iba de debajo del dedo: se queda del alto que tenía.
+      const hoja = nodo.closest(".hoja");
+      if (hoja && !hoja.style.minHeight) hoja.style.minHeight = Math.round(hoja.getBoundingClientRect().height) + "px";
+      filtroReparto.set(clave, lado);
+      nodo.dataset.filtro = lado || "todos";
+      botones.forEach(([b, suyo]) => b.setAttribute("aria-pressed", String(suyo === lado)));
+    };
+    [["v", visita.length], ["", visita.length + casa.length], ["l", casa.length]].forEach(([lado, n]) => {
+      const b = crear("button", "filtro-op " + (lado ? "lado-" + lado : "todos"));
+      b.type = "button";
+      const eq = lado === "v" ? p.v : p.l;
+      if (lado) b.appendChild(sigla(eq));
+      else b.appendChild(crear("span", null, "Todos"));
+      b.appendChild(crear("span", "n", String(n)));
+      b.setAttribute("aria-label", lado ? n + (n === 1 ? " le fue a " : " le fueron a ") + eq : "Todos, " + n);
+      b.addEventListener("click", () => aplicar(lado && filtroReparto.get(clave) === lado ? "" : lado));
+      botones.push([b, lado]);
+      filtro.appendChild(b);
+    });
+    nodo.appendChild(filtro);
 
     [[visita, "v"], [casa, "l"]].forEach(([quienes, lado]) => {
-      const fila = crear("div", "gente");
+      const fila = crear("div", "gente lado-" + lado);
+      fila.appendChild(sigla(lado === "v" ? p.v : p.l));
       quienes.slice().sort((a, b) => nombre(a).localeCompare(nombre(b), "es")).forEach((idx) => {
         const et = crear("span", p.cerrado ? (p.g === lado ? "ok" : "no") : null, nombre(idx));
         if (idx === jugador) et.classList.add("tu");
         fila.appendChild(et);
       });
+      if (!quienes.length) fila.appendChild(crear("span", "nadie", "Nadie"));
       nodo.appendChild(fila);
     });
+    aplicar(filtroReparto.get(clave) || "");
     return nodo;
   }
 
@@ -4383,8 +4568,10 @@ try {
     const terminado = p.cerrado || p.porConfirmar;
     const lados = crear("div", "lados");
     const empezo = p.vivo || p.cerrado || p.porConfirmar;
+    const sit = p.vivo ? p.sit : null;
     [["v", p.v, p.mv], ["l", p.l, p.ml]].forEach(([lado, eq, m]) => {
       const mia = !!mio && mio.lado === lado;
+      const conBalon = !!sit && sit.lado === lado;
       const l = crear("div", "eq-fila" + (empezo && p.g === lado ? " adelante" : "") +
         (mia ? " fila-mi-pick fila-" + palabras.tono : ""));
       l.appendChild(sigla(eq));
@@ -4395,6 +4582,12 @@ try {
         if (terminado && palabras.tono !== "neutro") {
           nombreEq.appendChild(crear("span", "fila-marca", palabras.tono === "bien" ? "✓" : "✕"));
         }
+        if (conBalon) nombreEq.appendChild(balon());
+        l.appendChild(nombreEq);
+      } else if (conBalon) {
+        const nombreEq = crear("span", "eq fila-con-marca");
+        nombreEq.appendChild(crear("span", "fila-nombre", eq));
+        nombreEq.appendChild(balon());
         l.appendChild(nombreEq);
       } else {
         l.appendChild(crear("span", "eq", eq));
@@ -4426,8 +4619,16 @@ try {
     meta.appendChild(crear("span", "cuando", cuando));
     if (palabras) meta.appendChild(crear("span", "fila-palabras " + palabras.tono, palabras.texto));
     fila.appendChild(meta);
+    const jugada = textoSituacion(sit);
+    if (jugada) {
+      const linea = crear("div", "situacion");
+      linea.appendChild(crear("span", null, jugada));
+      if (sit.zr) linea.appendChild(crear("span", "zr", "Zona roja"));
+      fila.appendChild(linea);
+    }
     const marcador = empezo && p.mv != null && p.ml != null ? p.mv + " a " + p.ml : "";
-    fila.setAttribute("aria-label", [p.v + " contra " + p.l, marcador, cuando, palabras && palabras.texto]
+    const dicho = sit ? "balón para " + (sit.lado === "v" ? p.v : p.l) + (jugada ? ", " + jugada : "") + (sit.zr ? ", en zona roja" : "") : "";
+    fila.setAttribute("aria-label", [p.v + " contra " + p.l, marcador, cuando, dicho, palabras && palabras.texto]
       .filter(Boolean).join(", "));
     fila.addEventListener("click", () => abrirPartido(s, p, fila));
     return fila;

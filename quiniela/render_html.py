@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.38.0"
+VERSION = "v0.39.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -464,8 +464,9 @@ MAXIMO_NOMBRES_PODIO = 6
 #: La imagen de la vista previa al compartir el enlace.
 TAMANO_PORTADA = (1200, 630)
 
-#: Cada cuántos segundos el navegador pide marcadores a ESPN por su cuenta.
-SEGUNDOS_VIVO = 60
+#: Cada cuántos segundos el navegador pide a ESPN marcador y jugada mientras hay un partido
+#: corriendo. Sin ninguno en juego, la página pregunta una vez por minuto.
+SEGUNDOS_VIVO = 20
 
 #: La copia guardada en el teléfono (sw.js): con mala señal se abre la última página completa
 #: que llegó. En False, sw.js se da de baja solo, borra la copia y la página deja de registrarlo.

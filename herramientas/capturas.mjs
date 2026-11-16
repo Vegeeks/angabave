@@ -43,7 +43,7 @@ if (!sitio || !salida) {
 mkdirSync(salida, { recursive: true });
 
 /* ── un servidor mínimo para la carpeta del sitio ── */
-const TIPOS = { ".html": "text/html; charset=utf-8", ".json": "application/json", ".png": "image/png", ".webmanifest": "application/json" };
+const TIPOS = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".json": "application/json", ".png": "image/png", ".webmanifest": "application/json" };
 const servidor = createServer((pedido, respuesta) => {
   const ruta = decodeURIComponent(pedido.url.split("?")[0]);
   const archivo = join(sitio, normalize(ruta === "/" ? "/index.html" : ruta));
@@ -164,6 +164,8 @@ const pantallas = [
   { n: "hoja-semanas", p: "/index.html", h: "#s8", yo: YO, pasos: ["document.querySelector('.semana-elegida').click()"] },
   { n: "hoja-tu", p: "/index.html", h: "#hoy", yo: YO, pasos: ["document.getElementById('identidad').click()"] },
   { n: "hoja-partido", p: "/index.html", h: "#s7", yo: YO, pasos: [PESTANA("Partidos"), "document.querySelector('#vista-semana .juego-fila').click()"] },
+  { n: "hoja-partido-filtro", p: "/index.html", h: "#s7", yo: YO, pasos: [PESTANA("Partidos"), "document.querySelector('#vista-semana .juego-fila').click()",
+    "document.querySelector('.detalle-partido .filtro-op.lado-l').click()"] },
   { n: "tema-chiefs", p: "/index.html", h: "#hoy", yo: YO, equipo: "Chiefs" },
   { n: "tema-chiefs-general", p: "/index.html", h: "#general", yo: YO, equipo: "Chiefs" },
   // Pantalla chica y computadora.
