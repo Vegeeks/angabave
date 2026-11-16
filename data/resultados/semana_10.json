@@ -2,35 +2,13 @@
   "semana": 10,
   "partidos": [
     {
-      "visitante": "Seahawks",
-      "local": "Raiders",
-      "marcador_visitante": 21,
-      "marcador_local": 13,
-      "ganador": "Seahawks",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-15T21:05:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Rams",
-      "local": "Cardinals",
-      "marcador_visitante": 34,
-      "marcador_local": 6,
-      "ganador": "Rams",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-15T21:05:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "49ers",
       "local": "Cowboys",
-      "marcador_visitante": 38,
-      "marcador_local": 19,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "marcador_visitante": 46,
+      "marcador_local": 40,
+      "ganador": "49ers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-15T21:25:00+00:00",
       "hora_definida": true
     },
@@ -120,6 +98,28 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-15T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Seahawks",
+      "local": "Raiders",
+      "marcador_visitante": 21,
+      "marcador_local": 13,
+      "ganador": "Seahawks",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-15T21:05:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Rams",
+      "local": "Cardinals",
+      "marcador_visitante": 34,
+      "marcador_local": 6,
+      "ganador": "Rams",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-15T21:05:00+00:00",
       "hora_definida": true
     },
     {
