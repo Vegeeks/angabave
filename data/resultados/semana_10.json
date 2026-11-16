@@ -2,14 +2,14 @@
   "semana": 10,
   "partidos": [
     {
-      "visitante": "49ers",
-      "local": "Cowboys",
-      "marcador_visitante": 46,
-      "marcador_local": 40,
-      "ganador": "49ers",
+      "visitante": "Steelers",
+      "local": "Bengals",
+      "marcador_visitante": 18,
+      "marcador_local": 38,
+      "ganador": "Bengals",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-11-15T21:25:00+00:00",
+      "inicio": "2026-11-16T01:20:00+00:00",
       "hora_definida": true
     },
     {
@@ -123,14 +123,14 @@
       "hora_definida": true
     },
     {
-      "visitante": "Steelers",
-      "local": "Bengals",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-16T01:20:00+00:00",
+      "visitante": "49ers",
+      "local": "Cowboys",
+      "marcador_visitante": 46,
+      "marcador_local": 40,
+      "ganador": "49ers",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-15T21:25:00+00:00",
       "hora_definida": true
     },
     {
