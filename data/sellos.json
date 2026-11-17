@@ -191,10 +191,11 @@
   },
   "10": {
     "archivo": "Semana_10.xlsx",
-    "sellado": "2026-11-16T01:21:05+00:00",
+    "sellado": "2026-11-17T01:16:06+00:00",
     "partidos": {
       "49ers@Cowboys": "0506d02dca771a8b093a212ce596b09b97289dcb20d9113365e1d2dd7c8324cd",
       "Bills@Jets": "94496f48223d7f26f99fc8acdd7c2e9a9ac8ff9bc662f13a208cb29f691a302f",
+      "Chargers@Ravens": "874083dd2044f3cb8f73f43c66901b814e102f1b7852ee551e56f6f00e06e94d",
       "Chiefs@Falcons": "8425c3d5d48561294ece3ec6d8decde9524786cf75b86ba10a16b538fd800653",
       "Dolphins@Colts": "52153c25b958dbb5e320ec1ad9b9db954f825345521a991dbec43320fa0c9671",
       "Jaguars@Titans": "02f5e8cb6e9a68a2bc80729fda268f368f8b1b70b3955c609970929b3bb88588",
