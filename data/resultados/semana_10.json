@@ -2,14 +2,25 @@
   "semana": 10,
   "partidos": [
     {
-      "visitante": "Steelers",
-      "local": "Bengals",
-      "marcador_visitante": 18,
-      "marcador_local": 38,
-      "ganador": "Bengals",
+      "visitante": "Chargers",
+      "local": "Ravens",
+      "marcador_visitante": 23,
+      "marcador_local": 20,
+      "ganador": "Chargers",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-11-16T01:20:00+00:00",
+      "inicio": "2026-11-17T01:15:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Washington",
+      "local": "Giants",
+      "marcador_visitante": 24,
+      "marcador_local": 21,
+      "ganador": "Washington",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-13T01:15:00+00:00",
       "hora_definida": true
     },
     {
@@ -134,25 +145,14 @@
       "hora_definida": true
     },
     {
-      "visitante": "Washington",
-      "local": "Giants",
-      "marcador_visitante": 24,
-      "marcador_local": 21,
-      "ganador": "Washington",
+      "visitante": "Steelers",
+      "local": "Bengals",
+      "marcador_visitante": 18,
+      "marcador_local": 38,
+      "ganador": "Bengals",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-11-13T01:15:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Chargers",
-      "local": "Ravens",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-17T01:15:00+00:00",
+      "inicio": "2026-11-16T01:20:00+00:00",
       "hora_definida": true
     }
   ]
