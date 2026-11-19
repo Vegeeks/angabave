@@ -4,26 +4,6 @@ PRODID:-//ANGABAVE//Quiniela NFL//ES
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
-UID:angabave-s11-t1@vegeeks.github.io
-DTSTAMP:20261119T055900Z
-DTSTART:20261119T045900Z
-DTEND:20261119T055900Z
-SUMMARY:Cierran los picks · semana 11 (1 partido)
-DESCRIPTION:Manda tu imagen a quinielanfl@hotmail.com antes de las 23:59. h
- ttps://vegeeks.github.io/angabave/#picks
-URL:https://vegeeks.github.io/angabave/#picks
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Cierran los picks · semana 11 (1 partido)
-TRIGGER:-PT2H
-END:VALARM
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Cierran los picks · semana 11 (1 partido)
-TRIGGER:PT0M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
 UID:angabave-s11-t2@vegeeks.github.io
 DTSTAMP:20261122T055900Z
 DTSTART:20261122T045900Z
