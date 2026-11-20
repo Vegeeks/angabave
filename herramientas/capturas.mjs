@@ -114,6 +114,8 @@ const MEDIR = `(() => {
 })()`;
 
 const VISTA = (v) => `document.querySelector('.al-pie button[data-vista="${v}"], .en-cabeza button[data-vista="${v}"]').click()`;
+// La semana que el momento tiene en juego (cambia cada semana; antes estaba fija en la 7).
+const ACTIVA = "location.hash = '#s' + JSON.parse(document.getElementById('datos').textContent).activa";
 const PESTANA = (t) => `Array.from(document.querySelectorAll('#vista-semana .tabs button')).find(b => b.textContent.startsWith(${JSON.stringify(t)})).click()`;
 const ABAJO = (y) => `window.scrollTo({top:${y},behavior:'instant'})`;
 
@@ -187,10 +189,11 @@ const pantallas = [
   ...(MOMENTOS ? [
     { n: "vivo-hoy", p: "/momentos/fase-vivo.html", h: "#hoy", yo: YO },
     { n: "vivo-hoy-abajo", p: "/momentos/fase-vivo.html", h: "#hoy", yo: YO, pasos: [ABAJO(800)] },
-    { n: "vivo-semana", p: "/momentos/fase-vivo.html", h: "#s7", yo: YO, pasos: [PESTANA("Partidos")] },
+    { n: "vivo-semana", p: "/momentos/fase-vivo.html", h: "#hoy", yo: YO, pasos: [ACTIVA, PESTANA("Partidos")] },
+    { n: "vivo-semana-abajo", p: "/momentos/fase-vivo.html", h: "#hoy", yo: YO, pasos: [ACTIVA, PESTANA("Partidos"), ABAJO(1250)] },
     { n: "vivo-semana-curso", p: "/momentos/fase-vivo.html", h: "#s10", yo: YO },
     { n: "chico-vivo-semana-curso", p: "/momentos/fase-vivo.html", h: "#s10", yo: YO, m: CHICO },
-    { n: "vivo-escenarios", p: "/momentos/fase-vivo.html", h: "#s7", yo: YO, pasos: [PESTANA("Escenarios")] },
+    { n: "vivo-escenarios", p: "/momentos/fase-vivo.html", h: "#hoy", yo: YO, pasos: [ACTIVA, PESTANA("Escenarios")] },
     { n: "domingo-temprano", p: "/momentos/fase-hoy.html", h: "#hoy", yo: YO },
     { n: "domingo-noche", p: "/momentos/fase-domingo-noche.html", h: "#hoy", yo: YO },
     { n: "dos-partidos", p: "/momentos/fase-dos-partidos.html", h: "#hoy", yo: YO },

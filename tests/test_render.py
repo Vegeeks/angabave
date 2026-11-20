@@ -1336,7 +1336,7 @@ def test_los_partidos_sin_hora_van_al_final_de_la_semana():
 
 def test_el_navegador_tampoco_ordena_ni_pisa_lo_que_no_tiene_hora(armado, tmp_path: Path):
     html = render(armado, tmp_path)
-    assert "(a.p.t || Infinity) - (b.p.t || Infinity)" in _funcion(html, "panelPartidos")
+    assert "(a.p.t || Infinity) - (b.p.t || Infinity)" in _funcion(html, "gruposDeLaSemana")
     assert 'crudo === "Scheduled" ? null' in _funcion(html, "parsearVivo")
 
 

@@ -9,6 +9,11 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.39.1
+
+* El botón de Hoy para ver el gol de campo dice "FG" en vez de "Gol".
+* En Semana, un partido que ya empezó deja de aparecer en "Por jugarse": sube a una sección "En vivo" en cuanto ESPN dice que arrancó, y al terminar baja a "Ya jugados" sin esperar al Directo (la fila sigue diciendo "Final · por confirmar" hasta que sea oficial). Lo mismo con tu equipo: deja de encabezar la lista en cuanto acaba su partido.
+
 ## v0.39.0
 
 * **La jugada en vivo.** Con un partido corriendo, la fila del partido marca con un balón al equipo que lo trae y, debajo, la oportunidad y dónde está: "1.ª y 10 en PIT 32", "3.ª y gol en CIN 4", con "Zona roja" cuando toca. Sale de la misma consulta a ESPN que ya traía el marcador.

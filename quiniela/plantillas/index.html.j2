@@ -2122,25 +2122,12 @@ try {
   function panelPartidos(s) {
     const raiz = crear("div");
     const juegos = todosLosJuegos(s).map((p, i) => ({ p, i }));
+    const { mios, enVivo, porJugar, jugados } = gruposDeLaSemana(juegos, equipo);
 
-    // Lo que falta por jugarse manda: va arriba. Lo ya jugado queda abajo,
+    // Arriba lo que se está jugando y luego lo que falta. Lo ya jugado queda abajo,
     // del más reciente al más viejo, porque es consulta, no expectativa.
     const bloques = [];
-    let mios = [];
-    if (equipo) {
-      // Tu partido se adelanta solo mientras no haya terminado: una vez
-      // cerrado no tiene por qué encabezar nada.
-      mios = juegos.filter(({ p }) => (p.v === equipo || p.l === equipo) && !p.cerrado);
-      if (mios.length) bloques.push({ etiqueta: "Tu equipo", juegos: mios, suelto: true });
-    }
-
-    const resto = juegos.filter((juego) => !mios.includes(juego));
-    const porJugar = resto
-      .filter(({ p }) => !p.cerrado)
-      .sort((a, b) => (a.p.t || Infinity) - (b.p.t || Infinity) || a.i - b.i);
-    const jugados = resto
-      .filter(({ p }) => p.cerrado)
-      .sort((a, b) => (b.p.t || 0) - (a.p.t || 0) || b.i - a.i);
+    if (mios.length) bloques.push({ etiqueta: "Tu equipo", juegos: mios, suelto: true });
 
     const agrupar = (lista, titulo) => {
       if (!lista.length) return;
@@ -2155,6 +2142,7 @@ try {
         }
       });
     };
+    agrupar(enVivo, "En vivo");
     agrupar(porJugar, porJugar.length === 1 ? "Falta este" : "Por jugarse");
     agrupar(jugados, "Ya jugados");
 
@@ -2168,6 +2156,24 @@ try {
       raiz.appendChild(caja);
     });
     return raiz;
+  }
+
+  /* En qué grupo de la semana va cada partido, con el marcador en vivo encima: lo que ya
+     empezó sale de "Por jugarse" en cuanto ESPN lo dice, y lo que ya acabó baja a "Ya jugados"
+     aunque falte que CI lo haga oficial (la fila sigue diciendo "Final · por confirmar"). */
+  function gruposDeLaSemana(juegos, equipo) {
+    const terminado = ({ p }) => !!(p.cerrado || p.porConfirmar);
+    const porHora = (a, b) => (a.p.t || Infinity) - (b.p.t || Infinity) || a.i - b.i;
+    // Tu partido se adelanta solo mientras no haya terminado: una vez
+    // terminado no tiene por qué encabezar nada.
+    const mios = equipo ? juegos.filter((j) => (j.p.v === equipo || j.p.l === equipo) && !terminado(j)) : [];
+    const resto = juegos.filter((j) => !mios.includes(j));
+    return {
+      mios,
+      enVivo: resto.filter((j) => j.p.vivo && !terminado(j)).sort(porHora),
+      porJugar: resto.filter((j) => !j.p.vivo && !terminado(j)).sort(porHora),
+      jugados: resto.filter(terminado).sort((a, b) => (b.p.t || 0) - (a.p.t || 0) || b.i - a.i),
+    };
   }
 
   /* Al tocar un partido sube una hoja con quién le fue a quién. */
@@ -4399,7 +4405,7 @@ try {
       gol.type = "button";
       gol.setAttribute("aria-label", "Ver el gol de campo");
       gol.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="12" rx="9" ry="5.4" transform="rotate(-30 12 12)"/>' +
-        '<path d="M9.6 13.6l4.8-3.2M10.7 11.5l.9 1.4M12.4 10.4l.9 1.4"/></svg><span>Gol</span>';
+        '<path d="M9.6 13.6l4.8-3.2M10.7 11.5l.9 1.4M12.4 10.4l.9 1.4"/></svg><span>FG</span>';
       gol.addEventListener("click", () => golAMano());
       filaFecha.appendChild(gol);
     }

@@ -35,6 +35,14 @@ def _correr(funciones: tuple[str, ...], llamada: str, casos: list):
     return json.loads(r.stdout)
 
 
+
+def test_el_boton_de_hoy_dice_fg():
+    saludo = _funcion(PLANTILLA.read_text(encoding="utf-8"), "saludo")
+    assert "<span>FG</span>" in saludo and "<span>Gol</span>" not in saludo
+    # El lector de pantalla oye el nombre completo, no las dos letras.
+    assert 'gol.setAttribute("aria-label", "Ver el gol de campo");' in saludo
+
+
 BASE = {"nombre": "Ana", "total": 94, "visto": None, "fecha": "2026-11-14", "ultimoDia": None, "enVivo": False, "reducido": False}
 
 
