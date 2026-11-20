@@ -211,7 +211,9 @@
   },
   "11": {
     "archivo": "Semana_11.xlsx",
-    "sellado": "2026-11-20T00:21:10+00:00",
-    "partidos": {}
+    "sellado": "2026-11-20T01:16:07+00:00",
+    "partidos": {
+      "Colts@Texans": "d175f4acea2c34782a83ee10b9c34df6d280034fe3e6b8b342a35c00ce1e71f9"
+    }
   }
 }
