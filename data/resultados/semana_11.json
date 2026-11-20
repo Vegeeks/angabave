@@ -4,11 +4,11 @@
     {
       "visitante": "Colts",
       "local": "Texans",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
+      "marcador_visitante": 3,
+      "marcador_local": 26,
+      "ganador": "Texans",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-20T01:15:00+00:00",
       "hora_definida": true
     },
