@@ -155,6 +155,9 @@ const pantallas = [
   { n: "fiesta-hoy", p: "/index.html?fiesta=accion-de-gracias", h: "#hoy", yo: YO },
   { n: "fiesta-semana", p: "/index.html?fiesta=accion-de-gracias", h: "#hoy", yo: YO,
     pasos: ["location.hash = '#s' + JSON.parse(document.getElementById('datos').textContent).fiestas[0].semanas[0]", PESTANA("Partidos")] },
+  // La general en navidad: un regalo por persona, en teléfono chico y en computadora.
+  { n: "navidad-general", p: "/index.html?fiesta=navidad", h: "#general", yo: YO },
+  { n: "navidad-general-chico", p: "/index.html?fiesta=navidad", h: "#general", yo: YO, m: CHICO },
   // Navidad (?fiesta=navidad): nieve, focos en la línea amarilla y el listón con el pino.
   { n: "navidad-hoy", p: "/index.html?fiesta=navidad", h: "#hoy", yo: YO },
   { n: "navidad-semana", p: "/index.html?fiesta=navidad", h: "#hoy", yo: YO,

@@ -9,6 +9,12 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.43.0
+
+* **La general en navidad: un regalo por persona.** En las semanas navideñas, la gráfica de la general es una fila de regalos con las iniciales de cada quien. La zona de premio es una zona de anotación, con su línea de gol, sus pilones y "PREMIO" pintado: los que están adentro cobran si la temporada terminara hoy. Arriba cuelga una serie: prenden los focos de quien cobra, en oro, plata o bronce según su lugar, y el de justo afuera queda tibio y dice "a 1".
+* **Entre más abajo, peor envuelto.** Quien cobra va de lujo, con el moño de su medalla y lucecitas en la tapa. Los demás se reparten en cuartos según su lugar: papel estampado con moño grande, papel liso con moño pegado de bolsita, caja de cartón con cinta canela, bolsa del súper con el nombre escrito con plumón y, el último lugar, un carbón. Tu regalo sigue la misma escalera, con los colores de tu equipo.
+* "Si terminara hoy" se ve como etiquetas de regalo con el lugar y su medalla. Fuera de navidad sigue la gráfica de puntos de siempre.
+
 ## v0.42.0
 
 * **Los focos de navidad con los colores de tu equipo.** Si elegiste equipo, la serie que cuelga de la línea amarilla prende con sus colores: tres o cuatro por equipo, escogidos a mano de su uniforme de local y de visita, de los alternos y clásicos y del logo (el oro de los Raiders de 1960, el rojo y el azul del logo de los Steelers, el celeste de los Oilers para los Titans). Los colores oscuros, como el azul marino o el café, van en su tono encendido para que se vean como foco. Sin equipo, la serie sigue siendo la clásica de colores, y si cambias de equipo cambia al momento.

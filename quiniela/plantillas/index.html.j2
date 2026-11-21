@@ -674,6 +674,27 @@ html[data-fiesta="accion-de-gracias"] .cancha .luz{filter:sepia(1) saturate(2.2)
 @keyframes campo-gral-sube{from{opacity:0; transform:translate3d(0,8px,0)}}
 .anima .campo-gral-p{animation:campo-gral-sube .32s var(--sale) backwards; animation-delay:calc(var(--i,0) * 12ms)}
 @media (min-width:900px){ .campo-gral-pasto{max-width:640px} }
+/* La general en navidad: un regalo por persona (el dibujo es un SVG que arma el guión). La zona de
+   premio es una zona de anotación y arriba prenden los focos de quien cobra. */
+.campo-gral-pasto.regalos{display:block; height:auto; padding-top:0}
+.campo-gral-pasto.regalos svg{display:block; width:100%; height:auto; overflow:visible}
+.rg-prendido{animation:rg-brilla 2.4s ease-in-out infinite alternate}
+@keyframes rg-brilla{from{opacity:.78} to{opacity:1}}
+.rg-tibio{animation:rg-tibio 3.4s linear infinite}
+@keyframes rg-tibio{0%,84%{opacity:.8} 87%{opacity:.3} 90%{opacity:.85} 93%{opacity:.35} 96%,100%{opacity:.8}}
+@media (prefers-reduced-motion:reduce){.rg-prendido,.rg-tibio{animation:none}}
+.campo-gral-lugar{display:none}
+/* El reparto, como etiquetas de regalo con su medalla. */
+html[data-fiesta="navidad"] .campo-gral-pie{display:flex; flex-wrap:wrap; align-items:center; gap:8px}
+html[data-fiesta="navidad"] .campo-gral-sep{display:none}
+html[data-fiesta="navidad"] .campo-gral-grupo{display:inline-flex; align-items:center; gap:4px; padding:2px 10px 2px 8px;
+  border-radius:var(--r3); background:#F1E3C2; color:#3a2a12}
+html[data-fiesta="navidad"] .campo-gral-grupo::before{content:""; flex:none; width:8px; height:8px; border-radius:50%; background:var(--medalla, #FFD25A)}
+html[data-fiesta="navidad"] .campo-gral-grupo[data-medalla="plata"]{--medalla:#C9D1D8}
+html[data-fiesta="navidad"] .campo-gral-grupo[data-medalla="bronce"]{--medalla:#E39A5C}
+html[data-fiesta="navidad"] .campo-gral-grupo b{color:#3a2a12}
+html[data-fiesta="navidad"] .campo-gral-grupo .campo-gral-monto{color:#8a4d00}
+html[data-fiesta="navidad"] .campo-gral-lugar{display:inline; font-weight:700}
 
 /* ═══════ las tablas ═══════ */
 .filtro-tabla{position:relative; display:flex; gap:8px; margin:0 0 8px}
@@ -6555,7 +6576,264 @@ try {
     actual.replaceWith(titular("h1", frase));
   }
 
-  /* El campo: una columna por número de aciertos y un punto por participante. */
+  /* ═══ la general en navidad: un regalo por persona ═══
+     Columnas por aciertos, como la de puntos. La zona de premio es una zona de anotación con su línea
+     de gol; arriba cuelga una serie y prenden los focos de quien cobra (oro, plata o bronce, por lugar);
+     el de justo afuera queda tibio: "a 1". Entre más abajo en la tabla, peor envuelto: de lujo quien
+     cobra y, entre los demás, por cuartos de la tabla, fino, sencillo, caja de cartón y bolsa del súper;
+     el último lugar, carbón. Solo es chiste: todo se ve bonito. */
+  // Ancho y alto de cada envoltura con columnas de 17.6 px; con otro ancho todo se escala parejo.
+  const ENVOLTURAS = { oro: [15.8, 17.6], plata: [15.4, 16.6], bronce: [15, 15.8], fino: [14.2, 14.6],
+    sencillo: [14.2, 14.2], carton: [14.6, 13.4], bolsa: [14.2, 15.4], carbon: [14.4, 11.6] };
+  const MEDALLA_DE_LUGAR = { 1: "oro", 2: "plata", 3: "bronce" };
+
+  /* Dónde va cada cosa. Pura (sin DOM): la usa el dibujo y la revisan las pruebas, que exigen que nada
+     se encime. gente: [{ p, total, pos, ini, yo, cobra }]; entrada: con cuántos aciertos se cobra. */
+  function regalosDeLaGeneral(gente, ancho, entrada) {
+    const totales = gente.map((g) => g.total);
+    const piso = Math.min(...totales), tope = Math.max(...totales);
+    const columnas = tope - piso + 1;
+    const PASILLO = entrada > piso ? 6 : 0, IZQ = 11, DER = 13;
+    const paso = columnas > 1 ? (ancho - IZQ - DER - PASILLO) / (columnas - 1) : 17.6;
+    const k = Math.max(0.5, Math.min(1.25, paso / 17.6));
+    const x = (t) => IZQ + (t - piso) * paso + (t >= entrada ? PASILLO : 0);
+    const porColumna = new Map();
+    gente.slice().sort((a, b) => (Number(b.yo) - Number(a.yo)) || a.ini.localeCompare(b.ini)).forEach((g) => {
+      if (!porColumna.has(g.total)) porColumna.set(g.total, []);
+      porColumna.get(g.total).push(g);
+    });
+    // La envoltura de cada columna: los que no cobran, por cuartos de la tabla; el último, carbón.
+    const nivel = new Map();
+    const fuera = Array.from(porColumna.keys()).filter((t) => t < entrada).sort((a, b) => b - a);
+    const cuantosFuera = fuera.reduce((n, t) => n + porColumna.get(t).length, 0);
+    let antes = 0;
+    fuera.forEach((t) => {
+      const f = antes / cuantosFuera;
+      nivel.set(t, f < 0.25 ? "fino" : f < 0.5 ? "sencillo" : f < 0.75 ? "carton" : "bolsa");
+      antes += porColumna.get(t).length;
+    });
+    if (fuera.length > 1) nivel.set(fuera[fuera.length - 1], "carbon");
+    const medallaDe = (g) => MEDALLA_DE_LUGAR[Math.min(Math.max(g.pos, 1), 3)];
+    const tipoDe = (g) => (g.total >= entrada ? medallaDe(g) : nivel.get(g.total));
+    const HUECO = 3.6 * k, MONO = 2.6 * k, cable = 10, zonaArriba = cable + 13 * k;
+    let pilaMayor = 0;
+    porColumna.forEach((lista) => {
+      const alto = lista.reduce((suma, g, j) => suma + ENVOLTURAS[tipoDe(g)][1] * k + (j ? HUECO : 0), 0);
+      pilaMayor = Math.max(pilaMayor, alto + MONO);
+    });
+    const base = Math.round(zonaArriba + 10 * k + pilaMayor);
+    const piezas = [], cajas = [];
+    porColumna.forEach((lista, t) => {
+      let y = base;
+      lista.forEach((g, j) => {
+        const tipo = tipoDe(g), [w, h] = ENVOLTURAS[tipo];
+        piezas.push({ g, tipo, medalla: t >= entrada ? tipo : null, x: x(t), y, abajo: j === 0 });
+        cajas.push({ q: "regalo " + g.total + " " + g.ini, x0: x(t) - (w / 2 + 0.6) * k, x1: x(t) + (w / 2 + 0.6) * k,
+          y0: y - h * k - MONO, y1: j === 0 ? y + 1.6 * k : y });   // solo el de hasta abajo lleva sombra
+        y -= h * k + HUECO;
+      });
+    });
+    const focos = [];
+    for (let t = piso; t <= tope; t++) {
+      const lista = porColumna.get(t);
+      const estado = t >= entrada ? (lista ? medallaDe(lista.reduce((a, b) => (a.pos <= b.pos ? a : b))) : "apagado")
+        : t === entrada - 1 && lista ? "tibio" : "apagado";
+      focos.push({ t, x: x(t), estado });
+      cajas.push({ q: "foco " + t, x0: x(t) - 3.2 * k, x1: x(t) + 3.2 * k, y0: cable - 2 * k, y1: cable + 8.2 * k });
+    }
+    // Los números: siempre los de quien cobra y el tuyo; los demás, cada tanto y sin encimarse.
+    const numeros = [], separacion = 16 * k;
+    const cabe = (xx) => numeros.every((n) => Math.abs(n.x - xx) >= separacion);
+    const cada = Math.max(1, Math.ceil(separacion / paso));
+    for (let t = tope; t >= piso; t--) {
+      const lista = porColumna.get(t);
+      if ((t >= entrada && lista) || (lista && lista.some((g) => g.yo))) numeros.push({ t, x: x(t), fuerte: t >= entrada });
+    }
+    for (let t = tope; t >= piso; t--) {
+      if ((tope - t) % cada === 0 && !numeros.some((n) => n.t === t) && cabe(x(t))) numeros.push({ t, x: x(t), fuerte: false });
+    }
+    numeros.forEach((n) => cajas.push({ q: "número " + n.t, x0: n.x - 7.5 * k, x1: n.x + 7.5 * k, y0: base + 17 * k, y1: base + 25 * k }));
+    const zona = { x0: entrada > piso ? x(entrada) - paso / 2 - PASILLO / 2 : 2, x1: ancho - 2, y0: zonaArriba, y1: base + 12 * k };
+    // Si todos cobran, no hay línea de gol: toda la gráfica es zona de premio.
+    if (entrada > piso) cajas.push({ q: "línea de gol", x0: zona.x0 - 2.4 * k, x1: zona.x0 + 2.4 * k, y0: zona.y0, y1: zona.y1 });
+    const corto = zona.x1 - zona.x0 < 40 * k;
+    const premio = { x: (zona.x0 + zona.x1) / 2, y: base + 9.6 * k, texto: corto ? "$" : "PREMIO" };
+    cajas.push({ q: "PREMIO", x0: premio.x - (corto ? 3 : 17) * k, x1: premio.x + (corto ? 3 : 17) * k, y0: base + 3.6 * k, y1: base + 10 * k });
+    const a1 = porColumna.has(entrada - 1) ? { x: x(entrada - 1), y: cable + 20 * k } : null;
+    if (a1) cajas.push({ q: "a 1", x0: a1.x - 4.5 * k, x1: a1.x + 4.5 * k, y0: a1.y - 6 * k, y1: a1.y + 1 * k });
+    return { piso, tope, entrada, paso, k, cable, base, alto: Math.ceil(base + 28 * k), ancho, piezas, focos, numeros, zona, premio, a1, cajas };
+  }
+
+  // Los papeles: color, estampado y listón. En la zona de premio, nunca rojos (la zona ya lo es).
+  const PAPELES_REGALO = [["#C8102E", "puntos", "#F1D27A"], ["#1E7B4F", "rayas", "#F3E6C6"], ["#22447A", "estrellas", "#F1D27A"],
+    ["#6B3FA0", "puntos", "#F1D27A"], ["#E8D5B0", "liso", "#C8102E"], ["#0F6B6B", "rayas", "#F3E6C6"]];
+  const LISOS_REGALO = ["#B3263A", "#1E7B4F", "#2A5FA8", "#6B3FA0", "#0F6B6B"];
+  const COLOR_MEDALLA = { oro: ["#FFD25A", "#FFF3C4", "#B8860B"], plata: ["#E6EBEF", "#FFFFFF", "#8E9AA3"], bronce: ["#E39A5C", "#FFE0C4", "#9A5520"] };
+  const DEFS_REGALOS = '<defs>' +
+    '<pattern id="rg-puntos" width="3.2" height="3.2" patternUnits="userSpaceOnUse"><circle cx="1.6" cy="1.6" r=".55" fill="#fff" fill-opacity=".55"/></pattern>' +
+    '<pattern id="rg-rayas" width="3.4" height="3.4" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><rect width="1.2" height="3.4" fill="#fff" fill-opacity=".22"/></pattern>' +
+    '<pattern id="rg-estrellas" width="5" height="5" patternUnits="userSpaceOnUse"><path d="M2.5 .9l.38 1.22 1.22.38-1.22.38-.38 1.22-.38-1.22-1.22-.38 1.22-.38z" fill="#F1D27A" fill-opacity=".8"/></pattern>' +
+    '<pattern id="rg-zona" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><rect width="7" height="7" fill="#6A1220"/><rect width="3" height="7" fill="#7A1727"/></pattern>' +
+    '<linearGradient id="rg-cuerpo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></linearGradient>' +
+    '<linearGradient id="rg-satin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".18"/><stop offset=".45" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient>' +
+    '<radialGradient id="rg-sombra"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="rg-halo-oro"><stop offset="0" stop-color="#FFD98A" stop-opacity=".55"/><stop offset="1" stop-color="#FFC24A" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="rg-halo-plata"><stop offset="0" stop-color="#F2F6F8" stop-opacity=".5"/><stop offset="1" stop-color="#F2F6F8" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="rg-halo-bronce"><stop offset="0" stop-color="#F0B07A" stop-opacity=".55"/><stop offset="1" stop-color="#E39A5C" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="rg-halo-tibio"><stop offset="0" stop-color="#FFD98A" stop-opacity=".3"/><stop offset="1" stop-color="#FFD98A" stop-opacity="0"/></radialGradient>' +
+    '<linearGradient id="rg-haz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE3A3" stop-opacity=".2"/><stop offset="1" stop-color="#FFE3A3" stop-opacity="0"/></linearGradient>' +
+    '<radialGradient id="rg-foco-oro" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#FFFCEB"/><stop offset=".5" stop-color="#FFD25A"/><stop offset="1" stop-color="#D9920E"/></radialGradient>' +
+    '<radialGradient id="rg-foco-plata" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#E6EBEF"/><stop offset="1" stop-color="#9AA6AE"/></radialGradient>' +
+    '<radialGradient id="rg-foco-bronce" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#FFF0E2"/><stop offset=".5" stop-color="#E39A5C"/><stop offset="1" stop-color="#A55A22"/></radialGradient>' +
+    '<radialGradient id="rg-cristal" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/></radialGradient>' +
+    '<linearGradient id="rg-nieve" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F8F6"/><stop offset="1" stop-color="#C9D4CE"/></linearGradient>' +
+    '</defs>';
+  const LETRA_REGALO = "-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif";
+  const LETRA_MANO = "'Marker Felt', 'Chalkboard SE', 'Comic Sans MS', cursive";
+  const n1 = (v) => Math.round(v * 100) / 100;
+  // El texto de las iniciales siempre se escapa: viene del nombre de cada quien.
+  const textoSvg = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  function lazoSvg(y, color, sombra, e) {
+    const c = (v) => n1(v * e);
+    return '<path d="M0 ' + y + ' c' + c(-2.2) + ' ' + c(-3.6) + ' ' + c(-6.6) + ' ' + c(-3.4) + ' ' + c(-5.6) + ' ' + c(-0.2) + ' c' + c(0.6) + ' ' + c(1.4) + ' ' + c(3.2) + ' ' + c(1.3) + ' ' + c(5.6) + ' ' + c(0.2) + 'z" fill="' + color + '"/>' +
+      '<path d="M0 ' + y + ' c' + c(2.2) + ' ' + c(-3.6) + ' ' + c(6.6) + ' ' + c(-3.4) + ' ' + c(5.6) + ' ' + c(-0.2) + ' c' + c(-0.6) + ' ' + c(1.4) + ' ' + c(-3.2) + ' ' + c(1.3) + ' ' + c(-5.6) + ' ' + c(0.2) + 'z" fill="' + color + '"/>' +
+      '<path d="M' + c(-2.6) + ' ' + n1(y - 1.4 * e) + ' q' + c(1.2) + ' ' + c(0.4) + ' ' + c(2.6) + ' ' + c(1.4) + ' q' + c(1.4) + ' ' + c(-1) + ' ' + c(2.6) + ' ' + c(-1.4) + '" fill="none" stroke="' + sombra + '" stroke-width=".6" stroke-opacity=".6"/>' +
+      '<circle cx="0" cy="' + n1(y + 0.1) + '" r="' + c(1.25) + '" fill="' + color + '"/>';
+  }
+
+  function etiquetaSvg(cy, ancho, ini, fondo, tinta, borde, giro, mano) {
+    const tam = ini.length <= 2 ? 5.2 : 4.5;
+    return '<g' + (giro ? ' transform="rotate(' + giro + ' 0 ' + cy + ')"' : "") + '><rect x="' + n1(-ancho / 2) + '" y="' + n1(cy - 3.3) + '" width="' + n1(ancho) + '" height="6.6" rx="1.2" fill="' + fondo + '"' +
+      (borde ? ' stroke="' + borde + '" stroke-width=".7"' : "") + '/><text x="0" y="' + n1(cy + tam * 0.36) + '" text-anchor="middle" font-size="' + tam + '" font-weight="' + (mano ? 700 : 800) + '" font-family="' + (mano ? LETRA_MANO : LETRA_REGALO) + '" fill="' + tinta + '">' + textoSvg(ini) + '</text></g>';
+  }
+
+  /* Cada envoltura, dibujada con su base en (0, 0) y hacia arriba, en tamaño de referencia. */
+  function envolturaSvg(pz, papel, liso, tuyo) {
+    const [w, h] = ENVOLTURAS[pz.tipo], g = pz.g, x0 = -w / 2, y0 = -h;
+    let s = pz.abajo ? '<ellipse cx="0" cy=".4" rx="' + n1(w * 0.55) + '" ry="1.2" fill="url(#rg-sombra)"/>' : "";
+    if (pz.tipo === "carbon") {
+      s += '<path d="M' + n1(x0 + 1) + ' -1 L' + n1(x0) + ' ' + n1(y0 + 5) + ' L' + n1(x0 + 3.2) + ' ' + n1(y0 + 1.2) + ' L1 ' + n1(y0) + ' L' + n1(x0 + w - 1.6) + ' ' + n1(y0 + 1.8) +
+        ' L' + n1(x0 + w) + ' ' + n1(y0 + 6.4) + ' L' + n1(x0 + w - 1) + ' -.6 Z" fill="#2A2E33"' + (g.yo ? ' stroke="#fff" stroke-width="1.1"' : "") + '/>' +
+        '<path d="M' + n1(x0 + 3.2) + ' ' + n1(y0 + 1.2) + ' L1 ' + n1(y0) + ' L0 ' + n1(y0 + 4) + ' Z" fill="#4A5058"/><path d="M1 ' + n1(y0) + ' L' + n1(x0 + w - 1.6) + ' ' + n1(y0 + 1.8) + ' L1.6 ' + n1(y0 + 4.4) + ' Z" fill="#3A4047"/>' +
+        '<circle cx="' + n1(x0 + 4.4) + '" cy="' + n1(y0 + 2.6) + '" r=".6" fill="#fff" fill-opacity=".8"/>' +
+        '<text x="0" y="-2.6" text-anchor="middle" font-size="' + (g.ini.length <= 2 ? 5 : 4.4) + '" font-weight="800" font-family="' + LETRA_REGALO + '" fill="' + (g.yo ? tuyo[0] : "#F3F6F4") + '">' + textoSvg(g.ini) + '</text>';
+      return s;
+    }
+    if (pz.tipo === "bolsa") {
+      const cuerpo = "M" + n1(x0 + 1.6) + " " + n1(y0 + 3.4) + " L" + n1(x0 + w - 1.6) + " " + n1(y0 + 3.4) + " Q" + n1(x0 + w + 0.3) + " " + n1(y0 + 8) + " " + n1(x0 + w) + " -1.2" +
+        " Q0 .3 " + n1(x0) + " -1.2 Q" + n1(x0 - 0.3) + " " + n1(y0 + 8) + " " + n1(x0 + 1.6) + " " + n1(y0 + 3.4) + "Z";
+      s += '<path d="M-2.4 ' + n1(y0 + 3.2) + ' q-1.4 -3.4 1 -3.2 q1.4 .3 1.4 2 q0 -1.7 1.4 -2 q2.4 -.2 1 3.2z" fill="#E6ECEE"/>' +
+        '<path d="' + cuerpo + '" fill="#F1F4F5" fill-opacity=".95"' + (g.yo ? ' stroke="#fff" stroke-width="1.1"' : "") + '/>' +
+        '<path d="M' + n1(x0 + 3) + ' ' + n1(y0 + 6) + ' q2 1.6 1.2 5 M' + n1(x0 + w - 3.4) + ' ' + n1(y0 + 5.4) + ' q-1.6 2.4 -.4 6.4" fill="none" stroke="#C3CDD1" stroke-width=".55"/>' +
+        '<text x="0" y="' + n1(y0 + 11.2) + '" text-anchor="middle" font-size="' + (g.ini.length <= 2 ? 5.4 : 4.6) + '" font-weight="700" font-family="' + LETRA_MANO + '" fill="' + (g.yo ? tuyo[0] : "#1f3a8a") + '" transform="rotate(-4 0 ' + n1(y0 + 10) + ')">' + textoSvg(g.ini) + '</text>';
+      return s;
+    }
+    if (pz.tipo === "carton") {
+      s += '<rect x="' + n1(x0) + '" y="' + n1(y0) + '" width="' + w + '" height="' + h + '" rx=".8" fill="#C9A06A"/><rect x="' + n1(x0) + '" y="' + n1(y0) + '" width="' + w + '" height="' + h + '" rx=".8" fill="url(#rg-cuerpo)"/>' +
+        '<line x1="' + n1(x0) + '" y1="' + n1(y0 + 3.2) + '" x2="' + n1(x0 + w) + '" y2="' + n1(y0 + 3.2) + '" stroke="#8C6A3E" stroke-width=".6"/>' +
+        '<rect x="-1.5" y="' + n1(y0) + '" width="3" height="' + n1(h * 0.62) + '" fill="' + (g.yo ? tuyo[0] : "#E9D7B0") + '" fill-opacity=".85"/>' +
+        '<path d="M' + n1(x0 + 1.2) + ' ' + n1(y0 + 1.4) + 'l1.1-1 1.1 1M' + n1(x0 + 1.2) + ' ' + n1(y0 + 2.6) + 'l1.1-1 1.1 1" fill="none" stroke="#5a4326" stroke-width=".45"/>' +
+        etiquetaSvg(n1(y0 + h - 3.9), 10, g.ini, "#F2E6C4", "#2b2b2b", null, -6, true) +
+        (g.yo ? '<rect x="' + n1(x0 + 0.6) + '" y="' + n1(y0 + 0.6) + '" width="' + n1(w - 1.2) + '" height="' + n1(h - 1.2) + '" rx=".8" fill="none" stroke="#fff" stroke-width="1.1"/>' : "");
+      return s;
+    }
+    if (pz.tipo === "sencillo") {
+      const color = g.yo ? tuyo[0] : liso;
+      s += '<rect x="' + n1(x0) + '" y="' + n1(y0 + 3.6) + '" width="' + w + '" height="' + n1(h - 3.6) + '" rx="1.2" fill="' + color + '"/><rect x="' + n1(x0) + '" y="' + n1(y0 + 3.6) + '" width="' + w + '" height="' + n1(h - 3.6) + '" rx="1.2" fill="url(#rg-cuerpo)"/>' +
+        '<rect x="' + n1(x0 - 0.4) + '" y="' + n1(y0 + 1.2) + '" width="' + n1(w + 0.8) + '" height="3.2" rx=".9" fill="' + color + '"/><rect x="' + n1(x0 - 0.4) + '" y="' + n1(y0 + 1.2) + '" width="' + n1(w + 0.8) + '" height=".9" fill="#fff" fill-opacity=".22"/>' +
+        '<rect x="-.7" y="' + n1(y0 + 1.2) + '" width="1.4" height="' + n1(h - 1.2) + '" fill="#EDE3CC"/>';
+      for (let i = 0; i < 6; i++) {
+        s += '<circle cx="' + n1(2.4 + 1.5 * Math.cos(i * 1.047)) + '" cy="' + n1(y0 + 1.3 + 1.1 * Math.sin(i * 1.047)) + '" r="1.05" fill="#C9D1D8"/>';
+      }
+      s += '<circle cx="2.4" cy="' + n1(y0 + 1.3) + '" r="1" fill="#E9EEF1"/>' + etiquetaSvg(n1(y0 + h - 4.9), 9.6, g.ini, "#FFF8EA", "#3a2a12", null, 0, false) +
+        (g.yo ? '<rect x="' + n1(x0 + 0.6) + '" y="' + n1(y0 + 4.2) + '" width="' + n1(w - 1.2) + '" height="' + n1(h - 4.8) + '" rx="1" fill="none" stroke="#fff" stroke-width="1.1"/>' : "");
+      return s;
+    }
+    // De lujo (quien cobra, con su medalla) o fino.
+    const med = pz.medalla ? COLOR_MEDALLA[pz.medalla] : null;
+    const [color, estampado, liston] = g.yo ? [tuyo[0], "rayas", tuyo[1]] : papel;
+    const tapa = 4, cinta = med ? med[0] : liston;
+    if (med) s = '<ellipse cx="0" cy="' + n1(y0 + h / 2) + '" rx="' + n1(w * 0.78) + '" ry="' + n1(h * 0.72) + '" fill="url(#rg-halo-' + pz.medalla + ')"/>' + s;
+    const caja = (yy, alto, rx, relleno) => '<rect x="' + n1(x0) + '" y="' + n1(yy) + '" width="' + w + '" height="' + n1(alto) + '" rx="' + rx + '" fill="' + relleno + '"/>';
+    const tapaR = (relleno, alto) => '<rect x="' + n1(x0 - 0.6) + '" y="' + n1(y0 + 1.2) + '" width="' + n1(w + 1.2) + '" height="' + (alto || tapa) + '" rx="1" fill="' + relleno + '"/>';
+    s += caja(y0 + tapa, h - tapa, 1.4, color) + (estampado !== "liso" ? caja(y0 + tapa, h - tapa, 1.4, "url(#rg-" + estampado + ")") : "") + caja(y0 + tapa, h - tapa, 1.4, "url(#rg-cuerpo)");
+    s += tapaR(color) + (estampado !== "liso" ? tapaR("url(#rg-" + estampado + ")") : "") +
+      '<rect x="' + n1(x0 - 0.6) + '" y="' + n1(y0 + 1.2) + '" width="' + n1(w + 1.2) + '" height="1" rx=".5" fill="#fff" fill-opacity=".28"/>' +
+      '<rect x="' + n1(x0 - 0.6) + '" y="' + n1(y0 + 1.2 + tapa - 0.7) + '" width="' + n1(w + 1.2) + '" height=".7" fill="#000" fill-opacity=".22"/>';
+    s += '<rect x="-1.5" y="' + n1(y0 + 1.2) + '" width="3" height="' + n1(h - 1.2) + '" fill="' + cinta + '"/><rect x="-1.5" y="' + n1(y0 + 1.2) + '" width="3" height="' + n1(h - 1.2) + '" fill="url(#rg-satin)"/>';
+    if (med) {
+      for (let i = 0; i < 5; i++) s += '<circle cx="' + n1(x0 + 0.9 + i * (w - 1.8) / 4) + '" cy="' + n1(y0 + 3.2) + '" r=".95" fill="' + (i % 2 ? med[1] : med[0]) + '"/>';
+    }
+    s += lazoSvg(n1(y0 + 1.6), cinta, med ? med[2] : "#000", med ? 1.12 : 1);
+    s += etiquetaSvg(n1(y0 + h - 1.6 - 3.3), w - 4.2, g.ini, "#FFF8EA", "#3a2a12", med ? med[0] : null, 0, false);
+    if (g.yo) s += '<rect x="' + n1(x0 + 0.6) + '" y="' + n1(y0 + 4.6) + '" width="' + n1(w - 1.2) + '" height="' + n1(h - 5.2) + '" rx="1.2" fill="none" stroke="#fff" stroke-width="1.2"/>';
+    return s;
+  }
+
+  function focoSvg(estado) {
+    let s = "";
+    if (estado === "oro" || estado === "plata" || estado === "bronce") {
+      s += '<g class="rg-prendido"><circle cx="0" cy="4" r="8" fill="url(#rg-halo-' + estado + ')"/><rect x="-1.6" y="-2" width="3.2" height="2.6" rx=".7" fill="#59605c"/>' +
+        '<ellipse cx="0" cy="4" rx="2.9" ry="4.1" fill="url(#rg-foco-' + estado + ')"/></g>';
+    } else if (estado === "tibio") {
+      s += '<g class="rg-tibio"><circle cx="0" cy="4" r="7" fill="url(#rg-halo-tibio)"/><rect x="-1.6" y="-2" width="3.2" height="2.6" rx=".7" fill="#59605c"/>' +
+        '<ellipse cx="0" cy="4" rx="2.9" ry="4.1" fill="#A97B26"/><ellipse cx="0" cy="4" rx="2.9" ry="4.1" fill="url(#rg-cristal)"/></g>';
+    } else {
+      s += '<rect x="-1.6" y="-2" width="3.2" height="2.6" rx=".7" fill="#59605c"/><ellipse cx="0" cy="4" rx="2.6" ry="3.7" fill="#29312d"/><ellipse cx="0" cy="4" rx="2.6" ry="3.7" fill="url(#rg-cristal)" opacity=".55"/>';
+    }
+    return s;
+  }
+
+  /* El dibujo completo, a partir del acomodo. tuyo: [papel, listón] con los colores de tu equipo. */
+  function dibujoDeRegalos(a, tuyo) {
+    const k = a.k, z = a.zona, t = (x, y, esc) => ' transform="translate(' + n1(x) + ' ' + n1(y) + ')' + (esc ? ' scale(' + n1(k) + ')' : "") + '"';
+    // Ancho al 100 %: si la caja mide distinto de lo calculado, el dibujo se ajusta parejo y no se corta.
+    let s = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + n1(a.ancho) + ' ' + a.alto + '" width="100%" aria-hidden="true">' + DEFS_REGALOS;
+    // La zona de premio, pintada como zona de anotación.
+    s += '<rect x="' + n1(z.x0) + '" y="' + n1(z.y0) + '" width="' + n1(z.x1 - z.x0) + '" height="' + n1(z.y1 - z.y0) + '" rx="2" fill="url(#rg-zona)"/>' +
+      '<rect x="' + n1(z.x0) + '" y="' + n1(z.y0) + '" width="' + n1(z.x1 - z.x0) + '" height="' + n1(z.y1 - z.y0) + '" rx="2" fill="none" stroke="#F3F6F4" stroke-opacity=".85" stroke-width="1.2"/>';
+    // Los haces de luz, de cada foco prendido a su pila.
+    a.focos.filter((f) => f.estado !== "apagado" && f.estado !== "tibio").forEach((f) => {
+      s += '<polygon points="' + n1(f.x - 2 * k) + ',' + n1(a.cable + 9 * k) + ' ' + n1(f.x + 2 * k) + ',' + n1(a.cable + 9 * k) + ' ' + n1(f.x + 11 * k) + ',' + a.base + ' ' + n1(f.x - 11 * k) + ',' + a.base + '" fill="url(#rg-haz)"/>';
+    });
+    // La nieve, afuera de la zona.
+    if (z.x0 > 30) {
+      let d = "M0 " + n1(a.base + 2 * k);
+      for (let x = 0; x + 26 < z.x0 - 1; x += 26) d += " Q" + n1(x + 13) + " " + n1(a.base - (2.5 - ((x / 26) % 2) * 1.6) * k) + " " + n1(x + 26) + " " + n1(a.base + 1.2 * k);
+      d += " L" + n1(z.x0 - 1.2) + " " + n1(a.base + k) + " V" + n1(z.y1) + " H0Z";
+      s += '<path d="' + d + '" fill="url(#rg-nieve)" fill-opacity=".92"/>';
+    }
+    s += '<text x="' + n1(a.premio.x) + '" y="' + n1(a.premio.y) + '" text-anchor="middle" font-size="' + n1(7.6 * k) + '" font-weight="800" letter-spacing="' + n1(1.6 * k) + '" font-family="' + LETRA_REGALO + '" fill="#F3F6F4">' + a.premio.texto + '</text>';
+    // El cable de la serie.
+    let cable = "M" + n1(a.focos[0].x - a.paso / 2 - 6) + " " + a.cable;
+    a.focos.forEach((f) => { cable += " Q" + n1(f.x) + " " + n1(a.cable + 8 * k) + " " + n1(f.x + a.paso / 2) + " " + a.cable; });
+    s += '<path d="' + cable + '" fill="none" stroke="#4b5851" stroke-width="1.2"/>';
+    // Los regalos.
+    let i = 0, j = 0, m = 0;
+    a.piezas.forEach((pz) => {
+      let papel = PAPELES_REGALO[i % PAPELES_REGALO.length];
+      if (pz.medalla) { const sinRojo = PAPELES_REGALO.filter((p) => p[0] !== "#C8102E"); papel = sinRojo[m++ % sinRojo.length]; }
+      else if (pz.tipo === "fino") i++;
+      const liso = LISOS_REGALO[j++ % LISOS_REGALO.length];
+      s += '<g' + t(pz.x, pz.y, true) + '>' + envolturaSvg(pz, papel, liso, tuyo) + '</g>';
+    });
+    // La línea de gol con sus pilones, los focos y lo que dicen.
+    if (a.entrada > a.piso) {
+      s += '<rect x="' + n1(z.x0 - 1.2 * k) + '" y="' + n1(z.y0) + '" width="' + n1(2.4 * k) + '" height="' + n1(z.y1 - z.y0) + '" fill="#F3F6F4"/>';
+      [z.y0, a.base + 3 * k].forEach((y) => { s += '<rect x="' + n1(z.x0 - 2.4 * k) + '" y="' + n1(y) + '" width="' + n1(4.8 * k) + '" height="' + n1(9 * k) + '" rx="1" fill="#FF7A18"/>'; });
+    }
+    a.focos.forEach((f) => { s += '<g' + t(f.x, a.cable, true) + '>' + focoSvg(f.estado) + '</g>'; });
+    if (a.a1) s += '<text x="' + n1(a.a1.x) + '" y="' + n1(a.a1.y) + '" text-anchor="middle" font-size="' + n1(7.8 * k) + '" font-weight="700" font-family="' + LETRA_REGALO + '" fill="#B98A2E">a 1</text>';
+    const colorNum = { oro: "#FFD25A", plata: "#E6EBEF", bronce: "#E39A5C" };
+    a.numeros.forEach((nn) => {
+      const foco = a.focos.find((f) => f.t === nn.t);
+      s += '<text x="' + n1(nn.x) + '" y="' + n1(a.base + 24 * k) + '" text-anchor="middle" font-size="' + n1(8.6 * k) + '" font-weight="600" style="font-family:var(--num), ' + LETRA_REGALO.replace(/'/g, "") + '" fill="' + (colorNum[foco.estado] || "#76817b") + '">' + nn.t + '</text>';
+    });
+    return s + "</svg>";
+  }
+
+  /* El campo: una columna por número de aciertos y un punto por participante. En navidad, un regalo. */
   function pintarCampoGeneral() {
     const vista = vistas.general;
     const previo = vista.querySelector(".campo-gral");
@@ -6577,7 +6855,11 @@ try {
     const f = jugador === null ? null : generalPorIdx.get(jugador);
 
     const caja = crear("section", "campo-gral");
-    caja.appendChild(crear("p", "campo-gral-nota", "Cada punto es uno de los " + D.general.length));
+    const fiesta = fiestaActual();
+    const regalos = !!fiesta && fiesta.clave === "navidad";
+    caja.appendChild(crear("p", "campo-gral-nota", regalos
+      ? "Cada regalo es uno de los " + D.general.length + " · entre más abajo, peor envuelto"
+      : "Cada punto es uno de los " + D.general.length));
     const pasto = crear("div", "campo-gral-pasto");
     pasto.setAttribute("role", "img");
     const lider = D.general[0];
@@ -6588,6 +6870,28 @@ try {
     const columnas = tope - piso + 1;
     caja.appendChild(pasto);
     vista.insertBefore(caja, vista.querySelector(".podio,.aviso"));
+    if (regalos) {
+      try {
+        pasto.classList.add("regalos");
+        const gente = D.general.map((g) => ({ p: g.p, total: g.total, pos: g.pos, ini: iniciales(nombre(g.p)), yo: g.p === jugador, cobra: cobran.has(g.p) }));
+        // Dos con las mismas iniciales: el que usa un apodo de una palabra se distingue con sus tres primeras letras.
+        const repetidas = new Map();
+        gente.forEach((g) => repetidas.set(g.ini, (repetidas.get(g.ini) || 0) + 1));
+        gente.forEach((g) => {
+          const partes = nombre(g.p).trim().split(/\s+/);
+          if (repetidas.get(g.ini) > 1 && partes.length === 1) g.ini = partes[0].slice(0, 3).charAt(0).toUpperCase() + partes[0].slice(1, 3).toLowerCase();
+        });
+        const colores = equipo && D.colores[equipo] ? D.colores[equipo] : null;
+        const tuyo = colores ? [colores.local, colores.visita] : [getComputedStyle(document.documentElement).getPropertyValue("--acento").trim() || "#FFD60A", "#F3F6F4"];
+        // Con la sección escondida no se puede medir: se usa el ancho de la pantalla menos sus orillas.
+        const anchoDibujo = pasto.clientWidth || Math.min(640, (document.documentElement.clientWidth || 390) - 32);
+        pasto.innerHTML = dibujoDeRegalos(regalosDeLaGeneral(gente, anchoDibujo, entrada), tuyo);
+      } catch (e) {
+        console.error(e);
+        pasto.classList.remove("regalos");
+        pasto.textContent = "";
+      }
+    }
     const ancho = (pasto.clientWidth || 288) / columnas;
     // Más de siete en una columna: puntos de 9 px y, si hace falta, de 6; nunca más anchos que su columna.
     const mayor = Math.max(...Array.from(porColumna.values(), (g) => g.length));
@@ -6597,7 +6901,7 @@ try {
     const cada = Math.max(1, Math.ceil(22 / ancho));
 
     let n = 0;
-    for (let total = piso; total <= tope; total++) {
+    for (let total = piso; total <= tope && !pasto.classList.contains("regalos"); total++) {
       const gente = porColumna.get(total) || [];
       const col = crear("div", "campo-gral-col" + (total === entrada ? " corte" : "") + (f && f.total === total ? " yo" : ""));
       const pila = crear("div", "campo-gral-pila");
@@ -6616,14 +6920,19 @@ try {
     const pie = crear("p", "campo-gral-pie");
     pie.appendChild(document.createTextNode(P.temporada_cerrada ? "Así quedó: " : "Si terminara hoy: "));
     P.hoy.forEach((g, k) => {
-      if (k) pie.appendChild(document.createTextNode(" · "));
+      if (k) pie.appendChild(crear("span", "campo-gral-sep", " · "));
       const yo = jugador !== null && g.p.includes(jugador);
       const otros = g.p.length - (yo ? 1 : 0);
       const quien = yo ? (otros ? "Tú y " + otros + " más" : "Tú")
         : g.p.length > 1 ? nombre(g.p[0]) + " y " + (g.p.length - 1) + " más" : nombre(g.p[0]);
-      pie.appendChild(crear("b", null, quien));
-      pie.appendChild(document.createTextNode(" "));
-      pie.appendChild(crear("span", "campo-gral-monto", g.premio + (g.p.length > 1 ? " c/u" : "")));
+      // Cada grupo junto, con su lugar: en navidad se vuelve una etiqueta de regalo con su medalla.
+      const grupo = crear("span", "campo-gral-grupo");
+      grupo.dataset.medalla = MEDALLA_DE_LUGAR[Math.min(Math.max(g.pos, 1), 3)];
+      grupo.appendChild(crear("span", "campo-gral-lugar", ordinal(g.pos) + " "));
+      grupo.appendChild(crear("b", null, quien));
+      grupo.appendChild(document.createTextNode(" "));
+      grupo.appendChild(crear("span", "campo-gral-monto", g.premio + (g.p.length > 1 ? " c/u" : "")));
+      pie.appendChild(grupo);
     });
     const enlace = crear("button", "enlace-titulo", "Cómo se reparte");
     enlace.type = "button";
