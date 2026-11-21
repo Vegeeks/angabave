@@ -543,6 +543,37 @@ main{view-transition-name:contenido; min-height:60vh}
   animation:caer var(--d) cubic-bezier(.25,.5,.5,1) forwards}
 @keyframes caer{0%{opacity:0; transform:translate3d(0,-20px,0) rotate(0)} 8%{opacity:1} 80%{opacity:1}
   100%{opacity:0; transform:translate3d(var(--x),105vh,0) rotate(var(--r))}}
+/* ═══ la semana de Acción de Gracias ═══
+   Solo mientras dura (html[data-fiesta], lo pone el guión con D.fiesta): hojas de otoño que caen
+   sobre el campo y unas que ya se quedaron en el pasto, luces de estadio cálidas, un listón con el
+   pavo en Hoy y en la semana, y Semana leída como menú. Todo vive detrás de la página: no tapa nada. */
+.arce{--forma:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5L13.4 4.6 15.8 3.6 15.3 7.2 19.2 6 17.6 9.6 21 11.2 17.4 13.2 18.4 15.8 14.6 15 13 17.8H12.5V22.5H11.5V17.8H11L9.4 15 5.6 15.8 6.6 13.2 3 11.2 6.4 9.6 4.8 6 8.7 7.2 8.2 3.6 10.6 4.6Z'/%3E%3C/svg%3E")}
+.roble{--forma:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2C17.2 6 19.6 11.4 17.4 16.6 15.9 20 13.6 21.4 12 22.2 10.4 21.4 8.1 20 6.6 16.6 4.4 11.4 6.8 6 12 2ZM11.6 6.5V21H12.4V6.5Z'/%3E%3C/svg%3E")}
+.arce,.roble{-webkit-mask-image:var(--forma); mask-image:var(--forma); -webkit-mask-size:contain; mask-size:contain;
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; -webkit-mask-position:center; mask-position:center}
+.fiesta{position:absolute; inset:0; overflow:hidden; pointer-events:none}
+.estreno .fiesta{visibility:hidden}
+.fiesta .cae{position:absolute; top:-28px; animation:hoja-cae var(--d) ease-in-out var(--t) 3}
+.fiesta .cae.otra{animation-name:hoja-cae-otra}
+.fiesta .hoja{display:block; width:calc(18px * var(--s)); height:calc(18px * var(--s))}
+.fiesta .quieta{position:absolute; opacity:.9}
+@keyframes hoja-cae{0%{transform:translate3d(0,0,0) rotate(0deg); opacity:0} 6%{opacity:.85}
+  25%{transform:translate3d(18px,150px,0) rotate(70deg)} 50%{transform:translate3d(-14px,300px,0) rotate(160deg)}
+  75%{transform:translate3d(12px,450px,0) rotate(250deg)} 92%{opacity:.85}
+  100%{transform:translate3d(-6px,620px,0) rotate(330deg); opacity:0}}
+@keyframes hoja-cae-otra{0%{transform:translate3d(0,0,0) rotate(0deg); opacity:0} 6%{opacity:.85}
+  25%{transform:translate3d(-16px,150px,0) rotate(-60deg)} 50%{transform:translate3d(14px,300px,0) rotate(-150deg)}
+  75%{transform:translate3d(-12px,450px,0) rotate(-230deg)} 92%{opacity:.85}
+  100%{transform:translate3d(8px,620px,0) rotate(-300deg); opacity:0}}
+@media (prefers-reduced-motion:reduce){.fiesta .cae{display:none}}
+html[data-fiesta] .cancha .luz{filter:sepia(1) saturate(2.2) hue-rotate(-14deg)}
+.saludo p.liston-fiesta,.liston-fiesta{display:inline-flex; align-items:center; gap:8px; max-width:none; margin:0 0 8px;
+  padding:3px 12px 3px 4px; border-radius:99px; border:1px solid rgba(242,165,65,.6); background:rgba(36,14,4,.62);
+  color:#F6C85F; font-size:var(--t6); line-height:1.2; font-weight:700; letter-spacing:.02em}
+.liston-fiesta svg{flex:none; width:28px; height:28px}
+.liston-fiesta.chico{margin:0; padding:1px 10px 1px 2px; gap:4px}
+.liston-fiesta.chico svg{width:22px; height:22px}
+.confeti.arce,.confeti.roble{width:16px; height:16px}
 .empatados{font-weight:700}
 .empatados summary{display:inline-flex; align-items:center; gap:4px; min-height:44px; cursor:pointer; list-style:none}
 .empatados summary::-webkit-details-marker{display:none}
@@ -1939,6 +1970,132 @@ try {
   }
   const partidosDe = (s) => s.partidos.map(efectivo);
 
+  /* ═══ la semana de Acción de Gracias ═══
+     Solo esos días el portal se viste de otoño. Python calcula la ventana con el calendario
+     (D.fiesta: del lunes de esa semana a la mañana siguiente al último partido de la jornada)
+     y aquí solo se compara con la hora del teléfono: entra y se va sola, aunque la página siga
+     abierta. Con ?fiesta=1 se ve antes, para revisarla. */
+  const FIESTA_FORZADA = /[?&]fiesta=1(&|$)/.test(location.search);
+  function fiestaVigente(f, ahora, forzada) {
+    if (!f) return null;
+    return forzada || (ahora >= f.desde * 1000 && ahora < f.hasta * 1000) ? f : null;
+  }
+  const fiestaActual = () => fiestaVigente(D.fiesta, Date.now(), FIESTA_FORZADA);
+  const OTONO = ["#F6C85F", "#F2A541", "#E4572E", "#B23A48", "#9C5B33"];
+  // Las mismas hojas que recorta el CSS (.arce y .roble): aquí sirven para la imagen de picks.
+  const HOJA = {
+    arce: "M12 1.5L13.4 4.6 15.8 3.6 15.3 7.2 19.2 6 17.6 9.6 21 11.2 17.4 13.2 18.4 15.8 14.6 15 13 17.8H12.5V22.5H11.5V17.8H11L9.4 15 5.6 15.8 6.6 13.2 3 11.2 6.4 9.6 4.8 6 8.7 7.2 8.2 3.6 10.6 4.6Z",
+    roble: "M12 2C17.2 6 19.6 11.4 17.4 16.6 15.9 20 13.6 21.4 12 22.2 10.4 21.4 8.1 20 6.6 16.6 4.4 11.4 6.8 6 12 2ZM11.6 6.5V21H12.4V6.5Z",
+  };
+  // El pavo de la semana: plumas de otoño, cuerpo café, pico y moco. Igual en la página y en la imagen.
+  const PAVO = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">' +
+    '<ellipse cx="11.93" cy="23.76" rx="4.6" ry="12" transform="rotate(-75 11.93 23.76)" fill="#B23A48"/>' +
+    '<ellipse cx="14.42" cy="18.97" rx="4.6" ry="12" transform="rotate(-50 14.42 18.97)" fill="#E4572E"/>' +
+    '<ellipse cx="18.72" cy="15.67" rx="4.6" ry="12" transform="rotate(-25 18.72 15.67)" fill="#F2A541"/>' +
+    '<ellipse cx="24" cy="14.5" rx="4.6" ry="12" transform="rotate(0 24 14.5)" fill="#F6C85F"/>' +
+    '<ellipse cx="29.28" cy="15.67" rx="4.6" ry="12" transform="rotate(25 29.28 15.67)" fill="#F2A541"/>' +
+    '<ellipse cx="33.58" cy="18.97" rx="4.6" ry="12" transform="rotate(50 33.58 18.97)" fill="#E4572E"/>' +
+    '<ellipse cx="36.07" cy="23.76" rx="4.6" ry="12" transform="rotate(75 36.07 23.76)" fill="#B23A48"/>' +
+    '<ellipse cx="16.21" cy="22.5" rx="3.6" ry="8.5" transform="rotate(-60 16.21 22.5)" fill="#8C4A2F"/>' +
+    '<ellipse cx="19.5" cy="19.21" rx="3.6" ry="8.5" transform="rotate(-30 19.5 19.21)" fill="#C8672E"/>' +
+    '<ellipse cx="24" cy="18" rx="3.6" ry="8.5" transform="rotate(0 24 18)" fill="#8C4A2F"/>' +
+    '<ellipse cx="28.5" cy="19.21" rx="3.6" ry="8.5" transform="rotate(30 28.5 19.21)" fill="#C8672E"/>' +
+    '<ellipse cx="31.79" cy="22.5" rx="3.6" ry="8.5" transform="rotate(60 31.79 22.5)" fill="#8C4A2F"/>' +
+    '<path d="M20.5 40.6v3M27.5 40.6v3M19 43.6h3M26 43.6h3" fill="none" stroke="#F2A541" stroke-width="1.4" stroke-linecap="round"/>' +
+    '<ellipse cx="24" cy="31" rx="10" ry="10.5" fill="#6B3E26"/>' +
+    '<ellipse cx="24" cy="34" rx="6" ry="6.2" fill="#8A5432"/>' +
+    '<ellipse cx="24" cy="20.5" rx="5" ry="5.6" fill="#7A4A2E"/>' +
+    '<circle cx="22.2" cy="19.4" r="1.25" fill="#fff"/>' +
+    '<circle cx="25.8" cy="19.4" r="1.25" fill="#fff"/>' +
+    '<circle cx="22.4" cy="19.6" r=".6" fill="#1b1b1b"/>' +
+    '<circle cx="25.6" cy="19.6" r=".6" fill="#1b1b1b"/>' +
+    '<path d="M22.6 21.7h2.8L24 24.3z" fill="#F6C85F"/>' +
+    '<path d="M25 22.3c1.5.6 2 2.4 1 3.4-.8.7-1.9.1-1.8-1z" fill="#D7263D"/>' +
+    '</svg>';
+  // [izquierda %, tamaño, duración s, retraso s, forma, color, al revés]: caen tres veces y se van.
+  const HOJAS_QUE_CAEN = [
+    [6, 1, 11, -1, "arce", 1, 0], [17, 0.8, 13, -6, "roble", 3, 1], [28, 1.15, 10, -3, "arce", 2, 0],
+    [39, 0.7, 14, -9, "roble", 0, 1], [50, 0.95, 12, -4.5, "arce", 3, 0], [61, 0.75, 15, -11, "roble", 1, 1],
+    [70, 1.1, 11.5, -7.5, "arce", 0, 0], [80, 0.85, 13.5, -2, "roble", 2, 1], [89, 1, 12.5, -8.5, "arce", 4, 0],
+    [95, 0.7, 10.5, -5, "roble", 1, 1],
+  ];
+  // [izquierda %, abajo px, tamaño, giro, forma, color]: las que ya se quedaron en el pasto, en las
+  // orillas, donde no hay texto (el renglón de abajo llega casi a la línea amarilla).
+  const HOJAS_QUIETAS = [
+    [-3, 10, 1, -25, "arce", 2], [-1, 1, 0.7, 60, "roble", 0],
+    [97, 12, 0.85, 15, "arce", 3], [98.5, 1, 0.75, -40, "roble", 1],
+  ];
+  function capaDeFiesta() {
+    const capa = crear("div", "fiesta");
+    capa.setAttribute("aria-hidden", "true");
+    if (!suave) HOJAS_QUE_CAEN.forEach(([x, tam, dura, desde, forma, color, otra]) => {
+      const cae = crear("span", "cae" + (otra ? " otra" : ""));
+      cae.style.cssText = "left:" + x + "%;--d:" + dura + "s;--t:" + desde + "s";
+      const hoja = crear("i", "hoja " + forma);
+      hoja.style.cssText = "--s:" + tam + ";background:" + OTONO[color];
+      cae.appendChild(hoja);
+      capa.appendChild(cae);
+    });
+    HOJAS_QUIETAS.forEach(([x, abajo, tam, giro, forma, color]) => {
+      const hoja = crear("i", "hoja quieta " + forma);
+      hoja.style.cssText = "left:" + x + "%;bottom:" + abajo + "px;--s:" + tam + ";transform:rotate(" + giro + "deg);background:" + OTONO[color];
+      capa.appendChild(hoja);
+    });
+    return capa;
+  }
+  /* Pone o quita la fiesta: la marca en <html> y las hojas detrás del campo. Dice si está puesta. */
+  function aplicarFiesta() {
+    const f = fiestaActual(), raiz = document.documentElement;
+    const capa = document.querySelector(".cancha .fiesta"), cancha = document.querySelector(".cancha");
+    if (f) {
+      raiz.dataset.fiesta = f.clave;
+      if (!capa && cancha) cancha.appendChild(capaDeFiesta());
+    } else {
+      delete raiz.dataset.fiesta;
+      if (capa) capa.remove();
+    }
+    return !!f;
+  }
+  function listonDeFiesta(texto, chico) {
+    const liston = crear(chico ? "span" : "p", "liston-fiesta" + (chico ? " chico" : ""));
+    liston.innerHTML = PAVO;
+    liston.firstChild.setAttribute("aria-hidden", "true");
+    liston.appendChild(crear("span", null, texto));
+    return liston;
+  }
+  // En Semana, los horarios de esa semana se leen como un menú; lo del fin de semana es recalentado.
+  const PLATOS = ["Recalentado", "Recalentado", null, "Entrada", "Plato fuerte", "Postre", "Recalentado"];
+  function platoDeFiesta(p) {
+    const plato = p.t ? PLATOS[new Date(p.t * 1000).getDay()] : null;
+    return plato ? plato + " · " : "";
+  }
+  // Unas hojas alrededor del sello de la imagen de picks de esa semana: [ángulo, tamaño, forma, color].
+  const HOJAS_DEL_SELLO = [[1.2, 2, "arce", 1], [1.9, 1.8, "roble", 2], [2.5, 2.2, "arce", 0],
+    [3.1, 1.7, "roble", 2], [3.7, 1.9, "arce", 1], [4.3, 1.6, "roble", 3]];
+  function hojasEnLienzo(ctx, x, y, radio) {
+    HOJAS_DEL_SELLO.forEach(([angulo, tam, forma, color], i) => {
+      ctx.save();
+      ctx.translate(x + Math.cos(angulo) * (radio + 14), y + Math.sin(angulo) * (radio + 14));
+      ctx.rotate(angulo + (i % 2 ? 0.9 : -0.6));
+      ctx.scale(tam, tam);
+      ctx.translate(-12, -12);
+      ctx.fillStyle = OTONO[color];
+      ctx.fill(new Path2D(HOJA[forma]), "evenodd");
+      ctx.restore();
+    });
+  }
+  async function imagenDeSvg(svg, lado) {
+    const conTamano = svg.replace("<svg ", '<svg width="' + lado + '" height="' + lado + '" ');
+    const url = URL.createObjectURL(new Blob([conTamano], { type: "image/svg+xml" }));
+    try {
+      const img = new Image();
+      await new Promise((listo, falla) => { img.onload = listo; img.onerror = falla; img.src = url; });
+      return img;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
   /* ═══ encabezado ═══ */
   /* "En vivo" solo cuando de verdad se está jugando algo. Una semana a medias
      un viernes está en curso, no en vivo: antes se encendía en rojo toda la
@@ -1970,12 +2127,13 @@ try {
     const gane = jugador !== null && (s.ganadores || []).includes(jugador);
     if (!gane) return;
     guardar("angabave.confeti." + s.n, "1");
+    const otono = !!D.fiesta && s.n === D.fiesta.semana;   // quien gana esa semana, con hojas
     const lluvia = crear("div", "confetis");
     lluvia.setAttribute("aria-hidden", "true");
     for (let i = 0; i < (gane ? 70 : 40); i++) {
-      const p = crear("i", "confeti");
+      const p = crear("i", "confeti" + (otono ? (i % 2 ? " arce" : " roble") : ""));
       p.style.left = Math.random() * 100 + "%";
-      p.style.background = i % 5 === 4 ? "var(--acento)" : COLORES[i % COLORES.length];
+      p.style.background = otono ? OTONO[i % OTONO.length] : i % 5 === 4 ? "var(--acento)" : COLORES[i % COLORES.length];
       p.style.setProperty("--d", (2.4 + Math.random() * 1.8).toFixed(2) + "s");
       p.style.setProperty("--x", Math.round(Math.random() * 160 - 80) + "px");
       p.style.setProperty("--r", Math.round(Math.random() * 900 - 450) + "deg");
@@ -2123,6 +2281,8 @@ try {
     const raiz = crear("div");
     const juegos = todosLosJuegos(s).map((p, i) => ({ p, i }));
     const { mios, enVivo, porJugar, jugados } = gruposDeLaSemana(juegos, equipo);
+    const fiesta = fiestaActual();
+    const plato = fiesta && s.n === fiesta.semana ? platoDeFiesta : null;
 
     // Arriba lo que se está jugando y luego lo que falta. Lo ya jugado queda abajo,
     // del más reciente al más viejo, porque es consulta, no expectativa.
@@ -2133,7 +2293,7 @@ try {
       if (!lista.length) return;
       bloques.push({ etiqueta: titulo, seccion: true });
       lista.forEach((juego) => {
-        const etiqueta = juego.p.grupo || "Hora por definir";
+        const etiqueta = (plato ? plato(juego.p) : "") + (juego.p.grupo || "Hora por definir");
         const ultimo = bloques[bloques.length - 1];
         if (ultimo && !ultimo.suelto && !ultimo.seccion && ultimo.etiqueta === etiqueta) {
           ultimo.juegos.push(juego);
@@ -2795,10 +2955,14 @@ try {
     ctx.fillText("QUINIELA NFL " + D.anio, ANCHO - MARGEN, 74);
     ctx.textAlign = "left";
 
-    // El sello dorado con la semana, como boleta oficial.
+    // El sello dorado con la semana, como boleta oficial. El de Acción de Gracias, de otoño y con pavo.
     const radio = semana === null ? 0 : 92;
+    const deFiesta = semana !== null && !!D.fiesta && semana === D.fiesta.semana;
     if (semana !== null) {
       const sx = ANCHO - MARGEN - radio, sy = CAMPO - 148;
+      if (deFiesta) {
+        try { hojasEnLienzo(ctx, sx, sy, radio); } catch (e) { /* sin hojas, el sello sigue */ }
+      }
       ctx.save();
       ctx.translate(sx, sy);
       ctx.rotate(-0.2);
@@ -2806,18 +2970,18 @@ try {
       ctx.beginPath();
       ctx.arc(0, 0, radio, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = "#ffd60a";
+      ctx.strokeStyle = deFiesta ? "#F2A541" : "#ffd60a";
       ctx.lineWidth = 4;
       ctx.stroke();
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(0, 0, radio - 13, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.fillStyle = "#ffd60a";
+      ctx.fillStyle = deFiesta ? "#F6C85F" : "#ffd60a";
       ctx.textAlign = "center";
       ctx.font = cuerpo(800, 13);
       espaciado(0);
-      const anillo = "PICKS OFICIALES · ANGABAVE · " + D.anio + " · ";
+      const anillo = (deFiesta ? "ACCIÓN DE GRACIAS · ANGABAVE · " : "PICKS OFICIALES · ANGABAVE · ") + D.anio + " · ";
       for (let i = 0; i < anillo.length; i++) {
         ctx.save();
         ctx.rotate((i / anillo.length) * Math.PI * 2);
@@ -2828,6 +2992,9 @@ try {
       ctx.fillText("SEMANA", 0, -10);
       ctx.font = rotulo(58);
       ctx.fillText(String(semana), 0, 44);
+      if (deFiesta) {
+        try { ctx.drawImage(await imagenDeSvg(PAVO, 136), -17, -60, 34, 34); } catch (e) { /* sin pavo, el sello sigue */ }
+      }
       ctx.restore();
       ctx.textAlign = "left";
     }
@@ -2839,7 +3006,7 @@ try {
     espaciado(0);
     let tam = 96;
     ctx.font = rotulo(tam);
-    const ancholibre = ANCHO - MARGEN * 2 - radio * 2 - 20;
+    const ancholibre = ANCHO - MARGEN * 2 - radio * 2 - (deFiesta ? 56 : 20);
     while (tam > 40 && ctx.measureText(titular).width > ancholibre) ctx.font = rotulo(--tam);
     ctx.fillStyle = "#f3f6f4";
     ctx.fillText(titular, MARGEN, CAMPO - 38);
@@ -4397,6 +4564,11 @@ try {
     const caja = crear("div", "saludo fase-" + fase);
     const fecha = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
     const filaFecha = crear("div", "fecha", fecha.charAt(0).toUpperCase() + fecha.slice(1));
+    const fiesta = fiestaActual();
+    if (fiesta) {
+      const elDia = mismoDia(Date.parse(fiesta.dia + "T12:00:00"), Date.now());
+      caja.appendChild(listonDeFiesta(elDia ? "Feliz Día de Acción de Gracias" : "Semana de Acción de Gracias"));
+    }
     caja.appendChild(filaFecha);
     // Para ver el gol de campo cuando quieras: solo con nombre y sin movimiento reducido.
     const g = jugador !== null ? generalPorIdx.get(jugador) : null;
@@ -5253,6 +5425,8 @@ try {
       vivos ? "En vivo" : { pendiente: "Por cargar", en_vivo: "En curso", cerrada: "Cerrada" }[s.estado] || "");
     if (vivos && ultimaConsulta) estado.title = "Última consulta " + ultimaConsulta.toLocaleTimeString("es-MX");
     fila.appendChild(estado);
+    const fiesta = fiestaActual();
+    if (fiesta && n === fiesta.semana) fila.appendChild(listonDeFiesta("Acción de Gracias", true));
     if (n !== D.activa && porSemana.has(D.activa)) {
       const volver = crear("button", "volver-actual", "Ir a la semana " + D.activa);
       volver.type = "button";
@@ -6508,6 +6682,13 @@ try {
   document.addEventListener("visibilitychange", () => { if (!document.hidden) revisarVersion(); });
   window.addEventListener("online", revisarVersion);
   revisarVersion();
+
+  /* La semana de Acción de Gracias entra y se va sola, aunque la página siga abierta. */
+  let hayFiesta = aplicarFiesta();
+  setInterval(() => {
+    const ahora = aplicarFiesta();
+    if (ahora !== hayFiesta) { hayFiesta = ahora; repintarSinEstorbar(); }
+  }, 60000);
 
   /* sw.js se registra con la página ya a la vista, para no competirle a lo que falta por llegar.
      Si algo falla, el portal sigue igual, solo sin copia. */

@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.39.1"
+VERSION = "v0.40.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -660,6 +660,35 @@ def _tandas(partidos: list[Partido]) -> list[dict]:
             }
         )
     return tandas
+
+
+def _accion_de_gracias(anio: int) -> date:
+    """El Día de Acción de Gracias: el cuarto jueves de noviembre."""
+    primero = date(anio, 11, 1)
+    return primero + timedelta(days=(3 - primero.weekday()) % 7 + 21)
+
+
+def _fiesta(semanas: list[SemanaRender], anio: int) -> dict | None:
+    """La semana de Acción de Gracias, si ya está en el calendario.
+
+    El portal se viste de otoño desde el lunes de esa semana hasta las 06:00 del día siguiente
+    al último partido de la jornada; el navegador compara con su reloj, así que entra y se va
+    sola. Sin partidos ese jueves (o sin la semana todavía), no hay fiesta.
+    """
+    dia = _accion_de_gracias(anio)
+    for semana in semanas:
+        dias = [_dia_de(p) for p in semana.partidos if p.inicio is not None]
+        if dia in dias:
+            desde = datetime.combine(dia - timedelta(days=3), time(0, 0), ZONA_CDMX)
+            hasta = datetime.combine(max(dias) + timedelta(days=1), time(6, 0), ZONA_CDMX)
+            return {
+                "clave": "accion-de-gracias",
+                "semana": semana.numero,
+                "dia": dia.isoformat(),
+                "desde": int(desde.timestamp()),
+                "hasta": int(hasta.timestamp()),
+            }
+    return None
 
 
 def _orden_nfl(partidos: list[Partido]) -> list[int]:
@@ -1427,6 +1456,8 @@ def generar_html(
         "correo": CORREO_ORGANIZADOR,
         # El archivo del cierre para el calendario, si esta semana lo hay.
         "recordatorio": plan_recordatorio,
+        # La semana de Acción de Gracias: cuándo se viste de otoño el portal.
+        "fiesta": _fiesta(semanas, anio),
         # Capa en vivo: el navegador consulta ESPN directo. Solo refresca el
         # marcador de partidos que aquí siguen abiertos; jamás cierra uno ni
         # toca el conteo oficial, que se calcula en CI y ya está probado.

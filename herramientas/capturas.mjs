@@ -151,6 +151,10 @@ const pantallas = [
   // El portal tal como está hoy, con nombre elegido.
   { n: "hoy", p: "/index.html", h: "#hoy", yo: YO },
   { n: "hoy-sin-nombre", p: "/index.html", h: "#hoy" },
+  // La semana de Acción de Gracias, a la fuerza (?fiesta=1): hojas, listón y Semana como menú.
+  { n: "fiesta-hoy", p: "/index.html?fiesta=1", h: "#hoy", yo: YO },
+  { n: "fiesta-semana", p: "/index.html?fiesta=1", h: "#hoy", yo: YO,
+    pasos: ["location.hash = '#s' + JSON.parse(document.getElementById('datos').textContent).fiesta.semana", PESTANA("Partidos")] },
   { n: "picks", p: "/index.html", h: "#picks", yo: YO },
   { n: "picks-abajo", p: "/index.html", h: "#picks", yo: YO, pasos: [ABAJO(760)] },
   { n: "semana-partidos", p: "/index.html", h: "#s8", yo: YO, pasos: [PESTANA("Partidos")] },

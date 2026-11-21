@@ -9,6 +9,13 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.40.0
+
+* **La semana de Acción de Gracias.** Del lunes 23 de noviembre a la mañana del martes 1 de diciembre el portal se viste de otoño: hojas que caen sobre el campo (tres veces, y se van) y otras que se quedan en el pasto, luces del estadio más cálidas y un listón con un pavo arriba de Hoy, que el jueves 26 dice "Feliz Día de Acción de Gracias". Pasada la semana vuelve solo a como estaba, aunque la página siga abierta.
+* **La semana 12, como menú.** En Partidos, los horarios de esa semana se leen como un menú: "Entrada" el miércoles, "Plato fuerte" el jueves, "Postre" el viernes y "Recalentado" el domingo y el lunes. Junto al estado de la semana va el listón de Acción de Gracias.
+* **La boleta conmemorativa.** La imagen de picks de la semana 12 lleva el sello en color de otoño con el pavo, "ACCIÓN DE GRACIAS" en el anillo y hojas alrededor. Quien gane la semana 12 recibe confeti de hojas.
+* Con movimiento reducido no caen hojas; solo quedan las del pasto. Los cierres no cambian: los cinco partidos de antes del domingo cierran juntos el martes 24 a las 23:59.
+
 ## v0.39.1
 
 * El botón de Hoy para ver el gol de campo dice "FG" en vez de "Gol".
