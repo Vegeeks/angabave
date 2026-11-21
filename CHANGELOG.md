@@ -9,6 +9,13 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.41.0
+
+* **Navidad hasta año nuevo.** Desde hoy y hasta la mañana del 2 de enero, menos la semana de Acción de Gracias, el portal se viste de navidad: nieve que no para de caer sobre el campo, estrellas que destellan en el cielo del estadio, gorro de Santa en la A, nieve sobre tu barra, la zona de anotación de rojo y una serie de focos de colores colgada de la línea amarilla que prenden uno tras otro.
+* **Tus aciertos y errores, foquitos.** En "Tu semana" cada partido es un foquito: verde lo que le atinaste, rojo lo que no, parpadeando lo que se está jugando y apagado lo que falta. La marca de cada partido (✓ o ✕) también se vuelve foquito, y la imagen de "Mi semana" de una semana navideña trae su serie.
+* **El listón** dice "Felices fiestas" ("Feliz Navidad" el 24 y 25 de diciembre, "Feliz Año Nuevo" el 31 y el 1.º), en Hoy y junto al estado de las semanas navideñas: de la 11 en adelante, menos la 12. La imagen de picks de esas semanas lleva el sello con aro rojo, "FELICES FIESTAS", un pino y copos alrededor; quien gana una de ellas recibe confeti rojo, verde, dorado y blanco.
+* Acción de Gracias manda en su semana: del lunes 23 de noviembre a la mañana del martes 1 de diciembre se ve como en la v0.40. Con movimiento reducido no cae nieve ni parpadea nada.
+
 ## v0.40.0
 
 * **La semana de Acción de Gracias.** Del lunes 23 de noviembre a la mañana del martes 1 de diciembre el portal se viste de otoño: hojas que caen sobre el campo (tres veces, y se van) y otras que se quedan en el pasto, luces del estadio más cálidas y un listón con un pavo arriba de Hoy, que el jueves 26 dice "Feliz Día de Acción de Gracias". Pasada la semana vuelve solo a como estaba, aunque la página siga abierta.

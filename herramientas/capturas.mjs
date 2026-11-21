@@ -151,10 +151,14 @@ const pantallas = [
   // El portal tal como está hoy, con nombre elegido.
   { n: "hoy", p: "/index.html", h: "#hoy", yo: YO },
   { n: "hoy-sin-nombre", p: "/index.html", h: "#hoy" },
-  // La semana de Acción de Gracias, a la fuerza (?fiesta=1): hojas, listón y Semana como menú.
-  { n: "fiesta-hoy", p: "/index.html?fiesta=1", h: "#hoy", yo: YO },
-  { n: "fiesta-semana", p: "/index.html?fiesta=1", h: "#hoy", yo: YO,
-    pasos: ["location.hash = '#s' + JSON.parse(document.getElementById('datos').textContent).fiesta.semana", PESTANA("Partidos")] },
+  // La semana de Acción de Gracias, a la fuerza (?fiesta=accion-de-gracias): hojas, listón y Semana como menú.
+  { n: "fiesta-hoy", p: "/index.html?fiesta=accion-de-gracias", h: "#hoy", yo: YO },
+  { n: "fiesta-semana", p: "/index.html?fiesta=accion-de-gracias", h: "#hoy", yo: YO,
+    pasos: ["location.hash = '#s' + JSON.parse(document.getElementById('datos').textContent).fiestas[0].semanas[0]", PESTANA("Partidos")] },
+  // Navidad (?fiesta=navidad): nieve, focos en la línea amarilla y el listón con el pino.
+  { n: "navidad-hoy", p: "/index.html?fiesta=navidad", h: "#hoy", yo: YO },
+  { n: "navidad-semana", p: "/index.html?fiesta=navidad", h: "#hoy", yo: YO,
+    pasos: ["location.hash = '#s' + JSON.parse(document.getElementById('datos').textContent).fiestas.find((f) => f.clave === 'navidad').semanas[0]", PESTANA("Partidos")] },
   { n: "picks", p: "/index.html", h: "#picks", yo: YO },
   { n: "picks-abajo", p: "/index.html", h: "#picks", yo: YO, pasos: [ABAJO(760)] },
   { n: "semana-partidos", p: "/index.html", h: "#s8", yo: YO, pasos: [PESTANA("Partidos")] },

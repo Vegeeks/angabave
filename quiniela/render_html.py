@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.40.0"
+VERSION = "v0.41.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -668,27 +668,43 @@ def _accion_de_gracias(anio: int) -> date:
     return primero + timedelta(days=(3 - primero.weekday()) % 7 + 21)
 
 
-def _fiesta(semanas: list[SemanaRender], anio: int) -> dict | None:
-    """La semana de Acción de Gracias, si ya está en el calendario.
+def _fiestas(semanas: list[SemanaRender], anio: int) -> list[dict]:
+    """Las temporadas con diseño propio, en orden de preferencia: si dos caen el mismo día, manda la primera.
 
-    El portal se viste de otoño desde el lunes de esa semana hasta las 06:00 del día siguiente
-    al último partido de la jornada; el navegador compara con su reloj, así que entra y se va
-    sola. Sin partidos ese jueves (o sin la semana todavía), no hay fiesta.
+    Acción de Gracias es su semana (la que trae partidos el cuarto jueves de noviembre), del lunes
+    hasta las 06:00 del día siguiente al último partido. Navidad va del 15 de noviembre a las 06:00
+    del 2 de enero, con las semanas que arrancan en ese tramo, menos la de Acción de Gracias. Las
+    semanas sirven para la boleta y el confeti; las fechas, para lo demás. El navegador compara con
+    su reloj, así que entran y se van solas.
     """
+    fiestas = []
     dia = _accion_de_gracias(anio)
+    de_gracias = None
     for semana in semanas:
         dias = [_dia_de(p) for p in semana.partidos if p.inicio is not None]
         if dia in dias:
-            desde = datetime.combine(dia - timedelta(days=3), time(0, 0), ZONA_CDMX)
-            hasta = datetime.combine(max(dias) + timedelta(days=1), time(6, 0), ZONA_CDMX)
-            return {
+            de_gracias = semana.numero
+            fiestas.append({
                 "clave": "accion-de-gracias",
-                "semana": semana.numero,
+                "semanas": [semana.numero],
                 "dia": dia.isoformat(),
-                "desde": int(desde.timestamp()),
-                "hasta": int(hasta.timestamp()),
-            }
-    return None
+                "desde": int(datetime.combine(dia - timedelta(days=3), time(0, 0), ZONA_CDMX).timestamp()),
+                "hasta": int(datetime.combine(max(dias) + timedelta(days=1), time(6, 0), ZONA_CDMX).timestamp()),
+            })
+            break
+    desde, hasta = date(anio, 11, 15), date(anio + 1, 1, 2)
+    navidenas = []
+    for semana in semanas:
+        dias = [_dia_de(p) for p in semana.partidos if p.inicio is not None]
+        if dias and semana.numero != de_gracias and desde <= min(dias) < hasta:
+            navidenas.append(semana.numero)
+    fiestas.append({
+        "clave": "navidad",
+        "semanas": navidenas,
+        "desde": int(datetime.combine(desde, time(0, 0), ZONA_CDMX).timestamp()),
+        "hasta": int(datetime.combine(hasta, time(6, 0), ZONA_CDMX).timestamp()),
+    })
+    return fiestas
 
 
 def _orden_nfl(partidos: list[Partido]) -> list[int]:
@@ -1456,8 +1472,8 @@ def generar_html(
         "correo": CORREO_ORGANIZADOR,
         # El archivo del cierre para el calendario, si esta semana lo hay.
         "recordatorio": plan_recordatorio,
-        # La semana de Acción de Gracias: cuándo se viste de otoño el portal.
-        "fiesta": _fiesta(semanas, anio),
+        # Acción de Gracias y navidad: cuándo se viste el portal y qué semanas llevan su boleta.
+        "fiestas": _fiestas(semanas, anio),
         # Capa en vivo: el navegador consulta ESPN directo. Solo refresca el
         # marcador de partidos que aquí siguen abiertos; jamás cierra uno ni
         # toca el conteo oficial, que se calcula en CI y ya está probado.

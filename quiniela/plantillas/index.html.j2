@@ -543,20 +543,27 @@ main{view-transition-name:contenido; min-height:60vh}
   animation:caer var(--d) cubic-bezier(.25,.5,.5,1) forwards}
 @keyframes caer{0%{opacity:0; transform:translate3d(0,-20px,0) rotate(0)} 8%{opacity:1} 80%{opacity:1}
   100%{opacity:0; transform:translate3d(var(--x),105vh,0) rotate(var(--r))}}
-/* ═══ la semana de Acción de Gracias ═══
-   Solo mientras dura (html[data-fiesta], lo pone el guión con D.fiesta): hojas de otoño que caen
-   sobre el campo y unas que ya se quedaron en el pasto, luces de estadio cálidas, un listón con el
-   pavo en Hoy y en la semana, y Semana leída como menú. Todo vive detrás de la página: no tapa nada. */
+/* ═══ las fiestas: Acción de Gracias y navidad ═══
+   Solo mientras duran (html[data-fiesta], lo pone el guión con D.fiestas). En Acción de Gracias, hojas
+   de otoño que caen sobre el campo y unas quietas en las orillas, y luces de estadio cálidas; en
+   navidad, nieve y una serie de focos colgada de la línea amarilla. En las dos, un listón en Hoy y en
+   la semana. Todo vive detrás de la página: no tapa nada. */
 .arce{--forma:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5L13.4 4.6 15.8 3.6 15.3 7.2 19.2 6 17.6 9.6 21 11.2 17.4 13.2 18.4 15.8 14.6 15 13 17.8H12.5V22.5H11.5V17.8H11L9.4 15 5.6 15.8 6.6 13.2 3 11.2 6.4 9.6 4.8 6 8.7 7.2 8.2 3.6 10.6 4.6Z'/%3E%3C/svg%3E")}
 .roble{--forma:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M12 2C17.2 6 19.6 11.4 17.4 16.6 15.9 20 13.6 21.4 12 22.2 10.4 21.4 8.1 20 6.6 16.6 4.4 11.4 6.8 6 12 2ZM11.6 6.5V21H12.4V6.5Z'/%3E%3C/svg%3E")}
-.arce,.roble{-webkit-mask-image:var(--forma); mask-image:var(--forma); -webkit-mask-size:contain; mask-size:contain;
+.copo{--forma:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M12 2V22M3.34 7 20.66 17M3.34 17 20.66 7M9.4 4.2 12 6.6 14.6 4.2M17.46 5.85 16.68 9.3 20.06 10.35M20.06 13.65 16.68 14.7 17.46 18.15M14.6 19.8 12 17.4 9.4 19.8M6.54 18.15 7.32 14.7 3.94 13.65M3.94 10.35 7.32 9.3 6.54 5.85'/%3E%3C/svg%3E")}
+.chispa{--forma:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C12.9 7 17 11.1 24 12 17 12.9 12.9 17 12 24 11.1 17 7 12.9 0 12 7 11.1 11.1 7 12 0Z'/%3E%3C/svg%3E")}
+.arce,.roble,.copo,.chispa{-webkit-mask-image:var(--forma); mask-image:var(--forma); -webkit-mask-size:contain; mask-size:contain;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; -webkit-mask-position:center; mask-position:center}
 .fiesta{position:absolute; inset:0; overflow:hidden; pointer-events:none}
-.estreno .fiesta{visibility:hidden}
+.estreno .fiesta,.estreno .fiesta-luces{visibility:hidden}
 .fiesta .cae{position:absolute; top:-28px; animation:hoja-cae var(--d) ease-in-out var(--t) 3}
 .fiesta .cae.otra{animation-name:hoja-cae-otra}
+/* En navidad la nieve no para (salvo con movimiento reducido): es lo que más se nota. */
+.fiesta .cae.nieve{animation-name:copo-cae; animation-iteration-count:infinite}
 .fiesta .hoja{display:block; width:calc(18px * var(--s)); height:calc(18px * var(--s))}
 .fiesta .quieta{position:absolute; opacity:.9}
+.fiesta .copo,.fiesta .bolita{display:block; background:#F3F6F4}
+.fiesta .bolita{border-radius:50%; background:radial-gradient(circle, #fff 0 45%, rgba(255,255,255,0) 75%)}
 @keyframes hoja-cae{0%{transform:translate3d(0,0,0) rotate(0deg); opacity:0} 6%{opacity:.85}
   25%{transform:translate3d(18px,150px,0) rotate(70deg)} 50%{transform:translate3d(-14px,300px,0) rotate(160deg)}
   75%{transform:translate3d(12px,450px,0) rotate(250deg)} 92%{opacity:.85}
@@ -565,11 +572,60 @@ main{view-transition-name:contenido; min-height:60vh}
   25%{transform:translate3d(-16px,150px,0) rotate(-60deg)} 50%{transform:translate3d(14px,300px,0) rotate(-150deg)}
   75%{transform:translate3d(-12px,450px,0) rotate(-230deg)} 92%{opacity:.85}
   100%{transform:translate3d(8px,620px,0) rotate(-300deg); opacity:0}}
-@media (prefers-reduced-motion:reduce){.fiesta .cae{display:none}}
-html[data-fiesta] .cancha .luz{filter:sepia(1) saturate(2.2) hue-rotate(-14deg)}
+@keyframes copo-cae{0%{transform:translate3d(0,0,0) rotate(0deg); opacity:0} 8%{opacity:.75}
+  25%{transform:translate3d(8px,150px,0) rotate(30deg)} 50%{transform:translate3d(-6px,300px,0) rotate(60deg)}
+  75%{transform:translate3d(7px,450px,0) rotate(90deg)} 92%{opacity:.75}
+  100%{transform:translate3d(-4px,620px,0) rotate(120deg); opacity:0}}
+.fiesta-luces{position:absolute; left:0; right:0; top:var(--alto-campo); height:20px; z-index:-1; overflow:hidden; pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='10' viewBox='0 0 28 10'%3E%3Cpath d='M0 .8Q14 8 28 .8' fill='none' stroke='%23566a5e' stroke-width='1.3'/%3E%3C/svg%3E") repeat-x 0 0/28px 10px}
+/* Cada foco: vidrio con brillo, su casquillo y un resplandor de su color. Prenden y bajan uno tras otro. */
+.foco{position:absolute; top:2px; width:6px; height:9px; margin-left:-3px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #fff 0 14%, var(--c) 48%, var(--c2) 100%);
+  animation:titila 1.2s ease-in-out var(--t) infinite alternate}
+.foco::before{content:""; position:absolute; left:1px; top:-2px; width:4px; height:3px; border-radius:2px; background:#4a544f}
+.foco::after{content:""; position:absolute; left:50%; top:50%; width:24px; height:24px; margin:-12px 0 0 -12px; border-radius:50%;
+  background:radial-gradient(circle, var(--g) 0, transparent 70%)}
+@keyframes titila{from{opacity:.45} to{opacity:1}}
+/* Estrellas que destellan en el cielo del estadio. */
+.fiesta .destello{position:absolute; display:block; background:#FFF3C4; animation:destello 2.6s ease-in-out var(--t) infinite}
+@keyframes destello{0%,100%{opacity:.15; transform:scale(.55)} 50%{opacity:1; transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.fiesta .cae{display:none} .foco,.fiesta .destello{animation:none}}
+/* Navidad en lo de siempre: la zona de anotación de rojo, gorro de Santa en la A, nieve sobre tu barra. */
+html[data-fiesta="navidad"] .cp-zona{fill:#B3121F}
+html[data-fiesta="navidad"] .logo{position:relative}
+html[data-fiesta="navidad"] .logo::before{content:""; position:absolute; left:5px; top:-6px; width:24px; height:20px; z-index:1;
+  transform:rotate(-14deg); pointer-events:none; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 20'%3E%3Cpath d='M3 14C6 6 11 2.5 16.5 2.8 19.5 3 21 5.5 20.5 8.5L19.6 13Z' fill='%23D7263D'/%3E%3Cpath d='M5.2 13.2C7.6 7.6 11.4 4.6 15.6 4.4' fill='none' stroke='%23ff6b74' stroke-width='1.2' stroke-linecap='round'/%3E%3Ccircle cx='21' cy='10.6' r='2.5' fill='%23F3F6F4'/%3E%3Cpath d='M2.5 13.2h18.5a2.2 2.2 0 0 1 0 4.4H2.5a2.2 2.2 0 0 1 0-4.4z' fill='%23F3F6F4'/%3E%3C/svg%3E") center/contain no-repeat}
+html[data-fiesta="navidad"] .mi-barra-yo::before{content:""; position:absolute; left:0; right:0; top:0; height:7px; pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 7'%3E%3Cpath d='M0 0H24V5C22 6.4 20 4.4 18 5.4 16 6.6 14 4.4 12 5.4 10 6.6 8 4.4 6 5.4 4 6.6 2 4.4 0 5Z' fill='%23F3F6F4'/%3E%3C/svg%3E") repeat-x 0 0/24px 7px}
+/* Tus aciertos y errores, foquitos: verde lo que le atinaste, rojo lo que no, parpadea lo que se está
+   jugando y apagado lo que falta. Cuelgan de su cable como una serie. */
+html[data-fiesta="navidad"] .progreso-semana{gap:0; align-items:stretch}
+html[data-fiesta="navidad"] .progreso-semana i{position:relative; height:26px; box-shadow:none; opacity:1;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 8'%3E%3Cpath d='M0 1Q10 9 20 1' fill='none' stroke='%23566a5e' stroke-width='1.3' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") 0 0/100% 8px no-repeat}
+html[data-fiesta="navidad"] .progreso-semana i::before{content:""; position:absolute; left:50%; top:7px; width:9px; height:13px; margin-left:-4.5px;
+  border-radius:50%; background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.3) 0 14%, #39433e 58%, #262d29 100%)}
+html[data-fiesta="navidad"] .progreso-semana i::after{content:""; position:absolute; left:50%; top:4px; width:5px; height:4px; margin-left:-2.5px;
+  border-radius:2px; background:#59605c}
+html[data-fiesta="navidad"] .progreso-semana :is(.ok,.gana){--c:#2BD67B; --c2:#11884A; --g:rgba(43,214,123,.5)}
+html[data-fiesta="navidad"] .progreso-semana :is(.mal,.pierde){--c:#FF3B47; --c2:#B3121F; --g:rgba(255,59,71,.55)}
+html[data-fiesta="navidad"] .progreso-semana .juega{--c:#FFD60A; --c2:#C9A100; --g:rgba(255,214,10,.5)}
+html[data-fiesta="navidad"] .progreso-semana :is(.ok,.mal,.gana,.pierde,.juega){
+  background:radial-gradient(circle at 50% 14px, var(--g) 0, transparent 13px), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 8'%3E%3Cpath d='M0 1Q10 9 20 1' fill='none' stroke='%23566a5e' stroke-width='1.3' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") 0 0/100% 8px no-repeat}
+html[data-fiesta="navidad"] .progreso-semana :is(.ok,.mal,.gana,.pierde,.juega)::before{
+  background:radial-gradient(circle at 35% 30%, #fff 0 14%, var(--c) 48%, var(--c2) 100%)}
+html[data-fiesta="navidad"] .progreso-semana :is(.gana,.pierde,.juega)::before{animation:titila .8s ease-in-out infinite alternate}
+html[data-fiesta="navidad"] .juego-fila .fila-marca{position:relative; align-self:center; width:9px; height:13px; margin:2px 0 0 4px;
+  color:transparent; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff 0 14%, var(--c) 48%, var(--c2) 100%)}
+html[data-fiesta="navidad"] .juego-fila .fila-marca::before{content:""; position:absolute; left:2px; top:-3px; width:5px; height:4px;
+  border-radius:2px; background:#59605c}
+html[data-fiesta="navidad"] .juego-fila .fila-marca.bien{--c:#2BD67B; --c2:#11884A; --g:rgba(43,214,123,.5)}
+html[data-fiesta="navidad"] .juego-fila .fila-marca.mal{--c:#FF3B47; --c2:#B3121F; --g:rgba(255,59,71,.55)}
+@media (prefers-reduced-motion:reduce){html[data-fiesta="navidad"] .progreso-semana :is(.gana,.pierde,.juega)::before{animation:none}}
+html[data-fiesta="accion-de-gracias"] .cancha .luz{filter:sepia(1) saturate(2.2) hue-rotate(-14deg)}
 .saludo p.liston-fiesta,.liston-fiesta{display:inline-flex; align-items:center; gap:8px; max-width:none; margin:0 0 8px;
   padding:3px 12px 3px 4px; border-radius:99px; border:1px solid rgba(242,165,65,.6); background:rgba(36,14,4,.62);
   color:#F6C85F; font-size:var(--t6); line-height:1.2; font-weight:700; letter-spacing:.02em}
+.saludo p.liston-fiesta.navidad,.liston-fiesta.navidad{border-color:#FFD60A; background:#C8102E; color:#fff}
 .liston-fiesta svg{flex:none; width:28px; height:28px}
 .liston-fiesta.chico{margin:0; padding:1px 10px 1px 2px; gap:4px}
 .liston-fiesta.chico svg{width:22px; height:22px}
@@ -1970,24 +2026,45 @@ try {
   }
   const partidosDe = (s) => s.partidos.map(efectivo);
 
-  /* ═══ la semana de Acción de Gracias ═══
-     Solo esos días el portal se viste de otoño. Python calcula la ventana con el calendario
-     (D.fiesta: del lunes de esa semana a la mañana siguiente al último partido de la jornada)
-     y aquí solo se compara con la hora del teléfono: entra y se va sola, aunque la página siga
-     abierta. Con ?fiesta=1 se ve antes, para revisarla. */
-  const FIESTA_FORZADA = /[?&]fiesta=1(&|$)/.test(location.search);
-  function fiestaVigente(f, ahora, forzada) {
-    if (!f) return null;
-    return forzada || (ahora >= f.desde * 1000 && ahora < f.hasta * 1000) ? f : null;
+  /* ═══ las fiestas ═══
+     Acción de Gracias y navidad visten el portal solo en sus días. Python calcula las ventanas con el
+     calendario (D.fiestas, en orden de preferencia: si dos caen el mismo día, manda la primera) y aquí
+     solo se comparan con la hora del teléfono: entran y se van solas, aunque la página siga abierta.
+     ?fiesta=navidad o ?fiesta=accion-de-gracias muestran una antes de tiempo; ?fiesta=1, la primera. */
+  const FIESTA_PEDIDA = (/[?&]fiesta=([a-z0-9-]+)/.exec(location.search) || [])[1] || null;
+  function fiestaDe(lista, ahora, pedida) {
+    if (!lista || !lista.length) return null;
+    if (pedida) return pedida === "1" ? lista[0] : lista.find((f) => f.clave === pedida) || null;
+    return lista.find((f) => ahora >= f.desde * 1000 && ahora < f.hasta * 1000) || null;
   }
-  const fiestaActual = () => fiestaVigente(D.fiesta, Date.now(), FIESTA_FORZADA);
+  const fiestaActual = () => fiestaDe(D.fiestas, Date.now(), FIESTA_PEDIDA);
+  // La boleta y el confeti son de la semana, no de la fecha: la boleta de esa semana es conmemorativa.
+  const fiestaDeSemana = (n) => (D.fiestas || []).find((f) => f.semanas.includes(n)) || null;
+  const NOMBRE_FIESTA = { "accion-de-gracias": "Acción de Gracias", navidad: "Felices fiestas" };
+  // Lo que dice el listón de Hoy; en sus días, la felicitación.
+  function textoDeFiesta(f, ahora) {
+    if (f.clave === "accion-de-gracias") {
+      return mismoDia(Date.parse(f.dia + "T12:00:00"), ahora) ? "Feliz Día de Acción de Gracias" : "Semana de Acción de Gracias";
+    }
+    const d = new Date(ahora), mes = d.getMonth(), dia = d.getDate();
+    if (mes === 11 && (dia === 24 || dia === 25)) return "Feliz Navidad";
+    if ((mes === 11 && dia === 31) || (mes === 0 && dia === 1)) return "Feliz Año Nuevo";
+    return "Felices fiestas";
+  }
   const OTONO = ["#F6C85F", "#F2A541", "#E4572E", "#B23A48", "#9C5B33"];
+  const NAVIDAD = ["#D7263D", "#2BB673", "#ffd60a", "#F3F6F4"];
+  // Los focos de la serie: [color, orilla oscura, resplandor].
+  const FOCOS = [["#FF3B47", "#B3121F", "rgba(255,59,71,.55)"], ["#2BD67B", "#11884A", "rgba(43,214,123,.5)"],
+    ["#FFD60A", "#C9A100", "rgba(255,214,10,.5)"], ["#3FC5FF", "#1C7FB8", "rgba(63,197,255,.5)"],
+    ["#FFF1C1", "#D9C27A", "rgba(255,241,193,.5)"]];
   // Las mismas hojas que recorta el CSS (.arce y .roble): aquí sirven para la imagen de picks.
   const HOJA = {
     arce: "M12 1.5L13.4 4.6 15.8 3.6 15.3 7.2 19.2 6 17.6 9.6 21 11.2 17.4 13.2 18.4 15.8 14.6 15 13 17.8H12.5V22.5H11.5V17.8H11L9.4 15 5.6 15.8 6.6 13.2 3 11.2 6.4 9.6 4.8 6 8.7 7.2 8.2 3.6 10.6 4.6Z",
     roble: "M12 2C17.2 6 19.6 11.4 17.4 16.6 15.9 20 13.6 21.4 12 22.2 10.4 21.4 8.1 20 6.6 16.6 4.4 11.4 6.8 6 12 2ZM11.6 6.5V21H12.4V6.5Z",
   };
-  // El pavo de la semana: plumas de otoño, cuerpo café, pico y moco. Igual en la página y en la imagen.
+  // El copo del CSS (.copo), con trazo: seis brazos, cada uno con su rama.
+  const COPO = "M12 2V22M3.34 7 20.66 17M3.34 17 20.66 7M9.4 4.2 12 6.6 14.6 4.2M17.46 5.85 16.68 9.3 20.06 10.35M20.06 13.65 16.68 14.7 17.46 18.15M14.6 19.8 12 17.4 9.4 19.8M6.54 18.15 7.32 14.7 3.94 13.65M3.94 10.35 7.32 9.3 6.54 5.85";
+  // El pavo de Acción de Gracias: plumas de otoño, cuerpo café, pico y moco. Igual en la página y en la imagen.
   const PAVO = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">' +
     '<ellipse cx="11.93" cy="23.76" rx="4.6" ry="12" transform="rotate(-75 11.93 23.76)" fill="#B23A48"/>' +
     '<ellipse cx="14.42" cy="18.97" rx="4.6" ry="12" transform="rotate(-50 14.42 18.97)" fill="#E4572E"/>' +
@@ -2012,6 +2089,21 @@ try {
     '<path d="M22.6 21.7h2.8L24 24.3z" fill="#F6C85F"/>' +
     '<path d="M25 22.3c1.5.6 2 2.4 1 3.4-.8.7-1.9.1-1.8-1z" fill="#D7263D"/>' +
     '</svg>';
+  // El pino de navidad: tres pisos, esferas, guirnalda y estrella.
+  const ARBOL = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">' +
+    '<path d="M24 20 38 36H10Z" fill="#17804C"/>' +
+    '<path d="M24 14 34.5 27H13.5Z" fill="#1F9D5F"/>' +
+    '<path d="M24 9 31.5 19H16.5Z" fill="#2BB673"/>' +
+    '<path d="M21.5 36h5v6h-5z" fill="#8A4520"/>' +
+    '<path d="M17 25.5Q24 28.5 31 24.5" fill="none" stroke="#F6C85F" stroke-width="1"/>' +
+    '<circle cx="20" cy="24.5" r="1.6" fill="#D7263D"/>' +
+    '<circle cx="28.5" cy="30" r="1.6" fill="#F6C85F"/>' +
+    '<circle cx="22.5" cy="32" r="1.4" fill="#4CC9F0"/>' +
+    '<circle cx="26.5" cy="21.5" r="1.3" fill="#F3F6F4"/>' +
+    '<circle cx="17" cy="33" r="1.3" fill="#F6C85F"/>' +
+    '<circle cx="31" cy="33.5" r="1.4" fill="#D7263D"/>' +
+    '<path d="M24 1.9 25.12 4.96 28.37 5.08 25.81 7.09 26.7 10.22 24 8.4 21.3 10.22 22.19 7.09 19.63 5.08 22.88 4.96Z" fill="#F6C85F"/>' +
+    '</svg>';
   // [izquierda %, tamaño, duración s, retraso s, forma, color, al revés]: caen tres veces y se van.
   const HOJAS_QUE_CAEN = [
     [6, 1, 11, -1, "arce", 1, 0], [17, 0.8, 13, -6, "roble", 3, 1], [28, 1.15, 10, -3, "arce", 2, 0],
@@ -2025,9 +2117,33 @@ try {
     [-3, 10, 1, -25, "arce", 2], [-1, 1, 0.7, 60, "roble", 0],
     [97, 12, 0.85, 15, "arce", 3], [98.5, 1, 0.75, -40, "roble", 1],
   ];
-  function capaDeFiesta() {
+  // La nieve, sin parar: [izquierda %, tamaño px, duración s, retraso s, forma]. Repartida a mano con una
+  // cuenta fija (sin azar), para que se vea igual cada vez.
+  const COPOS = Array.from({ length: 26 }, (_, k) => [(k * 37 + 7) % 100, k % 2 ? 3 + ((k * 3) % 4) : 8 + ((k * 5) % 7),
+    9 + ((k * 5) % 8), -((k * 3.3) % 12), k % 2 ? "bolita" : "copo"]);
+  // Las estrellas del cielo: [izquierda %, arriba px, tamaño px, retraso s].
+  const DESTELLOS = [[12, 8, 8, 0], [26, 40, 6, -1.2], [38, 14, 9, -2.1], [52, 50, 6, -0.6], [61, 6, 7, -1.7],
+    [74, 34, 10, -2.6], [86, 10, 6, -0.9], [95, 46, 8, -2.2]];
+  function capaDeFiesta(f) {
     const capa = crear("div", "fiesta");
     capa.setAttribute("aria-hidden", "true");
+    capa.dataset.clave = f.clave;
+    if (f.clave === "navidad") {
+      if (!suave) COPOS.forEach(([x, tam, dura, desde, forma]) => {
+        const cae = crear("span", "cae nieve");
+        cae.style.cssText = "left:" + x + "%;--d:" + dura + "s;--t:" + desde + "s";
+        const copo = crear("i", forma);
+        copo.style.cssText = "width:" + tam + "px;height:" + tam + "px";
+        cae.appendChild(copo);
+        capa.appendChild(cae);
+      });
+      DESTELLOS.forEach(([x, arriba, tam, desde]) => {
+        const chispa = crear("i", "destello chispa");
+        chispa.style.cssText = "left:" + x + "%;top:" + arriba + "px;width:" + tam + "px;height:" + tam + "px;--t:" + desde + "s";
+        capa.appendChild(chispa);
+      });
+      return capa;
+    }
     if (!suave) HOJAS_QUE_CAEN.forEach(([x, tam, dura, desde, forma, color, otra]) => {
       const cae = crear("span", "cae" + (otra ? " otra" : ""));
       cae.style.cssText = "left:" + x + "%;--d:" + dura + "s;--t:" + desde + "s";
@@ -2043,22 +2159,43 @@ try {
     });
     return capa;
   }
-  /* Pone o quita la fiesta: la marca en <html> y las hojas detrás del campo. Dice si está puesta. */
-  function aplicarFiesta() {
-    const f = fiestaActual(), raiz = document.documentElement;
-    const capa = document.querySelector(".cancha .fiesta"), cancha = document.querySelector(".cancha");
-    if (f) {
-      raiz.dataset.fiesta = f.clave;
-      if (!capa && cancha) cancha.appendChild(capaDeFiesta());
-    } else {
-      delete raiz.dataset.fiesta;
-      if (capa) capa.remove();
+  // La serie de focos que cuelga de la línea amarilla en navidad: prenden y bajan uno tras otro, sin parar.
+  // Tantos como quepan en lo más ancho de la pantalla, para que al girar el teléfono no falten.
+  function lucesDeNavidad() {
+    const serie = crear("div", "fiesta-luces");
+    serie.setAttribute("aria-hidden", "true");
+    const cuantos = Math.ceil(Math.max(window.innerWidth, screen.width || 0, screen.height || 0) / 28) + 1;
+    for (let k = 0; k < cuantos; k++) {
+      const [c, c2, g] = FOCOS[k % FOCOS.length];
+      const foco = crear("i", "foco");
+      foco.style.cssText = "left:" + (14 + 28 * k) + "px;--c:" + c + ";--c2:" + c2 + ";--g:" + g + ";--t:" + (-(k % 8) * 0.15).toFixed(2) + "s";
+      serie.appendChild(foco);
     }
-    return !!f;
+    return serie;
   }
-  function listonDeFiesta(texto, chico) {
-    const liston = crear(chico ? "span" : "p", "liston-fiesta" + (chico ? " chico" : ""));
-    liston.innerHTML = PAVO;
+  /* Pone o quita la fiesta del momento: la marca en <html>, lo que cae detrás del campo y, en navidad,
+     los focos. Si cambia de fiesta, cambia todo. Regresa la clave de la que quedó puesta. */
+  function aplicarFiesta() {
+    const f = fiestaActual(), raiz = document.documentElement, cancha = document.querySelector(".cancha");
+    const puesta = document.querySelector(".cancha .fiesta");
+    if (puesta && (!f || puesta.dataset.clave !== f.clave)) {
+      puesta.remove();
+      document.querySelectorAll(".fiesta-luces").forEach((n) => n.remove());
+    }
+    if (!f) {
+      delete raiz.dataset.fiesta;
+      return null;
+    }
+    raiz.dataset.fiesta = f.clave;
+    if (cancha && !document.querySelector(".cancha .fiesta")) {
+      cancha.appendChild(capaDeFiesta(f));
+      if (f.clave === "navidad") cancha.after(lucesDeNavidad());
+    }
+    return f.clave;
+  }
+  function listonDeFiesta(f, texto, chico) {
+    const liston = crear(chico ? "span" : "p", "liston-fiesta " + f.clave + (chico ? " chico" : ""));
+    liston.innerHTML = f.clave === "navidad" ? ARBOL : PAVO;
     liston.firstChild.setAttribute("aria-hidden", "true");
     liston.appendChild(crear("span", null, texto));
     return liston;
@@ -2084,6 +2221,68 @@ try {
       ctx.restore();
     });
   }
+  // Copos de nieve alrededor del sello de la boleta en navidad: [ángulo, tamaño].
+  const COPOS_DEL_SELLO = [[1.2, 1.5], [1.9, 1.1], [2.5, 1.7], [3.1, 1.2], [3.7, 1.5], [4.3, 1.1]];
+  function coposEnLienzo(ctx, x, y, radio) {
+    const trazo = new Path2D(COPO);
+    COPOS_DEL_SELLO.forEach(([angulo, tam], i) => {
+      ctx.save();
+      ctx.translate(x + Math.cos(angulo) * (radio + 14), y + Math.sin(angulo) * (radio + 14));
+      ctx.rotate(i * 0.4);
+      ctx.scale(tam, tam);
+      ctx.translate(-12, -12);
+      ctx.strokeStyle = "#F3F6F4";
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.stroke(trazo);
+      ctx.restore();
+    });
+  }
+  /* La tira de "Mi semana" en navidad: un cable con un foquito por partido. Verde el acierto, rojo el
+     error y apagado el empate, cada uno con su resplandor. */
+  function focosEnLienzo(ctx, trazos, x0, ancho, y) {
+    const paso = ancho / Math.max(trazos.length, 1);
+    const color = { ok: ["#2BD67B", "#11884A", "rgba(43,214,123,.55)"], mal: ["#FF3B47", "#B3121F", "rgba(255,59,71,.6)"] };
+    ctx.save();
+    ctx.strokeStyle = "#566a5e";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    trazos.forEach((_, i) => {
+      const a = x0 + i * paso;
+      if (i === 0) ctx.moveTo(a, y);
+      ctx.quadraticCurveTo(a + paso / 2, y + 22, a + paso, y);
+    });
+    ctx.stroke();
+    const r = Math.min(paso * 0.24, 13);
+    trazos.forEach((tipo, i) => {
+      const cx = x0 + i * paso + paso / 2, cy = y + 11 + r * 1.5;
+      const [c, c2, g] = color[tipo] || ["#39433e", "#262d29", null];
+      if (g) {
+        const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 3.2);
+        halo.addColorStop(0, g);
+        halo.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = halo;
+        ctx.fillRect(cx - r * 3.2, cy - r * 3.2, r * 6.4, r * 6.4);
+      }
+      const vidrio = ctx.createRadialGradient(cx - r * 0.3, cy - r * 0.45, r * 0.1, cx, cy, r * 1.45);
+      vidrio.addColorStop(0, g ? "#ffffff" : "rgba(255,255,255,.3)");
+      vidrio.addColorStop(0.35, c);
+      vidrio.addColorStop(1, c2);
+      ctx.fillStyle = vidrio;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r, r * 1.45, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#59605c";
+      ctx.fillRect(cx - r * 0.55, cy - r * 1.45 - r * 0.7, r * 1.1, r * 0.8);
+    });
+    ctx.restore();
+  }
+  // El sello de la boleta en una semana de fiesta: aro, letras, anillo, figura y adornos alrededor.
+  const SELLOS = {
+    "accion-de-gracias": { aro: "#F2A541", letra: "#F6C85F", anillo: "ACCIÓN DE GRACIAS", figura: PAVO, adornos: hojasEnLienzo },
+    navidad: { aro: "#D7263D", letra: "#ffd60a", anillo: "FELICES FIESTAS", figura: ARBOL, adornos: coposEnLienzo },
+  };
   async function imagenDeSvg(svg, lado) {
     const conTamano = svg.replace("<svg ", '<svg width="' + lado + '" height="' + lado + '" ');
     const url = URL.createObjectURL(new Blob([conTamano], { type: "image/svg+xml" }));
@@ -2095,7 +2294,6 @@ try {
       URL.revokeObjectURL(url);
     }
   }
-
   /* ═══ encabezado ═══ */
   /* "En vivo" solo cuando de verdad se está jugando algo. Una semana a medias
      un viernes está en curso, no en vivo: antes se encendía en rojo toda la
@@ -2127,13 +2325,15 @@ try {
     const gane = jugador !== null && (s.ganadores || []).includes(jugador);
     if (!gane) return;
     guardar("angabave.confeti." + s.n, "1");
-    const otono = !!D.fiesta && s.n === D.fiesta.semana;   // quien gana esa semana, con hojas
+    const fiesta = fiestaDeSemana(s.n);   // quien gana una semana de fiesta, con sus colores
+    const otono = !!fiesta && fiesta.clave === "accion-de-gracias";
+    const paleta = fiesta ? (otono ? OTONO : NAVIDAD) : null;
     const lluvia = crear("div", "confetis");
     lluvia.setAttribute("aria-hidden", "true");
     for (let i = 0; i < (gane ? 70 : 40); i++) {
       const p = crear("i", "confeti" + (otono ? (i % 2 ? " arce" : " roble") : ""));
       p.style.left = Math.random() * 100 + "%";
-      p.style.background = otono ? OTONO[i % OTONO.length] : i % 5 === 4 ? "var(--acento)" : COLORES[i % COLORES.length];
+      p.style.background = paleta ? paleta[i % paleta.length] : i % 5 === 4 ? "var(--acento)" : COLORES[i % COLORES.length];
       p.style.setProperty("--d", (2.4 + Math.random() * 1.8).toFixed(2) + "s");
       p.style.setProperty("--x", Math.round(Math.random() * 160 - 80) + "px");
       p.style.setProperty("--r", Math.round(Math.random() * 900 - 450) + "deg");
@@ -2282,7 +2482,7 @@ try {
     const juegos = todosLosJuegos(s).map((p, i) => ({ p, i }));
     const { mios, enVivo, porJugar, jugados } = gruposDeLaSemana(juegos, equipo);
     const fiesta = fiestaActual();
-    const plato = fiesta && s.n === fiesta.semana ? platoDeFiesta : null;
+    const plato = fiesta && fiesta.clave === "accion-de-gracias" && fiesta.semanas.includes(s.n) ? platoDeFiesta : null;
 
     // Arriba lo que se está jugando y luego lo que falta. Lo ya jugado queda abajo,
     // del más reciente al más viejo, porque es consulta, no expectativa.
@@ -2955,13 +3155,14 @@ try {
     ctx.fillText("QUINIELA NFL " + D.anio, ANCHO - MARGEN, 74);
     ctx.textAlign = "left";
 
-    // El sello dorado con la semana, como boleta oficial. El de Acción de Gracias, de otoño y con pavo.
+    // El sello dorado con la semana, como boleta oficial. En una semana de fiesta, con sus colores y adornos.
     const radio = semana === null ? 0 : 92;
-    const deFiesta = semana !== null && !!D.fiesta && semana === D.fiesta.semana;
+    const fiestaDelSello = semana !== null ? fiestaDeSemana(semana) : null;
+    const deFiesta = fiestaDelSello ? SELLOS[fiestaDelSello.clave] : null;
     if (semana !== null) {
       const sx = ANCHO - MARGEN - radio, sy = CAMPO - 148;
       if (deFiesta) {
-        try { hojasEnLienzo(ctx, sx, sy, radio); } catch (e) { /* sin hojas, el sello sigue */ }
+        try { deFiesta.adornos(ctx, sx, sy, radio); } catch (e) { /* sin adornos, el sello sigue */ }
       }
       ctx.save();
       ctx.translate(sx, sy);
@@ -2970,18 +3171,18 @@ try {
       ctx.beginPath();
       ctx.arc(0, 0, radio, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = deFiesta ? "#F2A541" : "#ffd60a";
+      ctx.strokeStyle = deFiesta ? deFiesta.aro : "#ffd60a";
       ctx.lineWidth = 4;
       ctx.stroke();
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(0, 0, radio - 13, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.fillStyle = deFiesta ? "#F6C85F" : "#ffd60a";
+      ctx.fillStyle = deFiesta ? deFiesta.letra : "#ffd60a";
       ctx.textAlign = "center";
       ctx.font = cuerpo(800, 13);
       espaciado(0);
-      const anillo = (deFiesta ? "ACCIÓN DE GRACIAS · ANGABAVE · " : "PICKS OFICIALES · ANGABAVE · ") + D.anio + " · ";
+      const anillo = (deFiesta ? deFiesta.anillo : "PICKS OFICIALES") + " · ANGABAVE · " + D.anio + " · ";
       for (let i = 0; i < anillo.length; i++) {
         ctx.save();
         ctx.rotate((i / anillo.length) * Math.PI * 2);
@@ -2993,7 +3194,7 @@ try {
       ctx.font = rotulo(58);
       ctx.fillText(String(semana), 0, 44);
       if (deFiesta) {
-        try { ctx.drawImage(await imagenDeSvg(PAVO, 136), -17, -60, 34, 34); } catch (e) { /* sin pavo, el sello sigue */ }
+        try { ctx.drawImage(await imagenDeSvg(deFiesta.figura, 136), -17, -60, 34, 34); } catch (e) { /* sin figura, el sello sigue */ }
       }
       ctx.restore();
       ctx.textAlign = "left";
@@ -4565,10 +4766,7 @@ try {
     const fecha = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
     const filaFecha = crear("div", "fecha", fecha.charAt(0).toUpperCase() + fecha.slice(1));
     const fiesta = fiestaActual();
-    if (fiesta) {
-      const elDia = mismoDia(Date.parse(fiesta.dia + "T12:00:00"), Date.now());
-      caja.appendChild(listonDeFiesta(elDia ? "Feliz Día de Acción de Gracias" : "Semana de Acción de Gracias"));
-    }
+    if (fiesta) caja.appendChild(listonDeFiesta(fiesta, textoDeFiesta(fiesta, Date.now())));
     caja.appendChild(filaFecha);
     // Para ver el gol de campo cuando quieras: solo con nombre y sin movimiento reducido.
     const g = jugador !== null ? generalPorIdx.get(jugador) : null;
@@ -4758,7 +4956,7 @@ try {
         const nombreEq = crear("span", "eq fila-con-marca");
         nombreEq.appendChild(crear("span", "fila-nombre", eq));
         if (terminado && palabras.tono !== "neutro") {
-          nombreEq.appendChild(crear("span", "fila-marca", palabras.tono === "bien" ? "✓" : "✕"));
+          nombreEq.appendChild(crear("span", "fila-marca " + (palabras.tono === "bien" ? "bien" : "mal"), palabras.tono === "bien" ? "✓" : "✕"));
         }
         if (conBalon) nombreEq.appendChild(balon());
         l.appendChild(nombreEq);
@@ -4884,7 +5082,8 @@ try {
         ctx.beginPath();
         if (ctx.roundRect) ctx.roundRect(x, y, ancho, h, r); else ctx.rect(x, y, ancho, h);
       };
-      trazos.forEach((tipo, i) => {
+      if ((fiestaDeSemana(s.n) || {}).clave === "navidad") focosEnLienzo(ctx, trazos, MARGEN, ANCHO - MARGEN * 2, TIRA);
+      else trazos.forEach((tipo, i) => {
         const x = MARGEN + i * (w + sep);
         if (tipo === "ok") { ctx.fillStyle = "#34d680"; caja(x, TIRA, w, 40, 8); ctx.fill(); }
         else if (tipo === "x") { ctx.fillStyle = "#5b6661"; caja(x, TIRA, w, 40, 8); ctx.fill(); }
@@ -5426,7 +5625,7 @@ try {
     if (vivos && ultimaConsulta) estado.title = "Última consulta " + ultimaConsulta.toLocaleTimeString("es-MX");
     fila.appendChild(estado);
     const fiesta = fiestaActual();
-    if (fiesta && n === fiesta.semana) fila.appendChild(listonDeFiesta("Acción de Gracias", true));
+    if (fiesta && fiesta.semanas.includes(n)) fila.appendChild(listonDeFiesta(fiesta, NOMBRE_FIESTA[fiesta.clave], true));
     if (n !== D.activa && porSemana.has(D.activa)) {
       const volver = crear("button", "volver-actual", "Ir a la semana " + D.activa);
       volver.type = "button";
@@ -6683,11 +6882,11 @@ try {
   window.addEventListener("online", revisarVersion);
   revisarVersion();
 
-  /* La semana de Acción de Gracias entra y se va sola, aunque la página siga abierta. */
-  let hayFiesta = aplicarFiesta();
+  /* Las fiestas entran y se van solas, aunque la página siga abierta. */
+  let fiestaPuesta = aplicarFiesta();
   setInterval(() => {
     const ahora = aplicarFiesta();
-    if (ahora !== hayFiesta) { hayFiesta = ahora; repintarSinEstorbar(); }
+    if (ahora !== fiestaPuesta) { fiestaPuesta = ahora; repintarSinEstorbar(); }
   }, 60000);
 
   /* sw.js se registra con la página ya a la vista, para no competirle a lo que falta por llegar.
