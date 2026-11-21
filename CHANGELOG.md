@@ -9,6 +9,11 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.43.1
+
+* Los regalos de la general ya no llevan iniciales: confundían. Si ya dijiste quién eres, tu regalo va hasta arriba de su pila, con el borde resaltado y una etiqueta con el color de tu equipo que dice "Tú". En computadora, al pasar el cursor sobre un regalo sale de quién es y sus aciertos.
+* **Mucho más grande en el teléfono.** La gráfica de regalos se parte en dos repisas: arriba los puntajes más altos, con toda la zona de premio y el que está "a 1"; abajo, los demás. Los regalos y los números quedan al 160 % de su tamaño y los puntajes sin nadie ocupan media columna y no llevan número. En computadora sigue en una sola fila, al mismo tamaño grande.
+
 ## v0.43.0
 
 * **La general en navidad: un regalo por persona.** En las semanas navideñas, la gráfica de la general es una fila de regalos con las iniciales de cada quien. La zona de premio es una zona de anotación, con su línea de gol, sus pilones y "PREMIO" pintado: los que están adentro cobran si la temporada terminara hoy. Arriba cuelga una serie: prenden los focos de quien cobra, en oro, plata o bronce según su lugar, y el de justo afuera queda tibio y dice "a 1".

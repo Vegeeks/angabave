@@ -50,8 +50,8 @@ def _acomodo(casos: list[tuple[list[dict], float, int]]) -> list[dict]:
     guion = f"""{codigo}
     console.log(JSON.stringify({json.dumps(casos)}.map(([gente, ancho, entrada]) => {{
       const a = regalosDeLaGeneral(gente, ancho, entrada);
-      return {{ alto: a.alto, base: a.base, k: a.k, zona: a.zona, a1: a.a1, premio: a.premio, cajas: a.cajas,
-        piezas: a.piezas.map((p) => ({{ total: p.g.total, pos: p.g.pos, yo: p.g.yo, tipo: p.tipo, medalla: p.medalla, x: p.x }})),
+      return {{ alto: a.alto, repisas: a.repisas, k: a.k, zona: a.zona, a1: a.a1, tu: a.tu, premio: a.premio, cajas: a.cajas,
+        piezas: a.piezas.map((p) => ({{ total: p.g.total, pos: p.g.pos, yo: p.g.yo, tipo: p.tipo, medalla: p.medalla, x: p.x, y: p.y }})),
         focos: a.focos, numeros: a.numeros }};
     }})));"""
     r = subprocess.run(["node", "-e", guion], capture_output=True, text=True)
@@ -110,8 +110,9 @@ def test_nada_se_encima_con_datos_dificiles():
         # Todo cabe en el dibujo: nada se sale por los lados ni por abajo.
         assert all(c["x0"] >= 0 and c["x1"] <= ancho and c["y0"] >= 0 and c["y1"] <= a["alto"] for c in a["cajas"])
         assert len(a["piezas"]) == len(gente)
-    # La pila de nueve no se aplasta: la gráfica crece.
-    assert _acomodo([(_gente(larga, cobran_desde=100), 358, 100)])[0]["alto"] > _acomodo([(_gente(REAL, cobran_desde=103), 358, 103)])[0]["alto"]
+    # La pila de nueve no se aplasta: la gráfica crece (contra las mismas columnas con pilas bajitas).
+    alta, baja = _acomodo([(_gente(larga, cobran_desde=100), 358, 100), (_gente({90: 1, 95: 2, 100: 2, 101: 1}, cobran_desde=100), 358, 100)])
+    assert alta["alto"] > baja["alto"]
 
 
 @con_node
@@ -122,6 +123,43 @@ def test_tu_regalo_sigue_la_escalera_y_sin_premio_no_hay_carbon_de_mas():
     # Si todos cobran, no hay escalera: todos de lujo, sin carbón y sin "a 1".
     [b] = _acomodo([(_gente({100: 3, 101: 2}, cobran_desde=100), 358, 100)])
     assert {p["tipo"] for p in b["piezas"]} <= {"oro", "plata", "bronce"} and b["a1"] is None
+
+
+@con_node
+def test_sin_letras_y_tu_regalo_con_su_etiqueta():
+    # Tú, empatado en la punta (uno de los dos de 104): tu regalo va hasta arriba de su pila y la etiqueta
+    # "Tú" queda dentro de la zona de premio, sin tocar nada.
+    [a, sin_nombre] = _acomodo([(_gente(REAL, yo=1, cobran_desde=103), 358, 103), (_gente(REAL, cobran_desde=103), 358, 103)])
+    de_104 = [p for p in a["piezas"] if p["total"] == 104]
+    assert de_104[-1]["yo"] and min(p["y"] for p in de_104) == de_104[-1]["y"]
+    assert a["tu"] is not None and a["zona"]["x0"] < a["tu"]["x"] < a["zona"]["x1"]
+    [caja_tu] = [c for c in a["cajas"] if c["q"] == "tú"]
+    assert caja_tu["y0"] >= a["zona"]["y0"]
+    assert _choques(a["cajas"]) == []
+    # Sin decir quién eres, no hay etiqueta ni borde para nadie.
+    assert sin_nombre["tu"] is None
+    texto = _texto()
+    # Las envolturas ya no llevan letras: confundían más de lo que ayudaban.
+    assert "g.ini" not in texto and "etiquetaSvg" not in texto
+    assert "iniciales(" not in _funcion(texto, "pintarCampoGeneral")
+    dibujo = _funcion(texto, "dibujoDeRegalos")
+    assert '>Tú</text>' in dibujo and "if (a.tu) {" in dibujo
+    # El nombre de cada quien solo sale al pasar el cursor (en computadora).
+    assert "'<title>' + textoSvg(pz.g.nombre" in dibujo
+
+
+@con_node
+def test_en_el_telefono_se_parte_en_repisas_y_todo_se_ve_grande():
+    telefono, chico, compu = _acomodo([(_gente(REAL, cobran_desde=103), 358, 103), (_gente(REAL, cobran_desde=103), 288, 103),
+                                       (_gente(REAL, cobran_desde=103), 640, 103)])
+    # En el teléfono, dos repisas y regalos al tamaño grande (1.6 veces el de referencia); en computadora, una.
+    assert (telefono["repisas"], chico["repisas"], compu["repisas"]) == (2, 2, 1)
+    assert telefono["k"] == 1.6 and chico["k"] >= 1.5 and compu["k"] == 1.6
+    # La repisa de arriba lleva toda la zona de premio y al que está "a 1".
+    assert telefono["zona"] is not None and telefono["a1"] is not None
+    assert _choques(telefono["cajas"]) == [] and _choques(chico["cajas"]) == []
+    # La zona dice PREMIO aunque el teléfono sea chico.
+    assert telefono["premio"]["texto"] == chico["premio"]["texto"] == "PREMIO"
 
 
 def test_la_general_se_viste_solo_en_navidad():
@@ -140,5 +178,5 @@ def test_la_general_se_viste_solo_en_navidad():
     assert 'grupo.dataset.medalla = MEDALLA_DE_LUGAR[Math.min(Math.max(g.pos, 1), 3)];' in campo
     assert 'html[data-fiesta="navidad"] .campo-gral-grupo{' in texto and ".campo-gral-lugar{display:none}" in texto
     assert "@media (prefers-reduced-motion:reduce){.rg-prendido,.rg-tibio{animation:none}}" in texto
-    # Las iniciales vienen del nombre: se escapan antes de entrar al SVG.
+    # Los nombres (del cursor) se escapan antes de entrar al SVG.
     assert 'const textoSvg = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");' in texto
