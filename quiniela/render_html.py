@@ -86,7 +86,7 @@ DESARROLLADOR = "Angel Barrera"
 #:   PARCHE sube con correcciones
 #:   MAYOR  llega a 1 cuando la temporada corra completa sin intervención
 ETAPA = "alfa"
-VERSION = "v0.41.0"
+VERSION = "v0.42.0"
 
 #: Dos colores por equipo, aclarados para leerse sobre fondo oscuro: el de casa
 #: y el de visita. El portal se tiñe con uno u otro según dónde juegue el
@@ -124,6 +124,47 @@ COLORES_EQUIPO: dict[str, dict[str, str]] = {
     "Buccaneers": {"local": "#FF3535", "visita": "#C6853F"},
     "Titans":     {"local": "#67A9E8", "visita": "#6D8FE8"},
     "Washington": {"local": "#C8656B", "visita": "#FFC547"},
+}
+
+
+#: Los focos de navidad de cada equipo: 3 o 4 colores ya "prendidos" (un azul marino o un negro no se
+#: ven como foco sobre el campo de noche, así que van en su tono encendido). Salen del uniforme de
+#: local y de visita, de los alternos y clásicos y del logo, para que ningún equipo quede con una
+#: serie triste. Se escogieron a mano; las pruebas solo vigilan que todos se vean prendidos y que no
+#: se repitan dentro de un equipo.
+FOCOS_EQUIPO: dict[str, list[str]] = {
+    "Cardinals":  ["#FF3048", "#FFFFFF", "#FFC72C"],              # rojo, blanco y el amarillo del pico
+    "Falcons":    ["#FF3848", "#FFFFFF", "#D5DADF"],              # rojo, blanco y plata
+    "Ravens":     ["#8C6BFF", "#F2C14E", "#FFFFFF", "#FF3B4E"],   # morado, oro y el rojo del escudo de Maryland
+    "Bills":      ["#3D7BFF", "#FFFFFF", "#FF3348", "#6EC1FF"],   # azul, rojo y el azul claro de 1960
+    "Panthers":   ["#1FAAF5", "#FFFFFF", "#C9D1D8", "#7FD3FF"],   # azul pantera, plata y celeste
+    "Bears":      ["#FF6A1F", "#FFFFFF", "#4F7DFF", "#FFB066"],   # naranja, azul marino encendido
+    "Bengals":    ["#FF6A1F", "#FFFFFF", "#FFA54A", "#FFD18F"],   # naranja de tigre en tres tonos
+    "Browns":     ["#FF5A1F", "#FFFFFF", "#C98652", "#FFB07A"],   # naranja y el café encendido, cobre
+    "Cowboys":    ["#3D7BFF", "#FFFFFF", "#C9D1D8", "#8FB8FF"],   # azul real del de Acción de Gracias, plata
+    "Broncos":    ["#FF6A1F", "#FFFFFF", "#3D7BFF", "#FFA54A"],   # naranja y el azul real del Orange Crush
+    "Lions":      ["#1E9BFF", "#FFFFFF", "#C9D1D8", "#7FC8FF"],   # azul Honolulu y plata
+    "Packers":    ["#2FA864", "#FFC72C", "#FFFFFF", "#8EDCA5"],   # verde, oro y verde claro
+    "Texans":     ["#FF3349", "#FFFFFF", "#4F7DFF", "#33B8F0"],   # rojo, azul y el azul H-Town
+    "Colts":      ["#3D8BFF", "#FFFFFF", "#9CCBFF", "#C9D1D8"],   # azul, blanco, celeste y plata
+    "Jaguars":    ["#14B8C8", "#F2C14E", "#FFFFFF", "#6FDDE6"],   # verde azulado y oro
+    "Chiefs":     ["#FF2A44", "#FFC72C", "#FFFFFF"],              # rojo y oro
+    "Chargers":   ["#33A9FF", "#FFC72C", "#FFFFFF", "#8AD3FF"],   # azul polvo y oro sol
+    "Rams":       ["#3D7BFF", "#FFC21A", "#FFFFFF", "#8FB8FF"],   # azul real y amarillo sol
+    "Raiders":    ["#D9DEE3", "#FFFFFF", "#E8B84A", "#A9B1B6"],   # plata y el oro de los Raiders de 1960
+    "Dolphins":   ["#13D3D9", "#FF6A1A", "#FFFFFF", "#2EA6C9"],   # agua, naranja y azul marino encendido
+    "Vikings":    ["#8C5CFF", "#FFC72C", "#FFFFFF", "#B79BFF"],   # morado, oro y lila
+    "Patriots":   ["#FF3348", "#FFFFFF", "#4F7DFF", "#C9D1D8"],   # rojo del Pat Patriot, azul y plata
+    "Saints":     ["#E8C77A", "#FFFFFF", "#FFD166"],              # oro viejo, blanco y oro brillante
+    "Giants":     ["#4F7DFF", "#FF3348", "#FFFFFF", "#C9D1D8"],   # azul real, rojo y gris
+    "Jets":       ["#22B566", "#FFFFFF", "#86E3AE", "#FFC72C"],   # verde, menta y el oro de los Titans de 1960
+    "Eagles":     ["#2ECC71", "#FFFFFF", "#1FA59A", "#C9D1D8"],   # verde Kelly, verde medianoche y plata
+    "Steelers":   ["#FFC72C", "#FFFFFF", "#FF3B47", "#3D7BFF"],   # oro y los tres colores del logo
+    "49ers":      ["#FF3B35", "#E2C27A", "#FFFFFF"],              # escarlata y oro
+    "Seahawks":   ["#7CD63A", "#FFFFFF", "#4F7DFF", "#C9D1D8"],   # verde acción, azul y gris lobo
+    "Buccaneers": ["#FF2A2A", "#FF8A1F", "#FFFFFF", "#BFB5A8"],   # rojo, el naranja clásico y peltre
+    "Titans":     ["#4BA3F0", "#FF3348", "#FFFFFF", "#A7D8FF"],   # azul Titans, rojo y el celeste de los Oilers
+    "Washington": ["#D8395A", "#FFC72C", "#FFFFFF", "#FFE08A"],   # vino encendido y oro
 }
 
 
@@ -1474,6 +1515,8 @@ def generar_html(
         "recordatorio": plan_recordatorio,
         # Acción de Gracias y navidad: cuándo se viste el portal y qué semanas llevan su boleta.
         "fiestas": _fiestas(semanas, anio),
+        # Los focos de navidad de cada equipo, para la serie de quien eligió el suyo.
+        "focos": FOCOS_EQUIPO,
         # Capa en vivo: el navegador consulta ESPN directo. Solo refresca el
         # marcador de partidos que aquí siguen abiertos; jamás cierra uno ni
         # toca el conteo oficial, que se calcula en CI y ya está probado.

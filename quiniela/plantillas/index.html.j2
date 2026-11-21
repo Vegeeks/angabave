@@ -1523,6 +1523,7 @@ try {
       equipo = selEquipo.value || null;
       guardar("angabave.equipo", equipo);
       aplicarTema();
+      aplicarFiesta();
       pintarIdentidad();
       repintar();
     });
@@ -2159,14 +2160,26 @@ try {
     });
     return capa;
   }
+  // Un foco a partir de su color: la orilla, 35 % más oscura, y el resplandor, el mismo color a media luz.
+  function focoDe(hex) {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    const oscuro = "#" + [r, g, b].map((x) => Math.round(x * 0.65).toString(16).padStart(2, "0")).join("");
+    return [hex, oscuro, "rgba(" + r + "," + g + "," + b + ",.5)"];
+  }
+  // De qué equipo es la serie: el tuyo si tiene focos propios (D.focos, escogidos a mano en Python); si no, nadie.
+  const equipoDeLuces = () => (equipo && D.focos && D.focos[equipo] ? equipo : "");
   // La serie de focos que cuelga de la línea amarilla en navidad: prenden y bajan uno tras otro, sin parar.
-  // Tantos como quepan en lo más ancho de la pantalla, para que al girar el teléfono no falten.
+  // Con equipo, va con sus colores; sin equipo, la clásica. Tantos focos como quepan en lo más ancho de la
+  // pantalla, para que al girar el teléfono no falten.
   function lucesDeNavidad() {
     const serie = crear("div", "fiesta-luces");
     serie.setAttribute("aria-hidden", "true");
+    const suyo = equipoDeLuces();
+    const colores = suyo ? D.focos[suyo].map(focoDe) : FOCOS;
+    serie.dataset.equipo = suyo;
     const cuantos = Math.ceil(Math.max(window.innerWidth, screen.width || 0, screen.height || 0) / 28) + 1;
     for (let k = 0; k < cuantos; k++) {
-      const [c, c2, g] = FOCOS[k % FOCOS.length];
+      const [c, c2, g] = colores[k % colores.length];
       const foco = crear("i", "foco");
       foco.style.cssText = "left:" + (14 + 28 * k) + "px;--c:" + c + ";--c2:" + c2 + ";--g:" + g + ";--t:" + (-(k % 8) * 0.15).toFixed(2) + "s";
       serie.appendChild(foco);
@@ -2191,6 +2204,9 @@ try {
       cancha.appendChild(capaDeFiesta(f));
       if (f.clave === "navidad") cancha.after(lucesDeNavidad());
     }
+    // Si cambiaste de equipo, la serie se vuelve a colgar con sus colores.
+    const luces = document.querySelector(".fiesta-luces");
+    if (luces && luces.dataset.equipo !== equipoDeLuces()) luces.replaceWith(lucesDeNavidad());
     return f.clave;
   }
   function listonDeFiesta(f, texto, chico) {

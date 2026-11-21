@@ -9,6 +9,11 @@ Esquema: `alfa vMAYOR.MENOR.PARCHE`
 La versión se muestra junto a la marca en el portal y vive en
 `quiniela/render_html.py` (`VERSION`).
 
+## v0.42.0
+
+* **Los focos de navidad con los colores de tu equipo.** Si elegiste equipo, la serie que cuelga de la línea amarilla prende con sus colores: tres o cuatro por equipo, escogidos a mano de su uniforme de local y de visita, de los alternos y clásicos y del logo (el oro de los Raiders de 1960, el rojo y el azul del logo de los Steelers, el celeste de los Oilers para los Titans). Los colores oscuros, como el azul marino o el café, van en su tono encendido para que se vean como foco. Sin equipo, la serie sigue siendo la clásica de colores, y si cambias de equipo cambia al momento.
+* Los foquitos de tus aciertos y errores siguen verdes y rojos.
+
 ## v0.41.0
 
 * **Navidad hasta año nuevo.** Desde hoy y hasta la mañana del 2 de enero, menos la semana de Acción de Gracias, el portal se viste de navidad: nieve que no para de caer sobre el campo, estrellas que destellan en el cielo del estadio, gorro de Santa en la A, nieve sobre tu barra, la zona de anotación de rojo y una serie de focos de colores colgada de la línea amarilla que prenden uno tras otro.

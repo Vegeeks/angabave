@@ -260,3 +260,68 @@ def test_en_navidad_los_aciertos_y_errores_son_foquitos():
 def test_python_manda_las_fiestas_al_navegador():
     fuente = (RAIZ / "quiniela" / "render_html.py").read_text(encoding="utf-8")
     assert '"fiestas": _fiestas(semanas, anio),' in fuente
+
+
+# --- los focos de cada equipo ---------------------------------------------------
+
+def _rgb(h):
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
+def _lineal(c):
+    c /= 255
+    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+
+def _luminancia(h):
+    r, g, b = (_lineal(x) for x in _rgb(h))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def _lab(h):
+    r, g, b = (_lineal(x) for x in _rgb(h))
+    x = (r * .4124 + g * .3576 + b * .1805) / .95047
+    y = r * .2126 + g * .7152 + b * .0722
+    z = (r * .0193 + g * .1192 + b * .9505) / 1.08883
+    f = lambda t: t ** (1 / 3) if t > 216 / 24389 else (24389 / 27 * t + 16) / 116
+    return 116 * f(y) - 16, 500 * (f(x) - f(y)), 200 * (f(y) - f(z))
+
+
+def test_cada_equipo_tiene_una_serie_que_se_ve_prendida_y_con_color():
+    import colorsys
+    import math
+
+    from quiniela.render_html import COLORES_EQUIPO, FOCOS_EQUIPO
+
+    assert set(FOCOS_EQUIPO) == set(COLORES_EQUIPO)
+    for equipo, colores in FOCOS_EQUIPO.items():
+        assert 3 <= len(colores) <= 4, equipo
+        assert all(re.fullmatch(r"#[0-9A-F]{6}", c) for c in colores), equipo
+        # Un foco apagado no adorna: nada de azul marino, negro o café tal cual.
+        assert min(_luminancia(c) for c in colores) >= 0.14, equipo
+        # Dentro de un equipo, que no haya dos focos que se confundan.
+        assert all(math.dist(_lab(a), _lab(b)) >= 12 for i, a in enumerate(colores) for b in colores[i + 1:]), equipo
+        # Y al menos uno con color de verdad, no solo blanco y plata.
+        hsl = [colorsys.rgb_to_hls(*(x / 255 for x in _rgb(c))) for c in colores]
+        assert any(s >= .5 and l <= .78 for _, l, s in hsl), equipo
+
+
+@con_node
+def test_el_foco_se_arma_con_su_color():
+    texto = _texto()
+    salida = subprocess.run(["node", "-e", _funcion(texto, "focoDe") + 'console.log(JSON.stringify(focoDe("#FF3348")));'],
+                            capture_output=True, text=True)
+    assert json.loads(salida.stdout) == ["#FF3348", "#a6212f", "rgba(255,51,72,.5)"]
+
+
+def test_la_serie_va_con_los_colores_de_tu_equipo():
+    texto = _texto()
+    luces = _funcion(texto, "lucesDeNavidad")
+    assert "const colores = suyo ? D.focos[suyo].map(focoDe) : FOCOS;" in luces
+    # Al cambiar de equipo la serie se vuelve a colgar, sin esperar.
+    assert "luces.replaceWith(lucesDeNavidad());" in _funcion(texto, "aplicarFiesta")
+    assert 'guardar("angabave.equipo", equipo);\n      aplicarTema();\n      aplicarFiesta();' in texto
+    # Los foquitos de aciertos y errores no cambian: siguen verdes y rojos.
+    assert 'html[data-fiesta="navidad"] .progreso-semana :is(.ok,.gana){--c:#2BD67B;' in texto
+    fuente = (RAIZ / "quiniela" / "render_html.py").read_text(encoding="utf-8")
+    assert '"focos": FOCOS_EQUIPO,' in fuente
