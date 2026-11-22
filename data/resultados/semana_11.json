@@ -39,9 +39,9 @@
       "local": "Panthers",
       "marcador_visitante": 33,
       "marcador_local": 35,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "ganador": "Panthers",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-22T18:00:00+00:00",
       "hora_definida": true
     },
