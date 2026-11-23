@@ -2,14 +2,14 @@
   "semana": 11,
   "partidos": [
     {
-      "visitante": "Jaguars",
-      "local": "Giants",
-      "marcador_visitante": 18,
-      "marcador_local": 23,
-      "ganador": "Giants",
+      "visitante": "Vikings",
+      "local": "49ers",
+      "marcador_visitante": 10,
+      "marcador_local": 35,
+      "ganador": "49ers",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-11-22T21:25:00+00:00",
+      "inicio": "2026-11-23T01:20:00+00:00",
       "hora_definida": true
     },
     {
@@ -112,14 +112,14 @@
       "hora_definida": true
     },
     {
-      "visitante": "Vikings",
-      "local": "49ers",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-23T01:20:00+00:00",
+      "visitante": "Jaguars",
+      "local": "Giants",
+      "marcador_visitante": 18,
+      "marcador_local": 23,
+      "ganador": "Giants",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-22T21:25:00+00:00",
       "hora_definida": true
     },
     {
