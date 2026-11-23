@@ -2,32 +2,21 @@
   "semana": 11,
   "partidos": [
     {
-      "visitante": "Jets",
-      "local": "Chargers",
-      "marcador_visitante": 27,
-      "marcador_local": 24,
-      "ganador": "Jets",
-      "finalizado": true,
-      "estado": "Final",
-      "inicio": "2026-11-22T21:05:00+00:00",
-      "hora_definida": true
-    },
-    {
       "visitante": "Raiders",
       "local": "Broncos",
-      "marcador_visitante": 17,
-      "marcador_local": 24,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "In Progress",
+      "marcador_visitante": 24,
+      "marcador_local": 38,
+      "ganador": "Broncos",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-22T21:25:00+00:00",
       "hora_definida": true
     },
     {
       "visitante": "Jaguars",
       "local": "Giants",
-      "marcador_visitante": 6,
-      "marcador_local": 20,
+      "marcador_visitante": 18,
+      "marcador_local": 23,
       "ganador": null,
       "finalizado": false,
       "estado": "In Progress",
@@ -109,6 +98,17 @@
       "finalizado": true,
       "estado": "Final",
       "inicio": "2026-11-22T18:00:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Jets",
+      "local": "Chargers",
+      "marcador_visitante": 27,
+      "marcador_local": 24,
+      "ganador": "Jets",
+      "finalizado": true,
+      "estado": "Final",
+      "inicio": "2026-11-22T21:05:00+00:00",
       "hora_definida": true
     },
     {
