@@ -211,7 +211,7 @@
   },
   "11": {
     "archivo": "Semana_11.xlsx",
-    "sellado": "2026-11-22T21:25:29+00:00",
+    "sellado": "2026-11-23T01:21:05+00:00",
     "partidos": {
       "Buccaneers@Lions": "799a6d645503797ebd462958ea47498b251b95398d86b5b69a28207d355c598a",
       "Cardinals@Chiefs": "687f3260acc2c50ec0474a33c310ebee018bb3f982888f2f484616eb4390f7ce",
@@ -223,7 +223,8 @@
       "Ravens@Panthers": "ad7ed1aa55b7fec9bef66796551c867e7b901c794c4078d9cbcff14f856d90c8",
       "Saints@Bears": "90b1b362e5cea60bff3ce5615be0bc94c4a4dfd42518c37834589b4a36aafb68",
       "Steelers@Eagles": "19ee15a2501a2e829908453264808ddda460f83759c0e55af3b2e122a70d853a",
-      "Titans@Cowboys": "c4aa1ff1891f7ff1c0254ad2d633e11446ca716d15f5a9074ff45c598afd79a8"
+      "Titans@Cowboys": "c4aa1ff1891f7ff1c0254ad2d633e11446ca716d15f5a9074ff45c598afd79a8",
+      "Vikings@49ers": "9ff120b1cc8d2f8d6525898a665099568df863f4adf5a99166a1c3af69a56de2"
     }
   }
 }
