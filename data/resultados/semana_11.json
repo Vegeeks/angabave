@@ -5,10 +5,10 @@
       "visitante": "Bengals",
       "local": "Washington",
       "marcador_visitante": 10,
-      "marcador_local": 7,
+      "marcador_local": 10,
       "ganador": null,
       "finalizado": false,
-      "estado": "Delayed",
+      "estado": "In Progress",
       "inicio": "2026-11-24T01:15:00+00:00",
       "hora_definida": true
     },
