@@ -211,8 +211,9 @@
   },
   "11": {
     "archivo": "Semana_11.xlsx",
-    "sellado": "2026-11-23T01:21:05+00:00",
+    "sellado": "2026-11-24T01:16:07+00:00",
     "partidos": {
+      "Bengals@Washington": "e00545e1a566757e8eaa5257d02c3ab57220c93de138d5f2f2985a6918db5293",
       "Buccaneers@Lions": "799a6d645503797ebd462958ea47498b251b95398d86b5b69a28207d355c598a",
       "Cardinals@Chiefs": "687f3260acc2c50ec0474a33c310ebee018bb3f982888f2f484616eb4390f7ce",
       "Colts@Texans": "d175f4acea2c34782a83ee10b9c34df6d280034fe3e6b8b342a35c00ce1e71f9",
