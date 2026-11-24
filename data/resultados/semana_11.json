@@ -2,14 +2,25 @@
   "semana": 11,
   "partidos": [
     {
-      "visitante": "Vikings",
-      "local": "49ers",
+      "visitante": "Bengals",
+      "local": "Washington",
       "marcador_visitante": 10,
-      "marcador_local": 35,
-      "ganador": "49ers",
+      "marcador_local": 7,
+      "ganador": null,
+      "finalizado": false,
+      "estado": "Delayed",
+      "inicio": "2026-11-24T01:15:00+00:00",
+      "hora_definida": true
+    },
+    {
+      "visitante": "Colts",
+      "local": "Texans",
+      "marcador_visitante": 3,
+      "marcador_local": 26,
+      "ganador": "Texans",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-11-23T01:20:00+00:00",
+      "inicio": "2026-11-20T01:15:00+00:00",
       "hora_definida": true
     },
     {
@@ -123,25 +134,14 @@
       "hora_definida": true
     },
     {
-      "visitante": "Colts",
-      "local": "Texans",
-      "marcador_visitante": 3,
-      "marcador_local": 26,
-      "ganador": "Texans",
+      "visitante": "Vikings",
+      "local": "49ers",
+      "marcador_visitante": 10,
+      "marcador_local": 35,
+      "ganador": "49ers",
       "finalizado": true,
       "estado": "Final",
-      "inicio": "2026-11-20T01:15:00+00:00",
-      "hora_definida": true
-    },
-    {
-      "visitante": "Bengals",
-      "local": "Washington",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
-      "inicio": "2026-11-24T01:15:00+00:00",
+      "inicio": "2026-11-23T01:20:00+00:00",
       "hora_definida": true
     }
   ]
