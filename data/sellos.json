@@ -230,8 +230,9 @@
   },
   "12": {
     "archivo": "Semana_12.xlsx",
-    "sellado": "2026-11-26T01:01:07+00:00",
+    "sellado": "2026-11-26T18:15:09+00:00",
     "partidos": {
+      "Bears@Lions": "467d43fa92184bbb79d06d2f43893cf4cfaedeb537b7fa34e5c0cce63a736ad3",
       "Packers@Rams": "9fa2ab7f57fb74c04df8cff86ccba9539a4187cb810b762669cfd5c494e0e109"
     }
   }
