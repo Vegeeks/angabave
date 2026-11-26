@@ -230,7 +230,9 @@
   },
   "12": {
     "archivo": "Semana_12.xlsx",
-    "sellado": "2026-11-26T00:10:12+00:00",
-    "partidos": {}
+    "sellado": "2026-11-26T01:01:07+00:00",
+    "partidos": {
+      "Packers@Rams": "9fa2ab7f57fb74c04df8cff86ccba9539a4187cb810b762669cfd5c494e0e109"
+    }
   }
 }
