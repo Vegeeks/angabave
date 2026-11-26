@@ -4,11 +4,11 @@
     {
       "visitante": "Packers",
       "local": "Rams",
-      "marcador_visitante": 0,
-      "marcador_local": 0,
-      "ganador": null,
-      "finalizado": false,
-      "estado": "Scheduled",
+      "marcador_visitante": 13,
+      "marcador_local": 26,
+      "ganador": "Rams",
+      "finalizado": true,
+      "estado": "Final",
       "inicio": "2026-11-26T01:00:00+00:00",
       "hora_definida": true
     },
