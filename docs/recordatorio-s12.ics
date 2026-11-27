@@ -4,26 +4,6 @@ PRODID:-//ANGABAVE//Quiniela NFL//ES
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
-UID:angabave-s12-t1@vegeeks.github.io
-DTSTAMP:20261127T055900Z
-DTSTART:20261127T045900Z
-DTEND:20261127T055900Z
-SUMMARY:Cierran los picks · semana 12 (1 partido)
-DESCRIPTION:Manda tu imagen a quinielanfl@hotmail.com antes de las 23:59. h
- ttps://vegeeks.github.io/angabave/#picks
-URL:https://vegeeks.github.io/angabave/#picks
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Cierran los picks · semana 12 (1 partido)
-TRIGGER:-PT2H
-END:VALARM
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:Cierran los picks · semana 12 (1 partido)
-TRIGGER:PT0M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
 UID:angabave-s12-t2@vegeeks.github.io
 DTSTAMP:20261129T055900Z
 DTSTART:20261129T045900Z
